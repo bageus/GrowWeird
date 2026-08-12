@@ -23,7 +23,7 @@ static func load_state() -> GameState:
 	var raw := file.get_as_text()
 	file.close()
 	var parsed: Variant = JSON.parse_string(raw)
-	if not parsed is Dictionary:
+	if not (parsed is Dictionary):
 		push_error("Save file is not a valid JSON object")
 		return null
 	var migrated := SaveMigrator.migrate(parsed)
