@@ -25,6 +25,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/plant/phenotype_resolver.gd",
 		"res://src/presentation/plant/plant_visual_assembler.gd",
 		"res://src/presentation/inventory/inventory_panel.gd",
+		"res://src/presentation/inventory/genetic_item_preview.gd",
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
