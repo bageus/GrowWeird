@@ -21,6 +21,17 @@ extends Resource
 @export_range(1.0, 3600.0, 1.0) var fertilizer_offer_interval_seconds: float = 120.0
 @export_range(1, 6, 1) var fertilizer_offer_count: int = 3
 
+@export_group("Offline Progression")
+@export var offline_progression_enabled: bool = true
+@export var offline_environment_enabled: bool = true
+@export var offline_growth_enabled: bool = true
+@export var offline_health_enabled: bool = true
+@export var offline_death_enabled: bool = false
+@export var offline_fruiting_enabled: bool = true
+@export var offline_offers_enabled: bool = true
+@export_range(60.0, 604800.0, 60.0) var offline_max_seconds: float = 28800.0
+@export_range(1, 2000, 1) var offline_max_steps: int = 480
+
 @export_group("Economy")
 @export var starting_money: int = 200
 @export var fertilizer_skip_base_price: int = 50
@@ -35,3 +46,4 @@ extends Resource
 
 @export_group("Persistence")
 @export_range(1.0, 300.0, 1.0) var autosave_interval_seconds: float = 15.0
+@export_range(5.0, 300.0, 5.0) var cloud_save_interval_seconds: float = 45.0
