@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="PlantSpeciesDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/plant_species_definition.gd" id="1_species"]
+
+[resource]
+script = ExtResource("1_species")
+id = &"shade_fern"
+display_name_key = "plant.shade_fern"
+moisture_min = 0.5
+moisture_max = 0.85
+light_min = 0.12
+light_max = 0.45
+open_window_preference = 1
+moisture_decay_per_second = 0.00065
+base_growth_per_second = 0.0017
+fruiting_growth_threshold = 0.78
+fruit_ripen_seconds = 110.0
+fruit_base_value = 48
+base_sale_value = 145
+shop_seed_price = 160
+unlock_pot_count = 2
+wood_color = Color(0.24, 0.16, 0.12, 1)
+leaf_color = Color(0.16, 0.48, 0.32, 1)
+fruit_color = Color(0.40, 0.66, 0.58, 1)
