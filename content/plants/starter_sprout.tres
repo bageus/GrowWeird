@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PlantSpeciesDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/plant_species_definition.gd" id="1_species"]
+
+[resource]
+script = ExtResource("1_species")
+id = &"starter_sprout"
+display_name_key = "plant.starter_sprout"
+moisture_min = 0.35
+moisture_max = 0.7
+light_min = 0.35
+light_max = 0.75
+open_window_preference = 0
+moisture_decay_per_second = 0.0005
+base_growth_per_second = 0.002
+base_sale_value = 100
