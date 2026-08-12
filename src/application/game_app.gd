@@ -57,6 +57,10 @@ func active_plant() -> PlantState:
 	var pot := active_pot()
 	return pot.plant if pot != null else null
 
+func active_species_definition() -> PlantSpeciesDefinition:
+	var plant := active_plant()
+	return registry.get_plant(plant.species_id) if plant != null else null
+
 func switch_pot(pot_id: String) -> bool:
 	if state == null or state.find_pot(pot_id) == null:
 		return false
@@ -183,6 +187,9 @@ func shop_catalog() -> Array[Dictionary]:
 	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return String(a["id"]) < String(b["id"]))
 	return result
 
+func species_shop_catalog() -> Array[Dictionary]:
+	return ShopService.species_catalog(state, registry.all_plants())
+
 func next_pot_price() -> int:
 	return ShopService.next_pot_price(state, rules)
 
@@ -191,6 +198,12 @@ func buy_shop_fertilizer(fertilizer_id: StringName) -> bool:
 		return false
 	state_changed.emit()
 	return true
+
+func buy_shop_seed(species_id: StringName) -> String:
+	var seed_id := ShopActions.buy_species_seed(state, species_id, registry)
+	if not seed_id.is_empty():
+		state_changed.emit()
+	return seed_id
 
 func buy_new_pot() -> String:
 	var pot_id := ShopActions.buy_pot(state, rules)
