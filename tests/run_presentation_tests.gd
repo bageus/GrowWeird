@@ -6,6 +6,7 @@ func _init() -> void:
 	_test_presentation_resources_load()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
+	_test_fruit_visual_state()
 	if _failures.is_empty():
 		print("GrowWeird presentation tests passed")
 		quit(0)
@@ -18,6 +19,7 @@ func _test_presentation_resources_load() -> void:
 	var paths := [
 		"res://src/presentation/main/main.tscn",
 		"res://src/presentation/main/main_screen.gd",
+		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
 		"res://src/presentation/plant/soil_view.gd",
@@ -26,6 +28,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/plant/plant_visual_assembler.gd",
 		"res://src/presentation/inventory/inventory_panel.gd",
 		"res://src/presentation/inventory/genetic_item_preview.gd",
+		"res://src/presentation/shop/shop_panel.gd",
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
@@ -39,10 +42,7 @@ func _test_growth_stage_geometry() -> void:
 	for slot in BranchState.VALID_SLOTS:
 		var young_length := _slot_length(young, slot)
 		var mature_length := _slot_length(mature, slot)
-		_expect(
-			mature_length > young_length,
-			"growth view: %s branch should visibly expand with growth" % String(slot)
-		)
+		_expect(mature_length > young_length, "growth view: %s branch should visibly expand with growth" % String(slot))
 
 func _test_phenotype_descriptor() -> void:
 	var branch := BranchState.new()
@@ -53,6 +53,15 @@ func _test_phenotype_descriptor() -> void:
 	_expect(int(phenotype["thorn_count"]) > 0, "phenotype: thorns must be visible")
 	_expect(int(phenotype["flower_count"]) > 0, "phenotype: bloom must be visible")
 	_expect(float(phenotype["glow_strength"]) > 0.0, "phenotype: glow must be visible")
+
+func _test_fruit_visual_state() -> void:
+	var fruit := GrowingFruitState.new()
+	fruit.progress = 0.99
+	_expect(not fruit.is_ready(), "fruit presentation: unripe fruit marked ready")
+	fruit.progress = 1.0
+	fruit.hybrid = true
+	_expect(fruit.is_ready() and fruit.hybrid, "fruit presentation: ripe hybrid state unavailable")
+	_expect(PlantView.MODE_HARVEST == &"harvest", "fruit presentation: harvest interaction mode missing")
 
 func _slot_length(layout: Dictionary, slot: StringName) -> float:
 	var slots: Dictionary = layout["slots"]
