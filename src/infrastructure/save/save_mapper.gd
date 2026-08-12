@@ -63,6 +63,7 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 		"alive": plant.alive,
 		"mutation_energy": _plain_dictionary(plant.mutation_energy),
 		"branches": branches,
+		"regrowth_progress": _plain_dictionary(plant.regrowth_progress),
 		"rng_state": plant.rng_state,
 	}
 
@@ -76,11 +77,16 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.health = clampf(float(data.get("health", 1.0)), 0.0, 1.0)
 	plant.alive = bool(data.get("alive", true)) and plant.health > 0.0
 	plant.mutation_energy = _plain_dictionary(data.get("mutation_energy", {}))
+	plant.regrowth_progress = _plain_dictionary(data.get("regrowth_progress", {}))
 	plant.rng_state = int(data.get("rng_state", 0))
 	var branch_data: Variant = data.get("branches", {})
 	for slot in BranchState.VALID_SLOTS:
 		var value: Variant = branch_data.get(String(slot)) if branch_data is Dictionary else null
 		plant.branches[String(slot)] = _branch_from_dictionary(value) if value is Dictionary else null
+		if plant.branch_at(slot) != null:
+			plant.clear_regrowth_progress(slot)
+		else:
+			plant.set_regrowth_progress(slot, plant.regrowth_progress_at(slot))
 	return plant
 
 static func _branch_to_dictionary(branch: BranchState) -> Dictionary:
