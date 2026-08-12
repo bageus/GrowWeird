@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://src/presentation/plant/soil_view.gd" id="4_soil"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_sense_view.gd" id="5_sense"]
 [ext_resource type="Script" path="res://src/presentation/inventory/inventory_panel.gd" id="6_inventory"]
+[ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
+[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="8_shop"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -65,9 +67,9 @@ theme_override_font_sizes/font_size = 20
 text = "$0"
 
 [node name="ShopButton" type="Button" parent="Margin/Layout/TopBar"]
+unique_name_in_owner = true
 layout_mode = 2
-disabled = true
-text = "Shop · soon"
+text = "Shop"
 
 [node name="PlantNameLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
@@ -82,7 +84,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="ToolsPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(150, 0)
+custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 
 [node name="Tools" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel"]
@@ -108,6 +110,17 @@ layout_mode = 2
 toggle_mode = true
 text = "Prune"
 
+[node name="HarvestButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Harvest"
+
+[node name="SellPlantButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sell plant"
+
 [node name="CancelButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 visible = false
@@ -117,7 +130,7 @@ text = "Cancel action"
 [node name="Hint" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Click the window to cycle light.\nClick its handle to open/close.\n\nPrune works directly on branches."
+text = "Click the window to cycle light.\nClick its handle to open/close.\n\nRipe fruit gets a gold ring."
 autowrap_mode = 2
 
 [node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
@@ -179,7 +192,7 @@ mouse_filter = 2
 script = ExtResource("5_sense")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(310, 0)
+custom_minimum_size = Vector2(330, 0)
 layout_mode = 2
 
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
@@ -240,22 +253,17 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Skip"
 
-[node name="Pots" type="HBoxContainer" parent="Margin/Layout"]
+[node name="PotsScroll" type="ScrollContainer" parent="Margin/Layout"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-alignment = 1
+vertical_scroll_mode = 0
+
+[node name="PotSelector" type="HBoxContainer" parent="Margin/Layout/PotsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 8
-
-[node name="PotOne" type="Button" parent="Margin/Layout/Pots"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(210, 0)
-layout_mode = 2
-text = "pot-1"
-
-[node name="PotTwo" type="Button" parent="Margin/Layout/Pots"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(210, 0)
-layout_mode = 2
-text = "pot-2"
+script = ExtResource("7_pots")
 
 [node name="EventLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
@@ -265,13 +273,43 @@ text = "Grow. Graft. Mutate."
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[node name="ShopOverlay" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -370.0
+offset_top = 58.0
+offset_right = -24.0
+offset_bottom = 410.0
+grow_horizontal = 0
+
+[node name="ShopLayout" type="VBoxContainer" parent="ShopOverlay"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CloseShopButton" type="Button" parent="ShopOverlay/ShopLayout"]
+layout_mode = 2
+text = "Close"
+
+[node name="ShopPanel" type="VBoxContainer" parent="ShopOverlay/ShopLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+script = ExtResource("8_shop")
+
+[connection signal="pressed" from="Margin/Layout/TopBar/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/WaterButton" to="." method="_on_water_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SprayButton" to="." method="_on_spray_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/PruneButton" to="." method="_on_prune_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/HarvestButton" to="." method="_on_harvest_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SellPlantButton" to="." method="_on_sell_plant_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferTwo" to="." method="_on_offer_two_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferThree" to="." method="_on_offer_three_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/SkipOffer" to="." method="_on_skip_offer_pressed"]
-[connection signal="pressed" from="Margin/Layout/Pots/PotOne" to="." method="_on_pot_one_pressed"]
-[connection signal="pressed" from="Margin/Layout/Pots/PotTwo" to="." method="_on_pot_two_pressed"]
+[connection signal="pressed" from="ShopOverlay/ShopLayout/CloseShopButton" to="." method="_on_close_shop_pressed"]

@@ -9,6 +9,7 @@ var source_species_id: StringName
 var ancestry: Array[String] = []
 var traits: Dictionary = {}
 var grafted: bool = false
+var fruit_growth: GrowingFruitState
 
 func add_trait(trait_id: StringName, amount: int = 1) -> void:
 	var key := String(trait_id)

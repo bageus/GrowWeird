@@ -13,4 +13,7 @@ light_max = 0.75
 open_window_preference = 0
 moisture_decay_per_second = 0.0005
 base_growth_per_second = 0.002
+fruiting_growth_threshold = 0.72
+fruit_ripen_seconds = 90.0
+fruit_base_value = 35
 base_sale_value = 100
