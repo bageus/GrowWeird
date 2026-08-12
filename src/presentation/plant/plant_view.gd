@@ -64,7 +64,7 @@ func _draw() -> void:
 		_draw_slot(descriptor, wood_color, leaf_color)
 
 func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) -> void:
-	if descriptor.is_empty() or not bool(descriptor.get("visible", true)):
+	if descriptor.is_empty():
 		return
 	var slot: StringName = descriptor.get("slot", &"")
 	var branch := descriptor.get("branch") as BranchState
@@ -101,9 +101,11 @@ func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Diction
 	var vector := end - start
 	var length := maxf(vector.length(), 1.0)
 	var normal := Vector2(-vector.y, vector.x) / length
-	var count := clampi(int(length / 42.0), 2, 6)
+	var count := clampi(int(length / 42.0), 0, 6)
+	if count <= 0:
+		return
 	for index in range(count):
-		var t := 0.34 + (float(index) / maxf(1.0, float(count - 1))) * 0.60
+		var t := 0.55 if count == 1 else 0.34 + (float(index) / float(count - 1)) * 0.60
 		var anchor := start.lerp(end, t)
 		var side := -1.0 if index % 2 == 0 else 1.0
 		var leaf_center := anchor + normal * side * 15.0 * leaf_scale
@@ -157,7 +159,7 @@ func _candidate_at(point: Vector2) -> StringName:
 	var closest_distance := 28.0
 	for slot_name in BranchState.VALID_SLOTS:
 		var descriptor: Dictionary = slots.get(String(slot_name), {})
-		if descriptor.is_empty() or not bool(descriptor.get("visible", true)):
+		if descriptor.is_empty():
 			continue
 		var branch := descriptor.get("branch") as BranchState
 		if not _is_selectable(branch):
