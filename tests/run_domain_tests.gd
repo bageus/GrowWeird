@@ -6,6 +6,8 @@ func _init() -> void:
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
 	_test_offer_contains_three_unique_items()
+	_test_cutting_plant_and_graft_flow()
+	_test_save_round_trip_preserves_new_state()
 	if _failures.is_empty():
 		print("GrowWeird domain tests passed")
 		quit(0)
@@ -75,6 +77,58 @@ func _test_offer_contains_three_unique_items() -> void:
 	_expect(generated, "fertilizer offer: expected an offer")
 	_expect(offer.offered_ids.size() == 3, "fertilizer offer: expected exactly three items")
 	_expect(unique.size() == 3, "fertilizer offer: items must be unique")
+
+func _test_cutting_plant_and_graft_flow() -> void:
+	var donor := _plant("donor")
+	donor.branch_at(&"left").add_trait(&"thorns", 4)
+	var cutting := PropagationService.prune(donor, &"left", "cutting-flow")
+	var empty_pot := PotState.new()
+	empty_pot.pot_id = "empty"
+	var planted := PropagationService.plant_cutting(cutting, empty_pot, "child")
+	_expect(planted and empty_pot.plant != null, "cutting flow: cutting should plant in empty pot")
+	_expect(
+		empty_pot.plant.branch_at(&"left").trait_level(&"thorns") == 4,
+		"cutting flow: planted cutting lost inherited trait"
+	)
+
+	var host := _plant("host-flow")
+	var blocked := PropagationService.graft_cutting(cutting, host, &"right", "blocked")
+	_expect(not blocked, "cutting flow: graft must fail when slot is occupied")
+	host.cut_branch(&"right")
+	var grafted := PropagationService.graft_cutting(cutting, host, &"right", "graft-flow")
+	_expect(grafted, "cutting flow: graft should succeed after slot is freed")
+
+func _test_save_round_trip_preserves_new_state() -> void:
+	var state := GameState.new()
+	state.money = 123
+	var pot := PotState.new()
+	pot.pot_id = "pot-save"
+	pot.plant = _plant("save-plant")
+	state.pots = [pot]
+	state.active_pot_id = pot.pot_id
+	state.fertilizer_offer.offered_ids = [&"humus", &"dead_mouse", &"banana_peel"]
+	state.fertilizer_offer.seconds_until_offer = 12.5
+
+	var cutting := CuttingState.new()
+	cutting.item_id = "cutting-save"
+	cutting.source_plant_id = pot.plant.instance_id
+	cutting.source_branch_id = pot.plant.branch_at(&"left").branch_id
+	cutting.genome = GeneticsService.snapshot_branch(pot.plant.branch_at(&"left"))
+	InventoryService.add_cutting(state.inventory, cutting)
+	InventoryService.add_fertilizer(state.inventory, &"humus", 2)
+
+	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
+	_expect(restored.money == 123, "save round trip: money changed")
+	_expect(restored.fertilizer_offer.offered_ids.size() == 3, "save round trip: offer lost")
+	_expect(
+		InventoryService.fertilizer_count(restored.inventory, &"humus") == 2,
+		"save round trip: fertilizer stack lost"
+	)
+	_expect(restored.inventory.cuttings.size() == 1, "save round trip: cutting lost")
+	_expect(
+		restored.inventory.cuttings[0].genome.species_id == &"starter_sprout",
+		"save round trip: cutting genome lost"
+	)
 
 func _plant(id: String) -> PlantState:
 	var plant := PlantState.new()
