@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+env:
+  GODOT_VERSION: "4.6.3"
+  GODOT_BINARY: "Godot_v4.6.3-stable_linux.x86_64"
+
 jobs:
   authored-file-limits:
     runs-on: ubuntu-latest
@@ -16,3 +20,24 @@ jobs:
           python-version: "3.12"
       - name: Enforce 350-line limit
         run: python scripts/check_line_limits.py
+
+  godot-headless-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Godot 4.6.3
+        run: |
+          curl --fail --location --retry 3 \
+            "https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip" \
+            --output godot.zip
+          echo "d0bc2113065e481c9c2c2b2c37daa4e8be3fe9e27f0ab9ab0b6096e9a37907f3  godot.zip" | sha256sum --check
+          unzip -q godot.zip -d .godot
+          chmod +x ".godot/${GODOT_BINARY}"
+          ".godot/${GODOT_BINARY}" --version
+      - name: Run domain tests
+        run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_domain_tests.gd"
+      - name: Run presentation tests
+        run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_presentation_tests.gd"
+      - name: Run offline and platform tests
+        run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_offline_platform_tests.gd"
