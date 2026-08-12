@@ -97,97 +97,64 @@ func rename_active_plant(new_name: String) -> bool:
 	return true
 
 func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
-	var plant := active_plant()
-	var fertilizer := registry.get_fertilizer(fertilizer_id)
-	if plant == null or not plant.alive or fertilizer == null:
+	var result := FertilizerActions.choose_offer(
+		state,
+		active_plant(),
+		fertilizer_id,
+		registry,
+		rules
+	)
+	if not bool(result.get("success", false)):
 		return []
-	if not FertilizerOfferService.can_choose(state.fertilizer_offer, fertilizer_id):
-		return []
-	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
-	FertilizerOfferService.resolve_choice(state.fertilizer_offer, fertilizer_id, rules)
+	var events := _events_from_result(result)
 	_emit_mutation_events(events)
 	state_changed.emit()
 	return events
 
 func skip_fertilizer_offer() -> bool:
-	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
-	if price <= 0 or not EconomyService.spend(state, price):
-		return false
-	if not FertilizerOfferService.resolve_skip(state.fertilizer_offer, rules):
-		EconomyService.credit(state, price)
+	if not FertilizerActions.skip_offer(state, rules):
 		return false
 	state_changed.emit()
 	return true
 
 func use_inventory_fertilizer(fertilizer_id: StringName) -> Array[Dictionary]:
-	var plant := active_plant()
-	var fertilizer := registry.get_fertilizer(fertilizer_id)
-	if plant == null or not plant.alive or fertilizer == null:
+	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry)
+	if not bool(result.get("success", false)):
 		return []
-	if InventoryService.fertilizer_count(state.inventory, fertilizer_id) <= 0:
-		return []
-	InventoryService.take_fertilizer(state.inventory, fertilizer_id)
-	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
+	var events := _events_from_result(result)
 	_emit_mutation_events(events)
 	state_changed.emit()
 	return events
 
 func prune_active_branch(slot: StringName) -> String:
-	var cutting := PropagationService.prune(active_plant(), slot, IdFactory.make("cutting"))
-	if cutting == null:
-		return ""
-	InventoryService.add_cutting(state.inventory, cutting)
-	state_changed.emit()
-	return cutting.item_id
+	var item_id := PropagationActions.prune(state, active_plant(), slot)
+	if not item_id.is_empty():
+		state_changed.emit()
+	return item_id
 
 func plant_cutting(cutting_id: String, pot_id: String) -> bool:
-	var cutting := InventoryService.find_cutting(state.inventory, cutting_id)
-	var pot := state.find_pot(pot_id)
-	if cutting == null or pot == null:
+	if not PropagationActions.plant_cutting(state, cutting_id, pot_id):
 		return false
-	if not PropagationService.plant_cutting(cutting, pot, IdFactory.make("plant")):
-		return false
-	InventoryService.take_cutting(state.inventory, cutting_id)
 	state_changed.emit()
 	return true
 
 func plant_seed(seed_id: String, pot_id: String) -> bool:
-	var seed := InventoryService.find_seed(state.inventory, seed_id)
-	var pot := state.find_pot(pot_id)
-	if seed == null or pot == null:
+	if not PropagationActions.plant_seed(state, seed_id, pot_id):
 		return false
-	if not PropagationService.plant_seed(seed, pot, IdFactory.make("plant")):
-		return false
-	InventoryService.take_seed(state.inventory, seed_id)
 	state_changed.emit()
 	return true
 
 func graft_cutting(cutting_id: String, slot: StringName) -> bool:
-	var cutting := InventoryService.find_cutting(state.inventory, cutting_id)
-	if cutting == null:
+	if not PropagationActions.graft_cutting(state, active_plant(), cutting_id, slot):
 		return false
-	if not PropagationService.graft_cutting(
-		cutting,
-		active_plant(),
-		slot,
-		IdFactory.make("branch")
-	):
-		return false
-	InventoryService.take_cutting(state.inventory, cutting_id)
 	state_changed.emit()
 	return true
 
 func create_seed_from_fruit(fruit_id: String) -> String:
-	var fruit := InventoryService.find_fruit(state.inventory, fruit_id)
-	if fruit == null:
-		return ""
-	var seed := PropagationService.seed_from_fruit(fruit, IdFactory.make("seed"))
-	if seed == null:
-		return ""
-	InventoryService.take_fruit(state.inventory, fruit_id)
-	InventoryService.add_seed(state.inventory, seed)
-	state_changed.emit()
-	return seed.item_id
+	var item_id := PropagationActions.create_seed_from_fruit(state, fruit_id)
+	if not item_id.is_empty():
+		state_changed.emit()
+	return item_id
 
 func current_comfort() -> Dictionary:
 	var pot := active_pot()
@@ -204,6 +171,15 @@ func current_offer_skip_price() -> int:
 
 func save_now() -> bool:
 	return state != null and SaveRepository.save(state)
+
+func _events_from_result(result: Dictionary) -> Array[Dictionary]:
+	var events: Array[Dictionary] = []
+	var raw: Variant = result.get("events", [])
+	if raw is Array:
+		for value in raw:
+			if value is Dictionary:
+				events.append(value)
+	return events
 
 func _emit_mutation_events(events: Array[Dictionary]) -> void:
 	if not events.is_empty():
