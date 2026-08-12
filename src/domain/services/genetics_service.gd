@@ -1,6 +1,13 @@
 class_name GeneticsService
 extends RefCounted
 
+static func fresh_species_snapshot(species_id: StringName) -> GenomeSnapshot:
+	if String(species_id).is_empty():
+		return null
+	var genome := GenomeSnapshot.new()
+	genome.species_id = species_id
+	return genome
+
 static func snapshot_branch(branch: BranchState) -> GenomeSnapshot:
 	if branch == null:
 		return null

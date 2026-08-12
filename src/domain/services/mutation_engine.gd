@@ -33,29 +33,48 @@ static func _eligible_mutations(
 ) -> Array[MutationDefinition]:
 	var result: Array[MutationDefinition] = []
 	for definition in mutations:
-		var energy := float(plant.mutation_energy.get(String(definition.trigger_axis), 0.0))
-		if energy >= definition.threshold:
+		if definition == null or definition.target_scope != &"branch":
+			continue
+		if not _has_candidate_branch(plant, definition):
+			continue
+		var requirements := definition.requirements()
+		if requirements.is_empty():
+			continue
+		var meets_all := true
+		for axis in requirements:
+			var energy := float(plant.mutation_energy.get(String(axis), 0.0))
+			if energy < float(requirements[axis]):
+				meets_all = false
+				break
+		if meets_all:
 			result.append(definition)
 	return result
+
+static func _has_candidate_branch(plant: PlantState, definition: MutationDefinition) -> bool:
+	for branch in plant.existing_branches():
+		if definition.repeatable or branch.trait_level(definition.trait_id) <= 0:
+			return true
+	return false
 
 static func _apply_definition(
 	plant: PlantState,
 	definition: MutationDefinition,
 	rng: RandomNumberGenerator
 ) -> Dictionary:
-	var branches := plant.existing_branches()
-	if definition.target_scope != &"branch" or branches.is_empty():
+	var candidates: Array[BranchState] = []
+	for branch in plant.existing_branches():
+		if definition.repeatable or branch.trait_level(definition.trait_id) <= 0:
+			candidates.append(branch)
+	if candidates.is_empty():
 		return {}
 
-	var branch := branches[rng.randi_range(0, branches.size() - 1)]
-	if not definition.repeatable and branch.trait_level(definition.trait_id) > 0:
-		return {}
-
-	var axis_key := String(definition.trigger_axis)
-	plant.mutation_energy[axis_key] = maxf(
-		0.0,
-		float(plant.mutation_energy.get(axis_key, 0.0)) - definition.threshold
-	)
+	var branch := candidates[rng.randi_range(0, candidates.size() - 1)]
+	for axis in definition.requirements():
+		var key := String(axis)
+		plant.mutation_energy[key] = maxf(
+			0.0,
+			float(plant.mutation_energy.get(key, 0.0)) - float(definition.requirements()[axis])
+		)
 	branch.add_trait(definition.trait_id, definition.level_increment)
 	return {
 		"mutation_id": String(definition.id),

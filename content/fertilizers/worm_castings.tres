@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FertilizerDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/fertilizer_definition.gd" id="1_fertilizer"]
+
+[resource]
+script = ExtResource("1_fertilizer")
+id = &"worm_castings"
+display_name_key = "fertilizer.worm_castings"
+shop_price = 75
+offer_weight = 1.2
+mutation_contributions = {"fungal": 3.0, "stability": 6.0}
+care_effects = {"health": 0.02}

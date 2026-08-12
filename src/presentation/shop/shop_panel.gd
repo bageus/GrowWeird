@@ -2,12 +2,18 @@ class_name ShopPanel
 extends VBoxContainer
 
 signal fertilizer_buy_requested(fertilizer_id: StringName)
+signal species_seed_buy_requested(species_id: StringName)
 signal pot_buy_requested
 
 var _last_signature: String = ""
 
-func set_shop(catalog: Array[Dictionary], pot_price: int, money: int) -> void:
-	var signature := "%s|%d|%d" % [str(catalog), pot_price, money]
+func set_shop(
+	fertilizer_catalog: Array[Dictionary],
+	species_catalog: Array[Dictionary],
+	pot_price: int,
+	money: int
+) -> void:
+	var signature := "%s|%s|%d|%d" % [str(fertilizer_catalog), str(species_catalog), pot_price, money]
 	if signature == _last_signature:
 		return
 	_last_signature = signature
@@ -15,8 +21,12 @@ func set_shop(catalog: Array[Dictionary], pot_price: int, money: int) -> void:
 		remove_child(child)
 		child.queue_free()
 	_add_header("Shop")
-	_add_muted("Buy known materials. Their hidden effects stay hidden.")
-	for item in catalog:
+	_add_muted("Known materials are sold by name; their hidden mutation effects stay secret.")
+	_add_header("Seeds")
+	for item in species_catalog:
+		_add_seed_row(item, money)
+	_add_header("Fertilizers")
+	for item in fertilizer_catalog:
 		_add_fertilizer_row(StringName(item.get("id", "")), int(item.get("price", 0)), money)
 	_add_header("Expansion")
 	var pot_button := Button.new()
@@ -27,6 +37,23 @@ func set_shop(catalog: Array[Dictionary], pot_price: int, money: int) -> void:
 
 func invalidate() -> void:
 	_last_signature = ""
+
+func _add_seed_row(item: Dictionary, money: int) -> void:
+	var id := StringName(item.get("id", ""))
+	var price := int(item.get("price", 0))
+	var unlocked := bool(item.get("unlocked", false))
+	var required_pots := int(item.get("requires_pots", 1))
+	var row := HBoxContainer.new()
+	var label := Label.new()
+	label.text = String(id).replace("_", " ").capitalize()
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(label)
+	var button := Button.new()
+	button.text = "$%d" % price if unlocked else "Need %d pots" % required_pots
+	button.disabled = not unlocked or money < price
+	button.pressed.connect(_emit_species_seed.bind(id))
+	row.add_child(button)
+	add_child(row)
 
 func _add_fertilizer_row(id: StringName, price: int, money: int) -> void:
 	var row := HBoxContainer.new()
@@ -56,6 +83,9 @@ func _add_muted(text: String) -> void:
 
 func _emit_fertilizer(id: StringName) -> void:
 	fertilizer_buy_requested.emit(id)
+
+func _emit_species_seed(id: StringName) -> void:
+	species_seed_buy_requested.emit(id)
 
 func _emit_pot() -> void:
 	pot_buy_requested.emit()

@@ -6,10 +6,12 @@ func _init() -> void:
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
 	_test_offer_contains_three_unique_items()
+	_test_multi_axis_mutation_consumes_requirements()
 	_test_cutting_plant_and_graft_flow()
 	_test_fruit_lifecycle_and_harvest()
 	_test_plant_sale_frees_pot()
 	_test_shop_transactions()
+	_test_species_seed_unlock_progression()
 	_test_save_round_trip_preserves_new_state()
 	if _failures.is_empty():
 		print("GrowWeird domain tests passed")
@@ -64,6 +66,25 @@ func _test_offer_contains_three_unique_items() -> void:
 	_expect(generated, "fertilizer offer: expected an offer")
 	_expect(offer.offered_ids.size() == 3, "fertilizer offer: expected exactly three items")
 	_expect(unique.size() == 3, "fertilizer offer: items must be unique")
+
+func _test_multi_axis_mutation_consumes_requirements() -> void:
+	var plant := _plant("synergy")
+	var fertilizer := FertilizerDefinition.new()
+	fertilizer.id = &"synergy_feed"
+	fertilizer.mutation_contributions = {"floral": 8.0, "predatory": 8.0}
+	var mutation := MutationDefinition.new()
+	mutation.id = &"lure_test"
+	mutation.axis_requirements = {"floral": 8.0, "predatory": 8.0}
+	mutation.trait_id = &"lure_bloom"
+	var definitions: Array[MutationDefinition] = [mutation]
+	var events := MutationEngine.apply_fertilizer(plant, fertilizer, definitions)
+	_expect(events.size() == 1, "mutation synergy: combined requirements should resolve once")
+	_expect(float(plant.mutation_energy.get("floral", -1.0)) == 0.0, "mutation synergy: floral energy was not consumed")
+	_expect(float(plant.mutation_energy.get("predatory", -1.0)) == 0.0, "mutation synergy: predatory energy was not consumed")
+	var found := false
+	for branch in plant.existing_branches():
+		found = found or branch.trait_level(&"lure_bloom") == 1
+	_expect(found, "mutation synergy: result trait was not applied")
 
 func _test_cutting_plant_and_graft_flow() -> void:
 	var donor := _plant("donor")
@@ -124,6 +145,22 @@ func _test_shop_transactions() -> void:
 	_expect(InventoryService.fertilizer_count(state.inventory, &"humus") == 1, "shop: fertilizer not added")
 	var pot_id := ShopActions.buy_pot(state, rules)
 	_expect(not pot_id.is_empty() and state.pots.size() == 3, "shop: new pot should be added")
+
+func _test_species_seed_unlock_progression() -> void:
+	var registry := ContentRegistry.new()
+	registry.load_all()
+	var state := GameState.new()
+	state.money = 1000
+	state.pots = [PotState.new(), PotState.new()]
+	_expect(ShopService.is_species_unlocked(state, registry.get_plant(&"shade_fern")), "species shop: shade fern should unlock at two pots")
+	_expect(not ShopService.is_species_unlocked(state, registry.get_plant(&"sun_creeper")), "species shop: sun creeper should stay locked before three pots")
+	var shade_seed_id := ShopActions.buy_species_seed(state, &"shade_fern", registry)
+	var shade_seed := InventoryService.find_seed(state.inventory, shade_seed_id)
+	_expect(shade_seed != null and shade_seed.genome.species_id == &"shade_fern", "species shop: purchased seed genome is wrong")
+	_expect(ShopActions.buy_species_seed(state, &"sun_creeper", registry).is_empty(), "species shop: locked seed purchase should fail")
+	state.pots.append(PotState.new())
+	var sun_seed_id := ShopActions.buy_species_seed(state, &"sun_creeper", registry)
+	_expect(not sun_seed_id.is_empty(), "species shop: sun creeper should unlock after third pot")
 
 func _test_save_round_trip_preserves_new_state() -> void:
 	var state := GameState.new()
