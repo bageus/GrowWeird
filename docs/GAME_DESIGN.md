@@ -25,10 +25,10 @@ There is no ideal final specimen. Any living plant can continue mutating indefin
 - Center: current pot and plant.
 - Background: interactive window, blinds/curtains and lighting.
 - Top-right: Shop; money immediately to its left.
-- Left-center: Water and Prune; Water opens Watering Can / Sprayer.
+- Left-center: Water and Prune; Water exposes Watering Can / Sprayer.
 - Right: vertical inventory for fruit, seeds, fertilizer, cuttings and later item types.
 - Bottom-center: periodic three-item fertilizer offer.
-- Below offers: pot selector; switching pot switches that pot's window/light state.
+- Below offers: pot selector; switching pot switches that pot's environment.
 - Start: 1 pot with a sprout + 1 empty pot.
 - Extra pots come from Shop. Decorative rooms/pots are out of current scope.
 
@@ -43,14 +43,18 @@ There is no ideal final specimen. Any living plant can continue mutating indefin
 8. Spend money on pots, plants, sprouts, seeds and targeted fertilizer.
 9. Repeat with increasingly unusual lineages.
 
-## 6. Plant structure
+## 6. Plant structure and native regrowth
 A plant has a persistent root/base and exactly three possible visible branch slots: `left`, `center`, `right`. A mature default silhouette is one central branch/trunk plus one branch on each side.
 - Any branch may be cut, including `center`.
 - Cutting removes that branch, creates a cutting item and frees that exact slot.
 - Cutting a branch does not automatically kill the root/base.
-- Grafting is possible only into a free slot.
+- Grafting is possible only into a free slot; no operation creates a fourth branch.
 - Different slots can therefore contain different ancestry.
-- Native regrowth of a freed slot is an open balance decision; the system must support either policy.
+- A species may enable natural native-branch regrowth for freed slots.
+- Native regrowth begins only when that plant is adult, sufficiently healthy and sufficiently comfortable according to its species tuning.
+- Regrowth happens in the exact empty slot and appears first as a visible bud while the slot is still mechanically empty.
+- The restored branch is a clean native branch of the host species. It does not recreate branch-local traits/mutations that belonged to the removed branch.
+- If a graft occupies the slot before native regrowth completes, pending native regrowth for that slot is cancelled.
 
 ## 7. Care model
 Each species defines internal preferences for:
@@ -70,7 +74,7 @@ Examples:
 - ☀ + needle right = too much light;
 - air icon + needle left = too little air.
 Three small status icons show water/light/air as only `good`, `warning`, `bad`. Hover/tap may show short text such as “Too much light”; percentages remain hidden.
-This gives two layers: beginners fix the large current problem; experienced players scan all three icons.
+Plant Sense is for living plants. A dead plant no longer has an actionable care reading.
 
 ## 9. Watering
 ### Watering can
@@ -86,16 +90,37 @@ Window controls are manipulated directly in the scene, not through a settings pa
 4. direct-sun condition — strongest/direct light when available.
 Window itself is open/closed and affects air preference. Temperature is excluded from the first version. Each pot owns its own environment so incompatible species can coexist.
 
-## 11. Real-time growth
+## 11. Real-time growth and life stages
 Plants grow in real time. Small plants grow faster; growth progressively slows as size increases. Care modifies speed:
 - comfortable: normal/full progression;
 - moderate mismatch: slower growth;
 - severe mismatch: growth nearly stops;
 - prolonged critical stress: health declines and death becomes possible.
-A mature living plant can live indefinitely. Maturity is not an ending; it enables continued mutations, fruit, pruning and grafting.
 
-## 12. Death
-Plants can die permanently. Death should require sustained critical conditions rather than one missed click. On death: growth, fruiting and mutation stop. The pot remains occupied until the dead plant is cleared/processed by the chosen rule. Offline-death behavior is still an open product decision.
+Every species moves continuously through three derived life stages:
+1. **Sprout** — small, fastest growth and limited silhouette.
+2. **Juvenile** — established plant, expanding branch geometry.
+3. **Adult** — mature specimen capable of species-configured native regrowth and normal mature systems.
+
+Stage boundaries are species-specific and are derived from growth progress; they are not separate collectible objects and do not reset genetics. An adult can live indefinitely under adequate care. Adulthood is not an ending: mutation, fruiting, pruning, grafting and future generations continue forever.
+
+Species should differ in silhouette as well as color/care. Height, side spread/lift and leaf scale may vary by species while branch-slot legality remains identical.
+
+## 12. Health, wilting and permanent death
+Health changes gradually from care quality rather than from age. Player-facing condition is qualitative:
+`Healthy → Stressed → Wilted → Critical → Dead`.
+Normal UI does not expose raw health percentages.
+
+Loss of vitality must be visible before death: leaves become fewer/smaller, colors dry/desaturate, branches sag, glow/flowers/fungi lose vitality and fruit looks less healthy. These visuals communicate state; they do not own the underlying thresholds.
+
+Plants can die permanently after sustained critical conditions. On death:
+- growth, native regrowth, fruiting and mutation stop;
+- prune/graft/harvest care interactions stop;
+- Plant Sense hides because the condition is no longer recoverable;
+- the dead specimen remains in the pot until sold/processed by an allowed economy action.
+
+A mature plant has no natural lifespan limit. Good care can keep it alive indefinitely.
+Offline death is a balance policy separate from foreground death. Current default allows offline progression but prevents a living specimen from crossing into permanent death while the game is closed; this policy can be tuned without changing the lifecycle model.
 
 ## 13. Fertilizer events
 Periodically three choices appear. Examples: banana peel, salt, dead mouse, insects, worms, humus, rotten fruit, mushrooms, nitrate/mineral fertilizer, radioactive material, unknown chemicals.
@@ -123,13 +148,16 @@ The most valuable outcomes should often be combinations:
 “Infinite mutation” means no gameplay cap on trait level/combination depth, while implementation remains compact.
 
 ## 16. Pruning and cuttings
-Prune mode highlights the three cuttable branches. Clicking one removes that exact branch and produces a cutting.
+Prune mode highlights the three cuttable existing branches. Clicking one removes that exact branch and produces a cutting.
 A cutting can be planted in an empty pot, grafted into another plant's free slot, processed into fertilizer or discarded; selling can be added later if balance needs it.
 A planted cutting starts from donor inherited state but is not permanently identical: future fertilizer events mutate it independently.
+
+On an adult plant whose species supports native regrowth, pruning also starts a potential new-growth cycle for that empty slot. Regrowth is not a free clone: the cutting preserves the removed branch snapshot, while the new host branch starts as native host tissue without that removed branch's local traits.
 
 ## 17. Grafting
 A graft occupies one free branch slot and retains donor ancestry/visible identity while living on the host. No graft creates a fourth slot.
 A grafted branch produces **hybrid fruit** using host/root and donor-branch ancestry. The plant may therefore become a mosaic of lineages.
+Grafting into a slot takes priority over pending native regrowth and cancels that regrowth progress.
 
 ## 18. Fruit and seeds
 Fruit can be sold, processed into fertilizer, or produce/convert into seeds according to species rules.
@@ -138,7 +166,7 @@ Seeds have no rarity tier. Their value comes from inherited state/ancestry. A se
 
 ## 19. Selling plants
 Selling the plant itself is the primary way to free an occupied pot. Price must not equal simple fruit output. Candidate influences: base species, age/size, health, mutation depth, rare synergies, graft complexity, fruiting value and later market demand.
-A non-fruiting thorn-covered monster may be worth more than a productive conventional tree if its combination is unusual enough.
+A non-fruiting thorn-covered monster may be worth more than a productive conventional tree if its combination is unusual enough. Dead/nonliving specimens may have reduced salvage value rather than becoming unsellable blockers.
 
 ## 20. Naming
 Players may give every specimen a custom name. The name belongs to the individual, not the species, and persists through save/load and future specimen-summary/sale UI.
@@ -162,7 +190,7 @@ Room/table background; window frame/glass; open/closed window; blinds/curtains; 
 ### Pot and soil
 One functional base pot; separate soil layer; 5+ moisture states.
 ### Plant modules
-Seed/sprout stages; root/base; center/left/right branch modules; several leaf shapes; flowers; fruit anchors/sprites.
+Seed/sprout stages; root/base; center/left/right branch modules; several leaf shapes; flowers; fruit anchors/sprites; wilted/dead variants or procedural equivalents; native-regrowth buds.
 ### Mutation modules
 Small/large thorns; hooks; serrated/sticky/trap leaves; carnivorous flower/trap parts; fungi/spores; glow; mutated fruit; color/pattern masks.
 ### Tools/UI
@@ -187,8 +215,10 @@ Water drops, mist, soil transition, growth, pruning particles, mutation reveal, 
 14. Cuttings and planting cuttings.
 15. Grafting into free slots.
 16. Hybrid fruit.
-17. Shop/content expansion.
-18. Save/load, balancing, analytics and platform integration.
+17. Species lifecycle/regrowth and stronger species silhouettes.
+18. Shop/content/progression expansion.
+19. Save/load, balancing, onboarding and game-feel pass.
+20. Platform-specific production integration and release work.
 A useful vertical slice exists once steps 1–8 are fun without the rest.
 
 ## 25. Reference games
@@ -212,12 +242,12 @@ GrowWeird differentiates through hidden fertilizer experimentation, unbounded vi
 
 ## 27. Open design decisions
 These are balance/product questions, not reasons to redesign architecture:
-- Does growth/health continue while closed, and for how long?
-- Can a freed native branch slot regrow naturally?
-- How often do fertilizer offers appear by life stage?
-- Does repeated paid skip become more expensive?
-- Exact irreversible-death thresholds and dead-plant salvage value?
-- When are hybrid-fruit genetics resolved: flower, fruit creation or harvest?
-- How strongly does ancestry affect sale price without enabling exploits?
-- Which mutations are branch-local versus whole-plant/root-level?
-- Target time to the first major visible mutation in a new session?
+- exact offline catch-up horizon and whether offline permanent death should remain disabled for release;
+- exact native-regrowth timings/health/comfort requirements per species;
+- how often fertilizer offers should vary by life stage, if at all;
+- whether repeated paid skip becomes more expensive;
+- dead-plant salvage value and future compost/recycle options;
+- how strongly ancestry affects sale price without enabling exploits;
+- which future mutations are branch-local versus whole-plant/root-level;
+- target time to the first major visible mutation in a new session;
+- whether regrown native branches may later inherit root-wide mutations beyond current branch-local rules.
