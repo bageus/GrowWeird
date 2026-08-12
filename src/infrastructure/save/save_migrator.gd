@@ -10,10 +10,31 @@ static func migrate(source: Dictionary) -> Dictionary:
 		push_error("Save schema %d is newer than supported schema %d" % [version, CURRENT_VERSION])
 		return {}
 
-	# Future migrations are applied sequentially here:
-	# while version < CURRENT_VERSION:
-	#     data = _migrate_vN_to_vN_plus_1(data)
-	#     version += 1
+	while version < CURRENT_VERSION:
+		match version:
+			1:
+				data = _migrate_v1_to_v2(data)
+			_:
+				push_error("No save migration registered for schema %d" % version)
+				return {}
+		version += 1
 
 	data["schema_version"] = CURRENT_VERSION
+	return data
+
+static func _migrate_v1_to_v2(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	data["inventory"] = {
+		"fertilizers": {},
+		"cuttings": [],
+		"seeds": [],
+		"fruits": [],
+	}
+	data["fertilizer_offer"] = {
+		"offered_ids": [],
+		"seconds_until_offer": 0.0,
+		"skip_count": 0,
+		"rng_state": 0,
+	}
+	data["schema_version"] = 2
 	return data
