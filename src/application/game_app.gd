@@ -26,6 +26,7 @@ func _process(delta: float) -> void:
 	var steps := _clock.consume(delta, rules.simulation_step_seconds)
 	for _step in range(steps):
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
+		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
 
 	if _has_living_plant() and FertilizerOfferService.advance(
@@ -97,13 +98,7 @@ func rename_active_plant(new_name: String) -> bool:
 	return true
 
 func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
-	var result := FertilizerActions.choose_offer(
-		state,
-		active_plant(),
-		fertilizer_id,
-		registry,
-		rules
-	)
+	var result := FertilizerActions.choose_offer(state, active_plant(), fertilizer_id, registry, rules)
 	if not bool(result.get("success", false)):
 		return []
 	var events := _events_from_result(result)
@@ -150,11 +145,58 @@ func graft_cutting(cutting_id: String, slot: StringName) -> bool:
 	state_changed.emit()
 	return true
 
+func harvest_active_fruit(slot: StringName) -> String:
+	var item_id := FruitActions.harvest(state, active_plant(), slot)
+	if not item_id.is_empty():
+		state_changed.emit()
+	return item_id
+
 func create_seed_from_fruit(fruit_id: String) -> String:
 	var item_id := PropagationActions.create_seed_from_fruit(state, fruit_id)
 	if not item_id.is_empty():
 		state_changed.emit()
 	return item_id
+
+func active_plant_sale_value() -> int:
+	return EconomyActions.plant_value(active_plant(), registry, rules)
+
+func sell_active_plant() -> int:
+	var amount := EconomyActions.sell_plant(state, active_pot(), registry, rules)
+	if amount > 0:
+		state_changed.emit()
+	return amount
+
+func fruit_sale_value(fruit_id: String) -> int:
+	var fruit := InventoryService.find_fruit(state.inventory, fruit_id) if state != null else null
+	return EconomyActions.fruit_value(fruit, registry, rules)
+
+func sell_fruit(fruit_id: String) -> int:
+	var amount := EconomyActions.sell_fruit(state, fruit_id, registry, rules)
+	if amount > 0:
+		state_changed.emit()
+	return amount
+
+func shop_catalog() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for definition in registry.all_fertilizers():
+		result.append({"id": definition.id, "price": definition.shop_price})
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return String(a["id"]) < String(b["id"]))
+	return result
+
+func next_pot_price() -> int:
+	return ShopService.next_pot_price(state, rules)
+
+func buy_shop_fertilizer(fertilizer_id: StringName) -> bool:
+	if not ShopActions.buy_fertilizer(state, fertilizer_id, registry):
+		return false
+	state_changed.emit()
+	return true
+
+func buy_new_pot() -> String:
+	var pot_id := ShopActions.buy_pot(state, rules)
+	if not pot_id.is_empty():
+		state_changed.emit()
+	return pot_id
 
 func current_comfort() -> Dictionary:
 	var pot := active_pot()
@@ -196,22 +238,16 @@ func _has_living_plant() -> bool:
 func _create_new_game() -> GameState:
 	var new_state := GameState.new()
 	new_state.money = rules.starting_money
-
 	var first_pot := PotState.new()
 	first_pot.pot_id = "pot-1"
 	first_pot.plant = PlantState.new()
 	first_pot.plant.instance_id = IdFactory.make("plant")
 	first_pot.plant.species_id = STARTER_SPECIES
 	first_pot.plant.initialize_native_branches()
-
 	var second_pot := PotState.new()
 	second_pot.pot_id = "pot-2"
-
 	new_state.pots = [first_pot, second_pot]
 	new_state.active_pot_id = first_pot.pot_id
-	FertilizerOfferService.initialize_rng(
-		new_state.fertilizer_offer,
-		int(first_pot.plant.instance_id.hash())
-	)
+	FertilizerOfferService.initialize_rng(new_state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
 	FertilizerOfferService.schedule_initial(new_state.fertilizer_offer, rules)
 	return new_state
