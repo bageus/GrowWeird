@@ -31,7 +31,9 @@ The current runner verifies these core invariants:
 
 - a seed genome snapshot does not change when its parent mutates later;
 - fruit from a grafted branch is marked hybrid and contains host + donor traits;
-- a fertilizer event contains three unique choices.
+- a fertilizer event contains three unique choices;
+- pruning, planting a cutting and grafting respect branch-slot/inheritance rules;
+- save mapping round-trips fertilizer offers, inventory stacks and cutting genomes.
 
 Add a regression test here whenever a domain invariant is fixed or introduced.
 
