@@ -3,6 +3,7 @@ extends Node
 signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
+signal offline_progress_applied(result: Dictionary)
 
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
 const STARTER_SPECIES: StringName = &"starter_sprout"
@@ -12,16 +13,26 @@ var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
 
 var _clock := GameClock.new()
-var _autosave_elapsed: float = 0.0
+var _persistence := PersistenceCoordinator.new()
+var _platform_paused: bool = false
 
 func _ready() -> void:
 	registry.load_all()
 	state = SaveRepository.load_state()
 	if state == null:
 		state = _create_new_game()
+	_persistence.reconciled.connect(_on_persistence_reconciled)
+	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
+	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
+	_persistence.start(state, registry, rules, PlatformRuntime)
 	state_changed.emit()
 
 func _process(delta: float) -> void:
+	if state == null:
+		return
+	_persistence.process(delta, state)
+	if not _persistence.is_ready() or _platform_paused:
+		return
 	var changed := false
 	var steps := _clock.consume(delta, rules.simulation_step_seconds)
 	for _step in range(steps):
@@ -37,18 +48,12 @@ func _process(delta: float) -> void:
 	):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
-
 	if changed:
 		state_changed.emit()
 
-	_autosave_elapsed += delta
-	if _autosave_elapsed >= rules.autosave_interval_seconds:
-		_autosave_elapsed = 0.0
-		SaveRepository.save(state)
-
 func _exit_tree() -> void:
-	if state != null:
-		SaveRepository.save(state)
+	if state != null and _persistence.is_ready():
+		_persistence.save_now(state, false)
 
 func active_pot() -> PotState:
 	return state.active_pot() if state != null else null
@@ -224,8 +229,50 @@ func current_offer_ids() -> Array[StringName]:
 func current_offer_skip_price() -> int:
 	return FertilizerOfferService.skip_price(state.fertilizer_offer, rules) if state != null else 0
 
+func platform_id() -> StringName:
+	return PlatformRuntime.platform_id()
+
+func cloud_save_available() -> bool:
+	return PlatformRuntime.cloud_available()
+
+func set_gameplay_active(active: bool) -> void:
+	PlatformRuntime.set_gameplay_active(active)
+
+func show_fullscreen_ad() -> void:
+	PlatformRuntime.show_fullscreen_ad()
+
 func save_now() -> bool:
-	return state != null and SaveRepository.save(state)
+	return state != null and _persistence.save_now(state)
+
+func _on_persistence_reconciled(next_state: GameState, offline_result: Dictionary) -> void:
+	state = next_state
+	_clock.reset()
+	_emit_offline_result(offline_result)
+	state_changed.emit()
+
+func _on_platform_pause_requested() -> void:
+	if _platform_paused:
+		return
+	_platform_paused = true
+	_clock.reset()
+	if _persistence.is_ready():
+		_persistence.save_now(state)
+
+func _on_platform_resume_requested() -> void:
+	if not _platform_paused:
+		return
+	_platform_paused = false
+	_clock.reset()
+	var result := _persistence.catch_up(state)
+	_emit_offline_result(result)
+	state_changed.emit()
+
+func _emit_offline_result(result: Dictionary) -> void:
+	if result.is_empty() or float(result.get("applied_seconds", 0.0)) <= 0.0:
+		return
+	offline_progress_applied.emit(result)
+	if bool(result.get("offer_created", false)):
+		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 
 func _events_from_result(result: Dictionary) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []

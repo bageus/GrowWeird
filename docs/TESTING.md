@@ -1,20 +1,23 @@
 # GrowWeird — Testing
 
-This document owns test execution instructions. Architecture requirements remain authoritative in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+This document owns test execution instructions. Architecture requirements remain authoritative in [`ARCHITECTURE.md`](ARCHITECTURE.md). Yandex-specific release checks live in [`YANDEX_GAMES.md`](YANDEX_GAMES.md).
 
 ## Required checks
 Before merging gameplay or architecture changes:
 1. Run the repository line-limit check.
-2. Run headless domain tests with the project Godot version.
-3. Run headless presentation tests when UI/rendering wiring changed.
-4. Open the playable slice and complete the manual interaction path below.
-5. Confirm save/load still works when the save schema changed.
+2. Run all headless Godot regression runners.
+3. Open the playable slice and complete the manual interaction path below when gameplay/UI changed.
+4. Confirm save/load still works when the save schema changed.
+5. For Yandex/platform changes, complete the platform checks below.
 
-## Line-limit check
+## CI
+GitHub Actions now uses the official Godot 4.6.3 Linux binary and runs the same three regression runners documented below. The downloaded binary is SHA-256 verified before execution.
+
+CI also runs:
 ```bash
 python3 scripts/check_line_limits.py
 ```
-GitHub Actions runs this automatically. Project-owned authored text files must remain at or below 350 lines.
+Project-owned authored text files must remain at or below 350 lines.
 
 ## Headless domain tests
 ```bash
@@ -47,6 +50,21 @@ The presentation runner checks:
 - Harvest interaction mode is available.
 Presentation tests validate rendering contracts only. They must not become a second owner of gameplay rules.
 
+## Headless offline/platform tests
+```bash
+godot --headless --path . --script res://tests/run_offline_platform_tests.gd
+```
+The offline/platform runner verifies:
+- long absences are capped by the configured offline horizon;
+- catch-up never exceeds the configured maximum simulation chunks;
+- permanent death can be disabled for offline simulation without creating a second growth formula;
+- permanent death can be enabled through the same policy;
+- fertilizer-offer time advances during eligible offline catch-up;
+- save JSON can round-trip independently from local filesystem I/O;
+- native/editor platform resources load and the local adapter provides a clock/fallback path.
+
+The Yandex JavaScript SDK itself cannot be exercised by native headless Godot; Web/Yandex behavior still requires the release verification path in [`YANDEX_GAMES.md`](YANDEX_GAMES.md).
+
 ## Playable slice manual path
 Run the project normally in Godot and verify:
 1. Cycle `dark → diffused → bright → direct` by clicking the window; toggle the handle open/closed.
@@ -67,6 +85,24 @@ Run the project normally in Godot and verify:
 16. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
 17. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
 
+## Offline manual path
+Use a copied save or a debug-adjusted `last_saved_unix`; do not edit gameplay formulas just to make the test convenient.
+
+Verify:
+1. close after a valid save, advance the saved timestamp gap, then reopen;
+2. only one catch-up is applied before realtime simulation resumes;
+3. the elapsed time is capped when the absence exceeds the configured horizon;
+4. soil/growth/health/fruit/offers follow the current offline switches in `GameRules`;
+5. with offline death disabled, a critically stressed plant remains barely alive rather than permanently dying;
+6. with offline death enabled in a temporary test rules resource, the same stressed state can die;
+7. an already-active fertilizer offer survives reload and is not rerolled;
+8. background/pause followed by resume uses catch-up rather than double-running foreground delta.
+
+## Platform/Yandex checks
+For platform changes, verify native/editor startup still falls back to `LocalPlatformAdapter` and does not require browser SDK objects.
+
+For an actual Yandex Web build, follow [`YANDEX_GAMES.md`](YANDEX_GAMES.md). At minimum verify local/cloud reconciliation, trusted platform time, pause/resume catch-up and readiness reporting. Do not treat a generic local browser run as proof that the Yandex SDK path works.
+
 ## Content progression ownership
 Exact fertilizer contributions, species care ranges, seed prices, unlock pot counts and visual palettes live in `content/**/*.tres` and are not duplicated in UI code.
 `MutationDefinition.axis_requirements` owns single- or multi-axis mutation thresholds. `MutationEngine` only evaluates those definitions.
@@ -78,4 +114,4 @@ Any persisted-field change must:
 - add a sequential migration in `SaveMigrator`;
 - keep old migrations intact;
 - round-trip all new state through the appropriate mapper.
-Current schema is **v3**. This content/progression slice adds no persisted fields, so no schema bump is required. `v2 → v3` remains the latest migration for branch-local growing-fruit state.
+Current schema is **v3**. Offline/platform work adds no persisted fields: it reuses `last_saved_unix`, so no schema bump is required. `v2 → v3` remains the latest migration for branch-local growing-fruit state.
