@@ -9,6 +9,7 @@ const MODE_GRAFT: StringName = &"graft"
 const MODE_HARVEST: StringName = &"harvest"
 
 var _plant: PlantState
+var _species_style: PlantSpeciesDefinition
 var _interaction_mode: StringName = MODE_NONE
 var _hovered_slot: StringName = &""
 var _layout: Dictionary = {}
@@ -16,6 +17,10 @@ var _layout: Dictionary = {}
 func set_plant(plant: PlantState) -> void:
 	_plant = plant
 	_rebuild()
+
+func set_species_style(definition: PlantSpeciesDefinition) -> void:
+	_species_style = definition
+	queue_redraw()
 
 func set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
@@ -53,8 +58,10 @@ func _draw() -> void:
 	if _plant == null:
 		return
 	var health := clampf(_plant.health, 0.0, 1.0)
-	var wood_color := Color(0.37, 0.22, 0.12).lerp(Color(0.29, 0.18, 0.10), health)
-	var leaf_color := Color(0.46, 0.36, 0.23).lerp(Color(0.22, 0.58, 0.24), health)
+	var target_wood := _species_style.wood_color if _species_style != null else Color(0.29, 0.18, 0.10)
+	var target_leaf := _species_style.leaf_color if _species_style != null else Color(0.22, 0.58, 0.24)
+	var wood_color := Color(0.37, 0.22, 0.12).lerp(target_wood, health)
+	var leaf_color := Color(0.46, 0.36, 0.23).lerp(target_leaf, health)
 	var base: Vector2 = _layout.get("base", Vector2.ZERO)
 	var root_top: Vector2 = _layout.get("root_top", base)
 	draw_line(base, root_top, wood_color, 11.0, true)
@@ -113,7 +120,8 @@ func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool) -> void:
 		draw_circle(center, 4.0, Color(0.96, 0.72, 0.82))
 		return
 	var radius := lerpf(5.0, 14.0, progress)
-	var fruit_color := Color(0.35, 0.68, 0.25).lerp(Color(0.91, 0.42, 0.18), progress)
+	var ripe_color := _species_style.fruit_color if _species_style != null else Color(0.91, 0.42, 0.18)
+	var fruit_color := Color(0.35, 0.68, 0.25).lerp(ripe_color, progress)
 	if branch.fruit_growth.hybrid:
 		fruit_color = fruit_color.lerp(Color(0.64, 0.28, 0.72), 0.42)
 	draw_circle(center, radius, fruit_color)
