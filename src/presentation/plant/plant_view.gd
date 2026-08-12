@@ -64,7 +64,7 @@ func _draw() -> void:
 		_draw_slot(descriptor, wood_color, leaf_color)
 
 func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) -> void:
-	if descriptor.is_empty():
+	if descriptor.is_empty() or not bool(descriptor.get("visible", true)):
 		return
 	var slot: StringName = descriptor.get("slot", &"")
 	var branch := descriptor.get("branch") as BranchState
@@ -157,7 +157,7 @@ func _candidate_at(point: Vector2) -> StringName:
 	var closest_distance := 28.0
 	for slot_name in BranchState.VALID_SLOTS:
 		var descriptor: Dictionary = slots.get(String(slot_name), {})
-		if descriptor.is_empty():
+		if descriptor.is_empty() or not bool(descriptor.get("visible", true)):
 			continue
 		var branch := descriptor.get("branch") as BranchState
 		if not _is_selectable(branch):
