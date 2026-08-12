@@ -1,593 +1,223 @@
 # GrowWeird — Game Design
-
-> Status: living design document.  
-> Scope: gameplay, UX, progression, content rules and MVP.  
-> Technical implementation rules live only in `ARCHITECTURE.md`.
+> Living design document. Gameplay/UX/content source of truth. Technical rules live only in `ARCHITECTURE.md`.
 
 ## 1. Product thesis
+GrowWeird is a mouse-first plant-growing game about care, experimentation and endlessly mutating plants. The player starts with one small sprout and one empty pot, manages water/light/air, uses normal and absurd fertilizers, cuts branches, roots cuttings, grafts other lineages, harvests fruit and creates seeds.
 
-GrowWeird is a mouse-first plant-growing game about care, experimentation and endlessly mutating plants.
-
-The player starts with one small sprout and one empty pot. Plants need the right amount of water, light and air. The player grows them in real time, fertilizes them with normal and absurd materials, cuts branches, roots cuttings, grafts branches from other plants, harvests fruit and creates seeds.
-
-The central fantasy is not “build the perfect garden”. It is:
-
-**Grow something nobody else has grown.**
-
+**Core fantasy: Grow something nobody else has grown.**
 There is no ideal final specimen. Any living plant can continue mutating indefinitely unless the player pays to skip a fertilizer event.
 
 ## 2. Core pillars
+1. **Readable care** — understand problems without spreadsheets or visible percentages.
+2. **Visible growth** — meaningful actions eventually change the specimen on screen.
+3. **Experimental mutation** — fertilizer properties are hidden and learned by use.
+4. **Ownership** — naming, pruning, cloning and grafting make plants personal.
+5. **Endless variation** — unusual combinations matter more than one linear best build.
+6. **Dark humor** — dead mice, insects, radiation, rot and absurd biology are valid content.
 
-1. **Readable care** — the player should understand what a plant dislikes without reading spreadsheets or numeric stats.
-2. **Visible growth** — every meaningful action should eventually change the plant on screen.
-3. **Experimental mutation** — fertilizer properties are hidden; knowledge comes from trying things.
-4. **Ownership** — naming, cutting, cloning and grafting make a plant feel authored by the player.
-5. **Endless variation** — value comes from unusual combinations, not from one linear “best” build.
-6. **Dark humor** — dead mice, insects, radiation, rot and absurd mutations are valid content.
-
-## 3. Target platforms and input
-
-Initial release target: Yandex Games / Web.
-
-Future targets: Android and iOS.
-
-Primary desktop control: mouse only.
-
-All gameplay actions must therefore be expressible as pointer/tap interactions so the same interaction model can later map cleanly to touch.
+## 3. Platforms and input
+- Initial target: Yandex Games / Web.
+- Future targets: Android and iOS.
+- Primary desktop input: mouse only.
+- Every gameplay action must map cleanly from pointer click to mobile tap later.
 
 ## 4. Main screen
-
-The main screen is intentionally compact.
-
 - Center: current pot and plant.
-- Background: window and lighting controls.
-- Top-right: Shop button.
-- Immediately left of Shop: money counter.
-- Left-center: Water and Prune tools.
-- Water tool opens Watering Can / Sprayer choice.
-- Right side: vertical inventory for fruit, seeds, fertilizer, cuttings and future item types.
-- Bottom-center: periodic choice of three fertilizer offers.
-- Below fertilizer offers: pot selector.
-- Switching pots switches to that pot's own window/light state.
-
-At game start the player owns:
-
-- 1 pot with a sprout;
-- 1 empty pot.
-
-Additional pots are bought in the Shop.
-
-Decorative rooms and decorative pot variants are out of current scope.
+- Background: interactive window, blinds/curtains and lighting.
+- Top-right: Shop; money immediately to its left.
+- Left-center: Water and Prune; Water opens Watering Can / Sprayer.
+- Right: vertical inventory for fruit, seeds, fertilizer, cuttings and later item types.
+- Bottom-center: periodic three-item fertilizer offer.
+- Below offers: pot selector; switching pot switches that pot's window/light state.
+- Start: 1 pot with a sprout + 1 empty pot.
+- Extra pots come from Shop. Decorative rooms/pots are out of current scope.
 
 ## 5. Core loop
-
 1. Inspect plant condition.
 2. Adjust water, light and window state.
-3. Wait for real-time growth.
-4. Resolve fertilizer offers: choose one or pay to skip.
-5. Observe mutations and new growth.
+3. Let the plant grow in real time.
+4. Resolve fertilizer offer: choose one item or pay to skip.
+5. Observe growth/mutation.
 6. Harvest fruit and/or prune branches.
 7. Sell, recycle, root, seed or graft acquired material.
-8. Use money to buy pots, plants, sprouts, seeds, fertilizer and future progression items.
+8. Spend money on pots, plants, sprouts, seeds and targeted fertilizer.
 9. Repeat with increasingly unusual lineages.
 
 ## 6. Plant structure
+A plant has a persistent root/base and exactly three possible visible branch slots: `left`, `center`, `right`. A mature default silhouette is one central branch/trunk plus one branch on each side.
+- Any branch may be cut, including `center`.
+- Cutting removes that branch, creates a cutting item and frees that exact slot.
+- Cutting a branch does not automatically kill the root/base.
+- Grafting is possible only into a free slot.
+- Different slots can therefore contain different ancestry.
+- Native regrowth of a freed slot is an open balance decision; the system must support either policy.
 
-A plant has a persistent root/base and up to three visible branch slots:
-
-- `left`
-- `center`
-- `right`
-
-A mature default silhouette is a central trunk/branch plus one left and one right branch.
-
-Any of the three branches may be cut, including the center branch.
-
-Cutting a branch:
-
-- removes it from the plant;
-- creates a cutting item;
-- frees that exact branch slot;
-- does not automatically kill the root/base.
-
-Grafting is possible only into a free branch slot.
-
-A plant can therefore contain branches with different ancestry.
-
-Whether an empty native slot regrows automatically is an open balance decision; architecture must support both policies without changing saved data.
-
-## 7. Care parameters
-
-Every species has preferences for:
-
+## 7. Care model
+Each species defines internal preferences for:
 - soil moisture;
 - light intensity/type;
 - air/window state;
-- optional leaf moisture preference for sprayer-sensitive plants.
+- optional leaf-moisture preference for sprayer-sensitive species.
+Different plants intentionally conflict: one wants lots of water, another little; one direct sun, another diffused light; one open window, another closed. Exact numeric values stay hidden from normal UI.
 
-Different species deliberately conflict:
-
-- some want lots of water, some very little;
-- some want direct sun, some diffused light;
-- some benefit from an open window, some dislike it;
-- some like spraying, some do not.
-
-Exact numeric values are internal. The normal player-facing UI should not expose percentages.
-
-## 8. Plant Sense — condition feedback
-
-The main condition indicator is a semicircular gauge above the plant.
-
-Concept:
-
+## 8. Plant Sense — readable condition UI
+The main indicator is a semicircle above the plant:
 `too little <- bad / warning / good / warning / bad -> too much`
-
-The center is the comfort zone.
-
-The gauge shows the **single most important current problem**, not a generic health score.
-
+The center is the comfort zone. The gauge shows the **single worst current need**, not generic health.
 Examples:
-
-- water icon + needle left = too dry;
-- water icon + needle right = too wet;
-- sun icon + needle right = too much light;
-- air icon + needle left = too little air for this species.
-
-Below or near the main gauge are three small status icons:
-
-- water;
-- light;
-- air.
-
-Each icon has only three readable states: good, warning, bad.
-
-Hover/tap may show a short text such as “Too much light”, but numbers remain hidden.
-
-This produces two information layers:
-
-- beginner: fix the icon currently shown on the big gauge;
-- experienced player: monitor all three compact indicators.
+- 💧 + needle left = too dry;
+- 💧 + needle right = too wet;
+- ☀ + needle right = too much light;
+- air icon + needle left = too little air.
+Three small status icons show water/light/air as only `good`, `warning`, `bad`. Hover/tap may show short text such as “Too much light”; percentages remain hidden.
+This gives two layers: beginners fix the large current problem; experienced players scan all three icons.
 
 ## 9. Watering
-
 ### Watering can
-
-Each click applies a meaningful portion of water to soil.
-
-The soil itself is the primary visual feedback:
-
-- very dry: pale/sandy;
-- dry: light;
-- comfortable: normal;
-- wet: dark;
-- saturated: very dark/wet.
-
-Moisture decays continuously in real time.
-
+Each click adds a meaningful water portion. Soil is primary feedback: pale/sandy → dry → normal → dark/wet → saturated. Moisture decays continuously in real time.
 ### Sprayer
-
-The sprayer is not merely a slower watering can.
-
-It applies:
-
-- a small amount of soil moisture;
-- a temporary leaf-moisture effect.
-
-Species can like, tolerate or dislike spraying.
+The sprayer adds a small amount of soil moisture plus temporary leaf moisture. Species may like, tolerate or dislike spraying; it is not just a slower watering can.
 
 ## 10. Light and window
-
-The window is manipulated directly rather than through a separate settings panel.
-
-Lighting states should be visually obvious. Initial target states:
-
-1. curtains/blinds closed — minimal light;
+Window controls are manipulated directly in the scene, not through a settings panel. Initial light states:
+1. closed blinds/curtains — minimal light;
 2. translucent blinds — diffused light;
 3. blinds open — bright light;
-4. direct sun condition — strongest/direct light when available.
-
-The window itself can be open or closed.
-
-Window state affects the plant's air preference. A separate temperature simulation is intentionally excluded from the first version to avoid overloading the player.
-
-Each pot owns its own environment state so incompatible species can coexist.
+4. direct-sun condition — strongest/direct light when available.
+Window itself is open/closed and affects air preference. Temperature is excluded from the first version. Each pot owns its own environment so incompatible species can coexist.
 
 ## 11. Real-time growth
-
-Plants grow in real time.
-
-Growth is faster while a plant is small and progressively slower as it becomes large.
-
-Growth speed is modified by care quality:
-
-- comfortable conditions: normal/full progression;
-- moderate mismatch: slower progression;
-- severe mismatch: growth may nearly stop;
-- critical prolonged stress: health declines and death becomes possible.
-
-A mature plant can live indefinitely if it remains alive.
-
-Maturity is not an ending; it is a platform for more mutations, fruit, pruning and grafting.
+Plants grow in real time. Small plants grow faster; growth progressively slows as size increases. Care modifies speed:
+- comfortable: normal/full progression;
+- moderate mismatch: slower growth;
+- severe mismatch: growth nearly stops;
+- prolonged critical stress: health declines and death becomes possible.
+A mature living plant can live indefinitely. Maturity is not an ending; it enables continued mutations, fruit, pruning and grafting.
 
 ## 12. Death
-
-Plants can die permanently.
-
-Death should be a consequence of sustained critical conditions, not a surprise caused by a single missed click.
-
-On death:
-
-- growth stops;
-- fruit production stops;
-- the specimen can no longer mutate;
-- the pot remains occupied until the dead plant is cleared or processed by a future rule.
-
-The exact offline-death policy is still an open product decision.
+Plants can die permanently. Death should require sustained critical conditions rather than one missed click. On death: growth, fruiting and mutation stop. The pot remains occupied until the dead plant is cleared/processed by the chosen rule. Offline-death behavior is still an open product decision.
 
 ## 13. Fertilizer events
+Periodically three choices appear. Examples: banana peel, salt, dead mouse, insects, worms, humus, rotten fruit, mushrooms, nitrate/mineral fertilizer, radioactive material, unknown chemicals.
+Player must either choose exactly one offer or pay money to skip the whole event. Without skips, continued play keeps applying mutation pressure.
+Fertilizer properties are **not shown**. There is currently no encyclopedia; learning comes from repeated experiments and visual outcomes.
 
-Periodically, three fertilizer choices appear below the plant.
+## 14. Mutation model
+Mutation is effectively unbounded. Do not model complete plants as a finite catalog like “Spiky Red Apple Tree”. A specimen is a combination of inherited/acquired traits and expression parameters.
+Initial conceptual mutation families:
+- **predatory/animal-organic** — thorns, hooks, serrated/sticky leaves, traps, toxic fruit, foul smell, carnivorous flowers;
+- **floral/plant-organic** — more flowers, unusual petals, larger/stranger fruit, bright coloration;
+- **fungal/decay** — mushrooms, spores, mold-like surfaces, dark tissue, fungal structures;
+- **chemical/radiation** — glow, pigmentation shifts, asymmetry, split structures, oversized organs;
+- **structural/mineral** — dense wood, heavy structures, reinforced thorns, growth changes;
+- **stabilizing/conventional** — humus/minerals mainly improve growth/stability with lower mutation pressure.
+Repeated exposure may deepen an existing trait instead of only adding binary traits.
 
-Examples:
-
-- banana peel;
-- salt;
-- dead mouse;
-- insects;
-- worms;
-- humus;
-- rotten fruit;
-- mushrooms;
-- nitrate/mineral fertilizer;
-- radioactive material;
-- unknown chemicals.
-
-The player may:
-
-- choose exactly one offered fertilizer; or
-- pay money to skip the entire fertilizer event.
-
-Skipping exists because there is no “finished” plant: without skips, continued play keeps applying mutation pressure.
-
-Fertilizer properties are **not shown** to the player.
-
-There is currently no encyclopedia. The player learns through repeated experimentation and visual results.
-
-## 14. Mutation philosophy
-
-Mutation is effectively unbounded.
-
-Do not model the game as a finite list such as “Normal Apple Tree”, “Spiky Apple Tree”, “Spiky Red Apple Tree”. A specimen is a combination of inherited and acquired traits.
-
-Fertilizers contribute hidden mutation tendencies. Initial conceptual families include:
-
-- predatory / animal-organic;
-- floral / fruiting / plant-organic;
-- fungal / decay;
-- chemical / radioactive;
-- structural / mineral;
-- stabilizing / conventional growth.
-
-Typical outcomes:
-
-### Predatory direction
-
-- thorns;
-- hooks;
-- serrated leaves;
-- sticky leaves;
-- traps;
-- toxic fruit;
-- foul smell;
-- carnivorous flowers.
-
-### Floral direction
-
-- increased flowering;
-- unusual petals;
-- larger or stranger fruit;
-- bright coloration;
-- stronger fruiting behavior.
-
-### Fungal/decay direction
-
-- mushrooms on trunk;
-- spores;
-- mold-like surfaces;
-- darkened tissue;
-- fungal fruit structures.
-
-### Chemical/radiation direction
-
-- glow;
-- unusual pigmentation;
-- asymmetry;
-- split structures;
-- oversized organs;
-- bizarre combinations.
-
-### Conventional fertilizer
-
-Humus, normal minerals and similar inputs mostly improve growth/stability and should mutate a plant less aggressively.
-
-## 15. Mutation combinations
-
-The most valuable mutations should often be combinations rather than isolated traits.
-
-Examples:
-
-- floral + predatory = beautiful lure flowers that trap prey;
-- radioactive + floral = glowing flowers or fruit;
+## 15. Mutation synergies
+The most valuable outcomes should often be combinations:
+- floral + predatory = lure flowers/traps;
+- radioactive + floral = glowing flowers/fruit;
 - fungal + predatory = spore-based traps;
 - structural + predatory = heavy woody thorns;
 - radioactive + fungal = bioluminescent fungal growth.
-
-Repeated exposure may deepen an existing trait rather than only adding new binary traits.
-
-“Mutation can continue forever” means there is no gameplay cap on trait growth or combination depth.
+“Infinite mutation” means no gameplay cap on trait level/combination depth, while implementation remains compact.
 
 ## 16. Pruning and cuttings
-
-Prune mode highlights cuttable branches.
-
-Clicking a branch cuts that exact left/center/right branch and produces a cutting item.
-
-A cutting may be:
-
-- planted in an empty pot;
-- grafted onto another plant if that plant has a free branch slot;
-- processed into fertilizer;
-- discarded;
-- potentially sold if later balancing requires it.
-
-A planted cutting begins from the donor's inherited state, but it is not permanently identical: future fertilizer events continue mutating it independently.
+Prune mode highlights the three cuttable branches. Clicking one removes that exact branch and produces a cutting.
+A cutting can be planted in an empty pot, grafted into another plant's free slot, processed into fertilizer or discarded; selling can be added later if balance needs it.
+A planted cutting starts from donor inherited state but is not permanently identical: future fertilizer events mutate it independently.
 
 ## 17. Grafting
-
-A graft uses a free branch slot.
-
-The grafted branch retains donor ancestry and visible identity, while continuing to live inside the host plant's environment and mutation history.
-
-A plant may therefore be a mosaic of lineages.
-
-A grafted branch produces **hybrid fruit**, combining host and branch ancestry according to genetics rules.
-
-No fourth branch may be added simply because a graft exists; the three-slot structure remains the hard spatial rule.
+A graft occupies one free branch slot and retains donor ancestry/visible identity while living on the host. No graft creates a fourth slot.
+A grafted branch produces **hybrid fruit** using host/root and donor-branch ancestry. The plant may therefore become a mosaic of lineages.
 
 ## 18. Fruit and seeds
-
-Fruit can be:
-
-- sold;
-- processed into fertilizer;
-- converted into/generated as seeds according to the species' fruit rules.
-
-When a seed item appears, it receives a snapshot of **all mutations relevant to its source lineage at that moment**.
-
-Later mutations to the parent do not retroactively change existing seeds.
-
-Seeds have no rarity tier of their own.
-
-Their value comes from the inherited specimen state, ancestry and resulting plant potential.
-
-A seed can be:
-
-- planted in an empty pot;
-- sold;
-- processed into fertilizer.
+Fruit can be sold, processed into fertilizer, or produce/convert into seeds according to species rules.
+When a seed item appears, it receives a snapshot of **all inheritable mutations relevant to its source lineage at that moment**. Later parent mutations never change an existing seed.
+Seeds have no rarity tier. Their value comes from inherited state/ancestry. A seed can be planted, sold or processed into fertilizer.
 
 ## 19. Selling plants
-
-The primary way to free an occupied pot is to sell the plant itself.
-
-Plant price must not be a simple “more fruit = more money” rule.
-
-Value is influenced by concepts such as:
-
-- base species value;
-- age/size;
-- current health;
-- unusual mutation depth;
-- rare combinations/synergies;
-- graft ancestry complexity;
-- fruiting value;
-- market demand if dynamic buyers are added later.
-
-A non-fruiting thorn-covered monster may be worth far more than a productive conventional tree if its combination is sufficiently unusual.
+Selling the plant itself is the primary way to free an occupied pot. Price must not equal simple fruit output. Candidate influences: base species, age/size, health, mutation depth, rare synergies, graft complexity, fruiting value and later market demand.
+A non-fruiting thorn-covered monster may be worth more than a productive conventional tree if its combination is unusual enough.
 
 ## 20. Naming
+Players may give every specimen a custom name. The name belongs to the individual, not the species, and persists through save/load and future specimen-summary/sale UI.
 
-The player may give each plant a custom name.
-
-The name belongs to the individual specimen, not the species.
-
-Names must persist through save/load and remain attached to the plant when it is sold/shown in any future summary UI.
-
-## 21. Shop
-
-Initial shop categories:
-
-- fertilizer;
-- plants;
-- sprouts;
-- seeds;
-- pots.
-
-Possible later categories:
-
-- tools;
-- automation;
-- special laboratory items.
-
-Decorative pots and room decoration are not planned for the current stage.
-
-## 22. Economy goals
-
-Money must create meaningful choices rather than only count upward.
-
-Primary sinks:
-
+## 21. Shop and economy
+Initial shop categories: fertilizer, plants, sprouts, seeds, pots. Later: tools, automation, laboratory items.
+Primary money sinks:
 - additional pots;
-- targeted fertilizer purchases;
+- targeted fertilizer;
 - plants/sprouts/seeds;
 - fertilizer-offer skips;
-- future tool/progression unlocks.
+- future progression/tools.
+Free random offers create experimentation; Shop purchases create control.
 
-Free random fertilizer offers create experimentation. The Shop creates control.
+## 22. Content generation strategy
+Practically endless variety comes from combining reusable gameplay/visual traits, not drawing every full plant variant. A specimen may combine species body style, branch shapes, leaf shapes/colors, flowers, fruit, thorns/hooks, fungi, glow/effects, graft visuals and procedural placement/scale parameters.
 
-## 23. Content generation strategy
-
-The game should create variety by combining reusable visual and gameplay traits rather than drawing a unique full plant for every combination.
-
-A specimen may combine:
-
-- species body style;
-- branch shapes;
-- leaf shapes;
-- colors;
-- flowers;
-- fruit;
-- thorns/hooks;
-- fungal parts;
-- glow/effects;
-- graft-specific branch visuals;
-- procedural scale/placement parameters.
-
-This is required for practically endless generation.
-
-## 24. Asset plan — MVP
-
+## 23. Asset plan — MVP
 ### Environment
-
-- room/table background;
-- window frame and glass;
-- open/closed window states;
-- blind/curtain layers;
-- sunlight and shadow overlays.
-
-### Pots and soil
-
-- functional base pot;
-- separate soil layer;
-- 5+ soil moisture visuals.
-
-### Plant base modules
-
-- seed/sprout stages;
-- root/base transition;
-- center branch modules;
-- left branch modules;
-- right branch modules;
-- multiple leaf shapes;
-- flowers;
-- fruit anchors and fruit sprites.
-
+Room/table background; window frame/glass; open/closed window; blinds/curtains; sunlight and shadow overlays.
+### Pot and soil
+One functional base pot; separate soil layer; 5+ moisture states.
+### Plant modules
+Seed/sprout stages; root/base; center/left/right branch modules; several leaf shapes; flowers; fruit anchors/sprites.
 ### Mutation modules
+Small/large thorns; hooks; serrated/sticky/trap leaves; carnivorous flower/trap parts; fungi/spores; glow; mutated fruit; color/pattern masks.
+### Tools/UI
+Watering can; sprayer; pruning shears; Shop/money; water/light/air indicators; fertilizer cards; pot selector; inventory frames; sell/recycle/plant/graft actions.
+### VFX/audio
+Water drops, mist, soil transition, growth, pruning particles, mutation reveal, fruit pickup, coins, spores/glow; sounds for watering, spraying, pruning, window/blinds, planting, harvest, mutation, selling and room ambience.
 
-- small/large thorns;
-- hooks;
-- serrated leaves;
-- sticky/trap leaves;
-- carnivorous flower/trap parts;
-- fungal growths;
-- spores;
-- glow overlays;
-- mutated fruit variants;
-- color/pattern masks.
-
-### Tools and UI
-
-- watering can;
-- sprayer;
-- pruning shears;
-- shop/money icons;
-- water/light/air indicators;
-- fertilizer cards/items;
-- pot selector;
-- inventory item frames;
-- sell/recycle/plant/graft actions.
-
-### Feedback/VFX
-
-- water drops;
-- spray mist;
-- wet-soil transition;
-- leaf/branch growth;
-- pruning particles;
-- mutation reveal;
-- fruit pickup;
-- coins;
-- spores/glow as needed.
-
-### Audio
-
-- watering;
-- spraying;
-- pruning;
-- window/blinds;
-- planting;
-- fruit pickup;
-- mutation event;
-- selling/coins;
-- light room ambience.
-
-## 25. MVP production order
-
-1. One plant, one pot, real-time moisture decay.
-2. Watering can and visible soil moisture.
+## 24. MVP production order
+1. One plant/pot + real-time moisture decay.
+2. Watering + visible soil moisture.
 3. Window/light states.
-4. Plant Sense condition UI.
+4. Plant Sense.
 5. Growth curve: small fast, large slow.
 6. Health, stress and permanent death.
 7. Three-choice fertilizer event + paid skip.
-8. First mutation family and visible mutation.
+8. First mutation family + visible mutation.
 9. Fruit, inventory and money.
-10. Second pot and per-pot environment.
-11. Plant selling and pot freeing.
-12. Seeds with mutation snapshot inheritance.
-13. Pruning all three branch slots.
+10. Second pot + per-pot environment.
+11. Plant selling + pot freeing.
+12. Seeds + mutation snapshot inheritance.
+13. Pruning all three slots.
 14. Cuttings and planting cuttings.
 15. Grafting into free slots.
 16. Hybrid fruit.
 17. Shop/content expansion.
 18. Save/load, balancing, analytics and platform integration.
-
 A useful vertical slice exists once steps 1–8 are fun without the rest.
 
-## 26. Reference games
-
-References are for studying interaction/progression, not feature copying.
-
-- **Plant Tycoon** — plant genetics and rare specimen discovery.
-- **Viridi** — calm plant-care feedback and readable visual condition.
-- **Botany Manor** — learning species-specific environmental needs.
+## 25. Reference games
+References are for studying interaction/progression, not copying features:
+- **Plant Tycoon** — genetics and rare specimen discovery.
+- **Viridi** — calm care feedback and readable condition.
+- **Botany Manor** — species-specific environmental needs.
 - **My Tiny Garden** — compact pot/water/fertilize/prune loop.
-- **Strange Horticulture** — strange-botany tone and presentation.
-- **Grow a Garden** — extremely readable seed → grow → harvest → sell loop.
+- **Strange Horticulture** — strange-botany tone/presentation.
+- **Grow a Garden** — readable seed → grow → harvest → sell loop.
+GrowWeird differentiates through hidden fertilizer experimentation, unbounded visible mutation, three-slot pruning/grafting and lineage inheritance.
 
-GrowWeird's intended differentiation is the combination of hidden fertilizer experimentation, unbounded visible mutation, three-slot pruning/grafting and lineage inheritance.
-
-## 27. Explicit non-goals for the current stage
-
+## 26. Explicit non-goals now
 - no plant encyclopedia;
 - no seed rarity tiers;
 - no decorative room system;
 - no decorative pot collection;
 - no fixed “perfect specimen” end state;
-- no requirement to expose hidden mutation numbers to the player;
-- no multiplayer dependency for the core game.
+- no visible hidden mutation numbers by default;
+- no multiplayer dependency for core gameplay.
 
-## 28. Open design decisions
-
-These do not block architecture but require balancing decisions before release:
-
-- Does growth/health continue while the game is closed, and for how long?
-- Can an empty native branch slot regrow on its own, or only via explicit grafting/new growth action?
-- How often do fertilizer offers appear at each life stage?
-- Can paid skip cost escalate with repeated skips?
-- What exact conditions cause irreversible death?
-- Does a dead plant have salvage value?
-- When exactly is hybrid-fruit genetics resolved: at flower creation, fruit creation or harvest?
-- How much ancestry should affect plant sale price before it becomes exploitable?
+## 27. Open design decisions
+These are balance/product questions, not reasons to redesign architecture:
+- Does growth/health continue while closed, and for how long?
+- Can a freed native branch slot regrow naturally?
+- How often do fertilizer offers appear by life stage?
+- Does repeated paid skip become more expensive?
+- Exact irreversible-death thresholds and dead-plant salvage value?
+- When are hybrid-fruit genetics resolved: flower, fruit creation or harvest?
+- How strongly does ancestry affect sale price without enabling exploits?
 - Which mutations are branch-local versus whole-plant/root-level?
-- What is the first-session target duration before the first visible major mutation?
+- Target time to the first major visible mutation in a new session?
