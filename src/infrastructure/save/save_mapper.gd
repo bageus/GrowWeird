@@ -41,11 +41,7 @@ static func _pot_from_dictionary(data: Dictionary) -> PotState:
 	var pot := PotState.new()
 	pot.pot_id = String(data.get("pot_id", ""))
 	pot.soil_moisture = clampf(float(data.get("soil_moisture", 0.5)), 0.0, 1.0)
-	pot.light_mode = clampi(
-		int(data.get("light_mode", PotState.LightMode.DIFFUSED)),
-		0,
-		PotState.LightMode.size() - 1
-	)
+	pot.light_mode = clampi(int(data.get("light_mode", PotState.LightMode.DIFFUSED)), 0, PotState.LightMode.size() - 1)
 	pot.window_open = bool(data.get("window_open", false))
 	var plant_data: Variant = data.get("plant")
 	if plant_data is Dictionary:
@@ -95,6 +91,7 @@ static func _branch_to_dictionary(branch: BranchState) -> Dictionary:
 		"ancestry": branch.ancestry.duplicate(),
 		"traits": _plain_dictionary(branch.traits),
 		"grafted": branch.grafted,
+		"fruit_growth": _fruit_growth_to_dictionary(branch.fruit_growth),
 	}
 
 static func _branch_from_dictionary(data: Dictionary) -> BranchState:
@@ -106,7 +103,21 @@ static func _branch_from_dictionary(data: Dictionary) -> BranchState:
 		branch.ancestry.append(String(ancestor))
 	branch.traits = _plain_dictionary(data.get("traits", {}))
 	branch.grafted = bool(data.get("grafted", false))
+	branch.fruit_growth = _fruit_growth_from_dictionary(data.get("fruit_growth"))
 	return branch
+
+static func _fruit_growth_to_dictionary(fruit: GrowingFruitState) -> Variant:
+	if fruit == null:
+		return null
+	return {"progress": fruit.progress, "hybrid": fruit.hybrid}
+
+static func _fruit_growth_from_dictionary(source: Variant) -> GrowingFruitState:
+	if not (source is Dictionary):
+		return null
+	var fruit := GrowingFruitState.new()
+	fruit.progress = clampf(float(source.get("progress", 0.0)), 0.0, 1.0)
+	fruit.hybrid = bool(source.get("hybrid", false))
+	return fruit
 
 static func _offer_to_dictionary(offer: FertilizerOfferState) -> Dictionary:
 	var offered: Array[String] = []
