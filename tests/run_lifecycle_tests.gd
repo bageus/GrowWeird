@@ -11,6 +11,9 @@ func _init() -> void:
 	_test_graft_cancels_native_regrowth()
 	_test_regrowth_save_round_trip()
 	_test_v3_migrates_to_v4()
+	_test_species_silhouettes_are_distinct()
+	_test_low_vitality_droops_geometry()
+	_test_regrowth_is_exposed_to_presentation()
 	if _failures.is_empty():
 		print("GrowWeird lifecycle tests passed")
 		quit(0)
@@ -78,6 +81,7 @@ func _test_native_branch_regrows_in_exact_slot() -> void:
 	_expect(branch != null and branch.slot == &"left", "regrowth: restored branch must occupy exact original slot")
 	_expect(branch != null and not branch.grafted, "regrowth: restored branch must be native")
 	_expect(branch != null and branch.source_species_id == plant.species_id, "regrowth: native branch must belong to host species")
+	_expect(branch != null and branch.traits.is_empty(), "regrowth: native regrowth must not recreate removed branch-local traits")
 	_expect(plant.regrowth_progress_at(&"left") == 0.0, "regrowth: completed progress should clear")
 
 func _test_regrowth_waits_for_adulthood() -> void:
@@ -125,6 +129,50 @@ func _test_v3_migrates_to_v4() -> void:
 	var plant_data: Dictionary = migrated["pots"][0]["plant"]
 	_expect(int(migrated.get("schema_version", 0)) == 4, "migration: v3 save should become v4")
 	_expect(plant_data.has("regrowth_progress") and plant_data["regrowth_progress"].is_empty(), "migration: v4 must add empty regrowth progress")
+
+func _test_species_silhouettes_are_distinct() -> void:
+	var registry := _registry()
+	var plant := _plant("silhouette")
+	plant.growth_ratio = 0.85
+	var size := Vector2(620.0, 500.0)
+	var starter := PlantVisualAssembler.build(size, plant, registry.get_plant(&"starter_sprout"))
+	var fern := PlantVisualAssembler.build(size, plant, registry.get_plant(&"shade_fern"))
+	var sun := PlantVisualAssembler.build(size, plant, registry.get_plant(&"sun_creeper"))
+	var starter_center: Dictionary = starter["slots"]["center"]
+	var fern_center: Dictionary = fern["slots"]["center"]
+	var starter_left: Dictionary = starter["slots"]["left"]
+	var fern_left: Dictionary = fern["slots"]["left"]
+	var sun_left: Dictionary = sun["slots"]["left"]
+	_expect((fern_center["end"] as Vector2).y > (starter_center["end"] as Vector2).y, "silhouette: shade fern should be visibly shorter")
+	_expect((fern_left["end"] as Vector2).x < (starter_left["end"] as Vector2).x, "silhouette: shade fern should spread wider than starter")
+	_expect((sun_left["end"] as Vector2).x < (starter_left["end"] as Vector2).x, "silhouette: sun creeper should spread wider than starter")
+
+func _test_low_vitality_droops_geometry() -> void:
+	var registry := _registry()
+	var species := registry.get_plant(&"starter_sprout")
+	var plant := _plant("droop")
+	plant.growth_ratio = 0.9
+	plant.health = 1.0
+	var healthy := PlantVisualAssembler.build(Vector2(620.0, 500.0), plant, species)
+	plant.health = 0.2
+	var wilted := PlantVisualAssembler.build(Vector2(620.0, 500.0), plant, species)
+	var healthy_left: Dictionary = healthy["slots"]["left"]
+	var wilted_left: Dictionary = wilted["slots"]["left"]
+	var healthy_center: Dictionary = healthy["slots"]["center"]
+	var wilted_center: Dictionary = wilted["slots"]["center"]
+	_expect((wilted_left["end"] as Vector2).y > (healthy_left["end"] as Vector2).y, "lifecycle visual: wilted side branches should droop")
+	_expect((wilted_center["end"] as Vector2).y > (healthy_center["end"] as Vector2).y, "lifecycle visual: wilted center stem should sag")
+
+func _test_regrowth_is_exposed_to_presentation() -> void:
+	var registry := _registry()
+	var plant := _plant("bud")
+	plant.growth_ratio = 1.0
+	plant.cut_branch(&"right")
+	plant.set_regrowth_progress(&"right", 0.55)
+	var layout := PlantVisualAssembler.build(Vector2(620.0, 500.0), plant, registry.get_plant(&"starter_sprout"))
+	var right: Dictionary = layout["slots"]["right"]
+	_expect(right["branch"] == null, "regrowth visual: regrowing slot must remain mechanically empty until complete")
+	_expect(absf(float(right["regrowth"]) - 0.55) < 0.001, "regrowth visual: presentation descriptor lost bud progress")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
