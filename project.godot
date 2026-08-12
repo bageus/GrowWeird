@@ -12,6 +12,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+PlatformRuntime="*res://src/infrastructure/platform/platform_runtime.gd"
 GameApp="*res://src/application/game_app.gd"
 
 [display]
