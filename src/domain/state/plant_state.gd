@@ -10,10 +10,12 @@ var health: float = 1.0
 var alive: bool = true
 var mutation_energy: Dictionary = {}
 var branches: Dictionary = {}
+var regrowth_progress: Dictionary = {}
 var rng_state: int = 0
 
 func initialize_native_branches() -> void:
 	branches.clear()
+	regrowth_progress.clear()
 	for slot in BranchState.VALID_SLOTS:
 		var branch := BranchState.new()
 		branch.branch_id = "%s:%s" % [instance_id, String(slot)]
@@ -34,6 +36,7 @@ func cut_branch(slot: StringName) -> BranchState:
 	if branch == null:
 		return null
 	branches[String(slot)] = null
+	set_regrowth_progress(slot, 0.0)
 	return branch
 
 func attach_branch(branch: BranchState, slot: StringName) -> bool:
@@ -41,6 +44,7 @@ func attach_branch(branch: BranchState, slot: StringName) -> bool:
 		return false
 	branch.slot = slot
 	branches[String(slot)] = branch
+	clear_regrowth_progress(slot)
 	return true
 
 func existing_branches() -> Array[BranchState]:
@@ -50,6 +54,19 @@ func existing_branches() -> Array[BranchState]:
 		if branch != null:
 			result.append(branch)
 	return result
+
+func regrowth_progress_at(slot: StringName) -> float:
+	if not BranchState.VALID_SLOTS.has(slot):
+		return 0.0
+	return clampf(float(regrowth_progress.get(String(slot), 0.0)), 0.0, 1.0)
+
+func set_regrowth_progress(slot: StringName, progress: float) -> void:
+	if not BranchState.VALID_SLOTS.has(slot):
+		return
+	regrowth_progress[String(slot)] = clampf(progress, 0.0, 1.0)
+
+func clear_regrowth_progress(slot: StringName) -> void:
+	regrowth_progress.erase(String(slot))
 
 func add_mutation_energy(axis: StringName, amount: float) -> void:
 	var key := String(axis)
