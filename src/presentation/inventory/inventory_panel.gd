@@ -58,6 +58,7 @@ func _add_cuttings(inventory: InventoryState) -> void:
 		if cutting == null:
 			continue
 		var row := _genetic_row(
+			cutting.genome,
 			_pretty_id(String(cutting.genome.species_id)),
 			cutting.genome.ancestry.size()
 		)
@@ -80,6 +81,7 @@ func _add_seeds(inventory: InventoryState) -> void:
 		if seed == null:
 			continue
 		var row := _genetic_row(
+			seed.genome,
 			_pretty_id(String(seed.genome.species_id)),
 			seed.genome.ancestry.size()
 		)
@@ -99,6 +101,7 @@ func _add_fruits(inventory: InventoryState) -> void:
 			continue
 		var prefix := "Hybrid " if fruit.hybrid else ""
 		var row := _genetic_row(
+			fruit.genome,
 			prefix + _pretty_id(String(fruit.genome.species_id)),
 			fruit.genome.ancestry.size()
 		)
@@ -108,11 +111,14 @@ func _add_fruits(inventory: InventoryState) -> void:
 		row.add_child(seed_button)
 		add_child(row)
 
-func _genetic_row(title: String, ancestry_count: int) -> HBoxContainer:
+func _genetic_row(genome: GenomeSnapshot, title: String, ancestry_count: int) -> HBoxContainer:
 	var row := HBoxContainer.new()
+	var preview := GeneticItemPreview.new()
+	preview.set_genome(genome)
+	row.add_child(preview)
 	var label := Label.new()
 	label.text = "%s · lineage %d" % [title, ancestry_count]
-	label.tooltip_text = "Genetic traits are intentionally hidden in normal UI."
+	label.tooltip_text = "Preview shows phenotype only; hidden mutation values stay secret."
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
 	return row
