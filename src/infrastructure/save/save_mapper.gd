@@ -28,7 +28,7 @@ static func _pot_to_dictionary(pot: PotState) -> Dictionary:
 	return {
 		"pot_id": pot.pot_id,
 		"soil_moisture": pot.soil_moisture,
-		"light_mode": int(pot.light_mode),
+		"light_mode": pot.light_mode,
 		"window_open": pot.window_open,
 		"plant": null if pot.plant == null else _plant_to_dictionary(pot.plant),
 	}
@@ -36,8 +36,12 @@ static func _pot_to_dictionary(pot: PotState) -> Dictionary:
 static func _pot_from_dictionary(data: Dictionary) -> PotState:
 	var pot := PotState.new()
 	pot.pot_id = String(data.get("pot_id", ""))
-	pot.soil_moisture = float(data.get("soil_moisture", 0.5))
-	pot.light_mode = int(data.get("light_mode", PotState.LightMode.DIFFUSED)) as PotState.LightMode
+	pot.soil_moisture = clampf(float(data.get("soil_moisture", 0.5)), 0.0, 1.0)
+	pot.light_mode = clampi(
+		int(data.get("light_mode", PotState.LightMode.DIFFUSED)),
+		0,
+		PotState.LightMode.size() - 1
+	)
 	pot.window_open = bool(data.get("window_open", false))
 	var plant_data: Variant = data.get("plant")
 	if plant_data is Dictionary:
@@ -67,15 +71,15 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.instance_id = String(data.get("instance_id", ""))
 	plant.custom_name = String(data.get("custom_name", ""))
 	plant.species_id = StringName(data.get("species_id", ""))
-	plant.age_seconds = float(data.get("age_seconds", 0.0))
-	plant.growth_ratio = float(data.get("growth_ratio", 0.0))
-	plant.health = float(data.get("health", 1.0))
-	plant.alive = bool(data.get("alive", true))
+	plant.age_seconds = maxf(0.0, float(data.get("age_seconds", 0.0)))
+	plant.growth_ratio = clampf(float(data.get("growth_ratio", 0.0)), 0.0, 1.0)
+	plant.health = clampf(float(data.get("health", 1.0)), 0.0, 1.0)
+	plant.alive = bool(data.get("alive", true)) and plant.health > 0.0
 	plant.mutation_energy = _plain_dictionary(data.get("mutation_energy", {}))
 	plant.rng_state = int(data.get("rng_state", 0))
-	var branch_data: Dictionary = data.get("branches", {})
+	var branch_data: Variant = data.get("branches", {})
 	for slot in BranchState.VALID_SLOTS:
-		var value: Variant = branch_data.get(String(slot))
+		var value: Variant = branch_data.get(String(slot)) if branch_data is Dictionary else null
 		plant.branches[String(slot)] = _branch_from_dictionary(value) if value is Dictionary else null
 	return plant
 
@@ -100,8 +104,10 @@ static func _branch_from_dictionary(data: Dictionary) -> BranchState:
 	branch.grafted = bool(data.get("grafted", false))
 	return branch
 
-static func _plain_dictionary(source: Dictionary) -> Dictionary:
+static func _plain_dictionary(source: Variant) -> Dictionary:
 	var result := {}
+	if not (source is Dictionary):
+		return result
 	for key in source:
 		result[String(key)] = source[key]
 	return result
