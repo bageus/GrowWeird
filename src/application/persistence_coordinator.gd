@@ -39,6 +39,16 @@ func process(delta: float, state: GameState) -> void:
 		_cloud_elapsed = 0.0
 		_save_cloud(state)
 
+func catch_up(state: GameState) -> Dictionary:
+	if not _ready or state == null:
+		return {}
+	var now := _platform.now_unix()
+	var elapsed := maxf(0.0, float(now - state.last_saved_unix)) if state.last_saved_unix > 0 else 0.0
+	var result := OfflineProgressionService.advance(state, elapsed, _registry, _rules)
+	state.last_saved_unix = now
+	SaveRepository.save(state)
+	return result
+
 func save_now(state: GameState, include_cloud: bool = true) -> bool:
 	if state == null:
 		return false
