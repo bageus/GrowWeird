@@ -45,11 +45,14 @@ func _refresh() -> void:
 	inventory_panel.set_inventory(GameApp.state.inventory)
 	_refresh_offer()
 	_refresh_pots()
+	prune_button.disabled = plant == null or not plant.alive
+	plant_sense.visible = plant != null
 
 	if pot == null:
 		plant_name_label.text = "No pot selected"
 		status_label.text = ""
 		plant_view.set_plant(null)
+		plant_sense.visible = false
 		return
 	window_view.set_environment(int(pot.light_mode), pot.window_open)
 	soil_view.set_moisture(pot.soil_moisture)
@@ -58,7 +61,6 @@ func _refresh() -> void:
 	if plant == null:
 		plant_name_label.text = "%s · empty" % pot.pot_id
 		status_label.text = "Choose a seed or cutting from inventory to plant here."
-		plant_sense.set_comfort({})
 		return
 
 	plant_name_label.text = plant.custom_name if not plant.custom_name.is_empty() else _pretty_id(String(plant.species_id))
@@ -73,12 +75,14 @@ func _refresh() -> void:
 
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
+	var plant := GameApp.active_plant()
+	var can_apply := plant != null and plant.alive
 	var buttons: Array[Button] = [offer_one, offer_two, offer_three]
 	for index in range(buttons.size()):
 		var button := buttons[index]
 		if index < ids.size():
 			button.text = _pretty_id(String(ids[index]))
-			button.disabled = GameApp.active_plant() == null
+			button.disabled = not can_apply
 		else:
 			button.text = "?"
 			button.disabled = true
@@ -129,8 +133,9 @@ func _on_spray_pressed() -> void:
 	GameApp.water_active(true)
 
 func _on_prune_pressed() -> void:
-	if GameApp.active_plant() == null:
-		event_label.text = "There is nothing to prune."
+	var plant := GameApp.active_plant()
+	if plant == null or not plant.alive:
+		event_label.text = "There is nothing living to prune."
 		return
 	_pending_item_id = ""
 	_pending_plant_kind = &""
@@ -158,7 +163,8 @@ func _on_branch_selected(slot: StringName) -> void:
 		_cancel_action()
 
 func _on_cutting_graft_requested(item_id: String) -> void:
-	if GameApp.active_plant() == null:
+	var plant := GameApp.active_plant()
+	if plant == null or not plant.alive:
 		event_label.text = "Select a pot with a living plant first."
 		return
 	_pending_item_id = item_id
