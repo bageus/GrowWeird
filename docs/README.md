@@ -16,9 +16,11 @@ This directory is the single home for project documentation and development rule
 
 - [`GAME_DESIGN.md`](GAME_DESIGN.md) — gameplay, UX, progression, economy and content rules.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — code boundaries, ownership, persistence, platform and technical rules.
+- [`TESTING.md`](TESTING.md) — test execution, smoke checks and save-schema verification workflow.
 
 ## Source-of-truth rule
 
 Gameplay intent belongs in `GAME_DESIGN.md`.
 Technical ownership and implementation constraints belong in `ARCHITECTURE.md`.
+Test execution instructions belong in `TESTING.md`.
 Future specialized rules should be extracted into a dedicated file in this directory only when they have a distinct responsibility and a clear source-of-truth owner.
