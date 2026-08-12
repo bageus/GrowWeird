@@ -61,3 +61,6 @@ static func _advance_pot(
 				plant.alive = false
 			else:
 				plant.health = 0.01
+
+	if policy.advance_growth and plant.alive:
+		BranchRegrowthService.advance(plant, delta_seconds, species, overall)
