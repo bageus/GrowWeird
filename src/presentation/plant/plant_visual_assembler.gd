@@ -9,29 +9,26 @@ static func build(size: Vector2, plant: PlantState) -> Dictionary:
 	var trunk_top := Vector2(center_x, base_y - stem_height)
 	var trunk_base := Vector2(center_x, base_y)
 	var side_y := lerpf(base_y - stem_height * 0.34, base_y - stem_height * 0.56, growth)
-	var side_span := lerpf(size.x * 0.08, size.x * 0.27, growth)
-	var side_lift := lerpf(size.y * 0.03, size.y * 0.16, growth)
+	var side_span := lerpf(size.x * 0.02, size.x * 0.27, growth)
+	var side_lift := lerpf(size.y * 0.01, size.y * 0.16, growth)
 	var descriptors := {
 		"center": _slot(
 			&"center",
 			trunk_base,
 			trunk_top,
-			plant.branch_at(&"center") if plant != null else null,
-			growth >= 0.08
+			plant.branch_at(&"center") if plant != null else null
 		),
 		"left": _slot(
 			&"left",
 			Vector2(center_x, side_y),
 			Vector2(center_x - side_span, side_y - side_lift),
-			plant.branch_at(&"left") if plant != null else null,
-			growth >= 0.30
+			plant.branch_at(&"left") if plant != null else null
 		),
 		"right": _slot(
 			&"right",
 			Vector2(center_x, side_y),
 			Vector2(center_x + side_span, side_y - side_lift),
-			plant.branch_at(&"right") if plant != null else null,
-			growth >= 0.42
+			plant.branch_at(&"right") if plant != null else null
 		),
 	}
 	return {
@@ -45,14 +42,12 @@ static func _slot(
 	slot: StringName,
 	start: Vector2,
 	end: Vector2,
-	branch: BranchState,
-	visible: bool
+	branch: BranchState
 ) -> Dictionary:
 	return {
 		"slot": slot,
 		"start": start,
 		"end": end,
 		"branch": branch,
-		"visible": visible,
 		"phenotype": PhenotypeResolver.resolve_branch(branch),
 	}
