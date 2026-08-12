@@ -25,7 +25,7 @@ grow_vertical = 2
 
 [node name="Layout" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="Margin/Layout"]
 layout_mode = 2
@@ -37,7 +37,7 @@ layout_mode = 2
 text = "Loading state..."
 
 [node name="PlantPlaceholder" type="PanelContainer" parent="Margin/Layout"]
-custom_minimum_size = Vector2(0, 280)
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -71,29 +71,58 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Light"
 
-[node name="FertilizerLabel" type="Label" parent="Margin/Layout"]
+[node name="OfferLabel" type="Label" parent="Margin/Layout"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Temporary fertilizer controls (hidden effects in final UI)"
+text = "Fertilizer offer"
 
-[node name="Fertilizers" type="HBoxContainer" parent="Margin/Layout"]
+[node name="Offers" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Humus" type="Button" parent="Margin/Layout/Fertilizers"]
+[node name="OfferOne" type="Button" parent="Margin/Layout/Offers"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Humus"
+text = "Offer 1"
 
-[node name="Mouse" type="Button" parent="Margin/Layout/Fertilizers"]
+[node name="OfferTwo" type="Button" parent="Margin/Layout/Offers"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Dead mouse"
+text = "Offer 2"
 
-[node name="Banana" type="Button" parent="Margin/Layout/Fertilizers"]
+[node name="OfferThree" type="Button" parent="Margin/Layout/Offers"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Banana peel"
+text = "Offer 3"
 
-[node name="Radiation" type="Button" parent="Margin/Layout/Fertilizers"]
+[node name="SkipOffer" type="Button" parent="Margin/Layout/Offers"]
+unique_name_in_owner = true
 layout_mode = 2
-text = "Radiation"
+text = "Skip"
+
+[node name="Propagation" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PruneLeft" type="Button" parent="Margin/Layout/Propagation"]
+layout_mode = 2
+text = "Prune left"
+
+[node name="PruneCenter" type="Button" parent="Margin/Layout/Propagation"]
+layout_mode = 2
+text = "Prune center"
+
+[node name="PruneRight" type="Button" parent="Margin/Layout/Propagation"]
+layout_mode = 2
+text = "Prune right"
+
+[node name="PlantCutting" type="Button" parent="Margin/Layout/Propagation"]
+layout_mode = 2
+text = "Plant first cutting → Pot 2"
+
+[node name="GraftCutting" type="Button" parent="Margin/Layout/Propagation"]
+layout_mode = 2
+text = "Graft first cutting"
 
 [node name="Pots" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
@@ -105,20 +134,30 @@ text = "Pot 1"
 
 [node name="PotTwo" type="Button" parent="Margin/Layout/Pots"]
 layout_mode = 2
-text = "Pot 2 (empty)"
+text = "Pot 2"
+
+[node name="InventoryLabel" type="Label" parent="Margin/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Inventory"
 
 [node name="EventLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Mutation events will appear here"
+text = "Events will appear here"
 
 [connection signal="pressed" from="Margin/Layout/Environment/WaterButton" to="." method="_on_water_pressed"]
 [connection signal="pressed" from="Margin/Layout/Environment/SprayButton" to="." method="_on_spray_pressed"]
 [connection signal="pressed" from="Margin/Layout/Environment/WindowButton" to="." method="_on_window_pressed"]
 [connection signal="pressed" from="Margin/Layout/Environment/LightButton" to="." method="_on_light_pressed"]
-[connection signal="pressed" from="Margin/Layout/Fertilizers/Humus" to="." method="_on_humus_pressed"]
-[connection signal="pressed" from="Margin/Layout/Fertilizers/Mouse" to="." method="_on_mouse_pressed"]
-[connection signal="pressed" from="Margin/Layout/Fertilizers/Banana" to="." method="_on_banana_pressed"]
-[connection signal="pressed" from="Margin/Layout/Fertilizers/Radiation" to="." method="_on_radiation_pressed"]
+[connection signal="pressed" from="Margin/Layout/Offers/OfferOne" to="." method="_on_offer_one_pressed"]
+[connection signal="pressed" from="Margin/Layout/Offers/OfferTwo" to="." method="_on_offer_two_pressed"]
+[connection signal="pressed" from="Margin/Layout/Offers/OfferThree" to="." method="_on_offer_three_pressed"]
+[connection signal="pressed" from="Margin/Layout/Offers/SkipOffer" to="." method="_on_skip_offer_pressed"]
+[connection signal="pressed" from="Margin/Layout/Propagation/PruneLeft" to="." method="_on_prune_left_pressed"]
+[connection signal="pressed" from="Margin/Layout/Propagation/PruneCenter" to="." method="_on_prune_center_pressed"]
+[connection signal="pressed" from="Margin/Layout/Propagation/PruneRight" to="." method="_on_prune_right_pressed"]
+[connection signal="pressed" from="Margin/Layout/Propagation/PlantCutting" to="." method="_on_plant_cutting_pressed"]
+[connection signal="pressed" from="Margin/Layout/Propagation/GraftCutting" to="." method="_on_graft_cutting_pressed"]
 [connection signal="pressed" from="Margin/Layout/Pots/PotOne" to="." method="_on_pot_one_pressed"]
 [connection signal="pressed" from="Margin/Layout/Pots/PotTwo" to="." method="_on_pot_two_pressed"]
