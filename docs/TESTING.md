@@ -24,11 +24,14 @@ The domain runner verifies:
 - seed snapshots stay immutable after later parent mutations;
 - grafted branches create hybrid genomes with host + donor traits;
 - fertilizer offers contain three unique choices;
+- multi-axis synergy mutations require and consume every configured axis;
 - pruning, cutting planting and grafting respect slot/inheritance rules;
 - mature comfortable branches grow and expose harvest-ready fruit;
 - harvesting resets the branch fruit cycle;
 - plant valuation returns money and selling frees the occupied pot;
 - Shop purchases add fertilizer and additional pots atomically;
+- species seed unlocks depend on data-driven pot-count requirements;
+- purchased species seeds contain the requested clean species genome;
 - save mapping round-trips fertilizer offers, inventory genetics and growing-fruit progress.
 
 ## Headless presentation tests
@@ -38,7 +41,8 @@ godot --headless --path . --script res://tests/run_presentation_tests.gd
 The presentation runner checks:
 - the main scene plus Shop/pot/inventory presentation resources load;
 - all three branch geometries expand with `growth_ratio` without becoming gameplay rules;
-- `thorns`, `bloom` and `glow` produce visible phenotype instructions;
+- base traits plus fungal/structural/synergy traits produce visible phenotype instructions;
+- species resources expose distinct visual palettes;
 - growing fruit exposes unripe/ready state for rendering;
 - Harvest interaction mode is available.
 Presentation tests validate rendering contracts only. They must not become a second owner of gameplay rules.
@@ -48,18 +52,25 @@ Run the project normally in Godot and verify:
 1. Cycle `dark → diffused → bright → direct` by clicking the window; toggle the handle open/closed.
 2. Water/spray and confirm soil plus Plant Sense react.
 3. Let the plant grow; center/left/right geometry expands continuously.
-4. Resolve fertilizer offers and confirm visible `thorns`, `bloom` or `glow` without hidden numbers.
-5. Prune a branch and confirm the cutting appears with phenotype preview.
-6. Plant a cutting/seed; only empty pots are valid targets.
-7. Graft a cutting into a free slot and confirm the graft marker/phenotype remains visible.
-8. Grow beyond the species fruiting threshold; each living branch should begin a visible fruit cycle.
-9. Confirm fruit progresses from tiny blossom/bud to colored fruit; hybrid fruit is visually distinct.
-10. When the gold ready ring appears, enter Harvest mode and click that branch; the fruit must move to inventory.
-11. In inventory, convert one harvested fruit to a seed and sell another fruit; money must update.
-12. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
-13. Open Shop, buy a fertilizer, use it from inventory, and verify money/inventory update exactly once.
-14. Buy a new pot; it must appear automatically in the dynamic bottom selector and accept planting.
-15. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
+4. Resolve fertilizer offers and confirm visible mutations without hidden numerical pressure values.
+5. Combine fertilizer families and verify synergy phenotypes such as lure blooms, crystal thorns or luminous fungus can appear.
+6. Confirm fungal growth, bark armor and synergy traits remain branch-local and survive pruning/grafting snapshots.
+7. Prune a branch and confirm the cutting appears with an expanded phenotype preview.
+8. Plant a cutting/seed; only empty pots are valid targets.
+9. Graft a cutting into a free slot and confirm the graft marker/phenotype remains visible.
+10. Grow beyond the species fruiting threshold and harvest a ripe fruit into inventory.
+11. Convert one harvested fruit to a seed and sell another fruit; money must update.
+12. Open Shop and confirm species seeds are listed separately from fertilizers.
+13. With the starting two pots, buy a `shade_fern` seed and plant it; its care preferences and palette must differ from the starter.
+14. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
+15. Buy and plant `sun_creeper`; confirm it prefers a different light/moisture range and has its own palette/fruit color.
+16. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
+17. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
+
+## Content progression ownership
+Exact fertilizer contributions, species care ranges, seed prices, unlock pot counts and visual palettes live in `content/**/*.tres` and are not duplicated in UI code.
+`MutationDefinition.axis_requirements` owns single- or multi-axis mutation thresholds. `MutationEngine` only evaluates those definitions.
+Species seed availability is calculated by `ShopService` from each `PlantSpeciesDefinition.unlock_pot_count` and current `GameState.pots`.
 
 ## Save schema
 Any persisted-field change must:
@@ -67,4 +78,4 @@ Any persisted-field change must:
 - add a sequential migration in `SaveMigrator`;
 - keep old migrations intact;
 - round-trip all new state through the appropriate mapper.
-Current schema is **v3**. `v2 → v3` adds branch-local growing-fruit state. Genetic inventory serialization belongs to `SaveItemMapper`; Game/Pot/Plant/Branch/fruit-growth serialization belongs to `SaveMapper`.
+Current schema is **v3**. This content/progression slice adds no persisted fields, so no schema bump is required. `v2 → v3` remains the latest migration for branch-local growing-fruit state.
