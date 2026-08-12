@@ -1,11 +1,11 @@
 class_name YandexPlatformAdapter
 extends PlatformAdapter
 
-const SAVE_KEY := "growweird_save_v1"
 const BRIDGE_NAME := "GrowWeirdYandexBridge"
 const BRIDGE_SOURCE := """
 (() => {
   if (window.GrowWeirdYandexBridge) return;
+  const saveKey = 'growweird_save_v1';
   const bridge = {
     ysdk: null,
     player: null,
@@ -54,14 +54,14 @@ const BRIDGE_SOURCE := """
     async loadCloud(done) {
       if (!this.player) { done(''); return; }
       try {
-        const data = await this.player.getData([%s]);
-        done(typeof data[%s] === 'string' ? data[%s] : '');
+        const data = await this.player.getData([saveKey]);
+        done(typeof data[saveKey] === 'string' ? data[saveKey] : '');
       } catch (_error) { done(''); }
     },
     async saveCloud(payload, done) {
       if (!this.player) { done(false); return; }
       try {
-        const data = {}; data[%s] = payload;
+        const data = {}; data[saveKey] = payload;
         await this.player.setData(data, true);
         done(true);
       } catch (_error) { done(false); }
@@ -85,7 +85,7 @@ const BRIDGE_SOURCE := """
   };
   window.GrowWeirdYandexBridge = bridge;
 })();
-""" % [JSON.stringify(SAVE_KEY), JSON.stringify(SAVE_KEY), JSON.stringify(SAVE_KEY), JSON.stringify(SAVE_KEY)]
+"""
 
 var _bridge: Variant
 var _ready: bool = false
