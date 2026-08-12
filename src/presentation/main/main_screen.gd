@@ -41,6 +41,7 @@ func _ready() -> void:
 	inventory_panel.fruit_seed_requested.connect(_on_fruit_seed_requested)
 	inventory_panel.fruit_sell_requested.connect(_on_fruit_sell_requested)
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
+	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -51,7 +52,12 @@ func _refresh() -> void:
 	money_label.text = "$%d" % GameApp.state.money
 	inventory_panel.set_inventory(GameApp.state.inventory, _fruit_prices())
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
-	shop_panel.set_shop(GameApp.shop_catalog(), GameApp.next_pot_price(), GameApp.state.money)
+	shop_panel.set_shop(
+		GameApp.shop_catalog(),
+		GameApp.species_shop_catalog(),
+		GameApp.next_pot_price(),
+		GameApp.state.money
+	)
 	_refresh_offer()
 	_refresh_actions(plant)
 	plant_sense.visible = plant != null
@@ -59,11 +65,13 @@ func _refresh() -> void:
 	if pot == null:
 		plant_name_label.text = "No pot selected"
 		status_label.text = ""
+		plant_view.set_species_style(null)
 		plant_view.set_plant(null)
 		plant_sense.visible = false
 		return
 	window_view.set_environment(int(pot.light_mode), pot.window_open)
 	soil_view.set_moisture(pot.soil_moisture)
+	plant_view.set_species_style(GameApp.active_species_definition())
 	plant_view.set_plant(plant)
 	if plant == null:
 		plant_name_label.text = "%s · empty" % pot.pot_id
@@ -230,6 +238,10 @@ func _on_close_shop_pressed() -> void:
 func _on_shop_fertilizer_requested(id: StringName) -> void:
 	var success := GameApp.buy_shop_fertilizer(id)
 	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Not enough money."
+
+func _on_shop_seed_requested(species_id: StringName) -> void:
+	var seed_id := GameApp.buy_shop_seed(species_id)
+	event_label.text = "%s seed added to inventory." % _pretty_id(String(species_id)) if not seed_id.is_empty() else "Seed is locked or unaffordable."
 
 func _on_shop_pot_requested() -> void:
 	var pot_id := GameApp.buy_new_pot()
