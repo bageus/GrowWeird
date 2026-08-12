@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="PlantSpeciesDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/plant_species_definition.gd" id="1_species"]
+
+[resource]
+script = ExtResource("1_species")
+id = &"sun_creeper"
+display_name_key = "plant.sun_creeper"
+moisture_min = 0.2
+moisture_max = 0.5
+light_min = 0.65
+light_max = 0.95
+open_window_preference = -1
+moisture_decay_per_second = 0.00042
+base_growth_per_second = 0.0019
+fruiting_growth_threshold = 0.7
+fruit_ripen_seconds = 78.0
+fruit_base_value = 62
+base_sale_value = 185
+shop_seed_price = 230
+unlock_pot_count = 3
+wood_color = Color(0.38, 0.23, 0.11, 1)
+leaf_color = Color(0.48, 0.63, 0.16, 1)
+fruit_color = Color(0.96, 0.68, 0.16, 1)
