@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
+[ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
+[ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
+[ext_resource type="Script" path="res://src/presentation/plant/soil_view.gd" id="4_soil"]
+[ext_resource type="Script" path="res://src/presentation/plant/plant_sense_view.gd" id="5_sense"]
+[ext_resource type="Script" path="res://src/presentation/inventory/inventory_panel.gd" id="6_inventory"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -11,153 +16,262 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.105, 0.094, 0.078, 1)
+
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 24.0
-offset_top = 24.0
-offset_right = -24.0
-offset_bottom = -24.0
+offset_left = 18.0
+offset_top = 14.0
+offset_right = -18.0
+offset_bottom = -14.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
 
 [node name="Layout" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="TopBar" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Layout/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "GROW WEIRD"
+
+[node name="Spacer" type="Control" parent="Margin/Layout/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MoneyLabel" type="Label" parent="Margin/Layout/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "$0"
+
+[node name="ShopButton" type="Button" parent="Margin/Layout/TopBar"]
+layout_mode = 2
+disabled = true
+text = "Shop · soon"
+
+[node name="PlantNameLabel" type="Label" parent="Margin/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+text = "Plant"
+horizontal_alignment = 1
+
+[node name="MainContent" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="Margin/Layout"]
+[node name="ToolsPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "GrowWeird — architecture smoke screen"
+
+[node name="Tools" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ToolsTitle" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+layout_mode = 2
+text = "Care"
+horizontal_alignment = 1
+
+[node name="WaterButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+layout_mode = 2
+text = "Water"
+
+[node name="SprayButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+layout_mode = 2
+text = "Spray"
+
+[node name="PruneButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Prune"
+
+[node name="CancelButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Cancel action"
+
+[node name="Hint" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Click the window to cycle light.\nClick its handle to open/close.\n\nPrune works directly on branches."
+autowrap_mode = 2
+
+[node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
+custom_minimum_size = Vector2(560, 390)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="World" type="Control" parent="Margin/Layout/MainContent/WorldPanel"]
+layout_mode = 2
+clip_contents = true
+
+[node name="WindowView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_window")
+
+[node name="PlantView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = -58.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_plant")
+
+[node name="SoilView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 0.31
+anchor_top = 0.69
+anchor_right = 0.69
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_soil")
+
+[node name="PlantSense" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_left = 0.30
+anchor_top = 0.015
+anchor_right = 0.70
+anchor_bottom = 0.29
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("5_sense")
+
+[node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
+custom_minimum_size = Vector2(310, 0)
+layout_mode = 2
+
+[node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="InventoryPanel" type="VBoxContainer" parent="Margin/Layout/MainContent/InventoryOuter/InventoryScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+script = ExtResource("6_inventory")
 
 [node name="StatusLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Loading state..."
-
-[node name="PlantPlaceholder" type="PanelContainer" parent="Margin/Layout"]
-custom_minimum_size = Vector2(0, 180)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Center" type="CenterContainer" parent="Margin/Layout/PlantPlaceholder"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="Margin/Layout/PlantPlaceholder/Center"]
-layout_mode = 2
-text = "PLANT VIEW PLACEHOLDER\nleft  |  center  |  right"
+text = "Loading..."
 horizontal_alignment = 1
 
-[node name="Environment" type="HBoxContainer" parent="Margin/Layout"]
+[node name="OffersPanel" type="PanelContainer" parent="Margin/Layout"]
 layout_mode = 2
+
+[node name="OffersLayout" type="VBoxContainer" parent="Margin/Layout/OffersPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="OfferLabel" type="Label" parent="Margin/Layout/OffersPanel/OffersLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Fertilizers"
+horizontal_alignment = 1
+
+[node name="OfferButtons" type="HBoxContainer" parent="Margin/Layout/OffersPanel/OffersLayout"]
+layout_mode = 2
+alignment = 1
 theme_override_constants/separation = 8
 
-[node name="WaterButton" type="Button" parent="Margin/Layout/Environment"]
-layout_mode = 2
-text = "Water"
-
-[node name="SprayButton" type="Button" parent="Margin/Layout/Environment"]
-layout_mode = 2
-text = "Spray"
-
-[node name="WindowButton" type="Button" parent="Margin/Layout/Environment"]
+[node name="OfferOne" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Window"
+text = "?"
 
-[node name="LightButton" type="Button" parent="Margin/Layout/Environment"]
+[node name="OfferTwo" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Light"
+text = "?"
 
-[node name="OfferLabel" type="Label" parent="Margin/Layout"]
+[node name="OfferThree" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
-text = "Fertilizer offer"
+text = "?"
 
-[node name="Offers" type="HBoxContainer" parent="Margin/Layout"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="OfferOne" type="Button" parent="Margin/Layout/Offers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Offer 1"
-
-[node name="OfferTwo" type="Button" parent="Margin/Layout/Offers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Offer 2"
-
-[node name="OfferThree" type="Button" parent="Margin/Layout/Offers"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Offer 3"
-
-[node name="SkipOffer" type="Button" parent="Margin/Layout/Offers"]
+[node name="SkipOffer" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Skip"
 
-[node name="Propagation" type="HBoxContainer" parent="Margin/Layout"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="PruneLeft" type="Button" parent="Margin/Layout/Propagation"]
-layout_mode = 2
-text = "Prune left"
-
-[node name="PruneCenter" type="Button" parent="Margin/Layout/Propagation"]
-layout_mode = 2
-text = "Prune center"
-
-[node name="PruneRight" type="Button" parent="Margin/Layout/Propagation"]
-layout_mode = 2
-text = "Prune right"
-
-[node name="PlantCutting" type="Button" parent="Margin/Layout/Propagation"]
-layout_mode = 2
-text = "Plant first cutting → Pot 2"
-
-[node name="GraftCutting" type="Button" parent="Margin/Layout/Propagation"]
-layout_mode = 2
-text = "Graft first cutting"
-
 [node name="Pots" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
+alignment = 1
 theme_override_constants/separation = 8
 
 [node name="PotOne" type="Button" parent="Margin/Layout/Pots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 0)
 layout_mode = 2
-text = "Pot 1"
+text = "pot-1"
 
 [node name="PotTwo" type="Button" parent="Margin/Layout/Pots"]
-layout_mode = 2
-text = "Pot 2"
-
-[node name="InventoryLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 0)
 layout_mode = 2
-text = "Inventory"
+text = "pot-2"
 
 [node name="EventLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
-text = "Events will appear here"
+text = "Grow. Graft. Mutate."
+horizontal_alignment = 1
+autowrap_mode = 2
 
-[connection signal="pressed" from="Margin/Layout/Environment/WaterButton" to="." method="_on_water_pressed"]
-[connection signal="pressed" from="Margin/Layout/Environment/SprayButton" to="." method="_on_spray_pressed"]
-[connection signal="pressed" from="Margin/Layout/Environment/WindowButton" to="." method="_on_window_pressed"]
-[connection signal="pressed" from="Margin/Layout/Environment/LightButton" to="." method="_on_light_pressed"]
-[connection signal="pressed" from="Margin/Layout/Offers/OfferOne" to="." method="_on_offer_one_pressed"]
-[connection signal="pressed" from="Margin/Layout/Offers/OfferTwo" to="." method="_on_offer_two_pressed"]
-[connection signal="pressed" from="Margin/Layout/Offers/OfferThree" to="." method="_on_offer_three_pressed"]
-[connection signal="pressed" from="Margin/Layout/Offers/SkipOffer" to="." method="_on_skip_offer_pressed"]
-[connection signal="pressed" from="Margin/Layout/Propagation/PruneLeft" to="." method="_on_prune_left_pressed"]
-[connection signal="pressed" from="Margin/Layout/Propagation/PruneCenter" to="." method="_on_prune_center_pressed"]
-[connection signal="pressed" from="Margin/Layout/Propagation/PruneRight" to="." method="_on_prune_right_pressed"]
-[connection signal="pressed" from="Margin/Layout/Propagation/PlantCutting" to="." method="_on_plant_cutting_pressed"]
-[connection signal="pressed" from="Margin/Layout/Propagation/GraftCutting" to="." method="_on_graft_cutting_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/WaterButton" to="." method="_on_water_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SprayButton" to="." method="_on_spray_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/PruneButton" to="." method="_on_prune_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
+[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
+[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferTwo" to="." method="_on_offer_two_pressed"]
+[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferThree" to="." method="_on_offer_three_pressed"]
+[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/SkipOffer" to="." method="_on_skip_offer_pressed"]
 [connection signal="pressed" from="Margin/Layout/Pots/PotOne" to="." method="_on_pot_one_pressed"]
 [connection signal="pressed" from="Margin/Layout/Pots/PotTwo" to="." method="_on_pot_two_pressed"]
