@@ -1,6 +1,13 @@
 class_name FertilizerOfferService
 extends RefCounted
 
+static func initialize_rng(offer: FertilizerOfferState, seed_value: int) -> void:
+	if offer == null or offer.rng_state != 0:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = seed_value
+	offer.rng_state = rng.state
+
 static func advance(
 	offer: FertilizerOfferState,
 	delta: float,
