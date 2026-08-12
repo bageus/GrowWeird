@@ -22,3 +22,10 @@ extends Resource
 
 @export_group("Economy")
 @export var base_sale_value: int = 100
+@export var shop_seed_price: int = 0
+@export_range(1, 100, 1) var unlock_pot_count: int = 1
+
+@export_group("Presentation")
+@export var wood_color: Color = Color(0.29, 0.18, 0.10)
+@export var leaf_color: Color = Color(0.22, 0.58, 0.24)
+@export var fruit_color: Color = Color(0.91, 0.42, 0.18)
