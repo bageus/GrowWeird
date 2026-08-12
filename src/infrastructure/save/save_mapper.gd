@@ -11,6 +11,8 @@ static func to_dictionary(state: GameState) -> Dictionary:
 		"active_pot_id": state.active_pot_id,
 		"last_saved_unix": state.last_saved_unix,
 		"pots": pots,
+		"inventory": SaveItemMapper.inventory_to_dictionary(state.inventory),
+		"fertilizer_offer": _offer_to_dictionary(state.fertilizer_offer),
 	}
 
 static func from_dictionary(data: Dictionary) -> GameState:
@@ -19,6 +21,8 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	state.money = int(data.get("money", 0))
 	state.active_pot_id = String(data.get("active_pot_id", ""))
 	state.last_saved_unix = int(data.get("last_saved_unix", 0))
+	state.inventory = SaveItemMapper.inventory_from_dictionary(data.get("inventory", {}))
+	state.fertilizer_offer = _offer_from_dictionary(data.get("fertilizer_offer", {}))
 	for value in data.get("pots", []):
 		if value is Dictionary:
 			state.pots.append(_pot_from_dictionary(value))
@@ -103,6 +107,29 @@ static func _branch_from_dictionary(data: Dictionary) -> BranchState:
 	branch.traits = _plain_dictionary(data.get("traits", {}))
 	branch.grafted = bool(data.get("grafted", false))
 	return branch
+
+static func _offer_to_dictionary(offer: FertilizerOfferState) -> Dictionary:
+	var offered: Array[String] = []
+	for fertilizer_id in offer.offered_ids:
+		offered.append(String(fertilizer_id))
+	return {
+		"offered_ids": offered,
+		"seconds_until_offer": offer.seconds_until_offer,
+		"skip_count": offer.skip_count,
+		"rng_state": offer.rng_state,
+	}
+
+static func _offer_from_dictionary(source: Variant) -> FertilizerOfferState:
+	var offer := FertilizerOfferState.new()
+	if not (source is Dictionary):
+		return offer
+	var data: Dictionary = source
+	for fertilizer_id in data.get("offered_ids", []):
+		offer.offered_ids.append(StringName(fertilizer_id))
+	offer.seconds_until_offer = maxf(0.0, float(data.get("seconds_until_offer", 0.0)))
+	offer.skip_count = maxi(0, int(data.get("skip_count", 0)))
+	offer.rng_state = int(data.get("rng_state", 0))
+	return offer
 
 static func _plain_dictionary(source: Variant) -> Dictionary:
 	var result := {}
