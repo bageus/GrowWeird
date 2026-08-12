@@ -6,6 +6,7 @@ const BRIDGE_SOURCE := """
 (() => {
   if (window.GrowWeirdYandexBridge) return;
   const saveKey = 'growweird_save_v1';
+  const maxCloudBytes = 190 * 1024;
   const bridge = {
     ysdk: null,
     player: null,
@@ -60,6 +61,11 @@ const BRIDGE_SOURCE := """
     },
     async saveCloud(payload, done) {
       if (!this.player) { done(false); return; }
+      if (new Blob([payload]).size > maxCloudBytes) {
+        console.warn('[GrowWeird] Cloud save exceeds safety limit.');
+        done(false);
+        return;
+      }
       try {
         const data = {}; data[saveKey] = payload;
         await this.player.setData(data, true);
