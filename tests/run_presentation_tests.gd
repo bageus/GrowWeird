@@ -6,6 +6,7 @@ func _init() -> void:
 	_test_presentation_resources_load()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
+	_test_species_visual_data()
 	_test_fruit_visual_state()
 	if _failures.is_empty():
 		print("GrowWeird presentation tests passed")
@@ -49,10 +50,27 @@ func _test_phenotype_descriptor() -> void:
 	branch.add_trait(&"thorns", 2)
 	branch.add_trait(&"bloom", 3)
 	branch.add_trait(&"glow", 1)
+	branch.add_trait(&"fungi", 2)
+	branch.add_trait(&"bark_armor", 1)
+	branch.add_trait(&"lure_bloom", 1)
+	branch.add_trait(&"crystal_thorns", 1)
+	branch.add_trait(&"luminous_fungus", 1)
 	var phenotype := PhenotypeResolver.resolve_branch(branch)
 	_expect(int(phenotype["thorn_count"]) > 0, "phenotype: thorns must be visible")
-	_expect(int(phenotype["flower_count"]) > 0, "phenotype: bloom must be visible")
+	_expect(int(phenotype["flower_count"]) > 0, "phenotype: bloom/lure must be visible")
 	_expect(float(phenotype["glow_strength"]) > 0.0, "phenotype: glow must be visible")
+	_expect(int(phenotype["fungus_count"]) > 0, "phenotype: fungi must be visible")
+	_expect(float(phenotype["branch_width_bonus"]) > 0.0, "phenotype: bark armor must affect silhouette")
+	_expect(int(phenotype["crystal_thorn_count"]) > 0, "phenotype: crystal thorns must be visible")
+	_expect(float(phenotype["fungus_glow"]) > 0.0, "phenotype: luminous fungus must glow")
+
+func _test_species_visual_data() -> void:
+	var starter := load("res://content/plants/starter_sprout.tres") as PlantSpeciesDefinition
+	var shade := load("res://content/plants/shade_fern.tres") as PlantSpeciesDefinition
+	var sun := load("res://content/plants/sun_creeper.tres") as PlantSpeciesDefinition
+	_expect(starter != null and shade != null and sun != null, "species presentation: species resources failed to load")
+	_expect(shade.leaf_color != starter.leaf_color, "species presentation: shade fern should have distinct palette")
+	_expect(sun.fruit_color != starter.fruit_color, "species presentation: sun creeper should have distinct fruit palette")
 
 func _test_fruit_visual_state() -> void:
 	var fruit := GrowingFruitState.new()
