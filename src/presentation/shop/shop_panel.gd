@@ -22,7 +22,7 @@ func set_shop(catalog: Array[Dictionary], pot_price: int, money: int) -> void:
 	var pot_button := Button.new()
 	pot_button.text = "New pot · $%d" % pot_price
 	pot_button.disabled = money < pot_price
-	pot_button.pressed.connect(func() -> void: pot_buy_requested.emit())
+	pot_button.pressed.connect(_emit_pot)
 	add_child(pot_button)
 
 func invalidate() -> void:
@@ -56,3 +56,6 @@ func _add_muted(text: String) -> void:
 
 func _emit_fertilizer(id: StringName) -> void:
 	fertilizer_buy_requested.emit(id)
+
+func _emit_pot() -> void:
+	pot_buy_requested.emit()
