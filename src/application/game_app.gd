@@ -22,7 +22,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	var steps := _clock.consume(delta, rules.simulation_step_seconds)
-	for _step in steps:
+	for _step in range(steps):
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 	if steps > 0:
 		state_changed.emit()
@@ -44,7 +44,7 @@ func active_plant() -> PlantState:
 	return pot.plant if pot != null else null
 
 func switch_pot(pot_id: String) -> bool:
-	if state.find_pot(pot_id) == null:
+	if state == null or state.find_pot(pot_id) == null:
 		return false
 	state.active_pot_id = pot_id
 	state_changed.emit()
