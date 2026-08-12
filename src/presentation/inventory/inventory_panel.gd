@@ -7,7 +7,13 @@ signal cutting_graft_requested(item_id: String)
 signal seed_plant_requested(item_id: String)
 signal fruit_seed_requested(item_id: String)
 
+var _last_signature: String = ""
+
 func set_inventory(inventory: InventoryState) -> void:
+	var signature := _signature(inventory)
+	if signature == _last_signature:
+		return
+	_last_signature = signature
 	_clear_rows()
 	_add_header("Inventory")
 	if inventory == null:
@@ -122,6 +128,18 @@ func _add_muted(text: String) -> void:
 	label.text = text
 	label.modulate = Color(1.0, 1.0, 1.0, 0.55)
 	add_child(label)
+
+func _signature(inventory: InventoryState) -> String:
+	if inventory == null:
+		return "null"
+	var parts: Array[String] = [str(inventory.fertilizers)]
+	for cutting in inventory.cuttings:
+		parts.append("c:%s" % cutting.item_id)
+	for seed in inventory.seeds:
+		parts.append("s:%s" % seed.item_id)
+	for fruit in inventory.fruits:
+		parts.append("f:%s" % fruit.item_id)
+	return "|".join(parts)
 
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
