@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="GameRules" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/config/game_rules.gd" id="1_rules"]
+
+[resource]
+script = ExtResource("1_rules")
+simulation_step_seconds = 1.0
+young_growth_multiplier = 1.8
+mature_growth_multiplier = 0.35
+critical_comfort_threshold = 0.25
+recovery_comfort_threshold = 0.7
+health_decay_per_second = 0.002
+health_recovery_per_second = 0.001
+watering_can_amount = 0.18
+sprayer_soil_amount = 0.035
+starting_money = 0
+fertilizer_skip_base_price = 50
+autosave_interval_seconds = 15.0
