@@ -56,7 +56,8 @@ static func plant_from_genome(genome: GenomeSnapshot, instance_id: String) -> Pl
 	plant.species_id = genome.species_id
 	plant.initialize_native_branches()
 	for branch in plant.existing_branches():
-		branch.traits = genome.traits.duplicate(true)
+		var inherited: Variant = genome.branch_traits.get(String(branch.slot))
+		branch.traits = inherited.duplicate(true) if inherited is Dictionary else genome.traits.duplicate(true)
 		branch.ancestry = genome.ancestry.duplicate()
 		_append_unique(branch.ancestry, instance_id)
 	return plant
