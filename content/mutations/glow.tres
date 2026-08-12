@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MutationDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/mutation_definition.gd" id="1_mutation"]
+
+[resource]
+script = ExtResource("1_mutation")
+id = &"glow"
+trigger_axis = &"radioactive"
+threshold = 10.0
+trait_id = &"glow"
+level_increment = 1
+target_scope = &"branch"
+repeatable = true
