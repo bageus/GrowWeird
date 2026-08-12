@@ -2,12 +2,15 @@
 
 GrowWeird is a Godot game about growing, pruning, grafting and endlessly mutating strange plants.
 
-## Documents
+## Documentation
 
-- [`GAME_DESIGN.md`](GAME_DESIGN.md) — gameplay rules, UX, progression and MVP scope.
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — code boundaries, ownership rules and technical constraints.
+All project documentation and development rules live in [`docs/`](docs/README.md).
 
-Those two documents intentionally cover different concerns. Gameplay rules belong in the design document; implementation ownership belongs in the architecture document.
+- [`docs/GAME_DESIGN.md`](docs/GAME_DESIGN.md) — gameplay rules, UX, progression and MVP scope.
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — code boundaries, ownership rules and technical constraints.
+- [`docs/README.md`](docs/README.md) — documentation index and documentation-placement rules.
+
+Do not add project documentation or rule files to the repository root. New documentation belongs under `docs/` and must keep a single authoritative source for each rule.
 
 ## Project principles
 
