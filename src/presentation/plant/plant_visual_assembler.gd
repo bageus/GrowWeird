@@ -16,19 +16,22 @@ static func build(size: Vector2, plant: PlantState) -> Dictionary:
 			&"center",
 			trunk_base,
 			trunk_top,
-			plant.branch_at(&"center") if plant != null else null
+			plant.branch_at(&"center") if plant != null else null,
+			growth >= 0.08
 		),
 		"left": _slot(
 			&"left",
 			Vector2(center_x, side_y),
 			Vector2(center_x - side_span, side_y - side_lift),
-			plant.branch_at(&"left") if plant != null else null
+			plant.branch_at(&"left") if plant != null else null,
+			growth >= 0.30
 		),
 		"right": _slot(
 			&"right",
 			Vector2(center_x, side_y),
 			Vector2(center_x + side_span, side_y - side_lift),
-			plant.branch_at(&"right") if plant != null else null
+			plant.branch_at(&"right") if plant != null else null,
+			growth >= 0.42
 		),
 	}
 	return {
@@ -42,12 +45,14 @@ static func _slot(
 	slot: StringName,
 	start: Vector2,
 	end: Vector2,
-	branch: BranchState
+	branch: BranchState,
+	visible: bool
 ) -> Dictionary:
 	return {
 		"slot": slot,
 		"start": start,
 		"end": end,
 		"branch": branch,
+		"visible": visible,
 		"phenotype": PhenotypeResolver.resolve_branch(branch),
 	}
