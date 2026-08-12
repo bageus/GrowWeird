@@ -6,7 +6,6 @@ static func fresh_species_snapshot(species_id: StringName) -> GenomeSnapshot:
 		return null
 	var genome := GenomeSnapshot.new()
 	genome.species_id = species_id
-	genome.ancestry = [String(species_id)]
 	return genome
 
 static func snapshot_branch(branch: BranchState) -> GenomeSnapshot:
