@@ -68,7 +68,9 @@ func _test_species_visual_data() -> void:
 	var starter := load("res://content/plants/starter_sprout.tres") as PlantSpeciesDefinition
 	var shade := load("res://content/plants/shade_fern.tres") as PlantSpeciesDefinition
 	var sun := load("res://content/plants/sun_creeper.tres") as PlantSpeciesDefinition
-	_expect(starter != null and shade != null and sun != null, "species presentation: species resources failed to load")
+	if starter == null or shade == null or sun == null:
+		_expect(false, "species presentation: species resources failed to load")
+		return
 	_expect(shade.leaf_color != starter.leaf_color, "species presentation: shade fern should have distinct palette")
 	_expect(sun.fruit_color != starter.fruit_color, "species presentation: sun creeper should have distinct fruit palette")
 
