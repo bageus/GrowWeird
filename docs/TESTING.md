@@ -45,8 +45,9 @@ godot --headless --path . --script res://tests/run_presentation_tests.gd
 The presentation runner checks that:
 
 - the main scene and presentation scripts load;
-- the visual growth assembler reveals center/left/right branches by stage;
-- `thorns`, `bloom` and `glow` produce visible phenotype instructions.
+- all three branch geometries expand as `growth_ratio` increases without creating new gameplay legality rules in Presentation;
+- `thorns`, `bloom` and `glow` produce visible phenotype instructions;
+- genetic inventory preview code is loadable with the rest of the presentation layer.
 
 Presentation tests validate rendering contracts only. They must not become a second owner of gameplay rules.
 
@@ -59,10 +60,10 @@ Verify this sequence:
 1. Click the window background to cycle `dark → diffused → bright → direct` light.
 2. Click the window handle to open/close the window.
 3. Water and spray; confirm soil visibly darkens and Plant Sense changes.
-4. Observe the plant start as a sprout and progressively reveal center, left and right branches.
+4. Observe the plant start with tiny bud-like branches and progressively expand into the center/left/right mature silhouette.
 5. Wait for the three-item fertilizer offer; choose radiation if available to get a fast visible `glow` mutation, or repeat relevant fertilizers until a mutation resolves.
 6. Confirm `thorns`, `bloom` or `glow` appear on the mutated branch without exposing hidden mutation numbers in normal UI.
-7. Enter Prune mode, hover a visible branch and click it; confirm a cutting appears in inventory.
+7. Enter Prune mode, hover a branch and click it; confirm a cutting appears in inventory with a phenotype preview.
 8. Click `Plant` on the cutting; only empty pots should be valid targets.
 9. Create another cutting, click `Graft`, then choose a glowing free branch slot on a living plant.
 10. Switch between pots; each pot must retain its own light/window/soil state.
