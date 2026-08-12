@@ -87,7 +87,6 @@ func _finalize(chosen: GameState) -> void:
 	SaveRepository.save(chosen)
 	_save_cloud(chosen, false)
 	_platform.mark_game_ready()
-	_platform.set_gameplay_active(true)
 	reconciled.emit(chosen, offline_result)
 
 func _save_local(state: GameState) -> void:
