@@ -22,8 +22,16 @@ extends Resource
 @export_range(1, 6, 1) var fertilizer_offer_count: int = 3
 
 @export_group("Economy")
-@export var starting_money: int = 0
+@export var starting_money: int = 200
 @export var fertilizer_skip_base_price: int = 50
+@export var trait_level_sale_value: int = 18
+@export var graft_sale_bonus: int = 65
+@export var ancestry_sale_value: int = 8
+@export_range(0.0, 1.0, 0.01) var nonliving_plant_value_multiplier: float = 0.15
+@export var fruit_trait_value: int = 6
+@export var hybrid_fruit_bonus: int = 30
+@export var pot_base_price: int = 250
+@export_range(1.0, 3.0, 0.05) var pot_price_growth: float = 1.55
 
 @export_group("Persistence")
 @export_range(1.0, 300.0, 1.0) var autosave_interval_seconds: float = 15.0
