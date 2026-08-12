@@ -6,6 +6,7 @@ signal branch_selected(slot: StringName)
 const MODE_NONE: StringName = &""
 const MODE_PRUNE: StringName = &"prune"
 const MODE_GRAFT: StringName = &"graft"
+const MODE_HARVEST: StringName = &"harvest"
 
 var _plant: PlantState
 var _interaction_mode: StringName = MODE_NONE
@@ -57,11 +58,9 @@ func _draw() -> void:
 	var base: Vector2 = _layout.get("base", Vector2.ZERO)
 	var root_top: Vector2 = _layout.get("root_top", base)
 	draw_line(base, root_top, wood_color, 11.0, true)
-
 	var slots: Dictionary = _layout.get("slots", {})
 	for slot_name in BranchState.VALID_SLOTS:
-		var descriptor: Dictionary = slots.get(String(slot_name), {})
-		_draw_slot(descriptor, wood_color, leaf_color)
+		_draw_slot(slots.get(String(slot_name), {}), wood_color, leaf_color)
 
 func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) -> void:
 	if descriptor.is_empty():
@@ -70,9 +69,7 @@ func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) ->
 	var branch := descriptor.get("branch") as BranchState
 	var start: Vector2 = descriptor.get("start", Vector2.ZERO)
 	var end: Vector2 = descriptor.get("end", Vector2.ZERO)
-	var selectable := _is_selectable(branch)
-	var highlighted := selectable and slot == _hovered_slot
-
+	var highlighted := _is_selectable(branch) and slot == _hovered_slot
 	if branch == null:
 		if _interaction_mode == MODE_GRAFT:
 			var ghost_color := Color(0.38, 0.74, 0.42, 0.62 if highlighted else 0.30)
@@ -84,17 +81,33 @@ func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) ->
 	var glow_strength := float(phenotype.get("glow_strength", 0.0))
 	if glow_strength > 0.0:
 		draw_line(start, end, Color(0.45, 0.96, 0.68, glow_strength * 0.32), 24.0, true)
-
 	var branch_color := Color(0.88, 0.74, 0.26) if highlighted else wood_color
 	draw_line(start, end, branch_color, 10.0 if highlighted else 8.0, true)
 	_draw_leaves(start, end, leaf_color, phenotype)
 	_draw_thorns(start, end, phenotype)
 	_draw_flowers(end, phenotype)
-
+	_draw_fruit(branch, end, highlighted)
 	if branch.grafted:
 		var graft_point := start.lerp(end, 0.12)
 		draw_circle(graft_point, 7.0, Color(0.68, 0.43, 0.26))
 		draw_arc(graft_point, 10.0, 0.0, TAU, 18, Color(0.94, 0.83, 0.61), 2.0, true)
+
+func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool) -> void:
+	if branch.fruit_growth == null:
+		return
+	var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0)
+	var center := end + Vector2(0.0, 18.0)
+	if progress < 0.18:
+		draw_circle(center, 4.0, Color(0.96, 0.72, 0.82))
+		return
+	var radius := lerpf(5.0, 14.0, progress)
+	var fruit_color := Color(0.35, 0.68, 0.25).lerp(Color(0.91, 0.42, 0.18), progress)
+	if branch.fruit_growth.hybrid:
+		fruit_color = fruit_color.lerp(Color(0.64, 0.28, 0.72), 0.42)
+	draw_circle(center, radius, fruit_color)
+	draw_line(center + Vector2(0.0, -radius), center + Vector2(0.0, -radius - 7.0), Color(0.22, 0.43, 0.16), 2.0, true)
+	if branch.fruit_growth.is_ready():
+		draw_arc(center, radius + 4.0, 0.0, TAU, 24, Color(1.0, 0.82, 0.28, 1.0 if highlighted else 0.6), 3.0, true)
 
 func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Dictionary) -> void:
 	var leaf_scale := float(phenotype.get("leaf_scale", 1.0))
@@ -111,15 +124,7 @@ func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Diction
 		var leaf_center := anchor + normal * side * 15.0 * leaf_scale
 		var forward := vector.normalized() * 11.0 * leaf_scale
 		var across := normal * 7.0 * leaf_scale
-		draw_colored_polygon(
-			PackedVector2Array([
-				leaf_center + forward,
-				leaf_center + across,
-				leaf_center - forward,
-				leaf_center - across,
-			]),
-			color
-		)
+		draw_colored_polygon(PackedVector2Array([leaf_center + forward, leaf_center + across, leaf_center - forward, leaf_center - across]), color)
 
 func _draw_thorns(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("thorn_count", 0))
@@ -151,12 +156,14 @@ func _is_selectable(branch: BranchState) -> bool:
 		return branch != null
 	if _interaction_mode == MODE_GRAFT:
 		return branch == null
+	if _interaction_mode == MODE_HARVEST:
+		return branch != null and branch.fruit_growth != null and branch.fruit_growth.is_ready()
 	return false
 
 func _candidate_at(point: Vector2) -> StringName:
 	var slots: Dictionary = _layout.get("slots", {})
 	var closest: StringName = &""
-	var closest_distance := 28.0
+	var closest_distance := 34.0 if _interaction_mode == MODE_HARVEST else 28.0
 	for slot_name in BranchState.VALID_SLOTS:
 		var descriptor: Dictionary = slots.get(String(slot_name), {})
 		if descriptor.is_empty():
@@ -166,7 +173,7 @@ func _candidate_at(point: Vector2) -> StringName:
 			continue
 		var start: Vector2 = descriptor.get("start", Vector2.ZERO)
 		var end: Vector2 = descriptor.get("end", Vector2.ZERO)
-		var distance := _distance_to_segment(point, start, end)
+		var distance := _distance_to_segment(point, start, end + Vector2(0.0, 18.0))
 		if distance < closest_distance:
 			closest_distance = distance
 			closest = slot_name
