@@ -23,6 +23,14 @@ func get_plant(id: StringName) -> PlantSpeciesDefinition:
 func get_fertilizer(id: StringName) -> FertilizerDefinition:
 	return _fertilizers.get(String(id)) as FertilizerDefinition
 
+func all_fertilizers() -> Array[FertilizerDefinition]:
+	var result: Array[FertilizerDefinition] = []
+	for value in _fertilizers.values():
+		var definition := value as FertilizerDefinition
+		if definition != null:
+			result.append(definition)
+	return result
+
 func all_mutations() -> Array[MutationDefinition]:
 	var result: Array[MutationDefinition] = []
 	for value in _mutations.values():
