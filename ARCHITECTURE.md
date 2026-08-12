@@ -1,150 +1,58 @@
 # GrowWeird — Architecture
-
-> Status: architectural source of truth.  
-> Engine: Godot 4.x.  
-> Goal: support a small MVP without creating a dead end when the project grows to Web, Android and iOS.
+> Architectural source of truth for the Godot 4.x project. Goal: ship a small Web MVP without creating a dead end for larger Web/Android/iOS versions.
 
 ## 1. Non-negotiable rules
+1. **One source of truth:** every gameplay rule, formula, balance value and mutable fact has one authoritative owner.
+2. **No project-owned text file over 350 lines.** Split by responsibility before crossing the limit.
+3. **No gameplay logic in UI or visual plant nodes.** UI sends intent and renders state/events.
+4. **No duplicated formulas.** Growth, comfort, valuation, mutation and inheritance each have one domain owner.
+5. **Definitions are immutable at runtime.** Species/fertilizer/trait resources are content, not save state.
+6. **Save data stores stable IDs + primitive/serializable state, never NodePaths/scenes.**
+7. **Gameplay randomness is deterministic when it matters.** Use owned RNG seeds/streams.
+8. **Platform APIs sit behind adapters.** Yandex/Android/iOS code never enters Domain.
+9. **Scenes compose/present; Domain decides.**
+10. **Expected invalid actions return explicit failures, not ad-hoc exceptions.**
 
-1. **One source of truth.** A gameplay rule, formula, balance value or runtime state has exactly one authoritative owner.
-2. **No handwritten text file may exceed 350 lines.** Split by responsibility before crossing the limit.
-3. **No gameplay logic in UI scenes.** UI sends commands and renders read models/events.
-4. **No gameplay logic in visual plant nodes.** Visuals reflect phenotype/state; they do not decide genetics, prices, growth or death.
-5. **No duplicated formulas.** Growth, comfort, valuation, inheritance and mutation resolution each have one domain service.
-6. **Definitions are immutable at runtime.** Species/fertilizer/trait/rule resources are content definitions, not save state.
-7. **Save data contains stable IDs and primitive state, never NodePaths or scene references.**
-8. **Randomness is deterministic when gameplay-relevant.** Mutation/genetics use owned RNG seeds so saves and tests are reproducible.
-9. **Platform APIs are behind adapters.** Yandex, Android and iOS code must not leak into domain logic.
-10. **Scenes are composition/presentation.** Business rules live in plain GDScript domain classes/services.
+## 2. 350-line enforcement
+Limit applies to tracked project text files such as `.gd`, `.md`, `.json`, `.cfg`, `.tscn`, `.tres`; generated/imported `.godot/` files are excluded. Large scenes/resources must be decomposed. Add `tools/check_file_length.py` and run it in CI/pre-commit; the checker also obeys the same limit.
 
-## 2. File-size rule
-
-The 350-line limit applies to project-owned text files, including:
-
-- `.gd`
-- `.md`
-- `.json`
-- `.cfg`
-- `.tscn`
-- `.tres`
-
-If a scene/resource approaches the limit, split it into child scenes/resources.
-
-Generated/imported files under `.godot/` are excluded.
-
-A CI/pre-commit check should fail when a tracked project text file exceeds 350 lines.
-
-Recommended checker location:
-
-`tools/check_file_length.py`
-
-The checker itself must also stay under 350 lines.
-
-## 3. Architectural shape
-
-Use a layered, data-driven architecture:
-
+## 3. Layer model
 ```text
 Presentation -> Application -> Domain <- Data Definitions
                       |
-                 Infrastructure
+               Infrastructure
                       |
-                   Platform
+                  Platform
 ```
-
 Dependencies point inward.
+- **Presentation:** input, views, animations, VFX/audio.
+- **Application:** player-action use cases, transactions, session orchestration.
+- **Domain:** rules/calculations/state invariants; no Godot scene/SDK dependency.
+- **Data Definitions:** authored immutable Resources and registries.
+- **Infrastructure:** persistence, clock, RNG implementation, analytics transport.
+- **Platform:** Yandex/Android/iOS adapters.
 
-- Presentation may call Application.
-- Application orchestrates Domain services.
-- Domain knows nothing about scenes, SDKs or save files.
-- Infrastructure implements persistence/time/platform boundaries.
-- Data Definitions describe content but do not own mutable player state.
-
-## 4. Suggested repository layout
-
+## 4. Suggested layout
 ```text
 res://
-  app/
-    boot/
-    session/
-    commands/
-    events/
-  domain/
-    plant/
-    care/
-    growth/
-    mutation/
-    genetics/
-    grafting/
-    harvest/
-    inventory/
-    economy/
-    offers/
-  data/
-    definitions/
-      species/
-      fertilizers/
-      traits/
-      mutation_rules/
-      balance/
-    registries/
-  presentation/
-    main/
-    plant/
-    hud/
-    inventory/
-    shop/
-    common/
-  infrastructure/
-    persistence/
-    time/
-    rng/
-    analytics/
-  platform/
-    common/
-    yandex/
-    android/
-    ios/
-  assets/
-    art/
-    audio/
-    fonts/
-  tests/
-    unit/
-    integration/
+  app/{boot,session,commands,events}/
+  domain/{plant,care,growth,mutation,genetics,grafting,harvest,inventory,economy,offers}/
+  data/definitions/{species,fertilizers,traits,mutation_rules,balance}/
+  data/registries/
+  presentation/{main,plant,hud,inventory,shop,common}/
+  infrastructure/{persistence,time,rng,analytics}/
+  platform/{common,yandex,android,ios}/
+  assets/{art,audio,fonts}/
+  tests/{unit,integration}/
   tools/
 ```
+Create folders only when the first real type needs them; do not build empty architecture for appearance.
 
-Do not create folders merely to match this document. Create them when the first real type for that responsibility exists.
+## 5. Composition root and globals
+Recommended entry scene: `res://app/boot/boot.tscn`. A `GameApplication` constructs/wires services and owns the active `GameSession`. Avoid many Autoload singletons. Gameplay state lives in `GameSession`, not a global dictionary. Autoload is reserved for truly process-wide SDK/bootstrap needs.
 
-## 5. Composition root
-
-The project should have one composition root responsible for constructing and wiring services.
-
-Recommended entry scene:
-
-`res://app/boot/boot.tscn`
-
-Recommended coordinator:
-
-`GameApplication`
-
-It owns references to application services and the active `GameSession`.
-
-Avoid a large collection of global Autoload singletons.
-
-Acceptable Autoload candidates are only truly process-wide infrastructure such as a minimal platform bootstrap if required by an SDK.
-
-Gameplay state itself must live in `GameSession`, not in an Autoload global dictionary.
-
-## 6. Content definitions vs runtime state
-
-This separation is critical.
-
-### Content definitions
-
-Authored once and treated as immutable:
-
+## 6. Definitions vs runtime state
+### Immutable authored definitions
 - `PlantSpeciesDefinition`
 - `FertilizerDefinition`
 - `TraitDefinition`
@@ -152,777 +60,252 @@ Authored once and treated as immutable:
 - `GrowthCurveDefinition`
 - `EconomyBalanceDefinition`
 - `OfferBalanceDefinition`
+Godot custom `Resource` files are appropriate.
+### Mutable runtime/save state
+- `GameState`, `PlayerState`, `PotState`, `PlantState`, `BranchState`
+- `MutationState`, `GenomeSnapshot`
+- `SeedState`, `CuttingState`, `FruitState`
+- `InventoryState`, `FertilizerOfferState`
+Runtime state must remain serializable and scene-independent.
 
-Godot custom `Resource` files are suitable for these definitions.
-
-### Runtime state
-
-Created per save/player/specimen:
-
-- `GameState`
-- `PlayerState`
-- `PotState`
-- `PlantState`
-- `BranchState`
-- `MutationState`
-- `GenomeSnapshot`
-- `SeedState`
-- `CuttingState`
-- `FruitState`
-- `InventoryState`
-- `FertilizerOfferState`
-
-Runtime state is serializable data and must not depend on scene nodes.
-
-## 7. Stable identifiers
-
-Every content definition must have a permanent string ID.
-
-Examples:
-
-```text
-species.apple_basic
-fertilizer.dead_mouse
-trait.carnivore.thorns
-mutation.glow.radioactive
-```
-
+## 7. Stable IDs
+Every definition gets a permanent string ID, e.g. `species.apple_basic`, `fertilizer.dead_mouse`, `trait.carnivore.thorns`.
 Rules:
+- released IDs never change if saves may contain them;
+- display names are localization keys, never IDs;
+- asset paths are not gameplay IDs;
+- migrations translate deprecated IDs when required.
 
-- IDs never change after release if they may exist in saves.
-- Display names are localization keys, not IDs.
-- Asset paths are not IDs.
-- Save migrations translate deprecated IDs when necessary.
+## 8. Registries as content source of truth
+Use explicit `SpeciesRegistry`, `FertilizerRegistry`, `TraitRegistry`, `MutationRuleRegistry`. No subsystem independently scans the same folders or keeps its own copy. Registries validate duplicate IDs, missing references, invalid ranges, impossible rules and missing required visual descriptors.
 
-## 8. Registries are the content source of truth
-
-Definitions are loaded through explicit registries, for example:
-
-- `SpeciesRegistry`
-- `FertilizerRegistry`
-- `TraitRegistry`
-- `MutationRuleRegistry`
-
-No system should scan arbitrary folders independently for the same definitions.
-
-The registry validates:
-
-- duplicate IDs;
-- missing referenced IDs;
-- invalid ranges;
-- impossible mutation requirements;
-- missing visual descriptors where required.
-
-## 9. GameState ownership
-
-`GameState` is the authoritative mutable snapshot of the current game.
-
-It contains references/state for:
-
-- player money;
-- owned pots;
-- plants per pot;
-- inventory;
-- active fertilizer offers;
-- save/version metadata;
-- authoritative last simulation timestamp.
-
-UI must never keep a competing writable copy of these values.
-
-Temporary UI selection state, such as “currently hovered branch”, is presentation state and does not belong in `GameState`.
+## 9. Authoritative GameState
+`GameState` is the only mutable gameplay snapshot. It owns player money, pots, plants, inventory, active fertilizer offers, schema/version metadata, RNG state and authoritative simulation timestamp. UI never owns competing writable copies. Hover/selection state is presentation-only.
 
 ## 10. PotState
-
-Each pot owns its own local environment.
-
-Recommended state:
-
-```text
-pot_id
-plant_id|null
-light_mode
-window_open
-last_environment_change_at
-```
-
-This guarantees that switching pots can also switch the visible background/window condition without forcing all plants to share one environment.
+Each pot owns its own environment so incompatible species can coexist.
+Recommended fields: `pot_id`, `plant_id|null`, `light_mode`, `window_open`, `last_environment_change_at`.
+Switching selected pot changes the presented environment; it does not rewrite another pot's state.
 
 ## 11. PlantState
-
-A plant instance should contain only specimen state, not authored species rules.
-
-Recommended fields:
-
+A specimen stores instance data, not species definitions:
 ```text
-plant_id
-custom_name
-species_id
-created_at
-age_seconds
-size
-health
-soil_moisture
-leaf_moisture
-root_genome
-mutation_state
-branch_slots
-fruit_state
-rng_seed
-status
+plant_id, custom_name, species_id, created_at, age_seconds
+size, health, soil_moisture, leaf_moisture, status
+root_genome, mutation_state, branch_slots, fruit_state, rng_seed
 ```
-
-`status` should use a small domain enum such as alive/dead.
-
-Derived values such as current price, comfort or growth speed are calculated, not persisted unless profiling proves caching necessary.
+Derived values such as comfort, growth speed and sale price are calculated, not persisted unless profiling later justifies a cache.
 
 ## 12. Three branch slots
-
-The root/base owns exactly three structural slots:
-
-- left
-- center
-- right
-
-Represent them by slot ID, not array position assumptions spread across code.
-
-Each slot contains either `null` or a `BranchState`.
-
-A `BranchState` should include:
-
+Root/base owns exactly `left`, `center`, `right`. Address slots by stable slot ID, not duplicated array-index assumptions.
+Each slot is `null` or a `BranchState` containing roughly:
 ```text
-branch_id
-slot_id
-origin_type
-source_plant_id|null
-genome
-mutation_state
-visual_seed
-created_at
+branch_id, slot_id, origin_type, source_plant_id|null
+genome, mutation_state, visual_seed, created_at
 ```
+`origin_type` may be native/grafted/cutting-derived. Cutting any branch, including center, sets the slot to `null` and creates `CuttingState`. Grafting requires `null`. The center branch is not a pruning exception.
 
-`origin_type` may distinguish native/grafted/cutting-derived lineage.
+## 13. Infinite mutation without class/save explosion
+Never create a class/resource for every complete plant combination. Store compact **MutationState** and derive a deterministic **PhenotypeDescriptor**.
+Recommended representation: `trait_id -> {level, expression, seed}`. Repeated acquisition changes level/expression instead of appending duplicate history events forever. Unique procedural variants store deterministic seeds/parameters rather than copied full visual trees.
+Thus “unlimited mutation” means no gameplay cap on levels/combinations, while save growth remains controlled.
 
-Cutting any branch sets its slot to `null` and creates a `CuttingState` snapshot.
+## 14. Mutation scope
+Every mutation definition explicitly declares scope: root/whole-plant, branch-local, fruit-expression, or future inheritance-only. Never infer scope from sprite names. `MutationEngine` is the sole resolver of new mutations; callers request resolution rather than reimplementing rules.
 
-Grafting requires a `null` slot.
-
-The center slot is not a special exception in pruning logic.
-
-## 13. Infinite mutation without infinite class explosion
-
-Never create a class/resource for every possible complete plant combination.
-
-Use two concepts:
-
-1. **Mutation state** — compact gameplay/genetic values.
-2. **Phenotype descriptor** — deterministic visual expression derived from state.
-
-Mutation state can store maps such as:
-
+## 15. Fertilizer source of truth
+`FertilizerDefinition` contains hidden mechanics once:
 ```text
-trait_id -> level/expression/seed
+id, localization_key, shop_price, mutation_contributions
+care_effects, growth_effects, icon_ref, offer_weight, tags
 ```
-
-Repeated acquisition of the same mutation increases or modifies its expression instead of appending duplicate event records forever.
-
-This gives unbounded progression while keeping saves compact.
-
-If unique procedural variants are needed, store a deterministic seed/parameters, not a copied full asset composition.
-
-“Unlimited mutation” therefore means no artificial gameplay cap on levels/combinations, not an ever-growing duplicate history log.
-
-## 14. Mutation ownership
-
-Mutations must explicitly declare scope:
-
-- root/whole-plant;
-- branch-local;
-- fruit-expression;
-- inherited-genome-only if a future mechanic requires it.
-
-Do not infer scope from asset names.
-
-`MutationEngine` is the only service allowed to resolve new mutations from fertilizer/genetic inputs.
-
-Other systems may request mutation resolution but must not duplicate mutation rules.
-
-## 15. Fertilizer definitions
-
-`FertilizerDefinition` is the single source for a fertilizer's hidden mechanical effects.
-
-Recommended authored data:
-
-```text
-id
-localization_key
-shop_price
-mutation_contributions
-care_effects
-growth_effects
-visual/icon reference
-offer_weight
-tags
-```
-
-UI receives only player-visible fields.
-
-Hidden mutation contributions must never be exposed merely because the definition contains them.
+UI receives only player-visible fields. Hidden contribution values remain hidden even though they exist in data.
 
 ## 16. Mutation rules
+`MutationRuleDefinition` is data; `MutationEngine` evaluates it. Inputs may include trait pressure, existing levels, species tags, ancestry, environment and deterministic RNG. Outputs may add/increase traits, alter expression seeds, enable organs or fruit modifiers. No rule formula is duplicated in visuals or fertilizer code.
 
-`MutationRuleDefinition` describes thresholds/combinations in data.
+## 17. GeneticsService
+`GeneticsService` is the only owner of genome copy/combine rules: seeds, cuttings, graft ancestry and hybrid fruit.
+### Seed
+When a seed item is created, capture an immutable `GenomeSnapshot` of all inheritable mutations relevant at that exact moment. Later parent mutation never changes existing seed snapshots.
+### Cutting
+At prune time, snapshot the cut branch's inheritable state. Once planted, the new specimen evolves independently under future fertilizers.
+### Graft
+A graft retains donor branch ancestry while attached to host root.
+### Hybrid fruit
+Resolve genetics only through `GeneticsService` using host/root + bearing-branch ancestry. Exact resolution moment stays configurable pending design choice.
 
-Examples of rule inputs:
-
-- trait pressure thresholds;
-- existing mutation levels;
-- species tags;
-- branch ancestry;
-- environmental state;
-- deterministic random roll.
-
-Examples of outputs:
-
-- add trait;
-- increase trait level;
-- modify expression seed;
-- enable visual organ;
-- add fruit-expression modifier.
-
-Rules belong in data; rule evaluation belongs only in `MutationEngine`.
-
-## 17. Genetics and inheritance
-
-`GeneticsService` is the only source of truth for copying/combining genomes.
-
-It owns:
-
-- seed snapshots;
-- cutting snapshots;
-- graft ancestry;
-- hybrid fruit inheritance.
-
-### Seed rule
-
-When the seed item is created, create an immutable `GenomeSnapshot` containing all inheritable mutations present at that exact moment.
-
-Existing seed snapshots never change when the parent mutates later.
-
-### Cutting rule
-
-A cutting receives a snapshot of the cut branch's inheritable state at cut time.
-
-After planting, the new plant is independent and can mutate indefinitely from future fertilizer events.
-
-### Graft rule
-
-A graft keeps donor branch ancestry while attached to the host root.
-
-### Hybrid fruit rule
-
-Hybrid fruit genetics must be resolved only through `GeneticsService`, using host/root and bearing-branch lineage.
-
-The exact resolution moment is configurable pending design decision.
-
-## 18. Care evaluation
-
-Use one `ComfortEvaluator`.
-
-Inputs:
-
-- species preferences;
-- pot light state;
-- window state;
-- soil moisture;
-- leaf moisture;
-- applicable mutation modifiers.
-
-Output should be a pure value object such as:
-
+## 18. ComfortEvaluator
+One pure `ComfortEvaluator` calculates care quality from species preferences, pot light/window, soil/leaf moisture and applicable mutation modifiers.
+Output value object:
 ```text
-water_deviation
-light_deviation
-air_deviation
-leaf_deviation
-overall_comfort
-worst_need
+water_deviation, light_deviation, air_deviation, leaf_deviation
+overall_comfort, worst_need
 ```
+Plant Sense renders this result. UI never duplicates comfort thresholds.
 
-The Plant Sense UI renders this output.
+## 19. PlantSimulationService
+Single owner of time-based plant simulation. It coordinates moisture decay, leaf-moisture decay, comfort, health damage/recovery, growth, maturity, death and later fruit progression.
+Design invariant: **smaller plants grow faster; larger plants progressively slower.** The curve lives in `GrowthCurveDefinition`, not hard-coded in scenes.
 
-The UI must not calculate comfort thresholds itself.
-
-## 19. Growth simulation
-
-`PlantSimulationService` is the only owner of time-based plant simulation.
-
-It coordinates pure calculations for:
-
-- moisture decay;
-- leaf-moisture decay;
-- comfort;
-- health damage/recovery;
-- growth;
-- maturity;
-- death;
-- fruit progression when implemented.
-
-Growth must support the design rule:
-
-**smaller plants grow faster; larger plants grow progressively slower.**
-
-The growth curve itself belongs in a balance definition, not hard-coded into UI or plant scenes.
-
-## 20. Real-time and offline simulation
-
-Use an injected `GameClock` interface.
-
-Domain logic must not call `Time.get_unix_time_from_system()` in many unrelated files.
-
-The production clock returns authoritative UTC timestamps.
-
-Tests can inject a fake clock.
-
-Store `last_simulated_at` in save state.
-
-When resuming:
-
+## 20. Real-time/offline time model
+Use injected `GameClock`; domain files must not independently read system wall time. Production clock returns UTC; tests use fake clock. Save `last_simulated_at`.
+Resume algorithm:
 1. compute elapsed real time;
-2. apply configured offline-progress policy;
-3. simulate using bounded steps or analytical integration;
-4. persist the new authoritative timestamp.
+2. apply configured offline policy;
+3. simulate by bounded steps or analytical integration;
+4. update authoritative timestamp.
+Never run one tick per missed second for long absences. Offline growth/death are policy switches, not architecture changes.
 
-Never run one frame/tick per missed second for long absences.
+## 21. Commands and events
+Presentation sends commands such as `WaterPlant`, `SprayPlant`, `SetLightMode`, `SetWindowState`, `ChooseFertilizer`, `SkipFertilizerOffer`, `PruneBranch`, `PlantCutting`, `GraftBranch`, `HarvestFruit`, `CreateSeed`, `SellPlant`, `RenamePlant`.
+Application validates, invokes Domain, changes `GameState`, then publishes events such as `PlantWatered`, `PlantMutated`, `BranchPruned`, `BranchGrafted`, `FruitHarvested`, `PlantDied`, `PlantSold`, `MoneyChanged`.
+Visual/audio code reacts to events; it never decides legality.
 
-Whether plants can die while the game is closed is a policy value, not an architectural rewrite.
+## 22. Atomic application actions
+A player action is one application transaction. Example `SellPlant` must validate existence, calculate price, credit money, clear pot, remove/move specimen state, emit events and schedule save through one use case. Never add money in UI, clear pot elsewhere and delete plant in a third callback.
 
-## 21. Commands and domain events
+## 23. Economy ownership
+- `PlantValuationService` owns plant sale formula.
+- `ShopService` owns purchases/catalog transactions.
+- `EconomyService` owns money transfer/invariants.
+Coefficients live in `EconomyBalanceDefinition`. UI asks the owner for price; it does not estimate. Valuation may consider species, age, health, mutation expression/synergy, graft complexity, fruiting and future market modifiers.
 
-Presentation sends intent as commands, for example:
+## 24. FertilizerOfferService
+Sole owner of offer cadence, weighted three-choice generation, deterministic offer RNG, skip price, choose/skip resolution and next scheduling. Save offered IDs and offer state so reload cannot reroll for free. Shop and random offers both reference the same `FertilizerDefinition`.
 
-- `WaterPlantCommand`
-- `SprayPlantCommand`
-- `SetLightModeCommand`
-- `SetWindowStateCommand`
-- `ChooseFertilizerCommand`
-- `SkipFertilizerOfferCommand`
-- `PruneBranchCommand`
-- `PlantCuttingCommand`
-- `GraftBranchCommand`
-- `HarvestFruitCommand`
-- `CreateSeedCommand`
-- `SellPlantCommand`
-- `RenamePlantCommand`
+## 25. InventoryService
+Only writer for inventory operations. Simple identical items may stack. Genetic items are instances: seeds, cuttings and any fruit whose genetics matter. Two visually identical seeds are not stackable if `GenomeSnapshot` differs.
 
-Application handlers validate the command, call domain services, mutate `GameState`, then emit domain/application events.
+## 26. Presentation modules
+Suggested views: `MainGameView`, `PlantView`, `WindowView`, `PlantSenseView`, `ToolPanelView`, `FertilizerOfferView`, `PotSelectorView`, `InventoryView`, `ShopView`.
+Views receive read-only presentation models and emit intent. Avoid a giant `main.gd`; split controllers around 250–300 lines before the 350-line hard limit.
 
-Example events:
+## 27. Plant visuals
+`PlantVisualAssembler` receives species visual definition + three branches + phenotype descriptor + size/health + visual seeds. It places reusable trunk/branch sprites, leaves, flowers, fruit, thorns, hooks, traps, fungi and effects.
+It does **not** decide what mutations exist.
 
-- `PlantWatered`
-- `PlantMutated`
-- `BranchPruned`
-- `BranchGrafted`
-- `FruitHarvested`
-- `PlantDied`
-- `PlantSold`
-- `MoneyChanged`
-
-Visuals and audio react to events; they do not determine whether the action was legal.
-
-## 22. Application transaction boundary
-
-A player action should be atomic from the application's perspective.
-
-Example: selling a plant must not independently:
-
-1. add money in UI code;
-2. clear the pot elsewhere;
-3. delete the plant in a third callback.
-
-Instead `SellPlantCommand` invokes one use case that:
-
-- validates plant exists;
-- calculates value through `PlantValuationService`;
-- adds money;
-- clears pot ownership;
-- removes/moves specimen state as required;
-- emits events;
-- schedules save.
-
-This prevents partial state and duplicated rules.
-
-## 23. Economy source of truth
-
-Use dedicated services:
-
-- `PlantValuationService`
-- `ShopService`
-- `EconomyService`
-
-`PlantValuationService` owns the sale formula.
-
-UI never estimates price independently.
-
-Balance coefficients live in `EconomyBalanceDefinition`.
-
-The service may consider species, age, health, mutation expression, synergy, graft complexity and future market modifiers.
-
-## 24. Fertilizer offer system
-
-`FertilizerOfferService` owns:
-
-- when an offer becomes due;
-- weighted generation of three choices;
-- deterministic random seed/state;
-- paid skip price;
-- resolving choose/skip;
-- scheduling the next offer.
-
-The three offered item IDs and offer deadline/state are saved so reloading cannot reroll choices for free.
-
-The Shop and random offer system may both reference the same `FertilizerDefinition`; they must not duplicate fertilizer mechanics.
-
-## 25. Inventory
-
-`InventoryService` is the only writer for inventory operations.
-
-Prefer typed item-state records rather than a generic unvalidated dictionary when an item carries lineage/genetics.
-
-Simple stackable items may use counts.
-
-Genetic items must be instances:
-
-- seeds;
-- cuttings;
-- hybrid fruit if its genetics matter.
-
-Two visually identical seeds may not be stackable if their genomes differ.
-
-## 26. Presentation architecture
-
-Presentation scenes should be split into small controllers/views.
-
-Suggested major views:
-
-- `MainGameView`
-- `PlantView`
-- `WindowView`
-- `PlantSenseView`
-- `ToolPanelView`
-- `FertilizerOfferView`
-- `PotSelectorView`
-- `InventoryView`
-- `ShopView`
-
-Each view receives read-only presentation data and emits user intent.
-
-Avoid a 1,000-line `main.gd` coordinator. If a controller approaches 250–300 lines, split responsibility before the 350-line hard limit.
-
-## 27. Plant visual generation
-
-Use a deterministic `PlantVisualAssembler` in Presentation.
-
-Inputs:
-
-- species visual definition;
-- three branch states;
-- phenotype descriptor;
-- plant size/health;
-- visual seeds.
-
-It selects/places reusable modules such as:
-
-- trunk/branch sprites;
-- leaves;
-- flowers;
-- fruit;
-- thorns;
-- hooks;
-- traps;
-- fungi;
-- glow/effect overlays.
-
-The assembler does not decide which mutation exists. It only renders the descriptor produced from domain state.
-
-## 28. Phenotype derivation
-
-Use one `PhenotypeResolver` to translate mutation/genome state into a renderable descriptor.
-
-This prevents three separate systems from interpreting “Carnivore level 4” differently.
-
-A descriptor can contain normalized visual instructions such as:
-
-```text
-leaf_shape_id
-leaf_scale
-leaf_color_params
-thorn_density
-thorn_scale
-flower_variant_id
-fruit_variant_id
-fungal_density
-glow_amount
-branch_deformation_seed
-```
-
-The resolver should be deterministic for the same specimen state and seeds.
+## 28. PhenotypeResolver
+One deterministic `PhenotypeResolver` converts genome/mutation state into renderable instructions so systems cannot interpret the same mutation differently.
+Descriptor may contain: `leaf_shape_id`, scale/color params, thorn density/scale, flower/fruit variant IDs, fungal density, glow, deformation seed and other normalized expression values. Same state + seeds must reconstruct the same appearance after load.
 
 ## 29. Persistence
-
-Use a versioned save DTO/schema separate from domain classes.
-
-Recommended root fields:
-
+Use versioned DTO/schema separate from scenes/domain objects.
+Recommended root:
 ```text
-schema_version
-saved_at_utc
-player
-pots
-plants
-inventory
-offers
-rng_state
+schema_version, saved_at_utc, player, pots, plants
+inventory, offers, rng_state
 ```
+Write: `GameState -> SaveMapper -> SaveDTO -> SaveRepository`.
+Load: `SaveRepository -> migrations -> SaveDTO -> SaveMapper -> GameState`.
+Do not serialize scene trees as primary save format.
 
-Persistence flow:
+## 30. Save migrations and safety
+Released breaking schema changes require chained migrations such as `v1 -> v2 -> v3 -> current`; current gameplay code only sees current state. Keep migrations isolated/small.
+Persistence should support atomic temp-write/replace where possible, last-known-good backup, validation, corruption fallback, milestone saves and debounced routine saves. Platform storage may differ while `SaveRepository` interface stays stable.
 
-`GameState -> SaveMapper -> SaveDTO -> SaveRepository`
+## 31. Platform adapters
+Application/Domain never import Yandex SDK. Define small capabilities such as `IPlatformStorage`, `IAdsService`, `IAnalyticsService`, optional `ILeaderboardService`, `IPlatformLifecycle`.
+Implement `YandexPlatformAdapter`, `AndroidPlatformAdapter`, `IOSPlatformAdapter`, local/dev adapter. Mobile expansion then replaces adapters rather than gameplay architecture.
 
-Load flow:
+## 32. Analytics boundary
+Analytics observes domain/application events. Never sprinkle vendor calls inside plant/mutation/economy classes. Analytics failure must never block a gameplay transaction.
 
-`SaveRepository -> migrations -> SaveDTO -> SaveMapper -> GameState`
+## 33. Deterministic RNG
+Use injectable named streams when useful: fertilizer offers, mutation resolution, genetics, phenotype cosmetics. Cosmetic randomness may be less strict, but a saved specimen's visible phenotype must remain stable after reload.
 
-Do not serialize Godot scene trees as the primary save format.
-
-## 30. Save migrations
-
-Every released schema change that can break old saves requires a migration.
-
-Example:
-
-```text
-v1 -> v2 -> v3 -> current
-```
-
-Never maintain parallel loading branches throughout gameplay code.
-
-Migration code owns historical compatibility; current domain code sees only current state.
-
-Keep each migration in its own small file if necessary to respect the 350-line rule.
-
-## 31. Save safety
-
-Infrastructure should support:
-
-- atomic write via temporary file + replace where platform permits;
-- last-known-good backup;
-- schema validation;
-- corruption fallback;
-- explicit save after economy/genetic milestones;
-- debounced save after frequent low-risk state changes.
-
-Web/platform adapters may implement storage differently, but `SaveRepository` interface remains stable.
-
-## 32. Platform abstraction
-
-Domain and Application must not import Yandex SDK code.
-
-Define small interfaces for platform capabilities, for example:
-
-- `IPlatformStorage`
-- `IAdsService`
-- `IAnalyticsService`
-- `ILeaderboardService` if later needed;
-- `IPlatformLifecycle`
-
-Adapters:
-
-- `YandexPlatformAdapter`
-- `AndroidPlatformAdapter`
-- `IOSPlatformAdapter`
-- local/dev adapter.
-
-This makes mobile expansion an adapter task rather than a gameplay rewrite.
-
-## 33. Analytics boundary
-
-Analytics observes application/domain events.
-
-Do not sprinkle vendor analytics calls inside mutation, economy or plant classes.
-
-Example event mapping:
-
-`PlantMutated -> analytics.track("plant_mutated", sanitized_payload)`
-
-Analytics failures must never block gameplay transactions.
-
-## 34. Testing strategy
-
-Domain logic should be testable without loading scenes.
-
-Priority unit tests:
-
+## 34. Tests
+Domain tests must run without scenes. Priority cases:
 - comfort boundaries;
-- growth slows with size;
-- prolonged critical state can kill;
-- adult plant can continue living;
-- fertilizer hidden effects resolve deterministically;
+- growth slows as size rises;
+- prolonged critical care can kill;
+- mature plant can live indefinitely;
+- fertilizer effects resolve deterministically;
 - mutation stacking has no artificial cap;
-- cutting any of three slots works;
-- graft requires a free slot;
+- all three branch slots can be cut;
+- graft requires free slot;
 - seed snapshot is immutable after creation;
-- cutting preserves donor snapshot then evolves independently;
+- cutting preserves snapshot then evolves independently;
 - hybrid fruit uses host + branch ancestry;
 - selling clears pot and credits exactly once;
-- offer reload does not reroll choices.
+- reload does not reroll fertilizer offers;
+- save/load + migrations round-trip.
 
-Integration tests should cover save/load and migration round trips.
+## 35. Duplication-prevention map
+Before writing a function, identify its owner:
+- “Is plant comfortable?” → `ComfortEvaluator`
+- “How fast does it grow/die?” → `PlantSimulationService`
+- “What mutation occurs?” → `MutationEngine`
+- “What does seed/cutting inherit?” → `GeneticsService`
+- “Can graft happen here?” → `GraftingService`
+- “What is plant worth?” → `PlantValuationService`
+- “What offer/skip price applies?” → `FertilizerOfferService`
+If another caller needs the answer, call that owner; never copy the formula.
 
-## 35. Deterministic RNG
+## 36. Rule-placement hierarchy
+1. Authored content value → Definition/Resource.
+2. Universal gameplay calculation → Domain service.
+3. One player-action orchestration → Application use case/handler.
+4. Persisted mutable fact → Runtime state.
+5. File/SDK/storage concern → Infrastructure/Platform.
+6. Rendering/input/animation → Presentation.
+If the same rule appears in two layers, the outer layer delegates to the inner owner.
 
-Gameplay randomness must be owned by an injectable RNG service/stream.
+## 37. Expected failures
+Commands return explicit failure codes/results for normal invalid states: occupied pot/slot, insufficient money, dead plant, missing branch/item, invalid target. Expected rejection is not an exception. Broken invariants should fail loudly in development and be captured by diagnostics in production where possible.
 
-Use separate named streams/seeds when useful, for example:
+## 38. Performance rules for Web/mobile
+- Avoid `_process()` on every plant part.
+- Simulate plants centrally at controlled cadence.
+- Presentation may animate every frame; gameplay simulation need not.
+- Background/offline plants use batched or analytical updates.
+- Keep mutation state compact and reconstruct visuals deterministically.
+- Load registries once and reuse definitions.
+- Pool transient VFX only if profiling shows benefit.
+- Profile browser memory before raising simultaneous pot count.
+Foreground/background/offline paths must use the same formulas to avoid divergent results.
 
-- fertilizer offers;
-- mutation resolution;
-- genetics;
-- phenotype cosmetics.
+## 39. Localization
+All player-visible authored text uses localization keys from the start. IDs are language-independent. Custom plant names are raw player content stored separately. This keeps RU/EN Web and future mobile localization out of Domain.
 
-Cosmetic randomness that does not affect gameplay may be freer, but a saved specimen's appearance should remain stable after reload.
+## 40. Client authority
+Initial GrowWeird saves are client-controlled and therefore not secure competitive state. Do not pretend otherwise. If trading/leaderboards/competitive economy later require server authority, add validation behind backend/platform services rather than ad-hoc anti-cheat checks throughout Domain.
 
-## 36. Duplication prevention rules
-
-Before adding a function, ask which service owns that rule.
-
-Examples:
-
-- “Is plant comfortable?” -> `ComfortEvaluator`
-- “How fast does it grow?” -> `PlantSimulationService` + growth definition
-- “What mutation occurs?” -> `MutationEngine`
-- “What does this seed inherit?” -> `GeneticsService`
-- “Can I graft here?” -> `GraftingService`
-- “What is this plant worth?” -> `PlantValuationService`
-- “How much does skip cost?” -> `FertilizerOfferService` + offer balance
-
-If another caller needs the same answer, call the owner; do not copy the formula.
-
-## 37. Rule placement hierarchy
-
-Use this hierarchy when deciding where code/data belongs:
-
-1. authored content value -> Definition/Resource;
-2. universal gameplay calculation -> Domain service;
-3. orchestration of one player action -> Application use case/command handler;
-4. persisted mutable fact -> Runtime state;
-5. storage/SDK/file concern -> Infrastructure/Platform;
-6. rendering/input/animation -> Presentation.
-
-If a rule appears in two layers, the outer layer should delegate to the inner owner instead of reproducing it.
-
-## 38. Error handling
-
-Domain commands should return explicit success/failure results for expected invalid actions.
-
-Examples:
-
-- pot occupied;
-- graft slot occupied;
-- insufficient money;
-- plant dead;
-- branch missing;
-- inventory item missing.
-
-Expected gameplay rejection is not an exception.
-
-Unexpected invariant violations should fail loudly in development and be captured by diagnostics in production where possible.
-
-## 39. Performance rules for Web/mobile
-
-- Avoid per-node `_process()` on every plant part.
-- Simulate active plants centrally at controlled intervals.
-- Visual animation can run per frame; gameplay simulation does not need to.
-- Pool frequent transient VFX if profiling shows allocation pressure.
-- Keep mutation state compact.
-- Use deterministic reconstruction for visuals rather than serializing large generated trees.
-- Load content registries once and reuse definitions.
-- Profile browser memory before increasing simultaneous pot count.
-
-## 40. Update cadence
-
-Prefer a central simulation scheduler.
-
-Example responsibilities:
-
-- active visible plant can receive frequent presentation updates;
-- domain moisture/growth may update at a lower fixed cadence;
-- background pots may update less frequently or analytically;
-- offline elapsed time is applied in batches.
-
-All paths must use the same formulas so foreground and offline results do not diverge materially.
-
-## 41. Localization
-
-All player-visible text uses localization keys from the start.
-
-Do not use localized display strings as gameplay IDs.
-
-Custom player plant names are raw user content and are stored separately from localization.
-
-This keeps Web RU/EN and future mobile localization independent from domain rules.
-
-## 42. Security and client authority
-
-GrowWeird is initially a client game, so local state is not inherently trustworthy for competitive systems.
-
-Do not architect core gameplay around a fake assumption that client saves are secure.
-
-If leaderboards, trading or competitive economy are added later, isolate server-authoritative validation behind platform/backend services rather than infecting current domain rules with ad-hoc anti-cheat checks.
-
-## 43. Recommended first implementation slice
-
-Build only enough architecture to prove the boundaries:
-
+## 41. First implementation slice
 1. `PlantSpeciesDefinition` + registry.
-2. `GameState`, `PotState`, `PlantState`, three branch slots.
+2. `GameState`, `PotState`, `PlantState` + three branch slots.
 3. `GameClock` + `PlantSimulationService`.
 4. `ComfortEvaluator`.
-5. one `WaterPlantCommand` and one light/window command path.
-6. minimal `PlantView` + Plant Sense read model.
+5. Water/light/window command path.
+6. Minimal `PlantView` + Plant Sense read model.
 7. `FertilizerDefinition` + `MutationEngine`.
-8. one visible mutation through `PhenotypeResolver`.
-9. versioned save round trip.
+8. One visible mutation through `PhenotypeResolver`.
+9. Versioned save round-trip.
+Do not prebuild every future interface; preserve boundaries and add implementations when first used.
 
-Do not implement every future interface before it is used. Preserve the boundaries, then add concrete services incrementally.
-
-## 44. Architecture definition of done for new features
-
-A feature is not complete until:
-
-- its source-of-truth owner is clear;
-- no formula/rule is duplicated;
-- persisted data has stable IDs;
+## 42. Definition of done for new features
+A feature is complete only when:
+- source-of-truth owner is clear;
+- formulas/rules are not duplicated;
+- persisted data uses stable IDs;
 - save migration impact is considered;
 - domain behavior is testable without UI;
-- platform-specific calls are isolated;
-- files remain below 350 lines;
+- platform calls are isolated;
+- all text files remain below 350 lines;
 - UI only renders/dispatches intent;
-- deterministic gameplay randomness is seeded;
-- any new content schema is validated by its registry.
+- gameplay RNG is deterministic where required;
+- new content schemas are registry-validated.
 
-## 45. Decisions intentionally left configurable
-
-Architecture must support these without a rewrite:
-
+## 43. Decisions intentionally configurable
+Architecture must support without rewrite:
 - offline growth enabled/disabled/capped;
 - offline permanent death enabled/disabled;
 - native branch regrowth policy;
 - fertilizer offer cadence;
 - skip-price curve;
-- mutation trigger thresholds;
+- mutation thresholds;
 - hybrid-fruit genetics timing;
 - branch-local vs root-wide mutation definitions;
-- market demand modifiers;
-- maximum number of owned pots imposed by balance/device limits.
-
-These are balance/product rules, not structural assumptions.
+- market-demand modifiers;
+- max owned pots due to balance/device limits.
+These are product/balance settings, not structural assumptions.
