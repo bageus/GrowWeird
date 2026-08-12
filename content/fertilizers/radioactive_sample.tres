@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FertilizerDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/fertilizer_definition.gd" id="1_fertilizer"]
+
+[resource]
+script = ExtResource("1_fertilizer")
+id = &"radioactive_sample"
+display_name_key = "fertilizer.radioactive_sample"
+shop_price = 250
+mutation_contributions = {"radioactive": 10.0}
+care_effects = {"health": -0.04}
