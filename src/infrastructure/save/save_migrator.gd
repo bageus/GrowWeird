@@ -18,6 +18,8 @@ static func migrate(source: Dictionary) -> Dictionary:
 				data = _migrate_v2_to_v3(data)
 			3:
 				data = _migrate_v3_to_v4(data)
+			4:
+				data = _migrate_v4_to_v5(data)
 			_:
 				push_error("No save migration registered for schema %d" % version)
 				return {}
@@ -70,4 +72,15 @@ static func _migrate_v3_to_v4(source: Dictionary) -> Dictionary:
 		if plant_value is Dictionary:
 			plant_value["regrowth_progress"] = {}
 	data["schema_version"] = 4
+	return data
+
+static func _migrate_v4_to_v5(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	# Existing players keep all previously available content and are not forced through onboarding.
+	data["progression"] = {
+		"progress_by_id": {},
+		"completed_ids": [],
+		"skip_onboarding": true,
+	}
+	data["schema_version"] = 5
 	return data
