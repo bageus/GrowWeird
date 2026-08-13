@@ -55,6 +55,19 @@ The lifecycle runner verifies:
 - poor vitality creates visible branch/stem droop;
 - Presentation receives bud progress while the slot remains mechanically empty until regrowth completes.
 
+## Headless resource-loop tests
+```bash
+godot --headless --path . --script res://tests/run_resource_loop_tests.gd
+```
+The resource runner verifies:
+- cutting sale uses species/genome valuation, consumes exactly that cutting and credits money;
+- seed sale uses species/genome valuation, consumes exactly that seed and credits money;
+- seed, cutting and fruit recycling destroy the source item and add the configured `Compost Mix` yield;
+- recycled genetics do not remain as another seed/cutting/fruit object;
+- a living whole plant cannot be composted;
+- a dead whole plant can be composted, produces biomass-based yield and frees its pot;
+- `Compost Mix` uses the ordinary inventory fertilizer path and applies its normal care/mutation definition.
+
 ## Headless presentation tests
 ```bash
 godot --headless --path . --script res://tests/run_presentation_tests.gd
@@ -90,23 +103,26 @@ Run the project normally in Godot and verify:
 3. Watch a new specimen transition through `Sprout → Juvenile → Adult`; geometry must expand continuously rather than jump between separate plant objects.
 4. Keep care good and confirm an adult remains stable indefinitely while fruit/mutations continue.
 5. Deliberately create prolonged critical care and observe color loss, fewer/smaller leaves and branch droop before permanent death.
-6. After death, confirm Plant Sense hides and prune/graft/harvest actions no longer work; the dead specimen can still be sold to free the pot.
+6. After death, confirm Plant Sense hides and prune/graft/harvest actions no longer work.
 7. Resolve fertilizer offers and confirm visible mutations without hidden numerical pressure values.
 8. Combine fertilizer families and verify synergy phenotypes such as lure blooms, crystal thorns or luminous fungus can appear.
 9. Confirm fungal growth, bark armor and synergy traits remain branch-local and survive pruning/grafting snapshots.
 10. Prune an adult healthy plant and keep care comfortable; confirm a small bud appears and eventually restores the exact freed slot as a clean native branch.
 11. Repeat pruning, then graft into the free slot before regrowth completes; native bud progress must disappear and the graft must remain.
 12. Save/reload during partial native regrowth and confirm the same bud progress resumes instead of restarting.
-13. Plant a cutting/seed; only empty pots are valid targets.
-14. Graft a cutting into a free slot and confirm the graft marker/phenotype remains visible.
-15. Grow beyond the species fruiting threshold and harvest a ripe fruit into inventory.
-16. Convert one harvested fruit to a seed and sell another fruit; money must update.
-17. Open Shop and confirm species seeds are listed separately from fertilizers.
-18. With the starting two pots, buy a `shade_fern` seed and plant it; it should be shorter, wider and leafier than the starter in addition to having different care/palette.
-19. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
-20. Buy and plant `sun_creeper`; confirm its low/wide silhouette, different care range and own palette/fruit color.
-21. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
-22. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
+13. In inventory, verify every cutting exposes `Plant`, `Graft`, `Sell` and `Compost` choices.
+14. Sell one cutting and confirm only that item disappears and money increases.
+15. Compost another cutting and confirm it disappears while the `Compost Mix` fertilizer stack increases.
+16. For a seed, verify `Plant`, `Sell` and `Compost`; selling/composting must consume the exact seed.
+17. Harvest fruit and verify the three competing actions: convert to seed, sell, or compost.
+18. Use recycled `Compost Mix` on a living plant and confirm it behaves like an ordinary fertilizer item and is consumed from inventory.
+19. Kill a test plant, then verify both final processing choices remain: reduced-value `Sell plant` and `Compost remains`.
+20. Compost the dead plant and confirm biomass yield enters inventory and the pot becomes immediately empty/selectable.
+21. Open Shop and confirm species seeds are listed separately from fertilizers.
+22. With the starting two pots, buy a `shade_fern` seed and plant it; it should be shorter, wider and leafier than the starter in addition to having different care/palette.
+23. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
+24. Buy and plant `sun_creeper`; confirm its low/wide silhouette, different care range and own palette/fruit color.
+25. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
 
 ## Offline manual path
 Use a copied save or a debug-adjusted `last_saved_unix`; do not edit gameplay formulas just to make the test convenient.
@@ -130,6 +146,7 @@ For an actual Yandex Web build, follow [`YANDEX_GAMES.md`](YANDEX_GAMES.md). At 
 Exact fertilizer contributions, species care ranges, lifecycle thresholds, branch-regrowth tuning, seed prices, unlock pot counts and visual palettes/silhouette parameters live in `content/**/*.tres` and are not duplicated in UI code.
 `MutationDefinition.axis_requirements` owns single- or multi-axis mutation thresholds. `MutationEngine` only evaluates those definitions.
 Species seed availability is calculated by `ShopService` from each `PlantSpeciesDefinition.unlock_pot_count` and current `GameState.pots`.
+Item sale multipliers and compost yields live in `GameRules`; genetic item value is calculated by `GeneticItemValuationService`, and recycling yield/compost identity by `RecyclingService`.
 
 ## Save schema
 Any persisted-field change must:
@@ -137,4 +154,4 @@ Any persisted-field change must:
 - add a sequential migration in `SaveMigrator`;
 - keep old migrations intact;
 - round-trip all new state through the appropriate mapper.
-Current schema is **v4**. `v3 → v4` adds per-slot native branch-regrowth progress; growth stage and health condition remain derived and are intentionally not persisted.
+Current schema is **v4**. The resource-loop slice adds no persisted fields: it consumes existing inventory objects into existing fertilizer stacks, so no migration is needed.
