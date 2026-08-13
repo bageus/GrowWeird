@@ -152,15 +152,18 @@ func _test_species_seed_unlock_progression() -> void:
 	var state := GameState.new()
 	state.money = 1000
 	state.pots = [PotState.new(), PotState.new()]
-	_expect(ShopService.is_species_unlocked(state, registry.get_plant(&"shade_fern")), "species shop: shade fern should unlock at two pots")
-	_expect(not ShopService.is_species_unlocked(state, registry.get_plant(&"sun_creeper")), "species shop: sun creeper should stay locked before three pots")
+	_expect(not ShopService.is_species_unlocked(state, registry.get_plant(&"shade_fern")), "species shop: shade fern should stay locked before lineage milestone")
+	state.progression.complete(&"make_seed")
+	_expect(ShopService.is_species_unlocked(state, registry.get_plant(&"shade_fern")), "species shop: shade fern should unlock after seed milestone with two pots")
+	_expect(not ShopService.is_species_unlocked(state, registry.get_plant(&"sun_creeper")), "species shop: sun creeper should stay locked before graft milestone and third pot")
 	var shade_seed_id := ShopActions.buy_species_seed(state, &"shade_fern", registry)
 	var shade_seed := InventoryService.find_seed(state.inventory, shade_seed_id)
 	_expect(shade_seed != null and shade_seed.genome.species_id == &"shade_fern", "species shop: purchased seed genome is wrong")
 	_expect(ShopActions.buy_species_seed(state, &"sun_creeper", registry).is_empty(), "species shop: locked seed purchase should fail")
+	state.progression.complete(&"make_graft")
 	state.pots.append(PotState.new())
 	var sun_seed_id := ShopActions.buy_species_seed(state, &"sun_creeper", registry)
-	_expect(not sun_seed_id.is_empty(), "species shop: sun creeper should unlock after third pot")
+	_expect(not sun_seed_id.is_empty(), "species shop: sun creeper should unlock after graft milestone plus third pot")
 
 func _test_save_round_trip_preserves_new_state() -> void:
 	var state := GameState.new()
