@@ -25,6 +25,7 @@ fruit_base_value = 48
 base_sale_value = 145
 shop_seed_price = 160
 unlock_pot_count = 2
+unlock_milestone_id = &"make_seed"
 wood_color = Color(0.24, 0.16, 0.12, 1)
 leaf_color = Color(0.16, 0.48, 0.32, 1)
 fruit_color = Color(0.40, 0.66, 0.58, 1)

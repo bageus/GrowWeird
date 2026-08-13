@@ -13,6 +13,7 @@ static func to_dictionary(state: GameState) -> Dictionary:
 		"pots": pots,
 		"inventory": SaveItemMapper.inventory_to_dictionary(state.inventory),
 		"fertilizer_offer": _offer_to_dictionary(state.fertilizer_offer),
+		"progression": _progression_to_dictionary(state.progression),
 	}
 
 static func from_dictionary(data: Dictionary) -> GameState:
@@ -23,6 +24,7 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	state.last_saved_unix = int(data.get("last_saved_unix", 0))
 	state.inventory = SaveItemMapper.inventory_from_dictionary(data.get("inventory", {}))
 	state.fertilizer_offer = _offer_from_dictionary(data.get("fertilizer_offer", {}))
+	state.progression = _progression_from_dictionary(data.get("progression", {}))
 	for value in data.get("pots", []):
 		if value is Dictionary:
 			state.pots.append(_pot_from_dictionary(value))
@@ -147,6 +149,28 @@ static func _offer_from_dictionary(source: Variant) -> FertilizerOfferState:
 	offer.skip_count = maxi(0, int(data.get("skip_count", 0)))
 	offer.rng_state = int(data.get("rng_state", 0))
 	return offer
+
+static func _progression_to_dictionary(progression: ProgressionState) -> Dictionary:
+	var completed: Array[String] = []
+	for id in progression.completed_ids:
+		completed.append(String(id))
+	return {
+		"progress_by_id": _plain_dictionary(progression.progress_by_id),
+		"completed_ids": completed,
+		"skip_onboarding": progression.skip_onboarding,
+	}
+
+static func _progression_from_dictionary(source: Variant) -> ProgressionState:
+	var progression := ProgressionState.new()
+	if not (source is Dictionary):
+		return progression
+	progression.progress_by_id = _plain_dictionary(source.get("progress_by_id", {}))
+	for id in source.get("completed_ids", []):
+		var milestone := StringName(id)
+		if not progression.completed_ids.has(milestone):
+			progression.completed_ids.append(milestone)
+	progression.skip_onboarding = bool(source.get("skip_onboarding", false))
+	return progression
 
 static func _plain_dictionary(source: Variant) -> Dictionary:
 	var result := {}

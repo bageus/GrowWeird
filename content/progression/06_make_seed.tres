@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/progression_definition.gd" id="1_progression"]
+
+[resource]
+script = ExtResource("1_progression")
+id = &"make_seed"
+order = 60
+title = "Keep the lineage"
+hint = "Turn one harvested fruit into a seed. The seed keeps a snapshot of its inherited mutations."
+event_id = &"seed_created"
+target_count = 1
+required_ids = Array[StringName]([&"harvest_fruit"])
+reward_money = 40

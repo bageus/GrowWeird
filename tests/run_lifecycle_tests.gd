@@ -10,7 +10,7 @@ func _init() -> void:
 	_test_regrowth_waits_for_adulthood()
 	_test_graft_cancels_native_regrowth()
 	_test_regrowth_save_round_trip()
-	_test_v3_migrates_to_v4()
+	_test_v3_migrates_through_current_schema()
 	_test_species_silhouettes_are_distinct()
 	_test_low_vitality_droops_geometry()
 	_test_regrowth_is_exposed_to_presentation()
@@ -116,19 +116,19 @@ func _test_regrowth_save_round_trip() -> void:
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
-	_expect(restored.schema_version == 4, "regrowth save: schema should be v4")
+	_expect(restored.schema_version == GameState.SCHEMA_VERSION, "regrowth save: schema should stay current")
 	_expect(restored.pots[0].plant.branch_at(&"left") == null, "regrowth save: empty slot should remain empty")
 	_expect(absf(restored.pots[0].plant.regrowth_progress_at(&"left") - 0.42) < 0.001, "regrowth save: partial progress was lost")
 
-func _test_v3_migrates_to_v4() -> void:
+func _test_v3_migrates_through_current_schema() -> void:
 	var legacy := {
 		"schema_version": 3,
 		"pots": [{"plant": {"branches": {"left": null, "center": null, "right": null}}}],
 	}
 	var migrated := SaveMigrator.migrate(legacy)
 	var plant_data: Dictionary = migrated["pots"][0]["plant"]
-	_expect(int(migrated.get("schema_version", 0)) == 4, "migration: v3 save should become v4")
-	_expect(plant_data.has("regrowth_progress") and plant_data["regrowth_progress"].is_empty(), "migration: v4 must add empty regrowth progress")
+	_expect(int(migrated.get("schema_version", 0)) == GameState.SCHEMA_VERSION, "migration: v3 save should reach current schema")
+	_expect(plant_data.has("regrowth_progress") and plant_data["regrowth_progress"].is_empty(), "migration: v4 step must add empty regrowth progress")
 
 func _test_species_silhouettes_are_distinct() -> void:
 	var registry := _registry()

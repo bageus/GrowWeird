@@ -26,7 +26,7 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 func _draw() -> void:
-	var brightness := [0.12, 0.42, 0.72, 1.0][_light_mode]
+	var brightness: float = float([0.12, 0.42, 0.72, 1.0][_light_mode])
 	var sky := Color(0.28, 0.34, 0.40).lerp(Color(0.67, 0.87, 1.0), brightness)
 	var frame := Color(0.48, 0.39, 0.30)
 	var inset := Rect2(size.x * 0.12, size.y * 0.08, size.x * 0.76, size.y * 0.82)

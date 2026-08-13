@@ -9,7 +9,9 @@ static func buy_fertilizer(
 	if state == null:
 		return false
 	var definition := registry.get_fertilizer(fertilizer_id)
-	if definition == null or definition.shop_price < 0:
+	if definition == null or definition.shop_price <= 0:
+		return false
+	if not ShopService.is_fertilizer_unlocked(state, definition):
 		return false
 	if not EconomyService.spend(state, definition.shop_price):
 		return false

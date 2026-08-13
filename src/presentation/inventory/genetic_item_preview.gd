@@ -17,12 +17,13 @@ func _draw() -> void:
 	var base := Vector2(center_x, size.y * 0.86)
 	var top := Vector2(center_x, size.y * 0.22)
 	var traits := _genome.traits if _genome != null else {}
-	var thorn_level := int(traits.get("thorns", 0))
-	var bloom_level := int(traits.get("bloom", 0)) + int(traits.get("lure_bloom", 0)) + int(traits.get("luminous_bloom", 0))
+	var thorn_level := int(traits.get("thorns", 0)) + int(traits.get("hooks", 0))
+	var bloom_level := int(traits.get("bloom", 0)) + int(traits.get("lure_bloom", 0)) + int(traits.get("luminous_bloom", 0)) + int(traits.get("crown_bloom", 0))
 	var glow_level := int(traits.get("glow", 0)) + int(traits.get("luminous_bloom", 0)) + int(traits.get("luminous_fungus", 0))
 	var fungal_level := int(traits.get("fungi", 0)) + int(traits.get("luminous_fungus", 0)) + int(traits.get("spore_trap", 0))
-	var bark_level := int(traits.get("bark_armor", 0))
+	var bark_level := int(traits.get("bark_armor", 0)) + int(traits.get("mineral_nodes", 0))
 	var crystal_level := int(traits.get("crystal_thorns", 0))
+	var toxic_level := int(traits.get("toxic_sacs", 0))
 
 	if glow_level > 0:
 		draw_circle(Vector2(center_x, size.y * 0.48), 17.0, Color(0.45, 0.96, 0.68, 0.18))
@@ -41,6 +42,9 @@ func _draw() -> void:
 			var y := size.y * (0.43 + 0.10 * float(index))
 			var x := center_x + (-7.0 if index % 2 == 0 else 7.0)
 			draw_circle(Vector2(x, y), 3.2, Color(0.55, 0.31, 0.55))
+	if toxic_level > 0:
+		draw_circle(Vector2(center_x + 8.0, size.y * 0.58), 4.0, Color(0.72, 0.78, 0.12))
+		draw_circle(Vector2(center_x + 7.0, size.y * 0.57), 1.0, Color(0.94, 1.0, 0.55))
 	if bloom_level > 0:
 		var flower_center := top + Vector2(0.0, -2.0)
 		for index in range(5):
