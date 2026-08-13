@@ -1,0 +1,122 @@
+extends SceneTree
+
+var _failures: Array[String] = []
+
+func _init() -> void:
+	_test_cutting_sale()
+	_test_seed_sale()
+	_test_item_recycling()
+	_test_dead_plant_recycling()
+	_test_compost_uses_normal_fertilizer_path()
+	if _failures.is_empty():
+		print("GrowWeird resource loop tests passed")
+		quit(0)
+		return
+	for failure in _failures:
+		push_error(failure)
+	quit(1)
+
+func _test_cutting_sale() -> void:
+	var registry := _registry()
+	var rules := GameRules.new()
+	var state := GameState.new()
+	var plant := _plant("cutting-sale")
+	plant.branch_at(&"left").add_trait(&"thorns", 2)
+	var cutting := PropagationService.prune(plant, &"left", "cutting-sale-item")
+	InventoryService.add_cutting(state.inventory, cutting)
+	var expected := ResourceActions.item_value(state, &"cutting", cutting.item_id, registry, rules)
+	var amount := ResourceActions.sell_item(state, &"cutting", cutting.item_id, registry, rules)
+	_expect(expected > 0 and amount == expected, "resource: cutting sale should use its valuation")
+	_expect(state.money == amount, "resource: cutting sale should credit money")
+	_expect(InventoryService.find_cutting(state.inventory, cutting.item_id) == null, "resource: sold cutting should be consumed")
+
+func _test_seed_sale() -> void:
+	var registry := _registry()
+	var rules := GameRules.new()
+	var state := GameState.new()
+	var seed := SeedState.new()
+	seed.item_id = "seed-sale-item"
+	seed.genome = GeneticsService.fresh_species_snapshot(&"shade_fern")
+	seed.genome.traits["fungi"] = 3
+	seed.genome.ancestry = ["parent-a", "parent-b"]
+	InventoryService.add_seed(state.inventory, seed)
+	var expected := ResourceActions.item_value(state, &"seed", seed.item_id, registry, rules)
+	var amount := ResourceActions.sell_item(state, &"seed", seed.item_id, registry, rules)
+	_expect(expected > 0 and amount == expected, "resource: seed sale should use genome value")
+	_expect(state.money == amount, "resource: seed sale should credit money")
+	_expect(InventoryService.find_seed(state.inventory, seed.item_id) == null, "resource: sold seed should be consumed")
+
+func _test_item_recycling() -> void:
+	var rules := GameRules.new()
+	var state := GameState.new()
+	var seed := SeedState.new()
+	seed.item_id = "seed-compost"
+	seed.genome = GeneticsService.fresh_species_snapshot(&"starter_sprout")
+	InventoryService.add_seed(state.inventory, seed)
+	var seed_yield := ResourceActions.recycle_item(state, &"seed", seed.item_id, rules)
+	_expect(seed_yield == rules.seed_compost_yield, "resource: seed compost yield mismatch")
+	_expect(InventoryService.find_seed(state.inventory, seed.item_id) == null, "resource: composted seed should be destroyed")
+
+	var plant := _plant("cutting-compost")
+	var cutting := PropagationService.prune(plant, &"right", "cutting-compost-item")
+	InventoryService.add_cutting(state.inventory, cutting)
+	var cutting_yield := ResourceActions.recycle_item(state, &"cutting", cutting.item_id, rules)
+	_expect(cutting_yield == rules.cutting_compost_yield, "resource: cutting compost yield mismatch")
+	_expect(InventoryService.find_cutting(state.inventory, cutting.item_id) == null, "resource: composted cutting should be destroyed")
+
+	var fruit := FruitState.new()
+	fruit.item_id = "fruit-compost"
+	fruit.genome = GeneticsService.fresh_species_snapshot(&"starter_sprout")
+	InventoryService.add_fruit(state.inventory, fruit)
+	var fruit_yield := ResourceActions.recycle_item(state, &"fruit", fruit.item_id, rules)
+	_expect(fruit_yield == rules.fruit_compost_yield, "resource: fruit compost yield mismatch")
+	_expect(InventoryService.find_fruit(state.inventory, fruit.item_id) == null, "resource: composted fruit should be destroyed")
+
+	var total := seed_yield + cutting_yield + fruit_yield
+	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == total, "resource: compost stack should equal recycled material")
+
+func _test_dead_plant_recycling() -> void:
+	var rules := GameRules.new()
+	var state := GameState.new()
+	var pot := PotState.new()
+	pot.pot_id = "dead-pot"
+	pot.plant = _plant("dead-plant")
+	pot.plant.growth_ratio = 1.0
+	state.pots = [pot]
+	state.active_pot_id = pot.pot_id
+	_expect(ResourceActions.recycle_dead_plant(state, pot, rules) == 0, "resource: living plant must not be compostable")
+	_expect(pot.plant != null, "resource: rejected live compost must preserve plant")
+	pot.plant.alive = false
+	pot.plant.health = 0.0
+	var expected := RecyclingService.dead_plant_yield(pot.plant, rules)
+	var amount := ResourceActions.recycle_dead_plant(state, pot, rules)
+	_expect(amount == expected and amount > 0, "resource: dead plant compost yield mismatch")
+	_expect(pot.plant == null, "resource: composting remains must free pot")
+	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == amount, "resource: dead plant compost should enter inventory")
+
+func _test_compost_uses_normal_fertilizer_path() -> void:
+	var registry := _registry()
+	var state := GameState.new()
+	var plant := _plant("compost-use")
+	plant.health = 0.5
+	InventoryService.add_fertilizer(state.inventory, RecyclingService.COMPOST_ID, 1)
+	var result := FertilizerActions.use_inventory(state, plant, RecyclingService.COMPOST_ID, registry)
+	_expect(bool(result.get("success", false)), "resource: compost should use normal fertilizer action")
+	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == 0, "resource: used compost should leave inventory")
+	_expect(plant.health > 0.5, "resource: compost care effect should be applied through fertilizer service")
+
+func _registry() -> ContentRegistry:
+	var registry := ContentRegistry.new()
+	registry.load_all()
+	return registry
+
+func _plant(id: String) -> PlantState:
+	var plant := PlantState.new()
+	plant.instance_id = id
+	plant.species_id = &"starter_sprout"
+	plant.initialize_native_branches()
+	return plant
+
+func _expect(condition: bool, message: String) -> void:
+	if not condition:
+		_failures.append(message)

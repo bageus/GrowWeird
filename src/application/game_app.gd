@@ -185,6 +185,30 @@ func sell_fruit(fruit_id: String) -> int:
 		state_changed.emit()
 	return amount
 
+func inventory_item_sale_value(kind: StringName, item_id: String) -> int:
+	return ResourceActions.item_value(state, kind, item_id, registry, rules)
+
+func sell_inventory_item(kind: StringName, item_id: String) -> int:
+	var amount := ResourceActions.sell_item(state, kind, item_id, registry, rules)
+	if amount > 0:
+		state_changed.emit()
+	return amount
+
+func recycle_inventory_item(kind: StringName, item_id: String) -> int:
+	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
+	if amount > 0:
+		state_changed.emit()
+	return amount
+
+func active_dead_plant_compost_yield() -> int:
+	return RecyclingService.dead_plant_yield(active_plant(), rules)
+
+func recycle_active_dead_plant() -> int:
+	var amount := ResourceActions.recycle_dead_plant(state, active_pot(), rules)
+	if amount > 0:
+		state_changed.emit()
+	return amount
+
 func shop_catalog() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for definition in registry.all_fertilizers():

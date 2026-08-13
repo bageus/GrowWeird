@@ -20,6 +20,7 @@ extends Control
 @onready var prune_button: Button = %PruneButton
 @onready var harvest_button: Button = %HarvestButton
 @onready var sell_plant_button: Button = %SellPlantButton
+@onready var recycle_plant_button: Button = %RecyclePlantButton
 @onready var cancel_button: Button = %CancelButton
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
@@ -39,7 +40,8 @@ func _ready() -> void:
 	inventory_panel.cutting_graft_requested.connect(_on_cutting_graft_requested)
 	inventory_panel.seed_plant_requested.connect(_on_seed_plant_requested)
 	inventory_panel.fruit_seed_requested.connect(_on_fruit_seed_requested)
-	inventory_panel.fruit_sell_requested.connect(_on_fruit_sell_requested)
+	inventory_panel.item_sell_requested.connect(_on_item_sell_requested)
+	inventory_panel.item_recycle_requested.connect(_on_item_recycle_requested)
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
@@ -50,7 +52,7 @@ func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
 	money_label.text = "$%d" % GameApp.state.money
-	inventory_panel.set_inventory(GameApp.state.inventory, _fruit_prices())
+	inventory_panel.set_inventory(GameApp.state.inventory, _item_prices())
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
 	shop_panel.set_shop(
 		GameApp.shop_catalog(),
@@ -97,6 +99,10 @@ func _refresh_actions(plant: PlantState) -> void:
 	harvest_button.disabled = not living or not _has_ready_fruit(plant)
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = "Sell plant · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
+	var compost_yield := GameApp.active_dead_plant_compost_yield()
+	recycle_plant_button.visible = plant != null and not plant.alive
+	recycle_plant_button.disabled = compost_yield <= 0
+	recycle_plant_button.text = "Compost remains · ×%d" % compost_yield
 
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
@@ -223,13 +229,22 @@ func _on_fruit_seed_requested(item_id: String) -> void:
 	var seed_id := GameApp.create_seed_from_fruit(item_id)
 	event_label.text = "Seed created." if not seed_id.is_empty() else "Could not create seed."
 
-func _on_fruit_sell_requested(item_id: String) -> void:
-	var amount := GameApp.sell_fruit(item_id)
-	event_label.text = "Fruit sold for $%d." % amount if amount > 0 else "Could not sell fruit."
+func _on_item_sell_requested(kind: StringName, item_id: String) -> void:
+	var amount := GameApp.sell_inventory_item(kind, item_id)
+	event_label.text = "%s sold for $%d." % [_pretty_id(String(kind)), amount] if amount > 0 else "Could not sell item."
+
+func _on_item_recycle_requested(kind: StringName, item_id: String) -> void:
+	var amount := GameApp.recycle_inventory_item(kind, item_id)
+	event_label.text = "%s composted into ×%d Compost Mix." % [_pretty_id(String(kind)), amount] if amount > 0 else "Could not compost item."
 
 func _on_sell_plant_pressed() -> void:
 	var amount := GameApp.sell_active_plant()
 	event_label.text = "Plant sold for $%d. Pot is free." % amount if amount > 0 else "Could not sell plant."
+	_cancel_action()
+
+func _on_recycle_plant_pressed() -> void:
+	var amount := GameApp.recycle_active_dead_plant()
+	event_label.text = "Remains composted into ×%d Compost Mix. Pot is free." % amount if amount > 0 else "Only dead plants can be composted."
 	_cancel_action()
 
 func _on_shop_pressed() -> void:
@@ -284,10 +299,14 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 func _on_offer_ready(_ids: Array[StringName]) -> void:
 	event_label.text = "Three new fertilizers appeared."
 
-func _fruit_prices() -> Dictionary:
+func _item_prices() -> Dictionary:
 	var result := {}
+	for cutting in GameApp.state.inventory.cuttings:
+		result[cutting.item_id] = GameApp.inventory_item_sale_value(&"cutting", cutting.item_id)
+	for seed in GameApp.state.inventory.seeds:
+		result[seed.item_id] = GameApp.inventory_item_sale_value(&"seed", seed.item_id)
 	for fruit in GameApp.state.inventory.fruits:
-		result[fruit.item_id] = GameApp.fruit_sale_value(fruit.item_id)
+		result[fruit.item_id] = GameApp.inventory_item_sale_value(&"fruit", fruit.item_id)
 	return result
 
 func _has_ready_fruit(plant: PlantState) -> bool:

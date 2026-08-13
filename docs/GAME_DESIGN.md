@@ -39,7 +39,7 @@ There is no ideal final specimen. Any living plant can continue mutating indefin
 4. Resolve fertilizer offer: choose one item or pay to skip.
 5. Observe growth/mutation.
 6. Harvest fruit and/or prune branches.
-7. Sell, recycle, root, seed or graft acquired material.
+7. Plant, graft, seed, sell or compost acquired genetic material.
 8. Spend money on pots, plants, sprouts, seeds and targeted fertilizer.
 9. Repeat with increasingly unusual lineages.
 
@@ -117,7 +117,8 @@ Plants can die permanently after sustained critical conditions. On death:
 - growth, native regrowth, fruiting and mutation stop;
 - prune/graft/harvest care interactions stop;
 - Plant Sense hides because the condition is no longer recoverable;
-- the dead specimen remains in the pot until sold/processed by an allowed economy action.
+- the dead specimen remains in the pot until sold for reduced salvage value or composted;
+- either final processing action frees the pot.
 
 A mature plant has no natural lifespan limit. Good care can keep it alive indefinitely.
 Offline death is a balance policy separate from foreground death. Current default allows offline progression but prevents a living specimen from crossing into permanent death while the game is closed; this policy can be tuned without changing the lifecycle model.
@@ -126,6 +127,8 @@ Offline death is a balance policy separate from foreground death. Current defaul
 Periodically three choices appear. Examples: banana peel, salt, dead mouse, insects, worms, humus, rotten fruit, mushrooms, nitrate/mineral fertilizer, radioactive material, unknown chemicals.
 Player must either choose exactly one offer or pay money to skip the whole event. Without skips, continued play keeps applying mutation pressure.
 Fertilizer properties are **not shown**. There is currently no encyclopedia; learning comes from repeated experiments and visual outcomes.
+
+`Compost Mix` is the common fertilizer output of recycling genetic material. It uses the same inventory/fertilizer application path as purchased or offered fertilizer; recycling is not a separate care mechanic.
 
 ## 14. Mutation model
 Mutation is effectively unbounded. Do not model complete plants as a finite catalog like “Spiky Red Apple Tree”. A specimen is a combination of inherited/acquired traits and expression parameters.
@@ -149,8 +152,13 @@ The most valuable outcomes should often be combinations:
 
 ## 16. Pruning and cuttings
 Prune mode highlights the three cuttable existing branches. Clicking one removes that exact branch and produces a cutting.
-A cutting can be planted in an empty pot, grafted into another plant's free slot, processed into fertilizer or discarded; selling can be added later if balance needs it.
-A planted cutting starts from donor inherited state but is not permanently identical: future fertilizer events mutate it independently.
+A cutting has three meaningful uses:
+- plant it in an empty pot;
+- graft it into another living plant's free slot;
+- sell it for a value derived from species, inherited trait depth and lineage;
+- compost it into `Compost Mix`.
+
+Planting/grafting consumes the cutting only after the operation succeeds. Selling or composting is irreversible and destroys that item snapshot. A planted cutting starts from donor inherited state but future fertilizer events mutate it independently.
 
 On an adult plant whose species supports native regrowth, pruning also starts a potential new-growth cycle for that empty slot. Regrowth is not a free clone: the cutting preserves the removed branch snapshot, while the new host branch starts as native host tissue without that removed branch's local traits.
 
@@ -160,13 +168,24 @@ A grafted branch produces **hybrid fruit** using host/root and donor-branch ance
 Grafting into a slot takes priority over pending native regrowth and cancels that regrowth progress.
 
 ## 18. Fruit and seeds
-Fruit can be sold, processed into fertilizer, or produce/convert into seeds according to species rules.
-When a seed item appears, it receives a snapshot of **all inheritable mutations relevant to its source lineage at that moment**. Later parent mutations never change an existing seed.
-Seeds have no rarity tier. Their value comes from inherited state/ancestry. A seed can be planted, sold or processed into fertilizer.
+Harvested fruit has three competing uses:
+- sell for money;
+- convert into a seed snapshot;
+- compost into `Compost Mix`.
 
-## 19. Selling plants
-Selling the plant itself is the primary way to free an occupied pot. Price must not equal simple fruit output. Candidate influences: base species, age/size, health, mutation depth, rare synergies, graft complexity, fruiting value and later market demand.
-A non-fruiting thorn-covered monster may be worth more than a productive conventional tree if its combination is unusual enough. Dead/nonliving specimens may have reduced salvage value rather than becoming unsellable blockers.
+When a seed item appears, it receives a snapshot of **all inheritable mutations relevant to its source lineage at that moment**. Later parent mutations never change an existing seed. Seeds have no rarity tier; their value comes from species, inherited state and ancestry.
+
+A seed can be planted, sold or composted. Selling/composting consumes the exact item. Composting intentionally destroys its genome and never creates another genetic object.
+
+## 19. Selling and processing plants
+Selling a living plant is the primary cash-out path that frees an occupied pot. Price must not equal simple fruit output. Candidate influences: base species, age/size, health, mutation depth, rare synergies, graft complexity, fruiting value and later market demand.
+A non-fruiting thorn-covered monster may be worth more than a productive conventional tree if its combination is unusual enough.
+
+A dead specimen has two final processing choices:
+- sell it for reduced salvage value;
+- compost the remains into `Compost Mix` based on specimen size and remaining branch biomass.
+
+Both choices remove the specimen and free the pot. Only dead plants may use the whole-plant compost action; living plants must be sold or kept alive.
 
 ## 20. Naming
 Players may give every specimen a custom name. The name belongs to the individual, not the species, and persists through save/load and future specimen-summary/sale UI.
@@ -179,7 +198,13 @@ Primary money sinks:
 - plants/sprouts/seeds;
 - fertilizer-offer skips;
 - future progression/tools.
-Free random offers create experimentation; Shop purchases create control.
+
+Primary material choices create opportunity cost:
+- sell genetic items for immediate money;
+- preserve them for planting/grafting/seeding;
+- destroy them for fertilizer through composting.
+
+Free random offers create experimentation; Shop purchases create control; recycling provides a material recovery path without preserving genetics.
 
 ## 22. Content generation strategy
 Practically endless variety comes from combining reusable gameplay/visual traits, not drawing every full plant variant. A specimen may combine species body style, branch shapes, leaf shapes/colors, flowers, fruit, thorns/hooks, fungi, glow/effects, graft visuals and procedural placement/scale parameters.
@@ -194,9 +219,9 @@ Seed/sprout stages; root/base; center/left/right branch modules; several leaf sh
 ### Mutation modules
 Small/large thorns; hooks; serrated/sticky/trap leaves; carnivorous flower/trap parts; fungi/spores; glow; mutated fruit; color/pattern masks.
 ### Tools/UI
-Watering can; sprayer; pruning shears; Shop/money; water/light/air indicators; fertilizer cards; pot selector; inventory frames; sell/recycle/plant/graft actions.
+Watering can; sprayer; pruning shears; Shop/money; water/light/air indicators; fertilizer cards; pot selector; inventory frames; sell/compost/plant/graft actions.
 ### VFX/audio
-Water drops, mist, soil transition, growth, pruning particles, mutation reveal, fruit pickup, coins, spores/glow; sounds for watering, spraying, pruning, window/blinds, planting, harvest, mutation, selling and room ambience.
+Water drops, mist, soil transition, growth, pruning particles, mutation reveal, fruit pickup, coins, spores/glow; sounds for watering, spraying, pruning, window/blinds, planting, harvest, mutation, selling, composting and room ambience.
 
 ## 24. MVP production order
 1. One plant/pot + real-time moisture decay.
@@ -216,9 +241,10 @@ Water drops, mist, soil transition, growth, pruning particles, mutation reveal, 
 15. Grafting into free slots.
 16. Hybrid fruit.
 17. Species lifecycle/regrowth and stronger species silhouettes.
-18. Shop/content/progression expansion.
-19. Save/load, balancing, onboarding and game-feel pass.
-20. Platform-specific production integration and release work.
+18. Complete item sell/compost/resource loop.
+19. Shop/content/progression expansion.
+20. Save/load, balancing, onboarding and game-feel pass.
+21. Platform-specific production integration and release work.
 A useful vertical slice exists once steps 1–8 are fun without the rest.
 
 ## 25. Reference games
@@ -246,7 +272,7 @@ These are balance/product questions, not reasons to redesign architecture:
 - exact native-regrowth timings/health/comfort requirements per species;
 - how often fertilizer offers should vary by life stage, if at all;
 - whether repeated paid skip becomes more expensive;
-- dead-plant salvage value and future compost/recycle options;
+- exact sale-vs-compost balance and recycling yields after economy playtesting;
 - how strongly ancestry affects sale price without enabling exploits;
 - which future mutations are branch-local versus whole-plant/root-level;
 - target time to the first major visible mutation in a new session;
