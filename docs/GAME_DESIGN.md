@@ -27,6 +27,7 @@ There is no ideal final specimen. Any living plant can continue mutating indefin
 - Top-right: Shop; money immediately to its left.
 - Left-center: Water and Prune; Water exposes Watering Can / Sprayer.
 - Right: vertical inventory for fruit, seeds, fertilizer, cuttings and later item types.
+- A compact current-goal card teaches the first-session loop without hiding normal gameplay controls.
 - Bottom-center: periodic three-item fertilizer offer.
 - Below offers: pot selector; switching pot switches that pot's environment.
 - Start: 1 pot with a sprout + 1 empty pot.
@@ -128,7 +129,7 @@ Periodically three choices appear. Examples: banana peel, salt, dead mouse, inse
 Player must either choose exactly one offer or pay money to skip the whole event. Without skips, continued play keeps applying mutation pressure.
 Fertilizer properties are **not shown**. There is currently no encyclopedia; learning comes from repeated experiments and visual outcomes.
 
-`Compost Mix` is the common fertilizer output of recycling genetic material. It uses the same inventory/fertilizer application path as purchased or offered fertilizer; recycling is not a separate care mechanic.
+`Compost Mix` is the common fertilizer output of recycling genetic material. It uses the same inventory/fertilizer application path as purchased or offered fertilizer; recycling is not a separate care mechanic. Compost Mix is not a targeted Shop purchase: its reliable source is processing existing material, though experimental random offers may still surface it.
 
 ## 14. Mutation model
 Mutation is effectively unbounded. Do not model complete plants as a finite catalog like “Spiky Red Apple Tree”. A specimen is a combination of inherited/acquired traits and expression parameters.
@@ -152,7 +153,7 @@ The most valuable outcomes should often be combinations:
 
 ## 16. Pruning and cuttings
 Prune mode highlights the three cuttable existing branches. Clicking one removes that exact branch and produces a cutting.
-A cutting has three meaningful uses:
+A cutting has four meaningful uses:
 - plant it in an empty pot;
 - graft it into another living plant's free slot;
 - sell it for a value derived from species, inherited trait depth and lineage;
@@ -190,7 +191,7 @@ Both choices remove the specimen and free the pot. Only dead plants may use the 
 ## 20. Naming
 Players may give every specimen a custom name. The name belongs to the individual, not the species, and persists through save/load and future specimen-summary/sale UI.
 
-## 21. Shop and economy
+## 21. Shop, economy and first-session progression
 Initial shop categories: fertilizer, plants, sprouts, seeds, pots. Later: tools, automation, laboratory items.
 Primary money sinks:
 - additional pots;
@@ -206,6 +207,28 @@ Primary material choices create opportunity cost:
 
 Free random offers create experimentation; Shop purchases create control; recycling provides a material recovery path without preserving genetics.
 
+A new save has a short milestone path that teaches systems by asking the player to perform real gameplay actions, not through a separate tutorial scene. Current sequence:
+1. water/spray the starter;
+2. change light or window state;
+3. use a fertilizer;
+4. continue experimenting until a visible mutation actually resolves;
+5. harvest a ripe fruit;
+6. convert fruit into a seed;
+7. prune a branch into a cutting;
+8. graft a cutting into a free slot;
+9. sell or compost one genetic inventory item.
+
+Milestones show one current goal, short contextual hint, progress and a small money reward. Future actions performed before their milestone becomes available do not bank tutorial credit; the player must demonstrate the action when that goal is active. Milestone rewards are one-time and are not repeatable income.
+
+Targeted Shop control opens gradually while random fertilizer offers remain ungated experimentation:
+- basic fertilizers remain available immediately;
+- `Mushroom Compost` targeted purchase opens after the first fertilizer experiment;
+- `Dead Mouse` and `Radioactive Sample` targeted purchase open after the first resolved mutation;
+- `shade_fern` requires both its existing two-pot requirement and the seed milestone;
+- `sun_creeper` requires both its existing three-pot requirement and the graft milestone.
+
+Existing saves created before milestone progression are not forced through onboarding and retain access to milestone-gated content. New saves use the milestone path.
+
 ## 22. Content generation strategy
 Practically endless variety comes from combining reusable gameplay/visual traits, not drawing every full plant variant. A specimen may combine species body style, branch shapes, leaf shapes/colors, flowers, fruit, thorns/hooks, fungi, glow/effects, graft visuals and procedural placement/scale parameters.
 
@@ -219,7 +242,7 @@ Seed/sprout stages; root/base; center/left/right branch modules; several leaf sh
 ### Mutation modules
 Small/large thorns; hooks; serrated/sticky/trap leaves; carnivorous flower/trap parts; fungi/spores; glow; mutated fruit; color/pattern masks.
 ### Tools/UI
-Watering can; sprayer; pruning shears; Shop/money; water/light/air indicators; fertilizer cards; pot selector; inventory frames; sell/compost/plant/graft actions.
+Watering can; sprayer; pruning shears; Shop/money; water/light/air indicators; fertilizer cards; pot selector; inventory frames; sell/compost/plant/graft actions; current-goal card.
 ### VFX/audio
 Water drops, mist, soil transition, growth, pruning particles, mutation reveal, fruit pickup, coins, spores/glow; sounds for watering, spraying, pruning, window/blinds, planting, harvest, mutation, selling, composting and room ambience.
 
@@ -242,8 +265,8 @@ Water drops, mist, soil transition, growth, pruning particles, mutation reveal, 
 16. Hybrid fruit.
 17. Species lifecycle/regrowth and stronger species silhouettes.
 18. Complete item sell/compost/resource loop.
-19. Shop/content/progression expansion.
-20. Save/load, balancing, onboarding and game-feel pass.
+19. First-session progression + Shop unlock ladder.
+20. Content depth, balancing and game-feel pass.
 21. Platform-specific production integration and release work.
 A useful vertical slice exists once steps 1–8 are fun without the rest.
 
