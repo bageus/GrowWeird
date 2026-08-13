@@ -10,6 +10,7 @@ extends Control
 @onready var plant_view: PlantView = %PlantView
 @onready var plant_sense: PlantSenseView = %PlantSense
 @onready var inventory_panel: InventoryPanel = %InventoryPanel
+@onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var shop_panel: ShopPanel = %ShopPanel
 @onready var shop_overlay: PanelContainer = %ShopOverlay
@@ -52,6 +53,7 @@ func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
 	money_label.text = "$%d" % GameApp.state.money
+	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
 	inventory_panel.set_inventory(GameApp.state.inventory, _item_prices())
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
 	shop_panel.set_shop(
@@ -257,7 +259,7 @@ func _on_close_shop_pressed() -> void:
 
 func _on_shop_fertilizer_requested(id: StringName) -> void:
 	var success := GameApp.buy_shop_fertilizer(id)
-	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Not enough money."
+	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Item is locked or unaffordable."
 
 func _on_shop_seed_requested(species_id: StringName) -> void:
 	var seed_id := GameApp.buy_shop_seed(species_id)
