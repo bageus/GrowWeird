@@ -6,6 +6,7 @@ func _init() -> void:
 	_test_presentation_resources_load()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
+	_test_mutation_reveal_detection()
 	_test_species_visual_data()
 	_test_fruit_visual_state()
 	if _failures.is_empty():
@@ -23,6 +24,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
+		"res://src/presentation/plant/branch_mutation_renderer.gd",
 		"res://src/presentation/plant/soil_view.gd",
 		"res://src/presentation/plant/plant_sense_view.gd",
 		"res://src/presentation/plant/phenotype_resolver.gd",
@@ -56,14 +58,33 @@ func _test_phenotype_descriptor() -> void:
 	branch.add_trait(&"lure_bloom", 1)
 	branch.add_trait(&"crystal_thorns", 1)
 	branch.add_trait(&"luminous_fungus", 1)
+	branch.add_trait(&"hooks", 2)
+	branch.add_trait(&"mineral_nodes", 1)
+	branch.add_trait(&"crown_bloom", 1)
+	branch.add_trait(&"toxic_sacs", 1)
 	var phenotype := PhenotypeResolver.resolve_branch(branch)
 	_expect(int(phenotype["thorn_count"]) > 0, "phenotype: thorns must be visible")
+	_expect(int(phenotype["hook_count"]) > 0, "phenotype: hooks must be visible")
 	_expect(int(phenotype["flower_count"]) > 0, "phenotype: bloom/lure must be visible")
+	_expect(float(phenotype["crown_bloom_strength"]) > 0.0, "phenotype: crown bloom must affect flowers")
 	_expect(float(phenotype["glow_strength"]) > 0.0, "phenotype: glow must be visible")
 	_expect(int(phenotype["fungus_count"]) > 0, "phenotype: fungi must be visible")
-	_expect(float(phenotype["branch_width_bonus"]) > 0.0, "phenotype: bark armor must affect silhouette")
+	_expect(float(phenotype["branch_width_bonus"]) > 0.0, "phenotype: bark/mineral growth must affect silhouette")
+	_expect(int(phenotype["mineral_node_count"]) > 0, "phenotype: mineral nodes must be visible")
+	_expect(int(phenotype["toxic_sac_count"]) > 0, "phenotype: toxic sacs must be visible")
 	_expect(int(phenotype["crystal_thorn_count"]) > 0, "phenotype: crystal thorns must be visible")
 	_expect(float(phenotype["fungus_glow"]) > 0.0, "phenotype: luminous fungus must glow")
+
+func _test_mutation_reveal_detection() -> void:
+	var plant := _plant()
+	var view := PlantView.new()
+	view.set_process(false)
+	view.set_plant(plant)
+	_expect(not view.is_processing(), "mutation reveal: initial specimen should not animate as a mutation")
+	plant.branch_at(&"left").add_trait(&"hooks", 1)
+	view.set_plant(plant)
+	_expect(view.is_processing(), "mutation reveal: increased branch trait should start reveal animation")
+	view.free()
 
 func _test_species_visual_data() -> void:
 	var starter := load("res://content/plants/starter_sprout.tres") as PlantSpeciesDefinition
