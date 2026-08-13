@@ -121,6 +121,12 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Sell plant"
 
+[node name="RecyclePlantButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Compost remains"
+
 [node name="CancelButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 visible = false
@@ -130,7 +136,7 @@ text = "Cancel action"
 [node name="Hint" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 size_flags_vertical = 3
-text = "Click the window to cycle light.\nClick its handle to open/close.\n\nRipe fruit gets a gold ring."
+text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGenetic items can be sold or composted."
 autowrap_mode = 2
 
 [node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
@@ -192,7 +198,7 @@ mouse_filter = 2
 script = ExtResource("5_sense")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(330, 0)
+custom_minimum_size = Vector2(390, 0)
 layout_mode = 2
 
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
@@ -307,6 +313,7 @@ script = ExtResource("8_shop")
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/PruneButton" to="." method="_on_prune_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/HarvestButton" to="." method="_on_harvest_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SellPlantButton" to="." method="_on_sell_plant_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/RecyclePlantButton" to="." method="_on_recycle_plant_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferTwo" to="." method="_on_offer_two_pressed"]
