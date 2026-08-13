@@ -32,6 +32,7 @@ extends Resource
 @export var base_sale_value: int = 100
 @export var shop_seed_price: int = 0
 @export_range(1, 100, 1) var unlock_pot_count: int = 1
+@export var unlock_milestone_id: StringName
 
 @export_group("Presentation")
 @export var wood_color: Color = Color(0.29, 0.18, 0.10)
