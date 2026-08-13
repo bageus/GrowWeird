@@ -29,6 +29,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/plant/plant_visual_assembler.gd",
 		"res://src/presentation/inventory/inventory_panel.gd",
 		"res://src/presentation/inventory/genetic_item_preview.gd",
+		"res://src/presentation/progression/progression_panel.gd",
 		"res://src/presentation/shop/shop_panel.gd",
 	]
 	for path in paths:
