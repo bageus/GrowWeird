@@ -33,7 +33,7 @@ The domain runner verifies:
 - harvesting resets the branch fruit cycle;
 - plant valuation returns money and selling frees the occupied pot;
 - Shop purchases add fertilizer and additional pots atomically;
-- species seed unlocks depend on data-driven pot-count requirements;
+- species seed unlocks combine data-driven milestone and pot-count requirements;
 - purchased species seeds contain the requested clean species genome;
 - save mapping round-trips fertilizer offers, inventory genetics and growing-fruit progress.
 
@@ -50,7 +50,7 @@ The lifecycle runner verifies:
 - a graft occupying the free slot cancels pending native regrowth;
 - regrown branches use host species/lineage and do not recreate removed branch-local mutations;
 - partial regrowth survives save/load;
-- schema `v3 → v4` migration adds regrowth state safely;
+- old saves still pass through the v4 regrowth migration on the way to current schema;
 - species silhouette parameters produce meaningfully different geometry;
 - poor vitality creates visible branch/stem droop;
 - Presentation receives bud progress while the slot remains mechanically empty until regrowth completes.
@@ -68,12 +68,27 @@ The resource runner verifies:
 - a dead whole plant can be composted, produces biomass-based yield and frees its pot;
 - `Compost Mix` uses the ordinary inventory fertilizer path and applies its normal care/mutation definition.
 
+## Headless progression tests
+```bash
+godot --headless --path . --script res://tests/run_progression_tests.gd
+```
+The progression runner verifies:
+- a new game starts with the watering milestone;
+- milestone rewards credit once and cannot be farmed by repeating completed actions;
+- events performed before a milestone is available do not bank progress for it;
+- `shade_fern` requires the lineage milestone plus its pot-count requirement;
+- `sun_creeper` requires the graft milestone plus its third-pot requirement;
+- targeted strange fertilizers remain Shop-locked until their configured milestone;
+- zero-price recycled `Compost Mix` is never listed or purchasable in Shop;
+- progression completion/partial progress round-trip through save v5;
+- v4 saves migrate with onboarding bypass so existing players keep previously available content.
+
 ## Headless presentation tests
 ```bash
 godot --headless --path . --script res://tests/run_presentation_tests.gd
 ```
 The presentation runner checks:
-- the main scene plus Shop/pot/inventory presentation resources load;
+- the main scene plus Shop/pot/inventory/progression presentation resources load;
 - all three branch geometries expand with `growth_ratio` without becoming gameplay rules;
 - base traits plus fungal/structural/synergy traits produce visible phenotype instructions;
 - species resources expose distinct visual palettes;
@@ -95,6 +110,34 @@ The offline/platform runner verifies:
 - native/editor platform resources load and the local adapter provides a clock/fallback path.
 
 The Yandex JavaScript SDK itself cannot be exercised by native headless Godot; Web/Yandex behavior still requires the release verification path in [`YANDEX_GAMES.md`](YANDEX_GAMES.md).
+
+## First-session manual path
+Use a new save. Do not mark progression complete manually.
+
+Verify the current goal advances only after a successful matching action:
+1. `Wake the sprout` → water/spray the living starter.
+2. `Change the room` → change light or window state.
+3. `Run an experiment` → apply a fertilizer; hidden effects must remain hidden.
+4. `Make it weird` → keep experimenting until a mutation actually resolves; fertilizer use without a mutation must not complete it.
+5. `Harvest the result` → harvest a ready fruit.
+6. `Keep the lineage` → convert fruit into a seed snapshot.
+7. `Take a cutting` → prune an existing branch.
+8. `Build a mosaic` → graft a cutting into a free slot.
+9. `Choose what survives` → sell or compost a genetic inventory item.
+
+At every milestone confirm:
+- the goal card advances immediately;
+- the configured money reward is credited exactly once;
+- doing future actions early does not auto-complete later goals;
+- Shop lock labels update without exposing internal milestone IDs.
+
+Shop progression checks:
+- `Mushroom Compost` becomes target-purchasable after the first fertilizer experiment;
+- `Dead Mouse` and `Radioactive Sample` become target-purchasable after the first resolved mutation;
+- `shade_fern` still needs two pots and also stays locked until the seed milestone;
+- `sun_creeper` still needs three pots and also stays locked until the graft milestone;
+- random three-choice fertilizer offers remain experimental and may surface unusual material before Shop unlock;
+- recycled `Compost Mix` never appears as a free Shop purchase.
 
 ## Playable slice manual path
 Run the project normally in Godot and verify:
@@ -118,11 +161,7 @@ Run the project normally in Godot and verify:
 18. Use recycled `Compost Mix` on a living plant and confirm it behaves like an ordinary fertilizer item and is consumed from inventory.
 19. Kill a test plant, then verify both final processing choices remain: reduced-value `Sell plant` and `Compost remains`.
 20. Compost the dead plant and confirm biomass yield enters inventory and the pot becomes immediately empty/selectable.
-21. Open Shop and confirm species seeds are listed separately from fertilizers.
-22. With the starting two pots, buy a `shade_fern` seed and plant it; it should be shorter, wider and leafier than the starter in addition to having different care/palette.
-23. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
-24. Buy and plant `sun_creeper`; confirm its low/wide silhouette, different care range and own palette/fruit color.
-25. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
+21. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
 
 ## Offline manual path
 Use a copied save or a debug-adjusted `last_saved_unix`; do not edit gameplay formulas just to make the test convenient.
@@ -142,10 +181,11 @@ For platform changes, verify native/editor startup still falls back to `LocalPla
 
 For an actual Yandex Web build, follow [`YANDEX_GAMES.md`](YANDEX_GAMES.md). At minimum verify local/cloud reconciliation, trusted platform time, pause/resume catch-up and readiness reporting. Do not treat a generic local browser run as proof that the Yandex SDK path works.
 
-## Content progression ownership
+## Content/progression ownership
 Exact fertilizer contributions, species care ranges, lifecycle thresholds, branch-regrowth tuning, seed prices, unlock pot counts and visual palettes/silhouette parameters live in `content/**/*.tres` and are not duplicated in UI code.
 `MutationDefinition.axis_requirements` owns single- or multi-axis mutation thresholds. `MutationEngine` only evaluates those definitions.
-Species seed availability is calculated by `ShopService` from each `PlantSpeciesDefinition.unlock_pot_count` and current `GameState.pots`.
+`ProgressionDefinition` resources own onboarding order, event targets, prerequisite IDs, copy and milestone money rewards. `ProgressionService` owns completion rules; Presentation receives only a current-goal descriptor.
+Species and targeted-fertilizer Shop availability is calculated by `ShopService` from definition-owned requirements plus `ProgressionState`/current pots.
 Item sale multipliers and compost yields live in `GameRules`; genetic item value is calculated by `GeneticItemValuationService`, and recycling yield/compost identity by `RecyclingService`.
 
 ## Save schema
@@ -154,4 +194,4 @@ Any persisted-field change must:
 - add a sequential migration in `SaveMigrator`;
 - keep old migrations intact;
 - round-trip all new state through the appropriate mapper.
-Current schema is **v4**. The resource-loop slice adds no persisted fields: it consumes existing inventory objects into existing fertilizer stacks, so no migration is needed.
+Current schema is **v5**. `v4 → v5` adds persisted milestone progress/completions and an onboarding-bypass flag. Existing v4 players migrate with the bypass enabled; new games start the milestone path normally.
