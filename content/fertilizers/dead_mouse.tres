@@ -7,5 +7,6 @@ script = ExtResource("1_fertilizer")
 id = &"dead_mouse"
 display_name_key = "fertilizer.dead_mouse"
 shop_price = 120
+unlock_milestone_id = &"find_mutation"
 mutation_contributions = {"predatory": 8.0, "fungal": 1.5}
 care_effects = {}
