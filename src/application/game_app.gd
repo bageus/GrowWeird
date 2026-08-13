@@ -4,14 +4,11 @@ signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
-
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
 const STARTER_SPECIES: StringName = &"starter_sprout"
-
 var state: GameState
 var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
-
 var _clock := GameClock.new()
 var _persistence := PersistenceCoordinator.new()
 var _platform_paused: bool = false
