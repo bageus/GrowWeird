@@ -11,7 +11,7 @@ Before merging gameplay or architecture changes:
 5. For Yandex/platform changes, complete the platform checks below.
 
 ## CI
-GitHub Actions now uses the official Godot 4.6.3 Linux binary and runs the same three regression runners documented below. The downloaded binary is SHA-256 verified before execution.
+GitHub Actions uses the official Godot 4.6.3 Linux binary, verifies its SHA-256, imports/parses the project, then runs all regression runners documented below.
 
 CI also runs:
 ```bash
@@ -36,6 +36,24 @@ The domain runner verifies:
 - species seed unlocks depend on data-driven pot-count requirements;
 - purchased species seeds contain the requested clean species genome;
 - save mapping round-trips fertilizer offers, inventory genetics and growing-fruit progress.
+
+## Headless lifecycle tests
+```bash
+godot --headless --path . --script res://tests/run_lifecycle_tests.gd
+```
+The lifecycle runner verifies:
+- species-driven `sprout → juvenile → adult` stage boundaries;
+- a cared-for adult remains alive long-term instead of dying from age;
+- sustained critical neglect causes irreversible foreground death;
+- a healthy adult regrows a native branch only in the exact freed slot;
+- regrowth does not bank progress before adulthood;
+- a graft occupying the free slot cancels pending native regrowth;
+- regrown branches use host species/lineage and do not recreate removed branch-local mutations;
+- partial regrowth survives save/load;
+- schema `v3 → v4` migration adds regrowth state safely;
+- species silhouette parameters produce meaningfully different geometry;
+- poor vitality creates visible branch/stem droop;
+- Presentation receives bud progress while the slot remains mechanically empty until regrowth completes.
 
 ## Headless presentation tests
 ```bash
@@ -68,22 +86,27 @@ The Yandex JavaScript SDK itself cannot be exercised by native headless Godot; W
 ## Playable slice manual path
 Run the project normally in Godot and verify:
 1. Cycle `dark → diffused → bright → direct` by clicking the window; toggle the handle open/closed.
-2. Water/spray and confirm soil plus Plant Sense react.
-3. Let the plant grow; center/left/right geometry expands continuously.
-4. Resolve fertilizer offers and confirm visible mutations without hidden numerical pressure values.
-5. Combine fertilizer families and verify synergy phenotypes such as lure blooms, crystal thorns or luminous fungus can appear.
-6. Confirm fungal growth, bark armor and synergy traits remain branch-local and survive pruning/grafting snapshots.
-7. Prune a branch and confirm the cutting appears with an expanded phenotype preview.
-8. Plant a cutting/seed; only empty pots are valid targets.
-9. Graft a cutting into a free slot and confirm the graft marker/phenotype remains visible.
-10. Grow beyond the species fruiting threshold and harvest a ripe fruit into inventory.
-11. Convert one harvested fruit to a seed and sell another fruit; money must update.
-12. Open Shop and confirm species seeds are listed separately from fertilizers.
-13. With the starting two pots, buy a `shade_fern` seed and plant it; its care preferences and palette must differ from the starter.
-14. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
-15. Buy and plant `sun_creeper`; confirm it prefers a different light/moisture range and has its own palette/fruit color.
-16. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
-17. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
+2. Water/spray and confirm soil plus Plant Sense react without displaying raw care percentages.
+3. Watch a new specimen transition through `Sprout → Juvenile → Adult`; geometry must expand continuously rather than jump between separate plant objects.
+4. Keep care good and confirm an adult remains stable indefinitely while fruit/mutations continue.
+5. Deliberately create prolonged critical care and observe color loss, fewer/smaller leaves and branch droop before permanent death.
+6. After death, confirm Plant Sense hides and prune/graft/harvest actions no longer work; the dead specimen can still be sold to free the pot.
+7. Resolve fertilizer offers and confirm visible mutations without hidden numerical pressure values.
+8. Combine fertilizer families and verify synergy phenotypes such as lure blooms, crystal thorns or luminous fungus can appear.
+9. Confirm fungal growth, bark armor and synergy traits remain branch-local and survive pruning/grafting snapshots.
+10. Prune an adult healthy plant and keep care comfortable; confirm a small bud appears and eventually restores the exact freed slot as a clean native branch.
+11. Repeat pruning, then graft into the free slot before regrowth completes; native bud progress must disappear and the graft must remain.
+12. Save/reload during partial native regrowth and confirm the same bud progress resumes instead of restarting.
+13. Plant a cutting/seed; only empty pots are valid targets.
+14. Graft a cutting into a free slot and confirm the graft marker/phenotype remains visible.
+15. Grow beyond the species fruiting threshold and harvest a ripe fruit into inventory.
+16. Convert one harvested fruit to a seed and sell another fruit; money must update.
+17. Open Shop and confirm species seeds are listed separately from fertilizers.
+18. With the starting two pots, buy a `shade_fern` seed and plant it; it should be shorter, wider and leafier than the starter in addition to having different care/palette.
+19. Confirm `sun_creeper` is locked until a third pot is owned; buy a pot and verify the seed unlocks immediately.
+20. Buy and plant `sun_creeper`; confirm its low/wide silhouette, different care range and own palette/fruit color.
+21. Sell the active plant; its pot must immediately become empty and remain selectable for planting.
+22. Save/reload while a fruit is partially ripe; progress and hybrid marker must persist.
 
 ## Offline manual path
 Use a copied save or a debug-adjusted `last_saved_unix`; do not edit gameplay formulas just to make the test convenient.
@@ -92,7 +115,7 @@ Verify:
 1. close after a valid save, advance the saved timestamp gap, then reopen;
 2. only one catch-up is applied before realtime simulation resumes;
 3. the elapsed time is capped when the absence exceeds the configured horizon;
-4. soil/growth/health/fruit/offers follow the current offline switches in `GameRules`;
+4. soil/growth/health/fruit/offers and native branch regrowth follow the current offline switches in `GameRules`;
 5. with offline death disabled, a critically stressed plant remains barely alive rather than permanently dying;
 6. with offline death enabled in a temporary test rules resource, the same stressed state can die;
 7. an already-active fertilizer offer survives reload and is not rerolled;
@@ -104,7 +127,7 @@ For platform changes, verify native/editor startup still falls back to `LocalPla
 For an actual Yandex Web build, follow [`YANDEX_GAMES.md`](YANDEX_GAMES.md). At minimum verify local/cloud reconciliation, trusted platform time, pause/resume catch-up and readiness reporting. Do not treat a generic local browser run as proof that the Yandex SDK path works.
 
 ## Content progression ownership
-Exact fertilizer contributions, species care ranges, seed prices, unlock pot counts and visual palettes live in `content/**/*.tres` and are not duplicated in UI code.
+Exact fertilizer contributions, species care ranges, lifecycle thresholds, branch-regrowth tuning, seed prices, unlock pot counts and visual palettes/silhouette parameters live in `content/**/*.tres` and are not duplicated in UI code.
 `MutationDefinition.axis_requirements` owns single- or multi-axis mutation thresholds. `MutationEngine` only evaluates those definitions.
 Species seed availability is calculated by `ShopService` from each `PlantSpeciesDefinition.unlock_pot_count` and current `GameState.pots`.
 
@@ -114,4 +137,4 @@ Any persisted-field change must:
 - add a sequential migration in `SaveMigrator`;
 - keep old migrations intact;
 - round-trip all new state through the appropriate mapper.
-Current schema is **v3**. Offline/platform work adds no persisted fields: it reuses `last_saved_unix`, so no schema bump is required. `v2 → v3` remains the latest migration for branch-local growing-fruit state.
+Current schema is **v4**. `v3 → v4` adds per-slot native branch-regrowth progress; growth stage and health condition remain derived and are intentionally not persisted.

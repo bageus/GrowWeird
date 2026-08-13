@@ -60,7 +60,7 @@ func _refresh() -> void:
 	)
 	_refresh_offer()
 	_refresh_actions(plant)
-	plant_sense.visible = plant != null
+	plant_sense.visible = plant != null and plant.alive
 
 	if pot == null:
 		plant_name_label.text = "No pot selected"
@@ -71,25 +71,30 @@ func _refresh() -> void:
 		return
 	window_view.set_environment(int(pot.light_mode), pot.window_open)
 	soil_view.set_moisture(pot.soil_moisture)
-	plant_view.set_species_style(GameApp.active_species_definition())
+	var species := GameApp.active_species_definition()
+	plant_view.set_species_style(species)
 	plant_view.set_plant(plant)
 	if plant == null:
 		plant_name_label.text = "%s · empty" % pot.pot_id
 		status_label.text = "Choose a seed or cutting from inventory to plant here."
 		return
 	plant_name_label.text = plant.custom_name if not plant.custom_name.is_empty() else _pretty_id(String(plant.species_id))
-	plant_sense.set_comfort(GameApp.current_comfort())
-	status_label.text = "Growth %.0f%% · Health %.0f%% · Soil %.0f%% · %s" % [
-		plant.growth_ratio * 100.0,
-		plant.health * 100.0,
-		pot.soil_moisture * 100.0,
-		"alive" if plant.alive else "not living",
+	if plant.alive:
+		plant_sense.set_comfort(GameApp.current_comfort())
+	var lifecycle := PlantStatusQuery.build(plant, species, GameApp.rules)
+	status_label.text = "%s · %s" % [
+		_pretty_id(String(lifecycle.get("growth_stage", &"sprout"))),
+		_pretty_id(String(lifecycle.get("condition", &"healthy"))),
 	]
+	if _has_regrowth(plant):
+		status_label.text += " · New branch forming"
+	if not plant.alive:
+		status_label.text += " · Final state"
 
 func _refresh_actions(plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	prune_button.disabled = not living
-	harvest_button.disabled = not _has_ready_fruit(plant)
+	harvest_button.disabled = not living or not _has_ready_fruit(plant)
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = "Sell plant · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
 
@@ -286,10 +291,18 @@ func _fruit_prices() -> Dictionary:
 	return result
 
 func _has_ready_fruit(plant: PlantState) -> bool:
-	if plant == null:
+	if plant == null or not plant.alive:
 		return false
 	for branch in plant.existing_branches():
 		if branch.fruit_growth != null and branch.fruit_growth.is_ready():
+			return true
+	return false
+
+func _has_regrowth(plant: PlantState) -> bool:
+	if plant == null or not plant.alive:
+		return false
+	for slot in BranchState.VALID_SLOTS:
+		if plant.branch_at(slot) == null and plant.regrowth_progress_at(slot) > 0.0:
 			return true
 	return false
 

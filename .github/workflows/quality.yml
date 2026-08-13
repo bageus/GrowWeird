@@ -39,6 +39,8 @@ jobs:
         run: ".godot/${GODOT_BINARY} --headless --editor --path . --quit"
       - name: Run domain tests
         run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_domain_tests.gd"
+      - name: Run plant lifecycle tests
+        run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_lifecycle_tests.gd"
       - name: Run presentation tests
         run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_presentation_tests.gd"
       - name: Run offline and platform tests

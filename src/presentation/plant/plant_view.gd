@@ -20,7 +20,7 @@ func set_plant(plant: PlantState) -> void:
 
 func set_species_style(definition: PlantSpeciesDefinition) -> void:
 	_species_style = definition
-	queue_redraw()
+	_rebuild()
 
 func set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
@@ -51,25 +51,32 @@ func _gui_input(event: InputEvent) -> void:
 			accept_event()
 
 func _rebuild() -> void:
-	_layout = PlantVisualAssembler.build(size, _plant)
+	_layout = PlantVisualAssembler.build(size, _plant, _species_style)
 	queue_redraw()
 
 func _draw() -> void:
 	if _plant == null:
 		return
-	var health := clampf(_plant.health, 0.0, 1.0)
+	var vitality := PlantLifecycleService.vitality(_plant)
 	var target_wood := _species_style.wood_color if _species_style != null else Color(0.29, 0.18, 0.10)
 	var target_leaf := _species_style.leaf_color if _species_style != null else Color(0.22, 0.58, 0.24)
-	var wood_color := Color(0.37, 0.22, 0.12).lerp(target_wood, health)
-	var leaf_color := Color(0.46, 0.36, 0.23).lerp(target_leaf, health)
+	var dry_wood := Color(0.28, 0.24, 0.19) if _plant.alive else Color(0.20, 0.19, 0.17)
+	var dry_leaf := Color(0.48, 0.36, 0.21) if _plant.alive else Color(0.25, 0.23, 0.18)
+	var wood_color := dry_wood.lerp(target_wood, vitality)
+	var leaf_color := dry_leaf.lerp(target_leaf, vitality)
 	var base: Vector2 = _layout.get("base", Vector2.ZERO)
 	var root_top: Vector2 = _layout.get("root_top", base)
 	draw_line(base, root_top, wood_color, 11.0, true)
 	var slots: Dictionary = _layout.get("slots", {})
 	for slot_name in BranchState.VALID_SLOTS:
-		_draw_slot(slots.get(String(slot_name), {}), wood_color, leaf_color)
+		_draw_slot(slots.get(String(slot_name), {}), wood_color, leaf_color, vitality)
 
-func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) -> void:
+func _draw_slot(
+	descriptor: Dictionary,
+	wood_color: Color,
+	leaf_color: Color,
+	vitality: float
+) -> void:
 	if descriptor.is_empty():
 		return
 	var slot: StringName = descriptor.get("slot", &"")
@@ -78,6 +85,7 @@ func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) ->
 	var end: Vector2 = descriptor.get("end", Vector2.ZERO)
 	var highlighted := _is_selectable(branch) and slot == _hovered_slot
 	if branch == null:
+		_draw_regrowth(start, end, float(descriptor.get("regrowth", 0.0)))
 		if _interaction_mode == MODE_GRAFT:
 			var ghost_color := Color(0.38, 0.74, 0.42, 0.62 if highlighted else 0.30)
 			draw_line(start, end, ghost_color, 8.0 if highlighted else 5.0, true)
@@ -85,24 +93,33 @@ func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color) ->
 		return
 
 	var phenotype: Dictionary = descriptor.get("phenotype", {})
-	var glow_strength := float(phenotype.get("glow_strength", 0.0))
+	var glow_strength := float(phenotype.get("glow_strength", 0.0)) * vitality
 	if glow_strength > 0.0:
 		draw_line(start, end, Color(0.45, 0.96, 0.68, glow_strength * 0.32), 24.0, true)
 	var branch_color := Color(0.88, 0.74, 0.26) if highlighted else wood_color
 	var width := (10.0 if highlighted else 8.0) + float(phenotype.get("branch_width_bonus", 0.0))
 	draw_line(start, end, branch_color, width, true)
 	_draw_bark(start, end, phenotype)
-	_draw_leaves(start, end, leaf_color, phenotype)
+	_draw_leaves(start, end, leaf_color, phenotype, vitality)
 	_draw_thorns(start, end, phenotype)
 	_draw_crystal_thorns(start, end, phenotype)
-	_draw_fungi(start, end, phenotype)
+	_draw_fungi(start, end, phenotype, vitality)
 	_draw_spore_traps(start, end, phenotype)
-	_draw_flowers(end, phenotype)
-	_draw_fruit(branch, end, highlighted)
+	_draw_flowers(end, phenotype, vitality)
+	_draw_fruit(branch, end, highlighted, vitality)
 	if branch.grafted:
 		var graft_point := start.lerp(end, 0.12)
 		draw_circle(graft_point, 7.0, Color(0.68, 0.43, 0.26))
 		draw_arc(graft_point, 10.0, 0.0, TAU, 18, Color(0.94, 0.83, 0.61), 2.0, true)
+
+func _draw_regrowth(start: Vector2, end: Vector2, progress: float) -> void:
+	if progress <= 0.0 or _plant == null or not _plant.alive:
+		return
+	var t := lerpf(0.04, 0.30, clampf(progress, 0.0, 1.0))
+	var bud_end := start.lerp(end, t)
+	var color := (_species_style.leaf_color if _species_style != null else Color(0.22, 0.58, 0.24)).lerp(Color(0.72, 0.84, 0.34), 0.35)
+	draw_line(start, bud_end, color.darkened(0.28), 4.0, true)
+	draw_circle(bud_end, lerpf(3.0, 7.0, progress), color)
 
 func _draw_bark(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("bark_ring_count", 0))
@@ -111,30 +128,33 @@ func _draw_bark(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 		var center := start.lerp(end, t)
 		draw_arc(center, 6.0, -0.8, 0.8, 8, Color(0.18, 0.11, 0.07, 0.85), 2.0, true)
 
-func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool) -> void:
+func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool, vitality: float) -> void:
 	if branch.fruit_growth == null:
 		return
 	var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0)
 	var center := end + Vector2(0.0, 18.0)
 	if progress < 0.18:
-		draw_circle(center, 4.0, Color(0.96, 0.72, 0.82))
+		draw_circle(center, 4.0, Color(0.96, 0.72, 0.82).lerp(Color(0.30, 0.25, 0.20), 1.0 - vitality))
 		return
 	var radius := lerpf(5.0, 14.0, progress)
 	var ripe_color := _species_style.fruit_color if _species_style != null else Color(0.91, 0.42, 0.18)
 	var fruit_color := Color(0.35, 0.68, 0.25).lerp(ripe_color, progress)
 	if branch.fruit_growth.hybrid:
 		fruit_color = fruit_color.lerp(Color(0.64, 0.28, 0.72), 0.42)
+	fruit_color = Color(0.29, 0.25, 0.19).lerp(fruit_color, vitality)
 	draw_circle(center, radius, fruit_color)
-	draw_line(center + Vector2(0.0, -radius), center + Vector2(0.0, -radius - 7.0), Color(0.22, 0.43, 0.16), 2.0, true)
-	if branch.fruit_growth.is_ready():
+	draw_line(center + Vector2(0.0, -radius), center + Vector2(0.0, -radius - 7.0), Color(0.22, 0.43, 0.16).lerp(Color(0.28, 0.25, 0.19), 1.0 - vitality), 2.0, true)
+	if branch.fruit_growth.is_ready() and _plant.alive:
 		draw_arc(center, radius + 4.0, 0.0, TAU, 24, Color(1.0, 0.82, 0.28, 1.0 if highlighted else 0.6), 3.0, true)
 
-func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Dictionary) -> void:
-	var leaf_scale := float(phenotype.get("leaf_scale", 1.0))
+func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Dictionary, vitality: float) -> void:
+	var species_scale := _species_style.leaf_scale if _species_style != null else 1.0
+	var leaf_scale := float(phenotype.get("leaf_scale", 1.0)) * species_scale * lerpf(0.58, 1.0, vitality)
 	var vector := end - start
 	var length := maxf(vector.length(), 1.0)
 	var normal := Vector2(-vector.y, vector.x) / length
-	var count := clampi(int(length / 42.0), 0, 6)
+	var base_count := clampi(int(length / 42.0), 0, 6)
+	var count := clampi(int(round(float(base_count) * lerpf(0.18, 1.0, vitality))), 0, 6)
 	if count <= 0:
 		return
 	for index in range(count):
@@ -174,14 +194,14 @@ func _draw_crystal_thorns(start: Vector2, end: Vector2, phenotype: Dictionary) -
 		draw_line(anchor, tip, Color(0.48, 0.86, 0.92), 4.0, true)
 		draw_circle(tip, 2.2, Color(0.82, 0.98, 1.0))
 
-func _draw_fungi(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
+func _draw_fungi(start: Vector2, end: Vector2, phenotype: Dictionary, vitality: float) -> void:
 	var count := int(phenotype.get("fungus_count", 0))
 	if count <= 0:
 		return
 	var vector := end - start
 	var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
 	var scale := float(phenotype.get("fungus_scale", 1.0))
-	var glow := float(phenotype.get("fungus_glow", 0.0))
+	var glow := float(phenotype.get("fungus_glow", 0.0)) * vitality
 	for index in range(count):
 		var t := (float(index) + 1.0) / (float(count) + 1.0)
 		var side := -1.0 if index % 2 == 0 else 1.0
@@ -205,24 +225,27 @@ func _draw_spore_traps(start: Vector2, end: Vector2, phenotype: Dictionary) -> v
 		draw_circle(center, 3.0, Color(0.76, 0.70, 0.35))
 		draw_line(center, center + normal * side * 8.0, Color(0.34, 0.12, 0.28), 2.0, true)
 
-func _draw_flowers(end: Vector2, phenotype: Dictionary) -> void:
+func _draw_flowers(end: Vector2, phenotype: Dictionary, vitality: float) -> void:
 	var count := int(phenotype.get("flower_count", 0))
 	if count <= 0:
 		return
-	var scale := float(phenotype.get("flower_scale", 1.0))
+	var scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality)
 	var lure := float(phenotype.get("lure_strength", 0.0))
-	var flower_glow := float(phenotype.get("flower_glow", 0.0))
+	var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
 	for index in range(count):
 		var angle := TAU * float(index) / float(count)
 		var center := end + Vector2(cos(angle), sin(angle)) * 18.0 * scale
 		if flower_glow > 0.0:
 			draw_circle(center, 13.0 * scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
 		var petal := Color(0.88, 0.39, 0.55).lerp(Color(0.68, 0.12, 0.34), lure)
+		petal = Color(0.37, 0.28, 0.22).lerp(petal, vitality)
 		draw_circle(center, 7.0 * scale, petal)
 		var center_color := Color(0.96, 0.79, 0.24).lerp(Color(0.18, 0.06, 0.08), lure)
 		draw_circle(center, 2.5 * scale, center_color)
 
 func _is_selectable(branch: BranchState) -> bool:
+	if _plant == null or not _plant.alive:
+		return false
 	if _interaction_mode == MODE_PRUNE:
 		return branch != null
 	if _interaction_mode == MODE_GRAFT:
