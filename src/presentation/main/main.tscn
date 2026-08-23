@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://src/presentation/inventory/inventory_panel.gd" id="6_inventory"]
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="8_shop"]
+[ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -211,6 +212,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5
 script = ExtResource("6_inventory")
+
+[node name="ProgressionPanel" type="PanelContainer" parent="Margin/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+script = ExtResource("9_progress")
 
 [node name="StatusLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true

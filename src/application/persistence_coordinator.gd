@@ -42,7 +42,7 @@ func process(delta: float, state: GameState) -> void:
 func catch_up(state: GameState) -> Dictionary:
 	if not _ready or state == null:
 		return {}
-	var now := _platform.now_unix()
+	var now: int = int(_platform.now_unix())
 	var elapsed := maxf(0.0, float(now - state.last_saved_unix)) if state.last_saved_unix > 0 else 0.0
 	var result := OfflineProgressionService.advance(state, elapsed, _registry, _rules)
 	state.last_saved_unix = now
@@ -77,7 +77,7 @@ func _on_cloud_loaded(payload: String) -> void:
 func _finalize(chosen: GameState) -> void:
 	if _ready or chosen == null:
 		return
-	var now := _platform.now_unix()
+	var now: int = int(_platform.now_unix())
 	var elapsed := 0.0
 	if chosen.last_saved_unix > 0 and now > chosen.last_saved_unix:
 		elapsed = float(now - chosen.last_saved_unix)
@@ -102,7 +102,7 @@ func _save_cloud(state: GameState, stamp_first: bool = true) -> void:
 	_platform.save_cloud(SaveRepository.to_json(state))
 
 func _stamp(state: GameState) -> void:
-	state.last_saved_unix = _platform.now_unix()
+	state.last_saved_unix = int(_platform.now_unix())
 
 func _on_cloud_saved(_success: bool) -> void:
 	_cloud_save_in_flight = false
