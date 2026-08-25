@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/progression_definition.gd" id="1_progression"]
+
+[resource]
+script = ExtResource("1_progression")
+id = &"water_the_sprout"
+order = 10
+title = "Wake the sprout"
+hint = "Give the starter plant some water. Watch the soil and Plant Sense instead of chasing numbers."
+event_id = &"watered"
+target_count = 1
+reward_money = 15

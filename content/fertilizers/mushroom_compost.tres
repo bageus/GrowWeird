@@ -7,6 +7,7 @@ script = ExtResource("1_fertilizer")
 id = &"mushroom_compost"
 display_name_key = "fertilizer.mushroom_compost"
 shop_price = 90
+unlock_milestone_id = &"try_fertilizer"
 offer_weight = 1.0
 mutation_contributions = {"fungal": 8.0, "floral": 1.0}
 care_effects = {"health": 0.01}

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/progression_definition.gd" id="1_progression"]
+
+[resource]
+script = ExtResource("1_progression")
+id = &"try_fertilizer"
+order = 30
+title = "Run an experiment"
+hint = "Use one fertilizer. Its real effect stays hidden until you learn it by observation."
+event_id = &"fertilizer_used"
+target_count = 1
+required_ids = Array[StringName]([&"tune_environment"])
+reward_money = 20

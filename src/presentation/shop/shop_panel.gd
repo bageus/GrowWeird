@@ -27,7 +27,7 @@ func set_shop(
 		_add_seed_row(item, money)
 	_add_header("Fertilizers")
 	for item in fertilizer_catalog:
-		_add_fertilizer_row(StringName(item.get("id", "")), int(item.get("price", 0)), money)
+		_add_fertilizer_row(item, money)
 	_add_header("Expansion")
 	var pot_button := Button.new()
 	pot_button.text = "New pot · $%d" % pot_price
@@ -42,31 +42,40 @@ func _add_seed_row(item: Dictionary, money: int) -> void:
 	var id := StringName(item.get("id", ""))
 	var price := int(item.get("price", 0))
 	var unlocked := bool(item.get("unlocked", false))
-	var required_pots := int(item.get("requires_pots", 1))
 	var row := HBoxContainer.new()
 	var label := Label.new()
 	label.text = String(id).replace("_", " ").capitalize()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
 	var button := Button.new()
-	button.text = "$%d" % price if unlocked else "Need %d pots" % required_pots
+	button.text = _seed_button_text(item, price)
 	button.disabled = not unlocked or money < price
 	button.pressed.connect(_emit_species_seed.bind(id))
 	row.add_child(button)
 	add_child(row)
 
-func _add_fertilizer_row(id: StringName, price: int, money: int) -> void:
+func _add_fertilizer_row(item: Dictionary, money: int) -> void:
+	var id := StringName(item.get("id", ""))
+	var price := int(item.get("price", 0))
+	var unlocked := bool(item.get("unlocked", false))
 	var row := HBoxContainer.new()
 	var label := Label.new()
 	label.text = String(id).replace("_", " ").capitalize()
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(label)
 	var button := Button.new()
-	button.text = "$%d" % price
-	button.disabled = money < price
+	button.text = "$%d" % price if unlocked else "Keep experimenting"
+	button.disabled = not unlocked or money < price
 	button.pressed.connect(_emit_fertilizer.bind(id))
 	row.add_child(button)
 	add_child(row)
+
+func _seed_button_text(item: Dictionary, price: int) -> String:
+	if bool(item.get("unlocked", false)):
+		return "$%d" % price
+	if String(item.get("lock_reason", "")) == "pots":
+		return "Need %d pots" % int(item.get("requires_pots", 1))
+	return "Keep experimenting"
 
 func _add_header(text: String) -> void:
 	var label := Label.new()

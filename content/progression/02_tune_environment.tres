@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/progression_definition.gd" id="1_progression"]
+
+[resource]
+script = ExtResource("1_progression")
+id = &"tune_environment"
+order = 20
+title = "Change the room"
+hint = "Adjust the light or open/close the window once. Different species will want different conditions."
+event_id = &"environment_changed"
+target_count = 1
+required_ids = Array[StringName]([&"water_the_sprout"])
+reward_money = 15

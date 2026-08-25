@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ProgressionDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/progression_definition.gd" id="1_progression"]
+
+[resource]
+script = ExtResource("1_progression")
+id = &"find_mutation"
+order = 40
+title = "Make it weird"
+hint = "Keep experimenting until a visible mutation appears. Repeating related materials can deepen the same direction."
+event_id = &"mutation_resolved"
+target_count = 1
+required_ids = Array[StringName]([&"try_fertilizer"])
+reward_money = 50

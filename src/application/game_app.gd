@@ -4,14 +4,11 @@ signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
-
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
 const STARTER_SPECIES: StringName = &"starter_sprout"
-
 var state: GameState
 var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
-
 var _clock := GameClock.new()
 var _persistence := PersistenceCoordinator.new()
 var _platform_paused: bool = false
@@ -78,6 +75,7 @@ func set_light_mode(mode: int) -> bool:
 	if pot == null or mode < 0 or mode >= PotState.LightMode.size():
 		return false
 	pot.light_mode = mode
+	_progress(&"environment_changed")
 	state_changed.emit()
 	return true
 
@@ -86,6 +84,7 @@ func set_window_open(value: bool) -> bool:
 	if pot == null:
 		return false
 	pot.window_open = value
+	_progress(&"environment_changed")
 	state_changed.emit()
 	return true
 
@@ -95,6 +94,7 @@ func water_active(use_sprayer: bool = false) -> bool:
 		return false
 	var amount := rules.sprayer_soil_amount if use_sprayer else rules.watering_can_amount
 	pot.soil_moisture = clampf(pot.soil_moisture + amount, 0.0, 1.0)
+	_progress(&"watered")
 	state_changed.emit()
 	return true
 
@@ -111,6 +111,9 @@ func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
 	if not bool(result.get("success", false)):
 		return []
 	var events := _events_from_result(result)
+	_progress(&"fertilizer_used")
+	if not events.is_empty():
+		_progress(&"mutation_resolved")
 	_emit_mutation_events(events)
 	state_changed.emit()
 	return events
@@ -126,6 +129,9 @@ func use_inventory_fertilizer(fertilizer_id: StringName) -> Array[Dictionary]:
 	if not bool(result.get("success", false)):
 		return []
 	var events := _events_from_result(result)
+	_progress(&"fertilizer_used")
+	if not events.is_empty():
+		_progress(&"mutation_resolved")
 	_emit_mutation_events(events)
 	state_changed.emit()
 	return events
@@ -133,6 +139,7 @@ func use_inventory_fertilizer(fertilizer_id: StringName) -> Array[Dictionary]:
 func prune_active_branch(slot: StringName) -> String:
 	var item_id := PropagationActions.prune(state, active_plant(), slot)
 	if not item_id.is_empty():
+		_progress(&"branch_pruned")
 		state_changed.emit()
 	return item_id
 
@@ -151,18 +158,21 @@ func plant_seed(seed_id: String, pot_id: String) -> bool:
 func graft_cutting(cutting_id: String, slot: StringName) -> bool:
 	if not PropagationActions.graft_cutting(state, active_plant(), cutting_id, slot):
 		return false
+	_progress(&"branch_grafted")
 	state_changed.emit()
 	return true
 
 func harvest_active_fruit(slot: StringName) -> String:
 	var item_id := FruitActions.harvest(state, active_plant(), slot)
 	if not item_id.is_empty():
+		_progress(&"fruit_harvested")
 		state_changed.emit()
 	return item_id
 
 func create_seed_from_fruit(fruit_id: String) -> String:
 	var item_id := PropagationActions.create_seed_from_fruit(state, fruit_id)
 	if not item_id.is_empty():
+		_progress(&"seed_created")
 		state_changed.emit()
 	return item_id
 
@@ -182,6 +192,7 @@ func fruit_sale_value(fruit_id: String) -> int:
 func sell_fruit(fruit_id: String) -> int:
 	var amount := EconomyActions.sell_fruit(state, fruit_id, registry, rules)
 	if amount > 0:
+		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
 
@@ -191,12 +202,14 @@ func inventory_item_sale_value(kind: StringName, item_id: String) -> int:
 func sell_inventory_item(kind: StringName, item_id: String) -> int:
 	var amount := ResourceActions.sell_item(state, kind, item_id, registry, rules)
 	if amount > 0:
+		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
 
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
 	if amount > 0:
+		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
 
@@ -210,11 +223,7 @@ func recycle_active_dead_plant() -> int:
 	return amount
 
 func shop_catalog() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
-	for definition in registry.all_fertilizers():
-		result.append({"id": definition.id, "price": definition.shop_price})
-	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return String(a["id"]) < String(b["id"]))
-	return result
+	return ShopService.fertilizer_catalog(state, registry.all_fertilizers())
 
 func species_shop_catalog() -> Array[Dictionary]:
 	return ShopService.species_catalog(state, registry.all_plants())
@@ -310,6 +319,9 @@ func _events_from_result(result: Dictionary) -> Array[Dictionary]:
 func _emit_mutation_events(events: Array[Dictionary]) -> void:
 	if not events.is_empty():
 		mutations_resolved.emit(events)
+
+func _progress(event_id: StringName) -> void:
+	ProgressionActions.record_event(state, event_id, registry)
 
 func _has_living_plant() -> bool:
 	if state == null:

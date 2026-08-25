@@ -7,15 +7,25 @@ const MODE_NONE: StringName = &""
 const MODE_PRUNE: StringName = &"prune"
 const MODE_GRAFT: StringName = &"graft"
 const MODE_HARVEST: StringName = &"harvest"
+const REVEAL_SECONDS := 1.15
 
 var _plant: PlantState
 var _species_style: PlantSpeciesDefinition
 var _interaction_mode: StringName = MODE_NONE
 var _hovered_slot: StringName = &""
 var _layout: Dictionary = {}
+var _trait_snapshot: Dictionary = {}
+var _reveal_slots: Dictionary = {}
 
 func set_plant(plant: PlantState) -> void:
+	var same_specimen := _plant != null and plant != null and _plant.instance_id == plant.instance_id
+	if same_specimen:
+		_detect_trait_increases(plant)
+	else:
+		_reveal_slots.clear()
+		set_process(false)
 	_plant = plant
+	_trait_snapshot = _snapshot_traits(plant)
 	_rebuild()
 
 func set_species_style(definition: PlantSpeciesDefinition) -> void:
@@ -30,7 +40,21 @@ func set_interaction_mode(mode: StringName) -> void:
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	set_process(false)
 	_rebuild()
+
+func _process(delta: float) -> void:
+	var expired: Array[String] = []
+	for key in _reveal_slots:
+		var remaining := maxf(0.0, float(_reveal_slots[key]) - delta)
+		_reveal_slots[key] = remaining
+		if remaining <= 0.0:
+			expired.append(String(key))
+	for key in expired:
+		_reveal_slots.erase(key)
+	if _reveal_slots.is_empty():
+		set_process(false)
+	queue_redraw()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -71,12 +95,7 @@ func _draw() -> void:
 	for slot_name in BranchState.VALID_SLOTS:
 		_draw_slot(slots.get(String(slot_name), {}), wood_color, leaf_color, vitality)
 
-func _draw_slot(
-	descriptor: Dictionary,
-	wood_color: Color,
-	leaf_color: Color,
-	vitality: float
-) -> void:
+func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color, vitality: float) -> void:
 	if descriptor.is_empty():
 		return
 	var slot: StringName = descriptor.get("slot", &"")
@@ -91,7 +110,6 @@ func _draw_slot(
 			draw_line(start, end, ghost_color, 8.0 if highlighted else 5.0, true)
 			draw_circle(end, 10.0, ghost_color)
 		return
-
 	var phenotype: Dictionary = descriptor.get("phenotype", {})
 	var glow_strength := float(phenotype.get("glow_strength", 0.0)) * vitality
 	if glow_strength > 0.0:
@@ -102,15 +120,20 @@ func _draw_slot(
 	_draw_bark(start, end, phenotype)
 	_draw_leaves(start, end, leaf_color, phenotype, vitality)
 	_draw_thorns(start, end, phenotype)
+	BranchMutationRenderer.draw_hooks(self, start, end, phenotype)
 	_draw_crystal_thorns(start, end, phenotype)
+	BranchMutationRenderer.draw_mineral_nodes(self, start, end, phenotype)
 	_draw_fungi(start, end, phenotype, vitality)
 	_draw_spore_traps(start, end, phenotype)
+	BranchMutationRenderer.draw_toxic_sacs(self, start, end, phenotype, vitality)
 	_draw_flowers(end, phenotype, vitality)
 	_draw_fruit(branch, end, highlighted, vitality)
 	if branch.grafted:
 		var graft_point := start.lerp(end, 0.12)
 		draw_circle(graft_point, 7.0, Color(0.68, 0.43, 0.26))
 		draw_arc(graft_point, 10.0, 0.0, TAU, 18, Color(0.94, 0.83, 0.61), 2.0, true)
+	var reveal := float(_reveal_slots.get(String(slot), 0.0)) / REVEAL_SECONDS
+	BranchMutationRenderer.draw_reveal(self, start, end, reveal)
 
 func _draw_regrowth(start: Vector2, end: Vector2, progress: float) -> void:
 	if progress <= 0.0 or _plant == null or not _plant.alive:
@@ -231,17 +254,40 @@ func _draw_flowers(end: Vector2, phenotype: Dictionary, vitality: float) -> void
 		return
 	var scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality)
 	var lure := float(phenotype.get("lure_strength", 0.0))
+	var crown := float(phenotype.get("crown_bloom_strength", 0.0))
 	var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
 	for index in range(count):
 		var angle := TAU * float(index) / float(count)
-		var center := end + Vector2(cos(angle), sin(angle)) * 18.0 * scale
+		var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * scale
 		if flower_glow > 0.0:
 			draw_circle(center, 13.0 * scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
 		var petal := Color(0.88, 0.39, 0.55).lerp(Color(0.68, 0.12, 0.34), lure)
+		petal = petal.lerp(Color(0.96, 0.62, 0.20), crown * 0.55)
 		petal = Color(0.37, 0.28, 0.22).lerp(petal, vitality)
 		draw_circle(center, 7.0 * scale, petal)
 		var center_color := Color(0.96, 0.79, 0.24).lerp(Color(0.18, 0.06, 0.08), lure)
 		draw_circle(center, 2.5 * scale, center_color)
+
+func _detect_trait_increases(plant: PlantState) -> void:
+	for slot in BranchState.VALID_SLOTS:
+		var branch := plant.branch_at(slot)
+		if branch == null:
+			continue
+		var previous: Dictionary = _trait_snapshot.get(String(slot), {})
+		for trait_id in branch.traits:
+			if int(branch.traits[trait_id]) > int(previous.get(String(trait_id), 0)):
+				_reveal_slots[String(slot)] = REVEAL_SECONDS
+				set_process(true)
+				break
+
+func _snapshot_traits(plant: PlantState) -> Dictionary:
+	var result := {}
+	if plant == null:
+		return result
+	for slot in BranchState.VALID_SLOTS:
+		var branch := plant.branch_at(slot)
+		result[String(slot)] = branch.traits.duplicate(true) if branch != null else {}
+	return result
 
 func _is_selectable(branch: BranchState) -> bool:
 	if _plant == null or not _plant.alive:

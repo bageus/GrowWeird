@@ -7,5 +7,6 @@ script = ExtResource("1_fertilizer")
 id = &"radioactive_sample"
 display_name_key = "fertilizer.radioactive_sample"
 shop_price = 250
+unlock_milestone_id = &"find_mutation"
 mutation_contributions = {"radioactive": 10.0}
 care_effects = {"health": -0.04}
