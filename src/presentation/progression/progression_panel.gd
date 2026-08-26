@@ -12,7 +12,7 @@ func set_goal(goal: Dictionary) -> void:
 		remove_child(child)
 		child.queue_free()
 	var layout := VBoxContainer.new()
-	layout.theme_override_constants.separation = 3
+	layout.add_theme_constant_override("separation", 3)
 	add_child(layout)
 	var title := Label.new()
 	if goal.is_empty():

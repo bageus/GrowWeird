@@ -23,6 +23,8 @@ extends Control
 @onready var sell_plant_button: Button = %SellPlantButton
 @onready var recycle_plant_button: Button = %RecyclePlantButton
 @onready var cancel_button: Button = %CancelButton
+@onready var garden_art: GardenArtView = %GardenArt
+@onready var window_mode_button: Button = %WindowModeButton
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -46,6 +48,8 @@ func _ready() -> void:
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
+	window_mode_button.pressed.connect(_on_window_mode_pressed)
+	garden_art.debug_changed.connect(_on_garden_debug_changed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
 
@@ -300,6 +304,12 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 
 func _on_offer_ready(_ids: Array[StringName]) -> void:
 	event_label.text = "Three new fertilizers appeared."
+
+func _on_window_mode_pressed() -> void:
+	garden_art.cycle_window_mode()
+
+func _on_garden_debug_changed() -> void:
+	_refresh()
 
 func _item_prices() -> Dictionary:
 	var result := {}

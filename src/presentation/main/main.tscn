@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="8_shop"]
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
+[ext_resource type="Script" path="res://src/presentation/main/garden_art_view.gd" id="10_garden"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -71,6 +72,11 @@ text = "$0"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Shop"
+
+[node name="WindowModeButton" type="Button" parent="Margin/Layout/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Window 1 / 4"
 
 [node name="PlantNameLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
@@ -197,6 +203,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_sense")
+
+[node name="GardenArt" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("10_garden")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(390, 0)
