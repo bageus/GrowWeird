@@ -25,6 +25,7 @@ extends Control
 @onready var cancel_button: Button = %CancelButton
 @onready var garden_art: GardenArtView = %GardenArt
 @onready var window_mode_button: Button = %WindowModeButton
+@onready var garden_debug_controller: GardenDebugController = GardenDebugController.new()
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -50,6 +51,7 @@ func _ready() -> void:
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
 	window_mode_button.pressed.connect(_on_window_mode_pressed)
 	garden_art.debug_changed.connect(_on_garden_debug_changed)
+	garden_debug_controller.setup(garden_art, get_node("Margin/Layout/MainContent/ToolsPanel/Tools") as VBoxContainer, event_label)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
 
