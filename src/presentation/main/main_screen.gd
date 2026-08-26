@@ -23,10 +23,16 @@ extends Control
 @onready var sell_plant_button: Button = %SellPlantButton
 @onready var recycle_plant_button: Button = %RecyclePlantButton
 @onready var cancel_button: Button = %CancelButton
+@onready var art_preview: GardenPreview = %ArtPreview
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
 var _pending_plant_kind: StringName = &""
+var _art_window := 0
+var _art_pot := 0
+var _art_soil := 2
+var _art_tree := 0
+var _art_pruned := false
 
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -47,6 +53,12 @@ func _ready() -> void:
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
 	_set_interaction_mode(PlantView.MODE_NONE)
+	art_preview.window_changed.connect(_on_art_window)
+	art_preview.pot_changed.connect(_on_art_pot)
+	art_preview.soil_changed.connect(_on_art_soil)
+	art_preview.tree_changed.connect(_on_art_tree)
+	art_preview.prune_changed.connect(_on_preview_prune)
+	art_preview.prune_undo_pressed.connect(_on_preview_undo_prune)
 	_refresh()
 
 func _refresh() -> void:
@@ -64,6 +76,7 @@ func _refresh() -> void:
 	)
 	_refresh_offer()
 	_refresh_actions(plant)
+	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
 	plant_sense.visible = plant != null and plant.alive
 
 	if pot == null:
@@ -301,6 +314,12 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 func _on_offer_ready(_ids: Array[StringName]) -> void:
 	event_label.text = "Three new fertilizers appeared."
 
+func _on_art_window() -> void: _art_window = posmod(_art_window + 1, 4); _refresh()
+func _on_art_pot(direction: int) -> void: _art_pot = posmod(_art_pot + direction, 5); _refresh()
+func _on_art_soil(direction: int) -> void: _art_soil = clampi(_art_soil + direction, 0, 5); _refresh()
+func _on_art_tree(direction: int) -> void: _art_tree = clampi(_art_tree + direction, 0, 7); _refresh()
+func _on_art_prune() -> void: _art_pruned = true; _refresh()
+func _on_art_undo_prune() -> void: _art_pruned = false; _refresh()
 func _item_prices() -> Dictionary:
 	var result := {}
 	for cutting in GameApp.state.inventory.cuttings:
