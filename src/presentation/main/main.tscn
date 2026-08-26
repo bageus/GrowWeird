@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="8_shop"]
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
+[ext_resource type="Script" path="res://src/presentation/main/garden_preview.gd" id="10_garden"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -197,6 +198,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_sense")
+
+[node name="ArtPreview" type="PanelContainer" parent="Margin/Layout/MainContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+script = ExtResource("10_garden")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(390, 0)
