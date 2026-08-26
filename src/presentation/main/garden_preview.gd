@@ -69,7 +69,8 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var canvas := Rect2(8.0, 8.0, size.x - 16.0, size.y - 16.0)
-	draw_texture_rect(WINDOWS[_window], _fit(WINDOWS[_window], canvas), false)
+	var window_rect := Rect2(canvas.position, Vector2(canvas.size.x, canvas.size.y * 0.62))
+	draw_texture_rect(WINDOWS[_window], _cover(WINDOWS[_window], window_rect), false)
 	var stand := Rect2(canvas.position + Vector2(canvas.size.x * 0.27, canvas.size.y * 0.66), Vector2(canvas.size.x * 0.46, canvas.size.y * 0.27))
 	draw_texture_rect(STAND, _fit(STAND, stand), false)
 	var pot := Rect2(canvas.position + Vector2(canvas.size.x * 0.32, canvas.size.y * 0.53), Vector2(canvas.size.x * 0.36, canvas.size.y * 0.32))
@@ -98,6 +99,11 @@ func _branch_at(point: Vector2) -> String:
 	if Rect2(canvas.position + Vector2(canvas.size.x * 0.50, canvas.size.y * 0.18), Vector2(canvas.size.x * 0.30, canvas.size.y * 0.34)).has_point(point):
 		return "right"
 	return ""
+
+func _cover(texture: Texture2D, bounds: Rect2) -> Rect2:
+	var scale := maxf(bounds.size.x / texture.get_width(), bounds.size.y / texture.get_height())
+	var draw_size := Vector2(texture.get_width(), texture.get_height()) * scale
+	return Rect2(bounds.position + (bounds.size - draw_size) * 0.5, draw_size)
 
 func _fit(texture: Texture2D, bounds: Rect2) -> Rect2:
 	var scale := minf(bounds.size.x / texture.get_width(), bounds.size.y / texture.get_height())
