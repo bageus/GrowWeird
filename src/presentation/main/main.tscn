@@ -201,8 +201,11 @@ script = ExtResource("5_sense")
 
 [node name="ArtPreview" type="PanelContainer" parent="Margin/Layout/MainContent"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(320, 0)
+custom_minimum_size = Vector2(360, 390)
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
 script = ExtResource("10_garden")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]

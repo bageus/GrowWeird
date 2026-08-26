@@ -44,6 +44,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_ARROW
 	set_process(false)
+	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
 	if not _prune_mode or _pruned:
@@ -68,17 +69,20 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var canvas := Rect2(8.0, 8.0, size.x - 16.0, size.y - 16.0)
-	var window_rect := Rect2(canvas.position, Vector2(canvas.size.x, canvas.size.y * 0.62))
+	var canvas := Rect2(Vector2.ZERO, size)
+	if size.x <= 1.0 or size.y <= 1.0:
+		return
+	var window_rect := Rect2(Vector2.ZERO, Vector2(size.x, size.y * 0.68))
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.08, 0.06, 0.05, 1.0))
 	draw_texture_rect(WINDOWS[_window], _cover(WINDOWS[_window], window_rect), false)
-	var stand := Rect2(canvas.position + Vector2(canvas.size.x * 0.27, canvas.size.y * 0.66), Vector2(canvas.size.x * 0.46, canvas.size.y * 0.27))
+	var stand := Rect2(Vector2(size.x * 0.20, size.y * 0.64), Vector2(size.x * 0.60, size.y * 0.34))
 	draw_texture_rect(STAND, _fit(STAND, stand), false)
-	var pot := Rect2(canvas.position + Vector2(canvas.size.x * 0.32, canvas.size.y * 0.53), Vector2(canvas.size.x * 0.36, canvas.size.y * 0.32))
+	var pot := Rect2(Vector2(size.x * 0.26, size.y * 0.50), Vector2(size.x * 0.48, size.y * 0.40))
 	draw_texture_rect(POTS[_pot], _fit(POTS[_pot], pot), false)
-	var soil := Rect2(canvas.position + Vector2(canvas.size.x * 0.37, canvas.size.y * 0.59), Vector2(canvas.size.x * 0.26, canvas.size.y * 0.16))
+	var soil := Rect2(Vector2(size.x * 0.32, size.y * 0.57), Vector2(size.x * 0.36, size.y * 0.19))
 	draw_texture_rect(SOILS[_soil], _fit(SOILS[_soil], soil), false)
 	var tree := TREES[8] if _pruned else TREES[_tree]
-	var tree_box := Rect2(canvas.position + Vector2(canvas.size.x * 0.25, canvas.size.y * 0.13), Vector2(canvas.size.x * 0.50, canvas.size.y * 0.57))
+	var tree_box := Rect2(Vector2(size.x * 0.16, size.y * 0.08), Vector2(size.x * 0.68, size.y * 0.58))
 	draw_texture_rect(tree, _fit(tree, tree_box), false)
 	if _prune_mode and not _pruned:
 		_draw_hint(canvas, -1.0)
@@ -93,7 +97,7 @@ func _draw_hint(canvas: Rect2, side: float) -> void:
 func _branch_at(point: Vector2) -> String:
 	if _tree < 5:
 		return ""
-	var canvas := Rect2(8.0, 8.0, size.x - 16.0, size.y - 16.0)
+	var canvas := Rect2(Vector2.ZERO, size)
 	if Rect2(canvas.position + Vector2(canvas.size.x * 0.20, canvas.size.y * 0.18), Vector2(canvas.size.x * 0.30, canvas.size.y * 0.34)).has_point(point):
 		return "left"
 	if Rect2(canvas.position + Vector2(canvas.size.x * 0.50, canvas.size.y * 0.18), Vector2(canvas.size.x * 0.30, canvas.size.y * 0.34)).has_point(point):
