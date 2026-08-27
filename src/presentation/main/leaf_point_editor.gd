@@ -17,6 +17,7 @@ var _point_slot: StringName = &"center"
 var _selected_slot: StringName = &""
 var _selected_index := -1
 var _dragging := false
+var _drag_axis := ""
 var _seed := 1
 var _message := ""
 var _message_time := 0.0
@@ -79,6 +80,7 @@ func _mouse(event: InputEventMouseButton) -> void:
 		if not hit.is_empty():
 			_selected_slot = hit.slot
 			_selected_index = hit.index
+			_drag_axis = "direction" if event.position.distance_to(_direction_screen(hit.slot, hit.index)) < POINT_RADIUS * 1.8 else "point"
 			_dragging = true
 			accept_event()
 			queue_redraw()
@@ -88,21 +90,26 @@ func _mouse(event: InputEventMouseButton) -> void:
 			accept_event()
 	else:
 		_dragging = false
+		_drag_axis = ""
 
 func _key(event: InputEventKey) -> void:
 	if _selected_slot.is_empty() or _selected_index < 0:
 		return
-	var point: Vector2 = _points()[String(_selected_slot)][_selected_index]
+	var point: Dictionary = LeafPointLayout.normalize_point(_points()[String(_selected_slot)][_selected_index])
 	match event.keycode:
-		KEY_LEFT: point.x -= POINT_STEP
-		KEY_RIGHT: point.x += POINT_STEP
-		KEY_UP: point.y -= POINT_STEP
-		KEY_DOWN: point.y += POINT_STEP
+		KEY_LEFT: point.position.x -= POINT_STEP
+		KEY_RIGHT: point.position.x += POINT_STEP
+		KEY_UP: point.position.y -= POINT_STEP
+		KEY_DOWN: point.position.y += POINT_STEP
 		KEY_DELETE, KEY_BACKSPACE:
 			_delete_point()
 			return
+		KEY_PLUS, KEY_EQUAL: point.size = clampf(point.size + POINT_STEP, 0.35, 2.0)
+		KEY_MINUS: point.size = clampf(point.size - POINT_STEP, 0.35, 2.0)
 		_: return
-	_set_point(Vector2(clampf(point.x, 0.02, 0.98), clampf(point.y, 0.02, 0.98)))
+	point.position = Vector2(clampf(point.position.x, 0.02, 0.98), clampf(point.position.y, 0.02, 0.98))
+	_points()[String(_selected_slot)][_selected_index] = point
+	_changed()
 
 func _panel_click(point: Vector2) -> void:
 	if _button(0).has_point(point):
@@ -111,13 +118,17 @@ func _panel_click(point: Vector2) -> void:
 		queue_redraw()
 		return
 	if _button(1).has_point(point):
-		refresh_leaves()
+		DisplayServer.clipboard_set(leaf_points_code())
+		_flash("Leaf coordinates copied")
 		return
 	if _button(2).has_point(point):
 		set_tree(tree_index - 1)
 		return
 	if _button(3).has_point(point):
 		set_tree(tree_index + 1)
+		return
+	if _button(4).has_point(point):
+		refresh_leaves()
 		return
 	for index in SLOTS.size():
 		var row := _point_row(index)
@@ -134,7 +145,7 @@ func _add_point(point: Vector2) -> void:
 	var local := (point - _canvas().position) / _canvas().size
 	var slot := _nearest_slot(local)
 	var values: Array = _points()[String(slot)]
-	values.append(Vector2(clampf(local.x, 0.02, 0.98), clampf(local.y, 0.02, 0.98)))
+	values.append(LeafPointLayout.point(clampf(local.x, 0.02, 0.98), clampf(local.y, 0.02, 0.98)))
 	_selected_slot = slot
 	_selected_index = values.size() - 1
 	_changed("Point added to %s" % slot)
@@ -143,8 +154,8 @@ func _add_named_point(slot: StringName) -> void:
 	var values: Array = _points()[String(slot)]
 	var point := Vector2(0.50, 0.50)
 	if not values.is_empty():
-		point = values.back() + Vector2(0.0, -0.06)
-	values.append(Vector2(clampf(point.x, 0.02, 0.98), clampf(point.y, 0.02, 0.98)))
+		point = LeafPointLayout.normalize_point(values.back()).position + Vector2(0.0, -0.06)
+	values.append(LeafPointLayout.point(clampf(point.x, 0.02, 0.98), clampf(point.y, 0.02, 0.98)))
 	_selected_slot = slot
 	_selected_index = values.size() - 1
 	_changed("Point added to %s" % slot)
@@ -173,10 +184,19 @@ func _move_point(point: Vector2) -> void:
 	if _selected_slot.is_empty() or _selected_index < 0:
 		return
 	var local := (point - _canvas().position) / _canvas().size
-	_set_point(Vector2(clampf(local.x, 0.02, 0.98), clampf(local.y, 0.02, 0.98)))
+	var item := LeafPointLayout.normalize_point(_points()[String(_selected_slot)][_selected_index])
+	if _drag_axis == "direction":
+		var origin := _point_screen(_selected_slot, _selected_index)
+		item.direction = Vector2(clampf((point.x - origin.x) / 28.0, -1.0, 1.0), clampf((point.y - origin.y) / 28.0, -1.0, 1.0))
+		_points()[String(_selected_slot)][_selected_index] = item
+		_changed()
+	else:
+		_set_point(Vector2(clampf(local.x, 0.02, 0.98), clampf(local.y, 0.02, 0.98)))
 
 func _set_point(point: Vector2) -> void:
-	_points()[String(_selected_slot)][_selected_index] = point
+	var item := LeafPointLayout.normalize_point(_points()[String(_selected_slot)][_selected_index])
+	item.position = point
+	_points()[String(_selected_slot)][_selected_index] = item
 	_changed()
 
 func _points() -> Dictionary:
@@ -188,12 +208,20 @@ func _points() -> Dictionary:
 func _nearest_slot(point: Vector2) -> StringName:
 	return &"left" if point.x < 0.46 else &"right" if point.x > 0.54 else &"center"
 
+func _point_screen(slot: StringName, index: int) -> Vector2:
+	var item: Dictionary = LeafPointLayout.normalize_point(_points()[String(slot)][index])
+	return _canvas().position + item.position * _canvas().size
+
+func _direction_screen(slot: StringName, index: int) -> Vector2:
+	var item: Dictionary = LeafPointLayout.normalize_point(_points()[String(slot)][index])
+	return _point_screen(slot, index) + item.direction * 28.0
+
 func _point_at(point: Vector2) -> Dictionary:
 	for slot in SLOTS:
 		var values: Array = _points()[String(slot)]
 		for index in values.size():
-			var screen: Vector2 = _canvas().position + Vector2(values[index]) * _canvas().size
-			if screen.distance_to(point) <= POINT_RADIUS * 1.8:
+			var screen := _point_screen(slot, index)
+			if screen.distance_to(point) <= POINT_RADIUS * 1.8 or _direction_screen(slot, index).distance_to(point) <= POINT_RADIUS * 1.8:
 				return {"slot": slot, "index": index}
 	return {}
 
@@ -213,8 +241,9 @@ func _refresh_leaves() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = _seed * 7919 + tree_index
 	for slot in SLOTS:
-		for point in _points().get(String(slot), []):
-			_leaves.append({"position": point, "frame": rng.randi_range(0, 5), "angle": rng.randf_range(-0.20, 0.20), "mirrored": rng.randf() > 0.62, "scale": rng.randf_range(0.80, 1.10)})
+		for raw in _points().get(String(slot), []):
+			var item: Dictionary = LeafPointLayout.normalize_point(raw)
+			_leaves.append({"position": item.position, "frame": rng.randi_range(0, 5), "angle": item.direction.angle() + rng.randf_range(-0.20, 0.20), "mirrored": item.direction.x < 0.0, "scale": item.size * rng.randf_range(0.92, 1.08)})
 
 func _draw() -> void:
 	if size.x <= 1.0 or size.y <= 1.0:
@@ -228,10 +257,14 @@ func _draw() -> void:
 			_draw_leaf(canvas.position + leaf.position * canvas.size, leaf)
 	for slot in SLOTS:
 		for index in _points()[String(slot)].size():
-			var point: Vector2 = canvas.position + _points()[String(slot)][index] * canvas.size
+			var point := _point_screen(slot, index)
+			var direction := _direction_screen(slot, index)
 			var selected: bool = slot == _selected_slot and index == _selected_index
-			draw_circle(point, POINT_RADIUS + 3.0 if selected else POINT_RADIUS, Color(0.25, 0.94, 0.72) if selected else Color(0.98, 0.76, 0.26))
+			var color := Color(0.25, 0.94, 0.72) if selected else Color(0.98, 0.76, 0.26)
+			draw_circle(point, POINT_RADIUS + 3.0 if selected else POINT_RADIUS, color)
 			draw_circle(point, 3.0, Color(0.09, 0.07, 0.04))
+			draw_line(point, direction, color, 2.0, true)
+			draw_circle(direction, 4.0, color)
 	_draw_panel(_panel())
 
 func _draw_leaf(center: Vector2, leaf: Dictionary) -> void:
@@ -247,9 +280,10 @@ func _draw_panel(panel: Rect2) -> void:
 	draw_string(ThemeDB.fallback_font, left, "LEAF POINT LAB", HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color(0.55, 0.96, 0.74))
 	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, 24.0), "Tree %02d · %s" % [tree_index + 1, "leaf layer ON" if leaf_layer_visible else "leaf layer OFF"], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.68, 0.62, 0.52))
 	_draw_button(_button(0), "Toggle leaf layer")
-	_draw_button(_button(1), "Refresh leaves")
+	_draw_button(_button(1), "Copy leaf coordinates")
 	_draw_button(_button(2), "Previous tree")
 	_draw_button(_button(3), "Next tree")
+	_draw_button(_button(4), "Refresh leaves")
 	for index in SLOTS.size():
 		var row := _point_row(index)
 		draw_string(ThemeDB.fallback_font, row.position + Vector2(32.0, 19.0), "%s points: %d" % [String(SLOTS[index]).capitalize(), (_points()[String(SLOTS[index])] as Array).size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.88, 0.82, 0.70))
@@ -257,11 +291,11 @@ func _draw_panel(panel: Rect2) -> void:
 		_draw_button(Rect2(row.end - Vector2(24.0, 28.0), Vector2(24.0, 28.0)), "−")
 	var selected_text := "none"
 	if not _selected_slot.is_empty() and _selected_index >= 0:
-		var point: Vector2 = _points()[String(_selected_slot)][_selected_index]
-		selected_text = "%s[%d]  x %.4f  y %.4f" % [_selected_slot, _selected_index, point.x, point.y]
+		var point: Dictionary = LeafPointLayout.normalize_point(_points()[String(_selected_slot)][_selected_index])
+		selected_text = "%s[%d]  x %.4f  y %.4f  size %.2f  dir %.2f,%.2f" % [_selected_slot, _selected_index, point.position.x, point.position.y, point.size, point.direction.x, point.direction.y]
 	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, 370.0), "SELECTED POINT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.60, 0.55, 0.47))
 	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, 390.0), selected_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(1.0, 0.84, 0.48))
-	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 38.0), "Click canvas: add · drag: move · Delete: remove", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.58, 0.54, 0.48))
+	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 38.0), "Click: add · drag dot/arrow · +/- size · Delete: remove", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.58, 0.54, 0.48))
 	if _message_time > 0.0:
 		draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 60.0), _message, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.52, 0.94, 0.72))
 
@@ -290,7 +324,6 @@ func _flash(text: String) -> void:
 	_message = text
 	_message_time = 2.5
 	queue_redraw()
-
 func _load_points() -> void:
 	var file := FileAccess.open(POINT_FILE_PATH, FileAccess.READ) if FileAccess.file_exists(POINT_FILE_PATH) else null
 	if file == null:
@@ -301,8 +334,14 @@ func _load_points() -> void:
 		for index in TREE_COUNT:
 			var values: Variant = data.points.get(str(index), null)
 			if values is Dictionary:
-				_points_by_tree[index] = values
-
+				_points_by_tree[index] = _normalize_points(values)
+func _normalize_points(values: Dictionary) -> Dictionary:
+	for slot in SLOTS:
+		var normalized: Array = []
+		for raw in values.get(String(slot), []):
+			normalized.append(LeafPointLayout.normalize_point(raw))
+		values[String(slot)] = normalized
+	return values
 func _save_points() -> void:
 	var file := FileAccess.open(POINT_FILE_PATH, FileAccess.WRITE)
 	if file == null:
