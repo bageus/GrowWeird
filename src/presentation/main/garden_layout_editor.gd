@@ -22,6 +22,7 @@ const HANDLE := 22.0
 const PANEL_RATIO := 0.27
 const STEP := 0.025
 const FILE_PATH := "user://growweird_layout.json"
+const ART_LAYOUT := {"stand": {"position": Vector2(0.5107, 0.4953), "size": Vector2(0.6000, 0.3400), "scale": 3.0000}, "pot": {"position": Vector2(0.4987, 0.7336), "size": Vector2(0.4800, 0.4000), "scale": 0.6500}, "soil": {"position": Vector2(0.4987, 0.7354), "size": Vector2(0.3600, 0.1900), "scale": 1.4250}, "tree": {"position": Vector2(0.4947, 0.4236), "size": Vector2(0.6800, 0.5800), "scale": 0.9250}}
 
 var window_index := 0
 var pot_index := 0
@@ -41,9 +42,9 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(true)
 	_reset_items()
+	_apply_art_layout()
 	_load_layout()
 	queue_redraw()
-
 func set_preview(next_window: int, next_pot: int, next_soil: int, next_tree: int, next_pruned: bool) -> void:
 	window_index = posmod(next_window, WINDOWS.size())
 	pot_index = posmod(next_pot, POTS.size())
@@ -52,18 +53,15 @@ func set_preview(next_window: int, next_pot: int, next_soil: int, next_tree: int
 	pruned = next_pruned
 	_update_textures()
 	queue_redraw()
-
 func set_prune_mode(enabled: bool) -> void:
 	pruned = false if enabled else pruned
 	queue_redraw()
-
 func layout_data() -> Dictionary:
 	var result := {}
 	for id in IDS:
 		var item: Dictionary = _items[id]
 		result[String(id)] = {"position": item.position, "size": item.size, "scale": item.scale}
 	return result
-
 func layout_code() -> String:
 	var lines: Array[String] = ["const ART_LAYOUT := {"]
 	for id in IDS:
@@ -79,14 +77,19 @@ func _reset_items() -> void:
 		"soil": {"position": Vector2(0.50, 0.665), "size": Vector2(0.36, 0.19), "scale": 1.0, "label": "Soil", "texture": SOILS[soil_index]},
 		"tree": {"position": Vector2(0.50, 0.37), "size": Vector2(0.68, 0.58), "scale": 1.0, "label": "Tree", "texture": TREES[tree_index]},
 	}
-
+func _apply_art_layout() -> void:
+	for id in IDS:
+		var item: Dictionary = _items[id]
+		var configured: Dictionary = ART_LAYOUT[String(id)]
+		item.position = configured.position
+		item.size = configured.size
+		item.scale = configured.scale
 func _update_textures() -> void:
 	if _items.is_empty():
 		return
 	_items["pot"].texture = POTS[pot_index]
 	_items["soil"].texture = SOILS[soil_index]
 	_items["tree"].texture = TREES[tree_index]
-
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_motion(event.position)
@@ -94,7 +97,6 @@ func _gui_input(event: InputEvent) -> void:
 		_mouse(event)
 	elif event is InputEventKey and event.pressed and not event.echo:
 		_key(event)
-
 func _motion(point: Vector2) -> void:
 	if _drag_mode == &"move" and _items.has(_selected):
 		var p: Vector2 = (point - _drag_offset) / _canvas().size
@@ -104,7 +106,6 @@ func _motion(point: Vector2) -> void:
 		var center: Vector2 = _item_rect(_selected).get_center()
 		_items[_selected].scale = clampf(_start_scale * maxf(8.0, point.distance_to(center)) / _start_distance, MIN_SCALE, MAX_SCALE)
 		_changed()
-
 func _mouse(event: InputEventMouseButton) -> void:
 	if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if _panel_click(event.position):
@@ -135,7 +136,6 @@ func _mouse(event: InputEventMouseButton) -> void:
 		_scale_at(event.position, STEP)
 	elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 		_scale_at(event.position, -STEP)
-
 func _key(event: InputEventKey) -> void:
 	if _selected == &"" or not _items.has(_selected):
 		return
@@ -151,7 +151,6 @@ func _key(event: InputEventKey) -> void:
 		_: return
 	item.position = Vector2(clampf(p.x, -0.2, 1.2), clampf(p.y, -0.2, 1.2))
 	_changed()
-
 func _panel_click(point: Vector2) -> bool:
 	var panel := _panel()
 	if not panel.has_point(point):
@@ -169,6 +168,12 @@ func _panel_click(point: Vector2) -> bool:
 		_changed()
 		_flash("Layout reset")
 		return true
+	if _button(3).has_point(point):
+		_apply_art_layout()
+		_selected = &""
+		_changed()
+		_flash("Draft coordinates applied")
+		return true
 	for i in VARIANTS.size():
 		var y := 214.0 + i * 40.0
 		if Rect2(panel.position + Vector2(18.0, y), Vector2(24.0, 28.0)).has_point(point):
@@ -178,7 +183,6 @@ func _panel_click(point: Vector2) -> bool:
 			_variant(VARIANTS[i], 1)
 			return true
 	return true
-
 func _variant(id: StringName, direction: int) -> void:
 	match id:
 		&"window":
@@ -195,7 +199,6 @@ func _variant(id: StringName, direction: int) -> void:
 			tree_changed.emit(direction)
 	_update_textures()
 	queue_redraw()
-
 func _scale_at(point: Vector2, amount: float) -> void:
 	var target := _item_at(point)
 	if target == &"":
@@ -203,13 +206,11 @@ func _scale_at(point: Vector2, amount: float) -> void:
 	_selected = target
 	_items[target].scale = clampf(_items[target].scale + amount, MIN_SCALE, MAX_SCALE)
 	_changed()
-
 func _item_at(point: Vector2) -> StringName:
 	for id in [&"tree", &"soil", &"pot", &"stand"]:
 		if _item_rect(id).has_point(point):
 			return id
 	return &""
-
 func _handle_at(point: Vector2) -> StringName:
 	if _selected == &"" or not _items.has(_selected):
 		return &""
@@ -217,21 +218,17 @@ func _handle_at(point: Vector2) -> StringName:
 	if Rect2(rect.end - Vector2(HANDLE, HANDLE), Vector2(HANDLE, HANDLE)).has_point(point) or Rect2(rect.position, Vector2(HANDLE, HANDLE)).has_point(point):
 		return _selected
 	return &""
-
 func _canvas() -> Rect2:
 	return Rect2(Vector2.ZERO, Vector2(size.x * (1.0 - PANEL_RATIO), size.y))
-
 func _panel() -> Rect2:
 	var canvas := _canvas()
 	return Rect2(Vector2(canvas.end.x, 0.0), Vector2(size.x - canvas.size.x, size.y))
-
 func _item_rect(id: StringName) -> Rect2:
 	var item: Dictionary = _items[id]
 	var canvas := _canvas()
 	var center: Vector2 = canvas.position + Vector2(item.position) * canvas.size
 	var bounds: Vector2 = Vector2(item.size) * canvas.size * float(item.scale)
 	return Rect2(center - bounds * 0.5, bounds)
-
 func _draw() -> void:
 	if size.x <= 1.0 or size.y <= 1.0 or _items.is_empty():
 		return
@@ -246,11 +243,9 @@ func _draw() -> void:
 		_draw_handle(Rect2(rect.end - Vector2(HANDLE, HANDLE), Vector2(HANDLE, HANDLE)), "+")
 		_draw_handle(Rect2(rect.position, Vector2(HANDLE, HANDLE)), "−")
 	_draw_panel(_panel())
-
 func _draw_handle(rect: Rect2, text: String) -> void:
 	draw_rect(rect, Color(1.0, 0.82, 0.26))
 	draw_string(ThemeDB.fallback_font, rect.position + Vector2(6.0, 16.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(0.12, 0.08, 0.03))
-
 func _draw_panel(panel: Rect2) -> void:
 	var left := panel.position + Vector2(18.0, 28.0)
 	draw_rect(panel, Color(0.09, 0.07, 0.055))
@@ -260,6 +255,7 @@ func _draw_panel(panel: Rect2) -> void:
 	_draw_button(_button(0), "Copy coordinates")
 	_draw_button(_button(1), "Save layout")
 	_draw_button(_button(2), "Reset layout")
+	_draw_button(_button(3), "Apply draft coordinates")
 	for i in VARIANTS.size():
 		var id := VARIANTS[i]
 		var row := Rect2(panel.position + Vector2(18.0, 214.0 + i * 40.0), Vector2(panel.size.x - 36.0, 28.0))
@@ -277,21 +273,17 @@ func _draw_panel(panel: Rect2) -> void:
 	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 28.0), "Drag · corners/wheel resize · arrows fine tune", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.58, 0.54, 0.48))
 	if _message_time > 0.0:
 		draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 52.0), _message, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.52, 0.94, 0.72))
-
 func _process(delta: float) -> void:
 	if _message_time > 0.0:
 		_message_time = maxf(0.0, _message_time - delta)
 		queue_redraw()
-
 func _draw_button(rect: Rect2, text: String) -> void:
 	draw_rect(rect, Color(0.18, 0.14, 0.10))
 	draw_rect(rect, Color(0.46, 0.35, 0.21), false, 1.0)
 	draw_string(ThemeDB.fallback_font, rect.position + Vector2(8.0, rect.size.y * 0.68), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.91, 0.85, 0.72))
-
 func _button(index: int) -> Rect2:
 	var panel := _panel()
 	return Rect2(panel.position + Vector2(18.0, 68.0 + index * 36.0), Vector2(panel.size.x - 36.0, 28.0))
-
 func _variant_label(id: StringName) -> String:
 	match id:
 		&"window": return "Background %d/4" % (window_index + 1)
@@ -299,16 +291,13 @@ func _variant_label(id: StringName) -> String:
 		&"soil": return "Soil asset %d/6" % (soil_index + 1)
 		&"tree": return "Tree asset %d/9" % (tree_index + 1)
 	return String(id)
-
 func _changed() -> void:
 	layout_changed.emit(layout_data())
 	queue_redraw()
-
 func _flash(text: String) -> void:
 	_message = text
 	_message_time = 2.5
 	queue_redraw()
-
 func _save_layout() -> void:
 	var file := FileAccess.open(FILE_PATH, FileAccess.WRITE)
 	if file == null:
@@ -338,12 +327,10 @@ func _load_layout() -> void:
 		item.position = Vector2(float(value.get("x", item.position.x)), float(value.get("y", item.position.y)))
 		item.size = Vector2(float(value.get("width", item.size.x)), float(value.get("height", item.size.y)))
 		item.scale = clampf(float(value.get("scale", item.scale)), MIN_SCALE, MAX_SCALE)
-
 func _cover(texture: Texture2D, bounds: Rect2) -> Rect2:
 	var scale := maxf(bounds.size.x / texture.get_width(), bounds.size.y / texture.get_height())
 	var draw_size := Vector2(texture.get_width(), texture.get_height()) * scale
 	return Rect2(bounds.position + (bounds.size - draw_size) * 0.5, draw_size)
-
 func _fit(texture: Texture2D, bounds: Rect2) -> Rect2:
 	var scale := minf(bounds.size.x / texture.get_width(), bounds.size.y / texture.get_height())
 	var draw_size := Vector2(texture.get_width(), texture.get_height()) * scale

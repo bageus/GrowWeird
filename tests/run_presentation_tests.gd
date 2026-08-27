@@ -42,6 +42,7 @@ func _test_presentation_resources_load() -> void:
 func _test_layout_editor_contract() -> void:
 	var editor := GardenLayoutEditor.new()
 	editor._reset_items()
+	editor._apply_art_layout()
 	var layout := editor.layout_data()
 	_expect(layout.size() == 4, "layout editor: all four movable assets must expose coordinates")
 	_expect(layout.has("stand") and layout.has("pot") and layout.has("soil") and layout.has("tree"), "layout editor: named asset coordinates missing")
@@ -49,6 +50,9 @@ func _test_layout_editor_contract() -> void:
 		_expect(layout[id].has("position") and layout[id].has("size") and layout[id].has("scale"), "layout editor: incomplete coordinates for %s" % id)
 	_expect(editor.layout_code().contains("const ART_LAYOUT"), "layout editor: code export missing")
 	_expect(not editor.layout_code().contains("window"), "layout editor: background must not be exported as movable asset")
+	var configured := {"stand": Vector2(0.5107, 0.4953), "pot": Vector2(0.4987, 0.7336), "soil": Vector2(0.4987, 0.7354), "tree": Vector2(0.4947, 0.4236)}
+	for id in configured:
+		_expect(editor.layout_data()[id].position == configured[id], "layout editor: preliminary ART_LAYOUT position not applied for %s" % id)
 	editor.free()
 
 func _test_growth_stage_geometry() -> void:
