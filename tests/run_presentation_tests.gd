@@ -42,6 +42,7 @@ func _test_presentation_resources_load() -> void:
 func _test_layout_editor_contract() -> void:
 	var editor := GardenLayoutEditor.new()
 	editor._reset_items()
+	editor._apply_art_layout()
 	var layout := editor.layout_data()
 	_expect(layout.size() == 4, "layout editor: all four movable assets must expose coordinates")
 	_expect(layout.has("stand") and layout.has("pot") and layout.has("soil") and layout.has("tree"), "layout editor: named asset coordinates missing")
