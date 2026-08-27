@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="8_shop"]
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
-[ext_resource type="Script" path="res://src/presentation/main/garden_layout_editor.gd" id="10_garden"]
+[ext_resource type="Script" path="res://src/presentation/main/garden_preview.gd" id="10_garden"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -207,6 +207,7 @@ custom_minimum_size = Vector2(760, 560)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+mouse_filter = 1
 clip_contents = true
 mouse_filter = 1
 script = ExtResource("10_garden")
