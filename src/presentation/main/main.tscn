@@ -86,7 +86,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 10
 
 [node name="ToolsPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(160, 0)
+custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
 
 [node name="Tools" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel"]
@@ -142,7 +142,7 @@ text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGen
 autowrap_mode = 2
 
 [node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(560, 390)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -201,7 +201,7 @@ script = ExtResource("5_sense")
 
 [node name="ArtPreview" type="PanelContainer" parent="Margin/Layout/MainContent"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 390)
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -209,7 +209,7 @@ clip_contents = true
 script = ExtResource("10_garden")
 
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(390, 0)
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
