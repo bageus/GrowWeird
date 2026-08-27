@@ -23,7 +23,7 @@ extends Control
 @onready var sell_plant_button: Button = %SellPlantButton
 @onready var recycle_plant_button: Button = %RecyclePlantButton
 @onready var cancel_button: Button = %CancelButton
-@onready var art_preview: GardenPreview = %ArtPreview
+@onready var art_preview: GardenLayoutEditor = %ArtPreview
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -57,8 +57,6 @@ func _ready() -> void:
 	art_preview.pot_changed.connect(_on_art_pot)
 	art_preview.soil_changed.connect(_on_art_soil)
 	art_preview.tree_changed.connect(_on_art_tree)
-	art_preview.prune_changed.connect(_on_preview_prune)
-	art_preview.prune_undo_pressed.connect(_on_preview_undo_prune)
 	_refresh()
 
 func _refresh() -> void:
@@ -318,8 +316,8 @@ func _on_art_window() -> void: _art_window = posmod(_art_window + 1, 4); _refres
 func _on_art_pot(direction: int) -> void: _art_pot = posmod(_art_pot + direction, 5); _refresh()
 func _on_art_soil(direction: int) -> void: _art_soil = clampi(_art_soil + direction, 0, 5); _refresh()
 func _on_art_tree(direction: int) -> void: _art_tree = clampi(_art_tree + direction, 0, 7); _refresh()
-func _on_art_prune() -> void: _art_pruned = true; _refresh()
-func _on_art_undo_prune() -> void: _art_pruned = false; _refresh()
+func _on_art_layout_changed(_layout: Dictionary) -> void:
+	return
 func _item_prices() -> Dictionary:
 	var result := {}
 	for cutting in GameApp.state.inventory.cuttings:

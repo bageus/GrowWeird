@@ -4,6 +4,7 @@ var _failures: Array[String] = []
 
 func _init() -> void:
 	_test_presentation_resources_load()
+	_test_layout_editor_contract()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
 	_test_mutation_reveal_detection()
@@ -37,6 +38,18 @@ func _test_presentation_resources_load() -> void:
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
+
+func _test_layout_editor_contract() -> void:
+	var editor := GardenLayoutEditor.new()
+	editor._reset_items()
+	var layout := editor.layout_data()
+	_expect(layout.size() == 4, "layout editor: all four movable assets must expose coordinates")
+	_expect(layout.has("stand") and layout.has("pot") and layout.has("soil") and layout.has("tree"), "layout editor: named asset coordinates missing")
+	for id in ["stand", "pot", "soil", "tree"]:
+		_expect(layout[id].has("position") and layout[id].has("size") and layout[id].has("scale"), "layout editor: incomplete coordinates for %s" % id)
+	_expect(editor.layout_code().contains("const ART_LAYOUT"), "layout editor: code export missing")
+	_expect(not editor.layout_code().contains("window"), "layout editor: background must not be exported as movable asset")
+	editor.free()
 
 func _test_growth_stage_geometry() -> void:
 	var plant := _plant()
