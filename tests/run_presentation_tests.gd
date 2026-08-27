@@ -5,6 +5,7 @@ var _failures: Array[String] = []
 func _init() -> void:
 	_test_presentation_resources_load()
 	_test_layout_editor_contract()
+	_test_leaf_point_editor_contract()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
 	_test_mutation_reveal_detection()
@@ -53,6 +54,15 @@ func _test_layout_editor_contract() -> void:
 	var configured := {"stand": Vector2(0.5107, 0.4953), "pot": Vector2(0.4987, 0.7336), "soil": Vector2(0.4987, 0.7354), "tree": Vector2(0.4947, 0.4236)}
 	for id in configured:
 		_expect(editor.layout_data()[id].position == configured[id], "layout editor: preliminary ART_LAYOUT position not applied for %s" % id)
+	editor.free()
+
+func _test_leaf_point_editor_contract() -> void:
+	var editor := LeafPointEditor.new()
+	editor.set_tree(4)
+	var points: Dictionary = editor.leaf_points()
+	_expect(points.has("center") and points.has("left") and points.has("right"), "leaf points: all branch slots must exist")
+	_expect((points["center"] as Array).size() > 0, "leaf points: mature trees need center points")
+	_expect(editor.leaf_points_code().contains("const LEAF_POINTS"), "leaf points: code export missing")
 	editor.free()
 
 func _test_growth_stage_geometry() -> void:
