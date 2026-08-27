@@ -22,6 +22,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/main/main.tscn",
 		"res://src/presentation/main/main_screen.gd",
 		"res://src/presentation/main/pot_selector.gd",
+		"res://src/presentation/main/garden_layout_editor.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
 		"res://src/presentation/plant/branch_mutation_renderer.gd",
