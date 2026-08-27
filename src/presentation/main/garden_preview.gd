@@ -24,6 +24,16 @@ var _pruned := false
 var _prune_mode := false
 var _hovered_side := ""
 var _pulse := 0.0
+var _layout := {
+	"stand": {"position": Vector2(0.50, 0.77), "size": Vector2(0.60, 0.34), "scale": 1.0},
+	"pot": {"position": Vector2(0.50, 0.70), "size": Vector2(0.48, 0.40), "scale": 1.0},
+	"soil": {"position": Vector2(0.50, 0.665), "size": Vector2(0.36, 0.19), "scale": 1.0},
+	"tree": {"position": Vector2(0.50, 0.37), "size": Vector2(0.68, 0.58), "scale": 1.0}
+}
+var _selected := ""
+var _dragging := false
+var _drag_offset := Vector2.ZERO
+var _last_pointer := Vector2.ZERO
 
 func set_preview(window_index: int, pot_index: int, soil_index: int, tree_index: int, pruned: bool) -> void:
 	_window = posmod(window_index, WINDOWS.size())
@@ -47,6 +57,35 @@ func _ready() -> void:
 	queue_redraw()
 
 func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			var target := _element_at(event.position)
+			if not target.is_empty():
+				_selected = target
+				_dragging = true
+				_drag_offset = event.position - _element_rect(target).get_center()
+				_last_pointer = event.position
+				queue_redraw()
+				accept_event()
+		else:
+			_dragging = false
+		return
+	if event is InputEventMouseMotion and _dragging and not _selected.is_empty():
+		var next := _layout[_selected].duplicate()
+		var pointer := event.position
+		next["position"] = (pointer - _drag_offset) / size
+		_last_pointer = pointer
+		_layout[_selected] = next
+		queue_redraw()
+		accept_event()
+		return
+	if event is InputEventMouseButton and event.pressed and not _selected.is_empty() and (event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN):
+		var item: Dictionary = _layout[_selected]
+		item["scale"] = clampf(float(item["scale"]) + (0.05 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -0.05), 0.25, 3.0)
+		_layout[_selected] = item
+		queue_redraw()
+		accept_event()
+		return
 	if not _prune_mode or _pruned:
 		return
 	if event is InputEventMouseMotion:
@@ -75,24 +114,44 @@ func _draw() -> void:
 	var window_rect := Rect2(Vector2.ZERO, Vector2(size.x, size.y * 0.68))
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.08, 0.06, 0.05, 1.0))
 	draw_texture_rect(WINDOWS[_window], _cover(WINDOWS[_window], window_rect), false)
-	var stand := Rect2(Vector2(size.x * 0.20, size.y * 0.64), Vector2(size.x * 0.60, size.y * 0.34))
-	draw_texture_rect(STAND, _fit(STAND, stand), false)
-	var pot := Rect2(Vector2(size.x * 0.26, size.y * 0.50), Vector2(size.x * 0.48, size.y * 0.40))
-	draw_texture_rect(POTS[_pot], _fit(POTS[_pot], pot), false)
-	var soil := Rect2(Vector2(size.x * 0.32, size.y * 0.57), Vector2(size.x * 0.36, size.y * 0.19))
-	draw_texture_rect(SOILS[_soil], _fit(SOILS[_soil], soil), false)
+	draw_texture_rect(STAND, _fit(STAND, _element_rect("stand")), false)
+	draw_texture_rect(POTS[_pot], _fit(POTS[_pot], _element_rect("pot")), false)
+	draw_texture_rect(SOILS[_soil], _fit(SOILS[_soil], _element_rect("soil")), false)
 	var tree := TREES[8] if _pruned else TREES[_tree]
-	var tree_box := Rect2(Vector2(size.x * 0.16, size.y * 0.08), Vector2(size.x * 0.68, size.y * 0.58))
-	draw_texture_rect(tree, _fit(tree, tree_box), false)
+	draw_texture_rect(tree, _fit(tree, _element_rect("tree")), false)
+	if not _selected.is_empty():
+		_draw_selection(_element_rect(_selected))
 	if _prune_mode and not _pruned:
 		_draw_hint(canvas, -1.0)
 		_draw_hint(canvas, 1.0)
+
+func _draw_selection(rect: Rect2) -> void:
+	draw_rect(rect, Color(1.0, 0.84, 0.25, 0.8), false, 2.0)
+	var button := Rect2(rect.end + Vector2(8, -18), Vector2(28, 28))
+	draw_rect(button, Color(0.10, 0.08, 0.06, 0.95), true)
+	draw_string(ThemeDB.fallback_font, button.position + Vector2(9, 20), "+", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color.WHITE)
+	var minus := Rect2(button.end + Vector2(4, 0), button.size)
+	draw_rect(minus, Color(0.10, 0.08, 0.06, 0.95), true)
+	draw_string(ThemeDB.fallback_font, minus.position + Vector2(10, 19), "−", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
 
 func _draw_hint(canvas: Rect2, side: float) -> void:
 	var center := canvas.position + Vector2(canvas.size.x * (0.35 if side < 0.0 else 0.65), canvas.size.y * 0.34)
 	var radius := 24.0 + sin(_pulse * 8.0) * 5.0 if _hovered_side == ("left" if side < 0.0 else "right") else 20.0
 	draw_circle(center, radius, Color(1.0, 0.78, 0.22, 0.14))
 	draw_arc(center, radius, 0.0, TAU, 24, Color(1.0, 0.82, 0.30, 0.82), 3.0, true)
+
+func _element_rect(key: String) -> Rect2:
+	var item: Dictionary = _layout[key]
+	var center: Vector2 = item["position"] * size
+	var base: Vector2 = item["size"] * size
+	var scaled := base * float(item["scale"])
+	return Rect2(center - scaled * 0.5, scaled)
+
+func _element_at(point: Vector2) -> String:
+	for key in ["tree", "soil", "pot", "stand"]:
+		if _element_rect(key).has_point(point):
+			return key
+	return ""
 
 func _branch_at(point: Vector2) -> String:
 	if _tree < 5:
