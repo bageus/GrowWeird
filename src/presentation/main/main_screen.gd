@@ -24,6 +24,7 @@ extends Control
 @onready var recycle_plant_button: Button = %RecyclePlantButton
 @onready var cancel_button: Button = %CancelButton
 @onready var art_preview: GardenLayoutEditor = %ArtPreview
+@onready var leaf_point_preview: LeafPointEditor = %LeafPointPreview
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -33,6 +34,7 @@ var _art_pot := 0
 var _art_soil := 2
 var _art_tree := 0
 var _art_pruned := false
+var _leaf_lab_visible := false
 
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -57,8 +59,8 @@ func _ready() -> void:
 	art_preview.pot_changed.connect(_on_art_pot)
 	art_preview.soil_changed.connect(_on_art_soil)
 	art_preview.tree_changed.connect(_on_art_tree)
+	leaf_point_preview.tree_changed.connect(_on_leaf_lab_tree_changed)
 	_refresh()
-
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
@@ -75,6 +77,9 @@ func _refresh() -> void:
 	_refresh_offer()
 	_refresh_actions(plant)
 	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
+	leaf_point_preview.set_tree(_art_tree)
+	leaf_point_preview.visible = _leaf_lab_visible
+	art_preview.visible = not _leaf_lab_visible
 	plant_sense.visible = plant != null and plant.alive
 
 	if pot == null:
@@ -105,7 +110,6 @@ func _refresh() -> void:
 		status_label.text += " · New branch forming"
 	if not plant.alive:
 		status_label.text += " · Final state"
-
 func _refresh_actions(plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	prune_button.disabled = not living
@@ -116,7 +120,6 @@ func _refresh_actions(plant: PlantState) -> void:
 	recycle_plant_button.visible = plant != null and not plant.alive
 	recycle_plant_button.disabled = compost_yield <= 0
 	recycle_plant_button.text = "Compost remains · ×%d" % compost_yield
-
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
 	var plant := GameApp.active_plant()
@@ -137,7 +140,6 @@ func _refresh_offer() -> void:
 		"Something strange arrives in %.0fs" % GameApp.state.fertilizer_offer.seconds_until_offer
 		if ids.is_empty() else "Choose one. Its real effect is not explained."
 	)
-
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
@@ -145,47 +147,37 @@ func _set_interaction_mode(mode: StringName) -> void:
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
 	harvest_button.button_pressed = mode == PlantView.MODE_HARVEST
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty()
-
 func _cancel_action() -> void:
 	_pending_item_id = ""
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_NONE)
 	pot_selector.invalidate()
-
 func _on_water_pressed() -> void:
 	GameApp.water_active(false)
-
 func _on_spray_pressed() -> void:
 	GameApp.water_active(true)
-
 func _on_prune_pressed() -> void:
 	if GameApp.active_plant() == null:
 		event_label.text = "There is nothing to prune."
 		return
 	_begin_branch_mode(PlantView.MODE_PRUNE, "Prune mode: click any existing branch.")
-
 func _on_harvest_pressed() -> void:
 	if not _has_ready_fruit(GameApp.active_plant()):
 		event_label.text = "No ripe fruit yet."
 		return
 	_begin_branch_mode(PlantView.MODE_HARVEST, "Harvest mode: click a branch with a ripe fruit.")
-
 func _begin_branch_mode(mode: StringName, message: String) -> void:
 	_pending_item_id = ""
 	_pending_plant_kind = &""
 	_set_interaction_mode(mode)
 	event_label.text = message
-
 func _on_cancel_pressed() -> void:
 	_cancel_action()
 	event_label.text = "Action cancelled."
-
 func _on_light_mode_requested(mode: int) -> void:
 	GameApp.set_light_mode(mode)
-
 func _on_window_state_requested(open: bool) -> void:
 	GameApp.set_window_open(open)
-
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
@@ -197,7 +189,6 @@ func _on_branch_selected(slot: StringName) -> void:
 		var fruit_id := GameApp.harvest_active_fruit(slot)
 		event_label.text = "Fruit harvested." if not fruit_id.is_empty() else "That fruit is not ready."
 	_cancel_action()
-
 func _on_cutting_graft_requested(item_id: String) -> void:
 	var plant := GameApp.active_plant()
 	if plant == null or not plant.alive:
@@ -207,10 +198,8 @@ func _on_cutting_graft_requested(item_id: String) -> void:
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_GRAFT)
 	event_label.text = "Graft mode: choose one glowing empty branch slot."
-
 func _on_cutting_plant_requested(item_id: String) -> void:
 	_begin_plant_target(&"cutting", item_id)
-
 func _on_seed_plant_requested(item_id: String) -> void:
 	_begin_plant_target(&"seed", item_id)
 
@@ -232,20 +221,16 @@ func _handle_pot_click(pot_id: String) -> void:
 	else:
 		event_label.text = "Cannot plant there."
 	_cancel_action()
-
 func _on_inventory_fertilizer(fertilizer_id: StringName) -> void:
 	var events := GameApp.use_inventory_fertilizer(fertilizer_id)
 	if events.is_empty():
 		event_label.text = "Fertilizer used. No visible mutation yet."
-
 func _on_fruit_seed_requested(item_id: String) -> void:
 	var seed_id := GameApp.create_seed_from_fruit(item_id)
 	event_label.text = "Seed created." if not seed_id.is_empty() else "Could not create seed."
-
 func _on_item_sell_requested(kind: StringName, item_id: String) -> void:
 	var amount := GameApp.sell_inventory_item(kind, item_id)
 	event_label.text = "%s sold for $%d." % [_pretty_id(String(kind)), amount] if amount > 0 else "Could not sell item."
-
 func _on_item_recycle_requested(kind: StringName, item_id: String) -> void:
 	var amount := GameApp.recycle_inventory_item(kind, item_id)
 	event_label.text = "%s composted into ×%d Compost Mix." % [_pretty_id(String(kind)), amount] if amount > 0 else "Could not compost item."
@@ -259,12 +244,10 @@ func _on_recycle_plant_pressed() -> void:
 	var amount := GameApp.recycle_active_dead_plant()
 	event_label.text = "Remains composted into ×%d Compost Mix. Pot is free." % amount if amount > 0 else "Only dead plants can be composted."
 	_cancel_action()
-
 func _on_shop_pressed() -> void:
 	shop_overlay.visible = not shop_overlay.visible
 	shop_panel.invalidate()
 	_refresh()
-
 func _on_close_shop_pressed() -> void:
 	shop_overlay.visible = false
 
@@ -280,13 +263,10 @@ func _on_shop_pot_requested() -> void:
 	var pot_id := GameApp.buy_new_pot()
 	event_label.text = "%s purchased." % pot_id if not pot_id.is_empty() else "Not enough money for a new pot."
 	pot_selector.invalidate()
-
 func _on_offer_one_pressed() -> void:
 	_choose_offer(0)
-
 func _on_offer_two_pressed() -> void:
 	_choose_offer(1)
-
 func _on_offer_three_pressed() -> void:
 	_choose_offer(2)
 
@@ -297,10 +277,8 @@ func _choose_offer(index: int) -> void:
 	var events := GameApp.choose_fertilizer_offer(ids[index])
 	if events.is_empty():
 		event_label.text = "Fertilizer absorbed. Nothing obvious happened yet."
-
 func _on_skip_offer_pressed() -> void:
 	event_label.text = "Offer skipped." if GameApp.skip_fertilizer_offer() else "Not enough money to skip."
-
 func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	if events.is_empty():
 		return
@@ -308,7 +286,6 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	for event in events:
 		texts.append("%s changed: %s" % [event["branch_id"], _pretty_id(String(event["trait_id"]))])
 	event_label.text = " · ".join(texts)
-
 func _on_offer_ready(_ids: Array[StringName]) -> void:
 	event_label.text = "Three new fertilizers appeared."
 
@@ -318,6 +295,14 @@ func _on_art_soil(direction: int) -> void: _art_soil = clampi(_art_soil + direct
 func _on_art_tree(direction: int) -> void: _art_tree = clampi(_art_tree + direction, 0, 7); _refresh()
 func _on_art_layout_changed(_layout: Dictionary) -> void:
 	return
+func _on_leaf_lab_pressed() -> void:
+	_leaf_lab_visible = not _leaf_lab_visible
+	leaf_point_preview.visible = _leaf_lab_visible
+	art_preview.visible = not _leaf_lab_visible
+	$Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton.text = "Back to art layout" if _leaf_lab_visible else "Leaf point lab"
+func _on_leaf_lab_tree_changed(index: int) -> void:
+	_art_tree = index
+	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
 func _item_prices() -> Dictionary:
 	var result := {}
 	for cutting in GameApp.state.inventory.cuttings:
