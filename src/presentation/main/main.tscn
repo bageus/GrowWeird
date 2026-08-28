@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
@@ -10,6 +10,10 @@
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
 [ext_resource type="Script" path="res://src/presentation/main/garden_layout_editor.gd" id="10_garden"]
 [ext_resource type="Script" path="res://src/presentation/main/leaf_point_editor.gd" id="11_leaf"]
+[ext_resource type="Script" path="res://src/presentation/main/ui_pipeline_editor.gd" id="12_pipeline"]
+[ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="14_window"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/interface_layer.tscn" id="15_interface"]
+
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -18,7 +22,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
-[node name="Background" type="ColorRect" parent="."]
+
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,7 +31,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.105, 0.094, 0.078, 1)
+texture = ExtResource("14_window")
+expand_mode = 1
+stretch_mode = 0
+
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -42,97 +50,120 @@ theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
+
 [node name="Layout" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 theme_override_constants/separation = 9
+
 [node name="TopBar" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
+
 [node name="Title" type="Label" parent="Margin/Layout/TopBar"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "GROW WEIRD"
+
 [node name="Spacer" type="Control" parent="Margin/Layout/TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
+
 [node name="MoneyLabel" type="Label" parent="Margin/Layout/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "$0"
+
 [node name="ShopButton" type="Button" parent="Margin/Layout/TopBar"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Shop"
+
 [node name="PlantNameLabel" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 text = "Plant"
 horizontal_alignment = 1
+
 [node name="MainContent" type="HBoxContainer" parent="Margin/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 alignment = 1
 size_flags_horizontal = 3
+
 [node name="ToolsPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+
 [node name="Tools" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel"]
 layout_mode = 2
 theme_override_constants/separation = 8
+
 [node name="ToolsTitle" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 text = "Care"
 horizontal_alignment = 1
+
 [node name="WaterButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 text = "Water"
+
 [node name="SprayButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 text = "Spray"
+
 [node name="PruneButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 text = "Prune"
+
 [node name="HarvestButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 text = "Harvest"
+
 [node name="SellPlantButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Sell plant"
+
 [node name="RecyclePlantButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Compost remains"
+
 [node name="CancelButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Cancel action"
+
 [node name="LeafLabButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Leaf point lab"
+
 [node name="Hint" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 layout_mode = 2
 size_flags_vertical = 3
 text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGenetic items can be sold or composted."
 autowrap_mode = 2
+
 [node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
 [node name="World" type="Control" parent="Margin/Layout/MainContent/WorldPanel"]
 layout_mode = 2
 clip_contents = true
+
 [node name="WindowView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -142,6 +173,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_window")
+
 [node name="PlantView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -155,6 +187,7 @@ offset_bottom = -58.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_plant")
+
 [node name="SoilView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -166,6 +199,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_soil")
+
 [node name="PlantSense" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -177,6 +211,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_sense")
+
 [node name="ArtPreview" type="PanelContainer" parent="Margin/Layout/MainContent/WorldPanel/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -188,6 +223,7 @@ grow_vertical = 2
 mouse_filter = 1
 clip_contents = true
 script = ExtResource("10_garden")
+
 [node name="LeafPointPreview" type="PanelContainer" parent="Margin/Layout/MainContent/WorldPanel/World"]
 visible = false
 unique_name_in_owner = true
@@ -200,76 +236,92 @@ grow_vertical = 2
 mouse_filter = 1
 clip_contents = true
 script = ExtResource("11_leaf")
+
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 size_flags_vertical = 3
+
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
 layout_mode = 2
 horizontal_scroll_mode = 0
+
 [node name="InventoryPanel" type="VBoxContainer" parent="Margin/Layout/MainContent/InventoryOuter/InventoryScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5
 script = ExtResource("6_inventory")
+
 [node name="ProgressionPanel" type="PanelContainer" parent="Margin/Layout"]
 visible = false
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 script = ExtResource("9_progress")
+
 [node name="StatusLabel" type="Label" parent="Margin/Layout"]
 visible = false
 unique_name_in_owner = true
 layout_mode = 2
 text = "Loading..."
 horizontal_alignment = 1
+
 [node name="OffersPanel" type="PanelContainer" parent="Margin/Layout"]
 visible = false
 layout_mode = 2
+
 [node name="OffersLayout" type="VBoxContainer" parent="Margin/Layout/OffersPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
+
 [node name="OfferLabel" type="Label" parent="Margin/Layout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Fertilizers"
 horizontal_alignment = 1
+
 [node name="OfferButtons" type="HBoxContainer" parent="Margin/Layout/OffersPanel/OffersLayout"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8
+
 [node name="OfferOne" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "?"
+
 [node name="OfferTwo" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "?"
+
 [node name="OfferThree" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 text = "?"
+
 [node name="SkipOffer" type="Button" parent="Margin/Layout/OffersPanel/OffersLayout/OfferButtons"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Skip"
+
 [node name="PotsScroll" type="ScrollContainer" parent="Margin/Layout"]
 visible = false
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 vertical_scroll_mode = 0
+
 [node name="PotSelector" type="HBoxContainer" parent="Margin/Layout/PotsScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 script = ExtResource("7_pots")
+
 [node name="EventLabel" type="Label" parent="Margin/Layout"]
 visible = false
 unique_name_in_owner = true
@@ -278,6 +330,7 @@ layout_mode = 2
 text = "Grow. Graft. Mutate."
 horizontal_alignment = 1
 autowrap_mode = 2
+
 [node name="ShopOverlay" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 visible = false
@@ -291,17 +344,80 @@ offset_top = 58.0
 offset_right = -24.0
 offset_bottom = 410.0
 grow_horizontal = 0
+
 [node name="ShopLayout" type="VBoxContainer" parent="ShopOverlay"]
 layout_mode = 2
 theme_override_constants/separation = 8
+
 [node name="CloseShopButton" type="Button" parent="ShopOverlay/ShopLayout"]
 layout_mode = 2
 text = "Close"
+
 [node name="ShopPanel" type="VBoxContainer" parent="ShopOverlay/ShopLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 6
 script = ExtResource("8_shop")
+
+[node name="InterfaceLayer" parent="." instance=ExtResource("15_interface")]
+
+[node name="PipelineToggle" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 176.0
+offset_bottom = 52.0
+text = "Настройка UI"
+
+[node name="PipelineEditor" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_pipeline")
+
+[node name="PipelinePanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -296.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 116.0
+grow_horizontal = 0
+
+[node name="PipelineControls" type="VBoxContainer" parent="PipelinePanel"]
+layout_mode = 2
+
+[node name="PipelineTitle" type="Label" parent="PipelinePanel/PipelineControls"]
+layout_mode = 2
+text = "PIPELINE · drag the buttons"
+horizontal_alignment = 1
+
+[node name="PipelineButtons" type="HBoxContainer" parent="PipelinePanel/PipelineControls"]
+layout_mode = 2
+alignment = 1
+
+[node name="SavePipeline" type="Button" parent="PipelinePanel/PipelineControls/PipelineButtons"]
+layout_mode = 2
+text = "Сохранить координаты"
+
+[node name="ResetPipeline" type="Button" parent="PipelinePanel/PipelineControls/PipelineButtons"]
+layout_mode = 2
+text = "Сбросить"
+
+[node name="PipelineHint" type="Label" parent="PipelinePanel/PipelineControls"]
+layout_mode = 2
+text = "Перетащите кнопки на сцене, затем нажмите Сохранить"
+horizontal_alignment = 1
+
 [connection signal="pressed" from="Margin/Layout/TopBar/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/WaterButton" to="." method="_on_water_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SprayButton" to="." method="_on_spray_pressed"]
@@ -312,7 +428,11 @@ script = ExtResource("8_shop")
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton" to="." method="_on_leaf_lab_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferTwo" to="." method="_on_offer_two_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferThree" to="." method="_on_offer_three_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/SkipOffer" to="." method="_on_skip_offer_pressed"]
-[connection signal="pressed" from="ShopOverlay/ShopLayout/CloseShopButton" to="." method="_on_close_shop_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingButton" to="." method="_on_light_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/SunnyButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/VentilationButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/BlindsButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/CurtainsButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="PipelineToggle" to="." method="_on_pipeline_pressed"]
+[connection signal="pressed" from="PipelinePanel/PipelineControls/SavePipeline" to="." method="_on_pipeline_save_pressed"]
+[connection signal="pressed" from="PipelinePanel/PipelineControls/ResetPipeline" to="." method="_on_pipeline_reset_pressed"]
