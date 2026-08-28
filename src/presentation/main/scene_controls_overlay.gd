@@ -8,7 +8,6 @@ const DEFAULT_POSITIONS := {
 	"water": Vector2(0.04, 0.58),
 	"spray": Vector2(0.04, 0.66),
 	"lighting": Vector2(0.78, 0.10),
-	"window": Vector2(0.78, 0.18),
 	"prune": Vector2(0.78, 0.50),
 	"harvest": Vector2(0.78, 0.58),
 	"sell_plant": Vector2(0.78, 0.66),
