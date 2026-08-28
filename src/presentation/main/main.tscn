@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=14 format=3]
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
@@ -10,6 +10,10 @@
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
 [ext_resource type="Script" path="res://src/presentation/main/garden_layout_editor.gd" id="10_garden"]
 [ext_resource type="Script" path="res://src/presentation/main/leaf_point_editor.gd" id="11_leaf"]
+[ext_resource type="Script" path="res://src/presentation/main/ui_pipeline_editor.gd" id="12_pipeline"]
+[ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="14_window"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/interface_layer.tscn" id="15_interface"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/pipeline_panel.tscn" id="16_pipeline_panel"]
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -18,7 +22,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -26,7 +30,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.105, 0.094, 0.078, 1)
+texture = ExtResource("14_window")
+expand_mode = 1
+stretch_mode = 0
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -302,6 +308,26 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 6
 script = ExtResource("8_shop")
+[node name="InterfaceLayer" parent="." instance=ExtResource("15_interface")]
+[node name="PipelineToggle" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 176.0
+offset_bottom = 52.0
+text = "Настройка UI"
+[node name="PipelineEditor" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("12_pipeline")
+[node name="PipelinePanel" parent="." instance=ExtResource("16_pipeline_panel")]
 [connection signal="pressed" from="Margin/Layout/TopBar/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/WaterButton" to="." method="_on_water_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SprayButton" to="." method="_on_spray_pressed"]
@@ -312,7 +338,11 @@ script = ExtResource("8_shop")
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton" to="." method="_on_leaf_lab_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferTwo" to="." method="_on_offer_two_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferThree" to="." method="_on_offer_three_pressed"]
-[connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/SkipOffer" to="." method="_on_skip_offer_pressed"]
-[connection signal="pressed" from="ShopOverlay/ShopLayout/CloseShopButton" to="." method="_on_close_shop_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingButton" to="." method="_on_light_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/SunnyButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/VentilationButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/BlindsButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="InterfaceLayer/LightingOptions/CurtainsButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="PipelineToggle" to="." method="_on_pipeline_pressed"]
+[connection signal="pressed" from="PipelinePanel/PipelineControls/SavePipeline" to="." method="_on_pipeline_save_pressed"]
+[connection signal="pressed" from="PipelinePanel/PipelineControls/ResetPipeline" to="." method="_on_pipeline_reset_pressed"]

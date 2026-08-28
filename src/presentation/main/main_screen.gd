@@ -25,6 +25,9 @@ extends Control
 @onready var cancel_button: Button = %CancelButton
 @onready var art_preview: GardenLayoutEditor = %ArtPreview
 @onready var leaf_point_preview: LeafPointEditor = %LeafPointPreview
+@onready var pipeline_toggle: Button = %PipelineToggle
+@onready var pipeline_editor: UIPipelineEditor = %PipelineEditor
+@onready var pipeline_panel: PanelContainer = %PipelinePanel
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -35,6 +38,7 @@ var _art_soil := 2
 var _art_tree := 0
 var _art_pruned := false
 var _leaf_lab_visible := false
+var _lighting_submenu_visible := false
 
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -59,7 +63,6 @@ func _ready() -> void:
 	art_preview.pot_changed.connect(_on_art_pot)
 	art_preview.soil_changed.connect(_on_art_soil)
 	art_preview.tree_changed.connect(_on_art_tree)
-	leaf_point_preview.tree_changed.connect(_on_leaf_lab_tree_changed)
 	_refresh()
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
@@ -156,6 +159,11 @@ func _on_water_pressed() -> void:
 	GameApp.water_active(false)
 func _on_spray_pressed() -> void:
 	GameApp.water_active(true)
+func _on_light_pressed() -> void:
+	_lighting_submenu_visible = not _lighting_submenu_visible
+	_refresh()
+func _on_lighting_stub_pressed() -> void:
+	event_label.text = "Lighting option selected (placeholder)."
 func _on_prune_pressed() -> void:
 	if GameApp.active_plant() == null:
 		event_label.text = "There is nothing to prune."
@@ -303,6 +311,7 @@ func _on_leaf_lab_pressed() -> void:
 func _on_leaf_lab_tree_changed(index: int) -> void:
 	_art_tree = index
 	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
+
 func _item_prices() -> Dictionary:
 	var result := {}
 	for cutting in GameApp.state.inventory.cuttings:
