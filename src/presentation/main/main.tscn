@@ -124,7 +124,6 @@ size_flags_vertical = 3
 text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGenetic items can be sold or composted."
 autowrap_mode = 2
 [node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-visible = false
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -196,7 +195,6 @@ mouse_filter = 1
 clip_contents = true
 script = ExtResource("11_leaf")
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
-visible = false
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]

@@ -134,7 +134,8 @@ func _panel_click(point: Vector2) -> void:
 		var row := _point_row(index)
 		if Rect2(row.position, Vector2(24.0, 28.0)).has_point(point):
 			_point_slot = SLOTS[index]
-			_add_named_point(_point_slot)
+			_flash("New points: %s" % String(_point_slot).capitalize())
+			queue_redraw()
 			return
 		if Rect2(row.end - Vector2(24.0, 28.0), Vector2(24.0, 28.0)).has_point(point):
 			_point_slot = SLOTS[index]
