@@ -5,17 +5,15 @@ signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
 const DEFAULT_POSITIONS := {
-	"water": Vector2(0.04, 0.58),
-	"spray": Vector2(0.42, 0.43),
-	"lighting": Vector2(0.07, 0.13),
-	"prune": Vector2(0.04, 0.50),
-	"harvest": Vector2(0.40, 0.64),
-	"sell_plant": Vector2(0.04, 0.62),
-	"recycle_plant": Vector2(0.04, 0.70),
+	"water": Vector2(0.05, 0.56),
+	"lighting": Vector2(0.06, 0.14),
+	"prune": Vector2(0.05, 0.47),
+	"sell_plant": Vector2(0.05, 0.64),
+	"recycle_plant": Vector2(0.05, 0.72),
 	"cancel": Vector2(0.42, 0.86),
-	"shop": Vector2(0.84, 0.06),
-	"fertilizers": Vector2(0.02, 0.04),
-	"inventory": Vector2(0.68, 0.78),
+	"wallet": Vector2(0.72, 0.03),
+	"fertilizers": Vector2(0.16, 0.04),
+	"inventory": Vector2(0.76, 0.34),
 }
 
 var _controls: Dictionary = {}
@@ -28,6 +26,14 @@ func _ready() -> void:
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
 
+func set_water_options_visible(enabled: bool) -> void:
+	var menu := get_node_or_null("WaterOptions") as Control
+	if menu == null:
+		return
+	menu.visible = enabled
+	if enabled:
+		_place_popup(menu, _controls.get("water") as Control)
+
 func set_lighting_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("LightingOptions") as Control
 	if menu == null:
@@ -36,21 +42,13 @@ func set_lighting_options_visible(enabled: bool) -> void:
 	if enabled:
 		_place_popup(menu, _controls.get("lighting") as Control)
 
-func set_inventory_details_visible(enabled: bool) -> void:
-	var panel := get_node_or_null("InventoryDetails") as Control
-	if panel == null:
-		return
-	panel.visible = enabled
-	if enabled:
-		_place_popup(panel, _controls.get("inventory") as Control)
-
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
 	if panel == null:
 		return
 	panel.visible = enabled
 	if enabled:
-		_place_popup(panel, _controls.get("shop") as Control)
+		_place_popup(panel, _controls.get("wallet") as Control)
 
 func save_layout() -> bool:
 	_capture_layout()
@@ -106,15 +104,18 @@ func _capture_layout() -> void:
 		_layout[key] = _controls[key].normalized_position()
 
 func _reposition_open_popups() -> void:
+	var water := get_node_or_null("WaterOptions") as Control
+	if water != null and water.visible:
+		_place_popup(water, _controls.get("water") as Control)
 	var lighting := get_node_or_null("LightingOptions") as Control
 	if lighting != null and lighting.visible:
 		_place_popup(lighting, _controls.get("lighting") as Control)
-	var inventory := get_node_or_null("InventoryDetails") as Control
-	if inventory != null and inventory.visible:
-		_place_popup(inventory, _controls.get("inventory") as Control)
 	var shop := get_node_or_null("ShopContainer") as Control
 	if shop != null and shop.visible:
-		_place_popup(shop, _controls.get("shop") as Control)
+		_place_popup(shop, _controls.get("wallet") as Control)
+	var dialogs := get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs
+	if dialogs != null:
+		dialogs.refresh_position()
 
 func _place_popup(popup: Control, source: Control) -> void:
 	if popup == null or source == null:
@@ -140,10 +141,7 @@ func _load_layout() -> Dictionary:
 	for key in DEFAULT_POSITIONS:
 		var value = parsed.get(key)
 		if value is Array and value.size() >= 2:
-			result[key] = Vector2(
-				clampf(float(value[0]), 0.0, 1.0),
-				clampf(float(value[1]), 0.0, 1.0)
-			)
+			result[key] = Vector2(clampf(float(value[0]), 0.0, 1.0), clampf(float(value[1]), 0.0, 1.0))
 	return result
 
 func _save_layout() -> bool:
