@@ -4,8 +4,8 @@ var _failures: Array[String] = []
 
 func _init() -> void:
 	_test_presentation_resources_load()
-	_test_layout_editor_contract()
-	_test_leaf_point_editor_contract()
+	_test_scene_button_contract()
+	_test_window_asset_mapping()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
 	_test_mutation_reveal_detection()
@@ -24,7 +24,8 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/main/main.tscn",
 		"res://src/presentation/main/main_screen.gd",
 		"res://src/presentation/main/pot_selector.gd",
-		"res://src/presentation/main/garden_layout_editor.gd",
+		"res://src/presentation/main/scene_action_button.gd",
+		"res://src/presentation/main/scene_controls_overlay.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
 		"res://src/presentation/plant/branch_mutation_renderer.gd",
@@ -40,30 +41,31 @@ func _test_presentation_resources_load() -> void:
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
 
-func _test_layout_editor_contract() -> void:
-	var editor := GardenLayoutEditor.new()
-	editor._reset_items()
-	editor._apply_art_layout()
-	var layout := editor.layout_data()
-	_expect(layout.size() == 4, "layout editor: all four movable assets must expose coordinates")
-	_expect(layout.has("stand") and layout.has("pot") and layout.has("soil") and layout.has("tree"), "layout editor: named asset coordinates missing")
-	for id in ["stand", "pot", "soil", "tree"]:
-		_expect(layout[id].has("position") and layout[id].has("size") and layout[id].has("scale"), "layout editor: incomplete coordinates for %s" % id)
-	_expect(editor.layout_code().contains("const ART_LAYOUT"), "layout editor: code export missing")
-	_expect(not editor.layout_code().contains("window"), "layout editor: background must not be exported as movable asset")
-	var configured := {"stand": Vector2(0.5107, 0.4953), "pot": Vector2(0.4987, 0.7336), "soil": Vector2(0.4987, 0.7354), "tree": Vector2(0.4947, 0.4236)}
-	for id in configured:
-		_expect(editor.layout_data()[id].position == configured[id], "layout editor: preliminary ART_LAYOUT position not applied for %s" % id)
-	editor.free()
+func _test_scene_button_contract() -> void:
+	var host := Control.new()
+	host.size = Vector2(1000.0, 600.0)
+	var button := SceneActionButton.new()
+	button.size = Vector2(100.0, 40.0)
+	button.action_id = &"water"
+	host.add_child(button)
+	button.apply_normalized_position(Vector2(0.5, 0.25))
+	_expect(button.normalized_position().distance_to(Vector2(0.5, 0.25)) < 0.001, "scene buttons: normalized position must round-trip")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("lighting"), "scene buttons: lighting control missing")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("water") and SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: care controls missing")
+	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("window"), "scene buttons: environment must be controlled through lighting presets")
+	host.free()
 
-func _test_leaf_point_editor_contract() -> void:
-	var editor := LeafPointEditor.new()
-	editor.set_tree(4)
-	var points: Dictionary = editor.leaf_points()
-	_expect(points.has("center") and points.has("left") and points.has("right"), "leaf points: all branch slots must exist")
-	_expect((points["center"] as Array).size() > 0, "leaf points: mature trees need center points")
-	_expect(editor.leaf_points_code().contains("const LEAF_POINTS"), "leaf points: code export missing")
-	editor.free()
+func _test_window_asset_mapping() -> void:
+	var view := WindowView.new()
+	view.set_environment(PotState.LightMode.DIRECT, false)
+	_expect(view.texture == WindowView.SUNNY, "window art: sunny mode must use window_01")
+	view.set_environment(PotState.LightMode.DARK, false)
+	_expect(view.texture == WindowView.CURTAINS, "window art: curtains mode must use window_02")
+	view.set_environment(PotState.LightMode.DIRECT, true)
+	_expect(view.texture == WindowView.VENTILATION, "window art: ventilation mode must use window_03")
+	view.set_environment(PotState.LightMode.DIFFUSED, false)
+	_expect(view.texture == WindowView.BLINDS, "window art: blinds mode must use window_04")
+	view.free()
 
 func _test_growth_stage_geometry() -> void:
 	var plant := _plant()
