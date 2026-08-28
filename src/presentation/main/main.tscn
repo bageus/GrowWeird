@@ -169,7 +169,7 @@ mouse_filter = 2
 script = ExtResource("5_sense")
 [node name="ArtPreview" type="PanelContainer" parent="."]
 unique_name_in_owner = true
-visible = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_left = 0.0
