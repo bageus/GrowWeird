@@ -11,11 +11,11 @@ extends Control
 
 @onready var money_label: Label = scene_controls.get_node("WalletHud/WalletLayout/MoneyLabel")
 @onready var shop_button: Button = scene_controls.get_node("WalletHud/WalletLayout/ShopButton")
-@onready var offer_label: Label = scene_controls.get_node("OffersPanel/Row/OfferLabel")
 @onready var offer_one: Button = scene_controls.get_node("OffersPanel/Row/OfferOne")
 @onready var offer_two: Button = scene_controls.get_node("OffersPanel/Row/OfferTwo")
 @onready var offer_three: Button = scene_controls.get_node("OffersPanel/Row/OfferThree")
 @onready var refresh_offer: Button = scene_controls.get_node("OffersPanel/Row/RefreshOffer")
+@onready var skip_offer: Button = scene_controls.get_node("OffersPanel/Row/SkipOffer")
 @onready var inventory_hud: InventoryHud = scene_controls.get_node("InventoryHud")
 @onready var inventory_dialogs: InventoryItemDialogs = scene_controls.get_node("InventoryItemDialogs")
 @onready var shop_container: PanelContainer = scene_controls.get_node("ShopContainer")
@@ -311,7 +311,10 @@ func _choose_offer(index: int) -> void:
 	GameApp.choose_fertilizer_offer(ids[index])
 
 func _on_refresh_offer_pressed() -> void:
-	event_label.text = "Fertilizers refreshed." if GameApp.skip_fertilizer_offer() else "Cannot refresh fertilizers."
+	event_label.text = "Fertilizers refreshed." if GameApp.refresh_fertilizer_offer() else "Cannot refresh fertilizers."
+
+func _on_skip_offer_pressed() -> void:
+	event_label.text = "Fertilizers skipped." if GameApp.skip_fertilizer_offer() else "Cannot skip fertilizers."
 
 func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	if events.is_empty():
