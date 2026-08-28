@@ -57,7 +57,7 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 		return
 	if _dragging:
 		position_committed.emit(action_id, normalized_position())
-	else:
+	elif not disabled:
 		activated.emit(action_id)
 	_tracking = false
 	_dragging = false
