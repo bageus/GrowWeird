@@ -94,7 +94,8 @@ func _test_inventory_hud_contract() -> void:
 	_expect(dialogs_text.contains("OutputLabel") and dialogs_text.contains("Grind into fertilizer"), "inventory HUD: recycling preview missing")
 	_expect(scene_text.contains("CurtainsButton") and scene_text.contains("OpenWindowButton") and scene_text.contains("BlindsButton") and scene_text.contains("NormalLightButton"), "lighting HUD: four requested modes missing")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
-	var starter := NewGameFactory.create(GameApp.rules)
+	var rules := load("res://content/config/default_game_rules.tres") as GameRules
+	var starter := NewGameFactory.create(rules)
 	_expect(starter.inventory.cuttings.size() == 1, "inventory HUD: new games need one starter item for interaction testing")
 
 func _test_window_asset_mapping() -> void:
