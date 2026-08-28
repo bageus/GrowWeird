@@ -119,6 +119,14 @@ func skip_fertilizer_offer() -> bool:
 	state_changed.emit()
 	return true
 
+func refresh_fertilizer_offer() -> bool:
+	if state == null or not _has_living_plant():
+		return false
+	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_fertilizers(), rules):
+		return false
+	state_changed.emit()
+	return true
+
 func use_inventory_fertilizer(fertilizer_id: StringName) -> Array[Dictionary]:
 	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry)
 	if not bool(result.get("success", false)):
