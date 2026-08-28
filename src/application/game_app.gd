@@ -4,8 +4,10 @@ signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
+
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
 const STARTER_SPECIES: StringName = &"starter_sprout"
+
 var state: GameState
 var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
@@ -36,13 +38,7 @@ func _process(delta: float) -> void:
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
-
-	if _has_living_plant() and FertilizerOfferService.advance(
-		state.fertilizer_offer,
-		delta,
-		registry.all_fertilizers(),
-		rules
-	):
+	if _has_living_plant() and FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_fertilizers(), rules):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
 	if changed:
@@ -200,11 +196,17 @@ func inventory_item_sale_value(kind: StringName, item_id: String) -> int:
 	return ResourceActions.item_value(state, kind, item_id, registry, rules)
 
 func sell_inventory_item(kind: StringName, item_id: String) -> int:
-	var amount := ResourceActions.sell_item(state, kind, item_id, registry, rules)
+	return sell_inventory_items(kind, item_id, 1)
+
+func sell_inventory_items(kind: StringName, item_id: String, quantity: int) -> int:
+	var amount := ResourceActions.sell_items(state, kind, item_id, quantity, registry, rules)
 	if amount > 0:
 		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
+
+func inventory_item_recycle_yield(kind: StringName) -> int:
+	return ResourceActions.recycle_yield(kind, rules)
 
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
@@ -344,6 +346,18 @@ func _create_new_game() -> GameState:
 	second_pot.pot_id = "pot-2"
 	new_state.pots = [first_pot, second_pot]
 	new_state.active_pot_id = first_pot.pot_id
+	_add_starter_inventory_item(new_state, first_pot.plant)
 	FertilizerOfferService.initialize_rng(new_state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
 	FertilizerOfferService.schedule_initial(new_state.fertilizer_offer, rules)
 	return new_state
+
+func _add_starter_inventory_item(new_state: GameState, plant: PlantState) -> void:
+	var branch := plant.branch_at(&"center")
+	if branch == null:
+		return
+	var cutting := CuttingState.new()
+	cutting.item_id = IdFactory.make("cutting")
+	cutting.source_plant_id = plant.instance_id
+	cutting.source_branch_id = branch.branch_id
+	cutting.genome = GeneticsService.snapshot_branch(branch)
+	InventoryService.add_cutting(new_state.inventory, cutting)
