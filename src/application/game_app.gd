@@ -4,8 +4,9 @@ signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
+
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
-const STARTER_SPECIES: StringName = &"starter_sprout"
+
 var state: GameState
 var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
@@ -36,13 +37,7 @@ func _process(delta: float) -> void:
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
-
-	if _has_living_plant() and FertilizerOfferService.advance(
-		state.fertilizer_offer,
-		delta,
-		registry.all_fertilizers(),
-		rules
-	):
+	if _has_living_plant() and FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_fertilizers(), rules):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
 	if changed:
@@ -200,11 +195,17 @@ func inventory_item_sale_value(kind: StringName, item_id: String) -> int:
 	return ResourceActions.item_value(state, kind, item_id, registry, rules)
 
 func sell_inventory_item(kind: StringName, item_id: String) -> int:
-	var amount := ResourceActions.sell_item(state, kind, item_id, registry, rules)
+	return sell_inventory_items(kind, item_id, 1)
+
+func sell_inventory_items(kind: StringName, item_id: String, quantity: int) -> int:
+	var amount := ResourceActions.sell_items(state, kind, item_id, quantity, registry, rules)
 	if amount > 0:
 		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
+
+func inventory_item_recycle_yield(kind: StringName) -> int:
+	return ResourceActions.recycle_yield(kind, rules)
 
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
@@ -332,18 +333,4 @@ func _has_living_plant() -> bool:
 	return false
 
 func _create_new_game() -> GameState:
-	var new_state := GameState.new()
-	new_state.money = rules.starting_money
-	var first_pot := PotState.new()
-	first_pot.pot_id = "pot-1"
-	first_pot.plant = PlantState.new()
-	first_pot.plant.instance_id = IdFactory.make("plant")
-	first_pot.plant.species_id = STARTER_SPECIES
-	first_pot.plant.initialize_native_branches()
-	var second_pot := PotState.new()
-	second_pot.pot_id = "pot-2"
-	new_state.pots = [first_pot, second_pot]
-	new_state.active_pot_id = first_pot.pot_id
-	FertilizerOfferService.initialize_rng(new_state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
-	FertilizerOfferService.schedule_initial(new_state.fertilizer_offer, rules)
-	return new_state
+	return NewGameFactory.create(rules)

@@ -6,6 +6,7 @@ func _init() -> void:
 	_test_presentation_resources_load()
 	_test_scene_button_contract()
 	_test_scene_hud_contract()
+	_test_inventory_hud_contract()
 	_test_window_asset_mapping()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
@@ -34,8 +35,10 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/plant/branch_mutation_renderer.gd",
 		"res://src/presentation/plant/phenotype_resolver.gd",
 		"res://src/presentation/plant/plant_visual_assembler.gd",
-		"res://src/presentation/inventory/inventory_panel.gd",
-		"res://src/presentation/inventory/genetic_item_preview.gd",
+		"res://src/presentation/inventory/inventory_hud.gd",
+		"res://src/presentation/inventory/inventory_hud.tscn",
+		"res://src/presentation/inventory/inventory_item_dialogs.gd",
+		"res://src/presentation/inventory/inventory_item_dialogs.tscn",
 		"res://src/presentation/progression/progression_panel.gd",
 		"res://src/presentation/shop/shop_panel.gd",
 	]
@@ -52,9 +55,10 @@ func _test_scene_button_contract() -> void:
 	button.apply_normalized_position(Vector2(0.5, 0.25))
 	_expect(button.normalized_position().distance_to(Vector2(0.5, 0.25)) < 0.001, "scene buttons: normalized position must round-trip")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("lighting"), "scene buttons: lighting control missing")
-	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("water") and SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: care controls missing")
-	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop"), "scene buttons: shop must live on the scene")
-	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("window"), "scene buttons: environment must be controlled through lighting presets")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("water"), "scene buttons: water control missing")
+	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: spray must be contextual under water")
+	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("harvest"), "scene buttons: harvest button must be removed")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("wallet"), "scene buttons: wallet block must be movable")
 	host.free()
 
 func _test_scene_hud_contract() -> void:
@@ -66,24 +70,37 @@ func _test_scene_hud_contract() -> void:
 	host.add_child(panel)
 	panel.apply_normalized_position(Vector2(0.6, 0.7))
 	_expect(panel.normalized_position().distance_to(Vector2(0.6, 0.7)) < 0.001, "scene HUD: draggable panels must use normalized coordinates")
-	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("fertilizers"), "scene HUD: fertilizer block must be movable on scene")
-	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("inventory"), "scene HUD: inventory block must be movable on scene")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("fertilizers"), "scene HUD: fertilizer block must be movable")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("inventory"), "scene HUD: inventory block must be movable")
 	var main_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
 	var hud_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(main_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
-	_expect(hud_text.contains("InventorySlotOne") and hud_text.contains("InventorySlotThree"), "scene HUD: compact three-slot inventory missing")
-	_expect(hud_text.contains("OffersPanel") and hud_text.contains("ShopButton"), "scene HUD: fertilizers and shop must live on the scene")
-	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must be removed")
+	_expect(hud_text.contains("WalletHud") and hud_text.contains("MoneyLabel") and hud_text.contains("ShopButton"), "scene HUD: balance and shop must share a wallet block")
+	_expect(hud_text.contains("OffersPanel") and hud_text.contains("RefreshOffer"), "scene HUD: fertilizers need horizontal refresh control")
+	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
+	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
+	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
 	host.free()
+
+func _test_inventory_hud_contract() -> void:
+	var hud_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.tscn")
+	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
+	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
+	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
+	_expect(dialogs_text.contains("RecycleAction") and dialogs_text.contains("SellAction") and dialogs_text.contains("UseAction"), "inventory HUD: item action menu incomplete")
+	_expect(dialogs_text.contains("QuantitySlider") and dialogs_text.contains("ValueLabel"), "inventory HUD: sale quantity/value popup missing")
+	_expect(dialogs_text.contains("OutputLabel") and dialogs_text.contains("Grind into fertilizer"), "inventory HUD: recycling preview missing")
+	_expect(scene_text.contains("CurtainsButton") and scene_text.contains("OpenWindowButton") and scene_text.contains("BlindsButton") and scene_text.contains("NormalLightButton"), "lighting HUD: four requested modes missing")
+	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 
 func _test_window_asset_mapping() -> void:
 	var view := WindowView.new()
 	view.set_environment(PotState.LightMode.DIRECT, false)
-	_expect(view.texture == WindowView.SUNNY, "window art: sunny mode must use window_01")
+	_expect(view.texture == WindowView.SUNNY, "window art: normal light must use window_01")
 	view.set_environment(PotState.LightMode.DARK, false)
 	_expect(view.texture == WindowView.CURTAINS, "window art: curtains mode must use window_02")
 	view.set_environment(PotState.LightMode.DIRECT, true)
-	_expect(view.texture == WindowView.VENTILATION, "window art: ventilation mode must use window_03")
+	_expect(view.texture == WindowView.VENTILATION, "window art: open window must use window_03")
 	view.set_environment(PotState.LightMode.DIFFUSED, false)
 	_expect(view.texture == WindowView.BLINDS, "window art: blinds mode must use window_04")
 	view.free()

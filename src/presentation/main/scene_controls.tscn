@@ -1,13 +1,14 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
-[ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="3_drag_panel"]
-[ext_resource type="Script" path="res://src/presentation/inventory/inventory_panel.gd" id="4_inventory"]
-[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="5_shop"]
+[ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="3_drag"]
+[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="4_shop"]
+[ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_hud.tscn" id="5_inventory"]
+[ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_item_dialogs.tscn" id="6_dialogs"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
-bg_color = Color(0.035, 0.035, 0.035, 0.58)
+bg_color = Color(0.035, 0.035, 0.035, 0.6)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -23,7 +24,7 @@ content_margin_right = 8.0
 content_margin_bottom = 7.0
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_popup"]
-bg_color = Color(0.035, 0.035, 0.035, 0.88)
+bg_color = Color(0.035, 0.035, 0.035, 0.9)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -33,10 +34,10 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-content_margin_left = 10.0
-content_margin_top = 8.0
-content_margin_right = 10.0
-content_margin_bottom = 10.0
+content_margin_left = 8.0
+content_margin_top = 7.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 
 [node name="SceneControls" type="Control"]
 layout_mode = 1
@@ -55,17 +56,9 @@ text = "Water"
 script = ExtResource("2_action")
 action_id = &"water"
 
-[node name="SprayButton" type="Button" parent="."]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Spray"
-script = ExtResource("2_action")
-action_id = &"spray"
-
 [node name="LightingButton" type="Button" parent="."]
-custom_minimum_size = Vector2(138, 38)
-offset_right = 138.0
+custom_minimum_size = Vector2(122, 38)
+offset_right = 122.0
 offset_bottom = 38.0
 text = "Lighting"
 script = ExtResource("2_action")
@@ -79,15 +72,6 @@ toggle_mode = true
 text = "Prune"
 script = ExtResource("2_action")
 action_id = &"prune"
-
-[node name="HarvestButton" type="Button" parent="."]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-toggle_mode = true
-text = "Harvest"
-script = ExtResource("2_action")
-action_id = &"harvest"
 
 [node name="SellPlantButton" type="Button" parent="."]
 custom_minimum_size = Vector2(112, 38)
@@ -115,156 +99,134 @@ text = "Cancel"
 script = ExtResource("2_action")
 action_id = &"cancel"
 
-[node name="ShopButton" type="Button" parent="."]
-custom_minimum_size = Vector2(96, 38)
-offset_right = 96.0
-offset_bottom = 38.0
+[node name="WalletHud" type="PanelContainer" parent="."]
+z_index = 7
+custom_minimum_size = Vector2(220, 48)
+offset_right = 220.0
+offset_bottom = 48.0
+theme_override_styles/panel = SubResource("StyleBox_hud")
+script = ExtResource("3_drag")
+layout_id = &"wallet"
+drag_handle_height = 48.0
+
+[node name="WalletLayout" type="HBoxContainer" parent="WalletHud"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MoneyLabel" type="Label" parent="WalletHud/WalletLayout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "$0"
+vertical_alignment = 1
+
+[node name="ShopButton" type="Button" parent="WalletHud/WalletLayout"]
+custom_minimum_size = Vector2(86, 34)
+layout_mode = 2
 text = "Shop"
-script = ExtResource("2_action")
-action_id = &"shop"
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
-custom_minimum_size = Vector2(186, 170)
-offset_right = 186.0
-offset_bottom = 170.0
+custom_minimum_size = Vector2(590, 54)
+offset_right = 590.0
+offset_bottom = 54.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
-script = ExtResource("3_drag_panel")
+script = ExtResource("3_drag")
 layout_id = &"fertilizers"
-drag_handle_height = 31.0
+drag_handle_height = 54.0
 
-[node name="OffersLayout" type="VBoxContainer" parent="OffersPanel"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="OfferLabel" type="Label" parent="OffersPanel/OffersLayout"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 15
-text = "Fertilizers"
-autowrap_mode = 2
-
-[node name="OfferOne" type="Button" parent="OffersPanel/OffersLayout"]
-layout_mode = 2
-text = "?"
-
-[node name="OfferTwo" type="Button" parent="OffersPanel/OffersLayout"]
-layout_mode = 2
-text = "?"
-
-[node name="OfferThree" type="Button" parent="OffersPanel/OffersLayout"]
-layout_mode = 2
-text = "?"
-
-[node name="SkipOffer" type="Button" parent="OffersPanel/OffersLayout"]
-layout_mode = 2
-text = "Skip"
-
-[node name="InventoryHud" type="PanelContainer" parent="."]
-z_index = 7
-custom_minimum_size = Vector2(252, 92)
-offset_right = 252.0
-offset_bottom = 92.0
-theme_override_styles/panel = SubResource("StyleBox_hud")
-script = ExtResource("3_drag_panel")
-layout_id = &"inventory"
-drag_handle_height = 28.0
-
-[node name="InventoryHudLayout" type="VBoxContainer" parent="InventoryHud"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="InventoryHudTitle" type="Label" parent="InventoryHud/InventoryHudLayout"]
-layout_mode = 2
-mouse_filter = 2
-text = "Inventory"
-
-[node name="Slots" type="HBoxContainer" parent="InventoryHud/InventoryHudLayout"]
+[node name="Row" type="HBoxContainer" parent="OffersPanel"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="InventorySlotOne" type="Button" parent="InventoryHud/InventoryHudLayout/Slots"]
-custom_minimum_size = Vector2(74, 50)
+[node name="OfferLabel" type="Label" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(105, 0)
 layout_mode = 2
-text = "FERT\n0"
+mouse_filter = 2
+text = "Fertilizers"
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="InventorySlotTwo" type="Button" parent="InventoryHud/InventoryHudLayout/Slots"]
-custom_minimum_size = Vector2(74, 50)
+[node name="OfferOne" type="Button" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(108, 36)
 layout_mode = 2
-text = "CUT\n0"
+text = "?"
 
-[node name="InventorySlotThree" type="Button" parent="InventoryHud/InventoryHudLayout/Slots"]
-custom_minimum_size = Vector2(74, 50)
+[node name="OfferTwo" type="Button" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(108, 36)
 layout_mode = 2
-text = "GEN\n0"
+text = "?"
+
+[node name="OfferThree" type="Button" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(108, 36)
+layout_mode = 2
+text = "?"
+
+[node name="RefreshOffer" type="Button" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(108, 36)
+layout_mode = 2
+text = "Refresh"
+
+[node name="InventoryHud" parent="." instance=ExtResource("5_inventory")]
+z_index = 7
+
+[node name="WaterOptions" type="PanelContainer" parent="."]
+visible = false
+z_index = 10
+custom_minimum_size = Vector2(212, 50)
+offset_right = 212.0
+offset_bottom = 50.0
+theme_override_styles/panel = SubResource("StyleBox_popup")
+
+[node name="Options" type="HBoxContainer" parent="WaterOptions"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="SprayButton" type="Button" parent="WaterOptions/Options"]
+custom_minimum_size = Vector2(94, 34)
+layout_mode = 2
+text = "Spray"
+
+[node name="PourButton" type="Button" parent="WaterOptions/Options"]
+custom_minimum_size = Vector2(94, 34)
+layout_mode = 2
+text = "Pour"
 
 [node name="LightingOptions" type="PanelContainer" parent="."]
 visible = false
 z_index = 10
-custom_minimum_size = Vector2(154, 166)
-offset_right = 154.0
-offset_bottom = 166.0
+custom_minimum_size = Vector2(474, 50)
+offset_right = 474.0
+offset_bottom = 50.0
 theme_override_styles/panel = SubResource("StyleBox_popup")
 
-[node name="Options" type="VBoxContainer" parent="LightingOptions"]
+[node name="Options" type="HBoxContainer" parent="LightingOptions"]
 layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="SunnyButton" type="Button" parent="LightingOptions/Options"]
-layout_mode = 2
-text = "Sunny"
-
-[node name="VentilationButton" type="Button" parent="LightingOptions/Options"]
-layout_mode = 2
-text = "Ventilation"
-
-[node name="BlindsButton" type="Button" parent="LightingOptions/Options"]
-layout_mode = 2
-text = "Blinds"
+theme_override_constants/separation = 5
 
 [node name="CurtainsButton" type="Button" parent="LightingOptions/Options"]
+custom_minimum_size = Vector2(106, 34)
 layout_mode = 2
 text = "Curtains"
 
-[node name="InventoryDetails" type="PanelContainer" parent="."]
-visible = false
-z_index = 11
-custom_minimum_size = Vector2(350, 390)
-offset_right = 350.0
-offset_bottom = 390.0
-theme_override_styles/panel = SubResource("StyleBox_popup")
-
-[node name="InventoryDetailsLayout" type="VBoxContainer" parent="InventoryDetails"]
+[node name="OpenWindowButton" type="Button" parent="LightingOptions/Options"]
+custom_minimum_size = Vector2(112, 34)
 layout_mode = 2
-theme_override_constants/separation = 5
+text = "Open window"
 
-[node name="InventoryHeader" type="HBoxContainer" parent="InventoryDetails/InventoryDetailsLayout"]
+[node name="BlindsButton" type="Button" parent="LightingOptions/Options"]
+custom_minimum_size = Vector2(96, 34)
 layout_mode = 2
+text = "Blinds"
 
-[node name="InventoryDetailsTitle" type="Label" parent="InventoryDetails/InventoryDetailsLayout/InventoryHeader"]
+[node name="NormalLightButton" type="Button" parent="LightingOptions/Options"]
+custom_minimum_size = Vector2(120, 34)
 layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 17
-text = "Inventory"
-
-[node name="CloseInventoryButton" type="Button" parent="InventoryDetails/InventoryDetailsLayout/InventoryHeader"]
-layout_mode = 2
-text = "×"
-
-[node name="InventoryScroll" type="ScrollContainer" parent="InventoryDetails/InventoryDetailsLayout"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="InventoryPanel" type="VBoxContainer" parent="InventoryDetails/InventoryDetailsLayout/InventoryScroll"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 5
-script = ExtResource("4_inventory")
+text = "Normal light"
 
 [node name="ShopContainer" type="PanelContainer" parent="."]
 visible = false
-z_index = 11
+z_index = 12
 custom_minimum_size = Vector2(350, 390)
 offset_right = 350.0
 offset_bottom = 390.0
@@ -291,4 +253,6 @@ text = "×"
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 6
-script = ExtResource("5_shop")
+script = ExtResource("4_shop")
+
+[node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
