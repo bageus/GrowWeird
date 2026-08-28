@@ -53,7 +53,6 @@ func leaf_points() -> Dictionary:
 
 func leaf_points_code() -> String:
 	return LeafPointLayout.points_code(_points_by_tree)
-
 func _process(delta: float) -> void:
 	if _message_time > 0.0:
 		_message_time = maxf(0.0, _message_time - delta)
