@@ -28,6 +28,7 @@ extends Control
 @onready var pipeline_toggle: Button = %PipelineToggle
 @onready var pipeline_editor: UIPipelineEditor = %PipelineEditor
 @onready var pipeline_panel: PanelContainer = %PipelinePanel
+@onready var interface_layer: Control = %InterfaceLayer
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id: String = ""
@@ -38,6 +39,7 @@ var _art_soil := 2
 var _art_tree := 0
 var _art_pruned := false
 var _leaf_lab_visible := false
+var _art_lab_visible := false
 var _lighting_submenu_visible := false
 
 func _ready() -> void:
@@ -63,6 +65,7 @@ func _ready() -> void:
 	art_preview.pot_changed.connect(_on_art_pot)
 	art_preview.soil_changed.connect(_on_art_soil)
 	art_preview.tree_changed.connect(_on_art_tree)
+	_configure_pipeline()
 	_refresh()
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
@@ -82,8 +85,10 @@ func _refresh() -> void:
 	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
 	leaf_point_preview.set_tree(_art_tree)
 	leaf_point_preview.visible = _leaf_lab_visible
-	art_preview.visible = not _leaf_lab_visible
+	art_preview.visible = _art_lab_visible and not _leaf_lab_visible
 	plant_sense.visible = plant != null and plant.alive
+	interface_layer.set_coins(GameApp.state.money)
+	interface_layer.set_lighting_options_visible(_lighting_submenu_visible)
 
 	if pot == null:
 		plant_name_label.text = "No pot selected"
@@ -155,13 +160,45 @@ func _cancel_action() -> void:
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_NONE)
 	pot_selector.invalidate()
+func _configure_pipeline() -> void:
+	var targets := {
+		"shop": interface_layer.get_node("ShopButton"),
+		"water": interface_layer.get_node("WaterButton"),
+		"lighting": interface_layer.get_node("LightingButton"),
+		"prune": interface_layer.get_node("PruneButton"),
+		"sell": interface_layer.get_node("SellButton"),
+	}
+	var defaults := {
+		"shop": Vector2(0.08, 0.19),
+		"water": Vector2(0.08, 0.27),
+		"lighting": Vector2(0.08, 0.35),
+		"prune": Vector2(0.08, 0.48),
+		"sell": Vector2(0.08, 0.56),
+	}
+	pipeline_editor.configure(targets, defaults)
+
+func _on_pipeline_pressed() -> void:
+	var active := not pipeline_editor.visible
+	pipeline_editor.set_active(active)
+	pipeline_panel.visible = active
+	pipeline_toggle.text = "Закрыть настройку UI" if active else "Настройка UI"
+	if active:
+		pipeline_editor.move_to_front()
+		pipeline_panel.move_to_front()
+
+func _on_pipeline_save_pressed() -> void:
+	pipeline_editor.save_layout()
+
+func _on_pipeline_reset_pressed() -> void:
+	pipeline_editor.reset_layout()
+
 func _on_water_pressed() -> void:
 	GameApp.water_active(false)
 func _on_spray_pressed() -> void:
 	GameApp.water_active(true)
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
-	_refresh()
+	interface_layer.set_lighting_options_visible(_lighting_submenu_visible)
 func _on_lighting_stub_pressed() -> void:
 	event_label.text = "Lighting option selected (placeholder)."
 func _on_prune_pressed() -> void:
@@ -301,13 +338,17 @@ func _on_art_window() -> void: _art_window = posmod(_art_window + 1, 4); _refres
 func _on_art_pot(direction: int) -> void: _art_pot = posmod(_art_pot + direction, 5); _refresh()
 func _on_art_soil(direction: int) -> void: _art_soil = clampi(_art_soil + direction, 0, 5); _refresh()
 func _on_art_tree(direction: int) -> void: _art_tree = clampi(_art_tree + direction, 0, 7); _refresh()
-func _on_art_layout_changed(_layout: Dictionary) -> void:
-	return
+func _on_art_layout_pressed() -> void:
+	_art_lab_visible = not _art_lab_visible
+	art_preview.visible = _art_lab_visible and not _leaf_lab_visible
+	if _art_lab_visible:
+		art_preview.move_to_front()
+
 func _on_leaf_lab_pressed() -> void:
 	_leaf_lab_visible = not _leaf_lab_visible
 	leaf_point_preview.visible = _leaf_lab_visible
-	art_preview.visible = not _leaf_lab_visible
-	$Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton.text = "Back to art layout" if _leaf_lab_visible else "Leaf point lab"
+	art_preview.visible = _art_lab_visible and not _leaf_lab_visible
+	$Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton.text = "Back to leaf lab" if _leaf_lab_visible else "Leaf point lab"
 func _on_leaf_lab_tree_changed(index: int) -> void:
 	_art_tree = index
 	art_preview.set_preview(_art_window, _art_pot, _art_soil, _art_tree, _art_pruned)
