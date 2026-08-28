@@ -5,6 +5,7 @@ var _failures: Array[String] = []
 func _init() -> void:
 	_test_presentation_resources_load()
 	_test_scene_button_contract()
+	_test_scene_hud_contract()
 	_test_window_asset_mapping()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
@@ -25,12 +26,11 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/main/main_screen.gd",
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/main/scene_action_button.gd",
+		"res://src/presentation/main/scene_draggable_panel.gd",
 		"res://src/presentation/main/scene_controls_overlay.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
 		"res://src/presentation/plant/branch_mutation_renderer.gd",
-		"res://src/presentation/plant/soil_view.gd",
-		"res://src/presentation/plant/plant_sense_view.gd",
 		"res://src/presentation/plant/phenotype_resolver.gd",
 		"res://src/presentation/plant/plant_visual_assembler.gd",
 		"res://src/presentation/inventory/inventory_panel.gd",
@@ -52,7 +52,25 @@ func _test_scene_button_contract() -> void:
 	_expect(button.normalized_position().distance_to(Vector2(0.5, 0.25)) < 0.001, "scene buttons: normalized position must round-trip")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("lighting"), "scene buttons: lighting control missing")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("water") and SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: care controls missing")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop"), "scene buttons: shop must live on the scene")
 	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("window"), "scene buttons: environment must be controlled through lighting presets")
+	host.free()
+
+func _test_scene_hud_contract() -> void:
+	var host := Control.new()
+	host.size = Vector2(1000.0, 600.0)
+	var panel := SceneDraggablePanel.new()
+	panel.size = Vector2(240.0, 90.0)
+	panel.layout_id = &"inventory"
+	host.add_child(panel)
+	panel.apply_normalized_position(Vector2(0.6, 0.7))
+	_expect(panel.normalized_position().distance_to(Vector2(0.6, 0.7)) < 0.001, "scene HUD: draggable panels must use normalized coordinates")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("fertilizers"), "scene HUD: fertilizer block must be movable on scene")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("inventory"), "scene HUD: inventory block must be movable on scene")
+	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
+	_expect(scene_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
+	_expect(scene_text.contains("InventorySlotOne") and scene_text.contains("InventorySlotThree"), "scene HUD: compact three-slot inventory missing")
+	_expect(not scene_text.contains("SoilView") and not scene_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must be removed")
 	host.free()
 
 func _test_window_asset_mapping() -> void:
