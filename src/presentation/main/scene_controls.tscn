@@ -139,13 +139,10 @@ drag_handle_height = 54.0
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="OfferLabel" type="Label" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(105, 0)
+[node name="RefreshOffer" type="Button" parent="OffersPanel/Row"]
+custom_minimum_size = Vector2(108, 36)
 layout_mode = 2
-mouse_filter = 2
-text = "Fertilizers"
-vertical_alignment = 1
-autowrap_mode = 2
+text = "Refresh"
 
 [node name="OfferOne" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(108, 36)
@@ -162,10 +159,10 @@ custom_minimum_size = Vector2(108, 36)
 layout_mode = 2
 text = "?"
 
-[node name="RefreshOffer" type="Button" parent="OffersPanel/Row"]
+[node name="SkipOffer" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(108, 36)
 layout_mode = 2
-text = "Refresh"
+text = "Skip"
 
 [node name="InventoryHud" parent="." instance=ExtResource("5_inventory")]
 z_index = 7

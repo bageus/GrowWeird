@@ -55,10 +55,10 @@ func _rebuild(inventory: InventoryState) -> void:
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(154.0, 38.0)
-	button.text = "●  %s%s" % [title, " ×%d" % count if count > 1 else ""]
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.tooltip_text = "%s · click for actions" % title
+	button.custom_minimum_size = Vector2(48.0, 48.0)
+	button.text = "●"
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.tooltip_text = "%s%s · click for actions" % [title, " ×%d" % count if count > 1 else ""]
 	button.pressed.connect(_emit_selected.bind(kind, item_id, count, title))
 	items.add_child(button)
 

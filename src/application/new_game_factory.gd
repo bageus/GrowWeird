@@ -16,12 +16,12 @@ static func create(rules: GameRules) -> GameState:
 	second_pot.pot_id = "pot-2"
 	state.pots = [first_pot, second_pot]
 	state.active_pot_id = first_pot.pot_id
-	_add_starter_inventory_item(state, first_pot.plant)
+	add_starter_inventory_item(state, first_pot.plant)
 	FertilizerOfferService.initialize_rng(state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
 	FertilizerOfferService.schedule_initial(state.fertilizer_offer, rules)
 	return state
 
-static func _add_starter_inventory_item(state: GameState, plant: PlantState) -> void:
+static func add_starter_inventory_item(state: GameState, plant: PlantState) -> void:
 	var branch := plant.branch_at(&"center")
 	if branch == null:
 		return
@@ -31,3 +31,14 @@ static func _add_starter_inventory_item(state: GameState, plant: PlantState) -> 
 	cutting.source_branch_id = branch.branch_id
 	cutting.genome = GeneticsService.snapshot_branch(branch)
 	InventoryService.add_cutting(state.inventory, cutting)
+
+static func ensure_inventory_bootstrap(state: GameState, plant: PlantState) -> void:
+	const marker_path := "user://growweird_inventory_bootstrap_v1"
+	if FileAccess.file_exists(marker_path):
+		return
+	var has_items := not state.inventory.cuttings.is_empty() or not state.inventory.seeds.is_empty() or not state.inventory.fruits.is_empty() or not state.inventory.fertilizers.is_empty()
+	if not has_items and plant != null:
+		add_starter_inventory_item(state, plant)
+	var file := FileAccess.open(marker_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string("1")

@@ -19,6 +19,8 @@ func _ready() -> void:
 	state = SaveRepository.load_state()
 	if state == null:
 		state = _create_new_game()
+	else:
+		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
 	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
@@ -115,6 +117,14 @@ func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
 
 func skip_fertilizer_offer() -> bool:
 	if not FertilizerActions.skip_offer(state, rules):
+		return false
+	state_changed.emit()
+	return true
+
+func refresh_fertilizer_offer() -> bool:
+	if state == null or not _has_living_plant():
+		return false
+	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_fertilizers(), rules):
 		return false
 	state_changed.emit()
 	return true

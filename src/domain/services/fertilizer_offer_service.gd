@@ -51,6 +51,16 @@ static func resolve_skip(offer: FertilizerOfferState, rules: GameRules) -> bool:
 	offer.seconds_until_offer = rules.fertilizer_offer_interval_seconds
 	return true
 
+static func refresh_offer(
+	offer: FertilizerOfferState,
+	fertilizers: Array[FertilizerDefinition],
+	rules: GameRules
+) -> bool:
+	if offer == null:
+		return false
+	offer.clear()
+	return _generate(offer, fertilizers, rules.fertilizer_offer_count)
+
 static func _generate(
 	offer: FertilizerOfferState,
 	fertilizers: Array[FertilizerDefinition],

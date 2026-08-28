@@ -67,10 +67,20 @@ func _collect_controls() -> void:
 			button.position_committed.connect(_on_control_position_committed)
 			button.drag_moved.connect(_on_control_drag_moved)
 		elif child is SceneDraggablePanel:
-			var panel := child as SceneDraggablePanel
-			_register_control(String(panel.layout_id), panel)
-			panel.position_committed.connect(_on_control_position_committed)
-			panel.drag_moved.connect(_on_control_drag_moved)
+			_register_panel(child as SceneDraggablePanel)
+	var inventory := get_node_or_null("InventoryHud") as SceneDraggablePanel
+	if inventory != null and not _controls.has("inventory"):
+		_register_panel(inventory)
+
+func _register_panel(panel: SceneDraggablePanel) -> void:
+	if panel == null or panel.layout_id.is_empty():
+		return
+	var key := String(panel.layout_id)
+	if _controls.has(key):
+		return
+	_register_control(key, panel)
+	panel.position_committed.connect(_on_control_position_committed)
+	panel.drag_moved.connect(_on_control_drag_moved)
 
 func _register_control(key: String, control: Control) -> void:
 	if key.is_empty():
@@ -94,7 +104,7 @@ func _apply_layout() -> void:
 	if size.x <= 1.0 or size.y <= 1.0:
 		return
 	for key in _controls:
-		var control := _controls[key]
+		var control: SceneDraggablePanel = _controls[key] as SceneDraggablePanel
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS.get(key, Vector2.ZERO))
 		control.apply_normalized_position(point)
 	_reposition_open_popups()
