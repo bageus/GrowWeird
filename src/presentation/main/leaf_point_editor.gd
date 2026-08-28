@@ -42,7 +42,6 @@ func set_leaf_layer_visible(enabled: bool) -> void:
 
 func refresh_leaves() -> void:
 	_flash("Manual leaf layout: no random refresh")
-	queue_redraw()
 
 func leaf_points() -> Dictionary:
 	return _points()
@@ -73,36 +72,36 @@ func _mouse(event: InputEventMouseButton) -> void:
 		return
 	if event.button_index != MOUSE_BUTTON_LEFT:
 		return
-	if event.pressed:
-		if _panel().has_point(event.position):
-			_panel_click(event.position)
-			accept_event()
-			return
-		var hit := _point_at(event.position)
-		if not hit.is_empty():
-			_selected_slot = hit.slot
-			_selected_index = hit.index
-			_point_slot = hit.slot
-			_drag_axis = "rotation" if event.position.distance_to(_rotation_screen(hit.slot, hit.index)) < POINT_RADIUS * 1.8 else "point"
-			_dragging = true
-			accept_event()
-			queue_redraw()
-			return
-		if _tree_rect().has_point(event.position):
-			_add_point(event.position, _point_slot)
-			accept_event()
-	else:
+	if not event.pressed:
 		_dragging = false
 		_drag_axis = ""
+		return
+	if _panel().has_point(event.position):
+		_panel_action(LeafArtPanel.hit(_panel(), event.position))
+		accept_event()
+		return
+	var hit := _point_at(event.position)
+	if not hit.is_empty():
+		_selected_slot = hit.slot
+		_selected_index = hit.index
+		_point_slot = hit.slot
+		_drag_axis = "rotation" if event.position.distance_to(_rotation_screen(hit.slot, hit.index)) < POINT_RADIUS * 1.8 else "point"
+		_dragging = true
+		accept_event()
+		queue_redraw()
+		return
+	if _tree_rect().has_point(event.position):
+		_add_point(event.position, _point_slot)
+		accept_event()
 
 func _key(event: InputEventKey) -> void:
 	if not _has_selection():
 		return
-	var item := _selected_point()
-	var move_step := POINT_STEP * (5.0 if event.shift_pressed else 1.0)
 	if event.ctrl_pressed and event.keycode == KEY_D:
 		_duplicate_selected()
 		return
+	var item := _selected_point()
+	var move_step := POINT_STEP * (5.0 if event.shift_pressed else 1.0)
 	match event.keycode:
 		KEY_LEFT: item.position.x -= move_step
 		KEY_RIGHT: item.position.x += move_step
@@ -120,47 +119,32 @@ func _key(event: InputEventKey) -> void:
 	item.position = Vector2(clampf(item.position.x, 0.0, 1.0), clampf(item.position.y, 0.0, 1.0))
 	_commit_selected(item)
 
-func _panel_click(point: Vector2) -> void:
-	if _button(0).has_point(point):
-		leaf_layer_visible = not leaf_layer_visible
-		_flash("Leaf layer %s" % ("ON" if leaf_layer_visible else "OFF"))
-		queue_redraw()
+func _panel_action(action: Dictionary) -> void:
+	if action.is_empty():
 		return
-	if _button(1).has_point(point):
-		DisplayServer.clipboard_set(leaf_points_code())
-		_flash("Leaf layout copied")
-		return
-	if _button(2).has_point(point):
-		set_tree(tree_index - 1)
-		return
-	if _button(3).has_point(point):
-		set_tree(tree_index + 1)
-		return
-	for index in SLOTS.size():
-		var row := _point_row(index)
-		if Rect2(row.position, Vector2(24.0, 28.0)).has_point(point):
-			_add_named_point(SLOTS[index])
-			return
-		if Rect2(row.end - Vector2(24.0, 28.0), Vector2(24.0, 28.0)).has_point(point):
-			_delete_named_point(SLOTS[index])
-			return
-		if row.has_point(point):
-			_point_slot = SLOTS[index]
+	match String(action.id):
+		"top":
+			match int(action.index):
+				0:
+					leaf_layer_visible = not leaf_layer_visible
+					_flash("Leaf layer %s" % ("ON" if leaf_layer_visible else "OFF"))
+				1:
+					DisplayServer.clipboard_set(leaf_points_code())
+					_flash("Leaf layout copied")
+				2: set_tree(tree_index - 1)
+				3: set_tree(tree_index + 1)
+		"branch_add": _add_named_point(SLOTS[int(action.index)])
+		"branch_delete": _delete_named_point(SLOTS[int(action.index)])
+		"branch_select":
+			_point_slot = SLOTS[int(action.index)]
 			_flash("New leaves: %s branch" % String(_point_slot).capitalize())
-			queue_redraw()
-			return
-	if not _has_selection():
-		return
-	for index in 4:
-		var row := _control_row(index)
-		if _control_button(row, true).has_point(point):
-			_adjust_control(index, -1)
-			return
-		if _control_button(row, false).has_point(point):
-			_adjust_control(index, 1)
-			return
-	if _control_row(4).has_point(point):
-		_toggle_mirror()
+		"control":
+			if _has_selection():
+				_adjust_control(int(action.index), int(action.direction))
+		"mirror":
+			if _has_selection():
+				_toggle_mirror()
+	queue_redraw()
 
 func _adjust_control(index: int, direction: int) -> void:
 	match index:
@@ -275,8 +259,8 @@ func _points() -> Dictionary:
 
 func _point_screen(slot: StringName, index: int) -> Vector2:
 	var item := LeafPointLayout.normalize_point(_points()[String(slot)][index])
-	var tree_rect := _tree_rect()
-	return tree_rect.position + item.position * tree_rect.size
+	var rect := _tree_rect()
+	return rect.position + item.position * rect.size
 
 func _rotation_screen(slot: StringName, index: int) -> Vector2:
 	var item := LeafPointLayout.normalize_point(_points()[String(slot)][index])
@@ -305,23 +289,11 @@ func _panel() -> Rect2:
 	var canvas := _canvas()
 	return Rect2(Vector2(canvas.end.x, 0.0), Vector2(size.x - canvas.size.x, size.y))
 
-func _point_row(index: int) -> Rect2:
-	var panel := _panel()
-	return Rect2(panel.position + Vector2(18.0, 220.0 + index * 36.0), Vector2(panel.size.x - 36.0, 28.0))
-
-func _control_row(index: int) -> Rect2:
-	var panel := _panel()
-	return Rect2(panel.position + Vector2(18.0, 350.0 + index * 36.0), Vector2(panel.size.x - 36.0, 28.0))
-
-func _control_button(row: Rect2, left: bool) -> Rect2:
-	return Rect2(row.position if left else row.end - Vector2(30.0, 28.0), Vector2(30.0, 28.0))
-
 func _draw() -> void:
 	if size.x <= 1.0 or size.y <= 1.0:
 		return
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.04, 0.035, 0.03))
-	var tree := LeafPointLayout.TREES[tree_index]
-	draw_texture_rect(tree, _tree_rect(), false)
+	draw_texture_rect(LeafPointLayout.TREES[tree_index], _tree_rect(), false)
 	if leaf_layer_visible:
 		for slot in SLOTS:
 			for index in (_points()[String(slot)] as Array).size():
@@ -329,7 +301,7 @@ func _draw() -> void:
 	for slot in SLOTS:
 		for index in (_points()[String(slot)] as Array).size():
 			_draw_point(slot, index)
-	_draw_panel(_panel())
+	LeafArtPanel.draw(self, _panel(), tree_index, _point_slot, _points(), _selected_point() if _has_selection() else {}, _message, _message_time)
 
 func _draw_leaf(center: Vector2, item: Dictionary) -> void:
 	var texture := LeafPointLayout.LEAF_TEXTURES[int(item.asset)]
@@ -337,8 +309,7 @@ func _draw_leaf(center: Vector2, item: Dictionary) -> void:
 	var source := Rect2(float(frame * LeafPointLayout.LEAF_FRAME_SIZE), 0.0, LeafPointLayout.LEAF_FRAME_SIZE, LeafPointLayout.LEAF_FRAME_SIZE)
 	var leaf_size := Vector2.ONE * float(LeafPointLayout.LEAF_FRAME_SIZE) * LEAF_SCALE * float(item.size)
 	var target := Rect2(Vector2(-leaf_size.x * 0.5, -leaf_size.y * LEAF_PIVOT_Y), leaf_size)
-	var draw_scale := Vector2(-1.0, 1.0) if bool(item.mirrored) else Vector2.ONE
-	draw_set_transform(center, float(item.rotation), draw_scale)
+	draw_set_transform(center, float(item.rotation), Vector2(-1.0, 1.0) if bool(item.mirrored) else Vector2.ONE)
 	draw_texture_rect_region(texture, target, source)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
@@ -352,54 +323,6 @@ func _draw_point(slot: StringName, index: int) -> void:
 	draw_circle(point, 3.0, Color(0.09, 0.07, 0.04))
 	draw_line(point, rotation, color, 2.0, true)
 	draw_circle(rotation, 4.0, color)
-
-func _draw_panel(panel: Rect2) -> void:
-	var left := panel.position + Vector2(18.0, 28.0)
-	draw_rect(panel, Color(0.09, 0.07, 0.055))
-	draw_string(ThemeDB.fallback_font, left, "LEAF ART LAB", HORIZONTAL_ALIGNMENT_LEFT, -1, 19, Color(0.55, 0.96, 0.74))
-	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, 24.0), "Tree %02d · manual placement" % (tree_index + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.68, 0.62, 0.52))
-	_draw_button(_button(0), "Toggle leaf layer")
-	_draw_button(_button(1), "Copy leaf layout")
-	_draw_button(_button(2), "Previous tree")
-	_draw_button(_button(3), "Next tree")
-	for index in SLOTS.size():
-		var row := _point_row(index)
-		var slot := SLOTS[index]
-		var prefix := "> " if slot == _point_slot else "  "
-		draw_string(ThemeDB.fallback_font, row.position + Vector2(32.0, 19.0), "%s%s: %d" % [prefix, String(slot).capitalize(), (_points()[String(slot)] as Array).size()], HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.88, 0.82, 0.70))
-		_draw_button(Rect2(row.position, Vector2(24.0, 28.0)), "+")
-		_draw_button(Rect2(row.end - Vector2(24.0, 28.0), Vector2(24.0, 28.0)), "−")
-	_draw_selected_controls()
-	if _message_time > 0.0:
-		draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 58.0), _message, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.52, 0.94, 0.72))
-	draw_string(ThemeDB.fallback_font, left + Vector2(0.0, panel.size.y - 34.0), "Drag dot/handle · wheel size · Q/E rotate · M mirror · Ctrl+D duplicate", HORIZONTAL_ALIGNMENT_LEFT, -1, 10, Color(0.58, 0.54, 0.48))
-
-func _draw_selected_controls() -> void:
-	var labels := ["Asset", "Frame", "Rotation", "Scale", "Mirror"]
-	for index in labels.size():
-		var row := _control_row(index)
-		if index < 4:
-			_draw_button(_control_button(row, true), "<")
-			_draw_button(_control_button(row, false), ">")
-		var text := labels[index]
-		if _has_selection():
-			var item := _selected_point()
-			match index:
-				0: text += "  %02d" % (int(item.asset) + 1)
-				1: text += "  %02d/%02d" % [int(item.frame) + 1, LeafPointLayout.frame_count(item.asset)]
-				2: text += "  %.1f°" % rad_to_deg(float(item.rotation))
-				3: text += "  %.2f" % float(item.size)
-				4: text += "  %s" % ("ON" if item.mirrored else "OFF")
-		draw_string(ThemeDB.fallback_font, row.position + Vector2(38.0, 19.0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.91, 0.85, 0.72))
-
-func _draw_button(rect: Rect2, text: String) -> void:
-	draw_rect(rect, Color(0.18, 0.14, 0.10))
-	draw_rect(rect, Color(0.46, 0.35, 0.21), false, 1.0)
-	draw_string(ThemeDB.fallback_font, rect.position + Vector2(8.0, rect.size.y * 0.68), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color(0.91, 0.85, 0.72))
-
-func _button(index: int) -> Rect2:
-	var panel := _panel()
-	return Rect2(panel.position + Vector2(18.0, 68.0 + index * 36.0), Vector2(panel.size.x - 36.0, 28.0))
 
 func _fit(texture: Texture2D, bounds: Rect2) -> Rect2:
 	var scale := minf(bounds.size.x / texture.get_width(), bounds.size.y / texture.get_height())
