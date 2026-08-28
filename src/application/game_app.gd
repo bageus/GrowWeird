@@ -6,6 +6,7 @@ signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
 
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
+const INVENTORY_BOOTSTRAP_MARKER := "user://growweird_inventory_bootstrap_v1"
 
 var state: GameState
 var registry := ContentRegistry.new()
@@ -19,6 +20,8 @@ func _ready() -> void:
 	state = SaveRepository.load_state()
 	if state == null:
 		state = _create_new_game()
+	else:
+		_ensure_inventory_bootstrap()
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
 	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
@@ -339,6 +342,18 @@ func _has_living_plant() -> bool:
 		if pot.plant != null and pot.plant.alive:
 			return true
 	return false
+
+func _ensure_inventory_bootstrap() -> void:
+	if FileAccess.file_exists(INVENTORY_BOOTSTRAP_MARKER):
+		return
+	var has_items := not state.inventory.cuttings.is_empty() 		or not state.inventory.seeds.is_empty() 		or not state.inventory.fruits.is_empty() 		or not state.inventory.fertilizers.is_empty()
+	if not has_items:
+		var plant := active_plant()
+		if plant != null:
+			NewGameFactory.add_starter_inventory_item(state, plant)
+	var file := FileAccess.open(INVENTORY_BOOTSTRAP_MARKER, FileAccess.WRITE)
+	if file != null:
+		file.store_string("1")
 
 func _create_new_game() -> GameState:
 	return NewGameFactory.create(rules)
