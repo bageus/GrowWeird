@@ -104,9 +104,10 @@ func _apply_layout() -> void:
 	if size.x <= 1.0 or size.y <= 1.0:
 		return
 	for key in _controls:
-		var control: SceneDraggablePanel = _controls[key] as SceneDraggablePanel
-		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS.get(key, Vector2.ZERO))
-		control.apply_normalized_position(point)
+		var control := _controls[key] as Control
+		if control is SceneDraggablePanel:
+			var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS.get(key, Vector2.ZERO))
+			(control as SceneDraggablePanel).apply_normalized_position(point)
 	_reposition_open_popups()
 
 func _capture_layout() -> void:
