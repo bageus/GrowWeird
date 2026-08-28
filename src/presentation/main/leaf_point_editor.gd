@@ -26,8 +26,8 @@ var _message_time := 0.0
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	set_process(true)
+	_points_by_tree = LeafLayoutStore.load(POINT_FILE_PATH)
 	_ensure_defaults()
-	_load_points()
 	queue_redraw()
 
 func set_tree(index: int) -> void:
@@ -330,7 +330,7 @@ func _fit(texture: Texture2D, bounds: Rect2) -> Rect2:
 	return Rect2(bounds.position + (bounds.size - draw_size) * 0.5, draw_size)
 
 func _changed(message := "") -> void:
-	_save_points()
+	LeafLayoutStore.save(POINT_FILE_PATH, _points_by_tree)
 	if not message.is_empty():
 		_flash(message)
 	queue_redraw()
@@ -339,33 +339,3 @@ func _flash(text: String) -> void:
 	_message = text
 	_message_time = 2.5
 	queue_redraw()
-
-func _load_points() -> void:
-	var file := FileAccess.open(POINT_FILE_PATH, FileAccess.READ) if FileAccess.file_exists(POINT_FILE_PATH) else null
-	if file == null:
-		return
-	var data: Variant = JSON.parse_string(file.get_as_text())
-	file.close()
-	if not data is Dictionary:
-		return
-	var source: Variant = data.get("points", data)
-	if not source is Dictionary:
-		return
-	for index in TREE_COUNT:
-		var values: Variant = source.get(str(index), null)
-		if values is Dictionary:
-			_points_by_tree[index] = _normalize_points(values)
-
-func _normalize_points(values: Dictionary) -> Dictionary:
-	var result := {"left": [], "center": [], "right": []}
-	for slot in SLOTS:
-		for raw in values.get(String(slot), []):
-			result[String(slot)].append(LeafPointLayout.normalize_point(raw))
-	return result
-
-func _save_points() -> void:
-	var file := FileAccess.open(POINT_FILE_PATH, FileAccess.WRITE)
-	if file == null:
-		return
-	file.store_string(JSON.stringify({"points": LeafPointLayout.serializable_points(_points_by_tree)}))
-	file.close()
