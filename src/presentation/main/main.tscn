@@ -1,48 +1,12 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
-[ext_resource type="Script" path="res://src/presentation/inventory/inventory_panel.gd" id="4_inventory"]
-[ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="5_pots"]
-[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="6_shop"]
-[ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="7_progress"]
-[ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="8_action"]
-[ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="9_controls"]
-[ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="10_window_art"]
-[ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="11_drag_panel"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
-bg_color = Color(0.035, 0.035, 0.035, 0.58)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.16)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 7.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_popup"]
-bg_color = Color(0.035, 0.035, 0.035, 0.88)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 1, 1, 0.2)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 10.0
-content_margin_top = 8.0
-content_margin_right = 10.0
-content_margin_bottom = 10.0
+[ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="4_pots"]
+[ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="5_progress"]
+[ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="6_window_art"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -106,7 +70,7 @@ autowrap_mode = 2
 [node name="ProgressionPanel" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
-script = ExtResource("7_progress")
+script = ExtResource("5_progress")
 
 [node name="PotsLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 layout_mode = 2
@@ -122,7 +86,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
-script = ExtResource("5_pots")
+script = ExtResource("4_pots")
 
 [node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
@@ -152,7 +116,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-texture = ExtResource("10_window_art")
+texture = ExtResource("6_window_art")
 expand_mode = 1
 stretch_mode = 5
 script = ExtResource("2_window")
@@ -191,298 +155,8 @@ theme_override_font_sizes/font_size = 20
 text = "$0"
 horizontal_alignment = 2
 
-[node name="SceneControls" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
+[node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
 unique_name_in_owner = true
-layout_mode = 1
-z_index = 5
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-script = ExtResource("9_controls")
-
-[node name="WaterButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Water"
-script = ExtResource("8_action")
-action_id = &"water"
-
-[node name="SprayButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Spray"
-script = ExtResource("8_action")
-action_id = &"spray"
-
-[node name="LightingButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(138, 38)
-offset_right = 138.0
-offset_bottom = 38.0
-text = "Lighting"
-script = ExtResource("8_action")
-action_id = &"lighting"
-
-[node name="PruneButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-toggle_mode = true
-text = "Prune"
-script = ExtResource("8_action")
-action_id = &"prune"
-
-[node name="HarvestButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-toggle_mode = true
-text = "Harvest"
-script = ExtResource("8_action")
-action_id = &"harvest"
-
-[node name="SellPlantButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Sell plant"
-script = ExtResource("8_action")
-action_id = &"sell_plant"
-
-[node name="RecyclePlantButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(120, 38)
-offset_right = 120.0
-offset_bottom = 38.0
-text = "Compost"
-script = ExtResource("8_action")
-action_id = &"recycle_plant"
-
-[node name="CancelButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Cancel"
-script = ExtResource("8_action")
-action_id = &"cancel"
-
-[node name="ShopButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 38)
-offset_right = 96.0
-offset_bottom = 38.0
-text = "Shop"
-script = ExtResource("8_action")
-action_id = &"shop"
-
-[node name="OffersPanel" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-z_index = 7
-custom_minimum_size = Vector2(186, 170)
-offset_right = 186.0
-offset_bottom = 170.0
-theme_override_styles/panel = SubResource("StyleBox_hud")
-script = ExtResource("11_drag_panel")
-layout_id = &"fertilizers"
-drag_handle_height = 31.0
-
-[node name="OffersLayout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="OfferLabel" type="Label" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-theme_override_font_sizes/font_size = 15
-text = "Fertilizers"
-autowrap_mode = 2
-
-[node name="OfferOne" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "?"
-
-[node name="OfferTwo" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "?"
-
-[node name="OfferThree" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "?"
-
-[node name="SkipOffer" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Skip"
-
-[node name="InventoryHud" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-z_index = 7
-custom_minimum_size = Vector2(252, 92)
-offset_right = 252.0
-offset_bottom = 92.0
-theme_override_styles/panel = SubResource("StyleBox_hud")
-script = ExtResource("11_drag_panel")
-layout_id = &"inventory"
-drag_handle_height = 28.0
-
-[node name="InventoryHudLayout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="InventoryHudTitle" type="Label" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout"]
-layout_mode = 2
-mouse_filter = 2
-text = "Inventory"
-
-[node name="Slots" type="HBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout"]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="InventorySlotOne" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(74, 50)
-layout_mode = 2
-text = "FERT\n0"
-
-[node name="InventorySlotTwo" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(74, 50)
-layout_mode = 2
-text = "CUT\n0"
-
-[node name="InventorySlotThree" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(74, 50)
-layout_mode = 2
-text = "GEN\n0"
-
-[node name="LightingOptions" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-visible = false
-z_index = 10
-custom_minimum_size = Vector2(154, 166)
-offset_right = 154.0
-offset_bottom = 166.0
-theme_override_styles/panel = SubResource("StyleBox_popup")
-
-[node name="Options" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="SunnyButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Sunny"
-
-[node name="VentilationButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Ventilation"
-
-[node name="BlindsButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Blinds"
-
-[node name="CurtainsButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Curtains"
-
-[node name="InventoryDetails" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-visible = false
-z_index = 11
-custom_minimum_size = Vector2(350, 390)
-offset_right = 350.0
-offset_bottom = 390.0
-theme_override_styles/panel = SubResource("StyleBox_popup")
-
-[node name="InventoryDetailsLayout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails"]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="InventoryHeader" type="HBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout"]
-layout_mode = 2
-
-[node name="InventoryDetailsTitle" type="Label" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout/InventoryHeader"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 17
-text = "Inventory"
-
-[node name="CloseInventoryButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout/InventoryHeader"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "×"
-
-[node name="InventoryScroll" type="ScrollContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout"]
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="InventoryPanel" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout/InventoryScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 5
-script = ExtResource("4_inventory")
-
-[node name="ShopContainer" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
-unique_name_in_owner = true
-visible = false
-z_index = 11
-custom_minimum_size = Vector2(350, 390)
-offset_right = 350.0
-offset_bottom = 390.0
-theme_override_styles/panel = SubResource("StyleBox_popup")
-
-[node name="ShopLayout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ShopHeader" type="HBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer/ShopLayout"]
-layout_mode = 2
-
-[node name="ShopTitle" type="Label" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer/ShopLayout/ShopHeader"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 17
-text = "Shop"
-
-[node name="CloseShopButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer/ShopLayout/ShopHeader"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "×"
-
-[node name="ShopPanel" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer/ShopLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-script = ExtResource("6_shop")
 
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveLayoutButton" to="." method="_on_save_layout_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/ResetLayoutButton" to="." method="_on_reset_layout_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout/OfferOne" to="." method="_on_offer_one_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout/OfferTwo" to="." method="_on_offer_two_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout/OfferThree" to="." method="_on_offer_three_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/OffersPanel/OffersLayout/SkipOffer" to="." method="_on_skip_offer_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots/InventorySlotOne" to="." method="_on_inventory_hud_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots/InventorySlotTwo" to="." method="_on_inventory_hud_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryHud/InventoryHudLayout/Slots/InventorySlotThree" to="." method="_on_inventory_hud_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/InventoryDetails/InventoryDetailsLayout/InventoryHeader/CloseInventoryButton" to="." method="_on_close_inventory_pressed"]
-[connection signal="pressed" from="Shell/Layout/ScenePanel/SceneRoot/SceneControls/ShopContainer/ShopLayout/ShopHeader/CloseShopButton" to="." method="_on_close_shop_pressed"]
