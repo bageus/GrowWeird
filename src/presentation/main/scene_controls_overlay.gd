@@ -6,21 +6,24 @@ signal action_requested(action_id: StringName)
 const FILE_PATH := "user://growweird_scene_buttons.json"
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.04, 0.58),
-	"spray": Vector2(0.04, 0.66),
-	"lighting": Vector2(0.78, 0.10),
-	"prune": Vector2(0.78, 0.50),
-	"harvest": Vector2(0.78, 0.58),
-	"sell_plant": Vector2(0.78, 0.66),
-	"recycle_plant": Vector2(0.78, 0.74),
+	"spray": Vector2(0.42, 0.43),
+	"lighting": Vector2(0.07, 0.13),
+	"prune": Vector2(0.04, 0.50),
+	"harvest": Vector2(0.40, 0.64),
+	"sell_plant": Vector2(0.04, 0.62),
+	"recycle_plant": Vector2(0.04, 0.70),
 	"cancel": Vector2(0.42, 0.86),
+	"shop": Vector2(0.84, 0.06),
+	"fertilizers": Vector2(0.02, 0.04),
+	"inventory": Vector2(0.68, 0.78),
 }
 
-var _buttons: Dictionary = {}
+var _controls: Dictionary = {}
 var _layout: Dictionary = {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_collect_buttons()
+	_collect_controls()
 	_layout = _load_layout()
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
@@ -31,34 +34,60 @@ func set_lighting_options_visible(enabled: bool) -> void:
 		return
 	menu.visible = enabled
 	if enabled:
-		_place_lighting_options()
+		_place_popup(menu, _controls.get("lighting") as Control)
+
+func set_inventory_details_visible(enabled: bool) -> void:
+	var panel := get_node_or_null("InventoryDetails") as Control
+	if panel == null:
+		return
+	panel.visible = enabled
+	if enabled:
+		_place_popup(panel, _controls.get("inventory") as Control)
+
+func set_shop_visible(enabled: bool) -> void:
+	var panel := get_node_or_null("ShopContainer") as Control
+	if panel == null:
+		return
+	panel.visible = enabled
+	if enabled:
+		_place_popup(panel, _controls.get("shop") as Control)
+
+func save_layout() -> bool:
+	_capture_layout()
+	return _save_layout()
 
 func reset_layout() -> void:
 	_layout = DEFAULT_POSITIONS.duplicate(true)
 	_apply_layout()
-	_save_layout()
 
-func _collect_buttons() -> void:
+func _collect_controls() -> void:
 	for child in get_children():
-		if not (child is SceneActionButton):
-			continue
-		var button := child as SceneActionButton
-		var key := String(button.action_id)
-		_buttons[key] = button
-		button.activated.connect(_on_button_activated)
-		button.position_committed.connect(_on_button_position_committed)
-		button.drag_moved.connect(_on_button_drag_moved)
+		if child is SceneActionButton:
+			var button := child as SceneActionButton
+			_register_control(String(button.action_id), button)
+			button.activated.connect(_on_button_activated)
+			button.position_committed.connect(_on_control_position_committed)
+			button.drag_moved.connect(_on_control_drag_moved)
+		elif child is SceneDraggablePanel:
+			var panel := child as SceneDraggablePanel
+			_register_control(String(panel.layout_id), panel)
+			panel.position_committed.connect(_on_control_position_committed)
+			panel.drag_moved.connect(_on_control_drag_moved)
+
+func _register_control(key: String, control: Control) -> void:
+	if key.is_empty():
+		return
+	_controls[key] = control
 
 func _on_button_activated(action_id: StringName) -> void:
 	action_requested.emit(action_id)
 
-func _on_button_position_committed(action_id: StringName, normalized_position: Vector2) -> void:
-	_layout[String(action_id)] = normalized_position
-	_save_layout()
-	_place_lighting_options()
+func _on_control_position_committed(layout_id: StringName, normalized_position: Vector2) -> void:
+	_layout[String(layout_id)] = normalized_position
+	_reposition_open_popups()
 
-func _on_button_drag_moved(_action_id: StringName) -> void:
-	_place_lighting_options()
+func _on_control_drag_moved(_layout_id: StringName) -> void:
+	_reposition_open_popups()
 
 func _on_resized() -> void:
 	_apply_layout()
@@ -66,24 +95,37 @@ func _on_resized() -> void:
 func _apply_layout() -> void:
 	if size.x <= 1.0 or size.y <= 1.0:
 		return
-	for key in _buttons:
-		var button := _buttons[key] as SceneActionButton
+	for key in _controls:
+		var control := _controls[key]
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS.get(key, Vector2.ZERO))
-		button.apply_normalized_position(point)
-	_place_lighting_options()
+		control.apply_normalized_position(point)
+	_reposition_open_popups()
 
-func _place_lighting_options() -> void:
-	var menu := get_node_or_null("LightingOptions") as Control
-	var lighting := _buttons.get("lighting") as SceneActionButton
-	if menu == null or lighting == null:
+func _capture_layout() -> void:
+	for key in _controls:
+		_layout[key] = _controls[key].normalized_position()
+
+func _reposition_open_popups() -> void:
+	var lighting := get_node_or_null("LightingOptions") as Control
+	if lighting != null and lighting.visible:
+		_place_popup(lighting, _controls.get("lighting") as Control)
+	var inventory := get_node_or_null("InventoryDetails") as Control
+	if inventory != null and inventory.visible:
+		_place_popup(inventory, _controls.get("inventory") as Control)
+	var shop := get_node_or_null("ShopContainer") as Control
+	if shop != null and shop.visible:
+		_place_popup(shop, _controls.get("shop") as Control)
+
+func _place_popup(popup: Control, source: Control) -> void:
+	if popup == null or source == null:
 		return
 	var gap := 8.0
-	var target := lighting.position + Vector2(lighting.size.x + gap, 0.0)
-	if target.x + menu.size.x > size.x:
-		target.x = lighting.position.x - menu.size.x - gap
-	if target.y + menu.size.y > size.y:
-		target.y = maxf(0.0, size.y - menu.size.y)
-	menu.position = Vector2(maxf(0.0, target.x), maxf(0.0, target.y))
+	var target := source.position + Vector2(source.size.x + gap, 0.0)
+	if target.x + popup.size.x > size.x:
+		target.x = source.position.x - popup.size.x - gap
+	if target.y + popup.size.y > size.y:
+		target.y = maxf(0.0, size.y - popup.size.y)
+	popup.position = Vector2(maxf(0.0, target.x), maxf(0.0, target.y))
 
 func _load_layout() -> Dictionary:
 	var result := DEFAULT_POSITIONS.duplicate(true)
@@ -104,11 +146,13 @@ func _load_layout() -> Dictionary:
 			)
 	return result
 
-func _save_layout() -> void:
+func _save_layout() -> bool:
 	var payload := {}
 	for key in DEFAULT_POSITIONS:
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS[key])
 		payload[key] = [point.x, point.y]
 	var file := FileAccess.open(FILE_PATH, FileAccess.WRITE)
-	if file != null:
-		file.store_string(JSON.stringify(payload))
+	if file == null:
+		return false
+	file.store_string(JSON.stringify(payload))
+	return true
