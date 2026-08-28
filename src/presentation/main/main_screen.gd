@@ -6,19 +6,21 @@ extends Control
 @onready var event_label: Label = %EventLabel
 @onready var offer_label: Label = %OfferLabel
 @onready var window_view: WindowView = %WindowView
-@onready var soil_view: SoilView = %SoilView
 @onready var plant_view: PlantView = %PlantView
-@onready var plant_sense: PlantSenseView = %PlantSense
 @onready var inventory_panel: InventoryPanel = %InventoryPanel
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var shop_panel: ShopPanel = %ShopPanel
 @onready var shop_container: PanelContainer = %ShopContainer
+@onready var inventory_details: PanelContainer = %InventoryDetails
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
 @onready var offer_one: Button = %OfferOne
 @onready var offer_two: Button = %OfferTwo
 @onready var offer_three: Button = %OfferThree
 @onready var skip_offer: Button = %SkipOffer
+@onready var inventory_slot_one: Button = %InventorySlotOne
+@onready var inventory_slot_two: Button = %InventorySlotTwo
+@onready var inventory_slot_three: Button = %InventorySlotThree
 @onready var lighting_button: SceneActionButton = %LightingButton
 @onready var prune_button: SceneActionButton = %PruneButton
 @onready var harvest_button: SceneActionButton = %HarvestButton
@@ -65,21 +67,19 @@ func _refresh() -> void:
 	money_label.text = "$%d" % GameApp.state.money
 	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
 	inventory_panel.set_inventory(GameApp.state.inventory, _item_prices())
+	_refresh_inventory_hud(GameApp.state.inventory)
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
 	shop_panel.set_shop(GameApp.shop_catalog(), GameApp.species_shop_catalog(), GameApp.next_pot_price(), GameApp.state.money)
 	_refresh_offer()
 	_refresh_actions(pot, plant)
-	plant_sense.visible = plant != null and plant.alive
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:
 		plant_name_label.text = "No pot selected"
 		status_label.text = "Choose or buy a pot to start growing."
 		plant_view.set_species_style(null)
 		plant_view.set_plant(null)
-		plant_sense.visible = false
 		return
 	window_view.set_environment(int(pot.light_mode), pot.window_open)
-	soil_view.set_moisture(pot.soil_moisture)
 	var species := GameApp.active_species_definition()
 	plant_view.set_species_style(species)
 	plant_view.set_plant(plant)
@@ -88,12 +88,25 @@ func _refresh() -> void:
 		status_label.text = "Choose a seed or cutting from inventory to plant here."
 		return
 	plant_name_label.text = plant.custom_name if not plant.custom_name.is_empty() else _pretty_id(String(plant.species_id))
-	if plant.alive:
-		plant_sense.set_comfort(GameApp.current_comfort())
 	var lifecycle := PlantStatusQuery.build(plant, species, GameApp.rules)
 	status_label.text = "%s · %s" % [_pretty_id(String(lifecycle.get("growth_stage", &"sprout"))), _pretty_id(String(lifecycle.get("condition", &"healthy")))]
 	if _has_regrowth(plant): status_label.text += " · New branch forming"
 	if not plant.alive: status_label.text += " · Final state"
+
+func _refresh_inventory_hud(inventory: InventoryState) -> void:
+	if inventory == null:
+		inventory_slot_one.text = "FERT\n0"
+		inventory_slot_two.text = "CUT\n0"
+		inventory_slot_three.text = "GEN\n0"
+		return
+	var fertilizer_count := 0
+	for count in inventory.fertilizers.values(): fertilizer_count += int(count)
+	inventory_slot_one.text = "FERT\n%d" % fertilizer_count
+	inventory_slot_two.text = "CUT\n%d" % inventory.cuttings.size()
+	inventory_slot_three.text = "GEN\n%d" % (inventory.seeds.size() + inventory.fruits.size())
+	inventory_slot_one.tooltip_text = "Fertilizers · click to open inventory"
+	inventory_slot_two.tooltip_text = "Cuttings · click to open inventory"
+	inventory_slot_three.tooltip_text = "Seeds + fruits · click to open inventory"
 
 func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	var living := plant != null and plant.alive
@@ -123,7 +136,7 @@ func _refresh_offer() -> void:
 	var price := GameApp.current_offer_skip_price()
 	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
 	skip_offer.disabled = price <= 0 or GameApp.state.money < price
-	offer_label.text = "New fertilizer in %.0fs" % GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else "Choose one fertilizer"
+	offer_label.text = "Fertilizers · %.0fs" % GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else "Fertilizers · choose one"
 
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
@@ -149,6 +162,7 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 		&"sell_plant": _on_sell_plant_pressed()
 		&"recycle_plant": _on_recycle_plant_pressed()
 		&"cancel": _on_cancel_pressed()
+		&"shop": _on_shop_pressed()
 
 func _on_water_pressed() -> void: GameApp.water_active(false)
 func _on_spray_pressed() -> void: GameApp.water_active(true)
@@ -234,6 +248,9 @@ func _handle_pot_click(pot_id: String) -> void:
 	else: event_label.text = "Cannot plant there."
 	_cancel_action()
 
+func _on_inventory_hud_pressed() -> void:
+	scene_controls.set_inventory_details_visible(not inventory_details.visible)
+func _on_close_inventory_pressed() -> void: scene_controls.set_inventory_details_visible(false)
 func _on_inventory_fertilizer(fertilizer_id: StringName) -> void:
 	if GameApp.use_inventory_fertilizer(fertilizer_id).is_empty(): event_label.text = "Fertilizer used. No visible mutation yet."
 func _on_fruit_seed_requested(item_id: String) -> void:
@@ -251,16 +268,18 @@ func _on_sell_plant_pressed() -> void:
 	_cancel_action()
 func _on_recycle_plant_pressed() -> void:
 	var amount := GameApp.recycle_active_dead_plant()
-	event_label.text = "Remains composted into ×%d Compost Mix." % amount if amount > 0 else "Only dead plants can be composted."
+	event_label.text = "Remains composted into ×%d Compost Mix. Pot is free." % amount if amount > 0 else "Only dead plants can be composted."
 	_cancel_action()
 func _on_shop_pressed() -> void:
-	shop_container.visible = not shop_container.visible
+	scene_controls.set_shop_visible(not shop_container.visible)
 	shop_panel.invalidate()
 	_refresh()
-func _on_close_shop_pressed() -> void: shop_container.visible = false
+func _on_close_shop_pressed() -> void: scene_controls.set_shop_visible(false)
+func _on_save_layout_pressed() -> void:
+	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
-	event_label.text = "Button positions reset."
+	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
 func _on_shop_fertilizer_requested(id: StringName) -> void:
 	var success := GameApp.buy_shop_fertilizer(id)
 	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Item is locked or unaffordable."
