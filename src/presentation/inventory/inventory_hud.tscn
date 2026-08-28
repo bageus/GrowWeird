@@ -25,7 +25,7 @@ offset_bottom = 190.0
 theme_override_styles/panel = SubResource("StyleBox_inventory")
 script = ExtResource("1_hud")
 layout_id = &"inventory"
-drag_handle_height = 30.0
+drag_handle_height = 0.0
 
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 2
