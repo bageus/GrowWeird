@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=11 format=3]
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
@@ -10,10 +10,7 @@
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="9_progress"]
 [ext_resource type="Script" path="res://src/presentation/main/garden_layout_editor.gd" id="10_garden"]
 [ext_resource type="Script" path="res://src/presentation/main/leaf_point_editor.gd" id="11_leaf"]
-[ext_resource type="Script" path="res://src/presentation/main/ui_pipeline_editor.gd" id="12_pipeline"]
 [ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="14_window"]
-[ext_resource type="PackedScene" path="res://src/presentation/main/interface_layer.tscn" id="15_interface"]
-[ext_resource type="PackedScene" path="res://src/presentation/main/pipeline_panel.tscn" id="16_pipeline_panel"]
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -31,6 +28,7 @@ expand_mode = 1
 stretch_mode = 0
 [node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 1
+z_index = 2
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -68,8 +66,9 @@ theme_override_constants/separation = 10
 alignment = 1
 size_flags_horizontal = 3
 [node name="ToolsPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(0, 0)
-size_flags_horizontal = 3
+custom_minimum_size = Vector2(180, 0)
+size_flags_horizontal = 0
+z_index = 2
 [node name="Tools" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel"]
 theme_override_constants/separation = 8
 [node name="ToolsTitle" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
@@ -79,6 +78,21 @@ horizontal_alignment = 1
 text = "Water"
 [node name="SprayButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 text = "Spray"
+[node name="LightingButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+text = "Lighting"
+[node name="LightingOptions" type="VBoxContainer" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+visible = false
+theme_override_constants/separation = 4
+[node name="SunnyButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions"]
+text = "Sunny"
+[node name="VentilationButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions"]
+text = "Ventilation"
+[node name="BlindsButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions"]
+text = "Blinds"
+[node name="CurtainsButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions"]
+text = "Curtains"
 [node name="PruneButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 toggle_mode = true
@@ -101,12 +115,16 @@ text = "Cancel action"
 [node name="LeafLabButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 unique_name_in_owner = true
 text = "Leaf point lab"
+[node name="ArtLabButton" type="Button" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
+unique_name_in_owner = true
+text = "Art layout"
 [node name="Hint" type="Label" parent="Margin/Layout/MainContent/ToolsPanel/Tools"]
 size_flags_vertical = 3
 text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGenetic items can be sold or composted."
 autowrap_mode = 2
 [node name="World" type="Control" parent="."]
 layout_mode = 1
+z_index = -1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -150,15 +168,16 @@ mouse_filter = 2
 script = ExtResource("5_sense")
 [node name="ArtPreview" type="PanelContainer" parent="."]
 unique_name_in_owner = true
-visible = false
+visible = true
 layout_mode = 1
 anchors_preset = 15
 anchor_left = 0.0
 anchor_right = 0.0
-offset_left = 16.0
-offset_right = 420.0
+offset_left = 8.0
+offset_right = 368.0
 anchor_bottom = 1.0
-mouse_filter = 1
+z_index = 3
+mouse_filter = 0
 clip_contents = true
 script = ExtResource("10_garden")
 [node name="LeafPointPreview" type="PanelContainer" parent="."]
@@ -168,15 +187,18 @@ layout_mode = 1
 anchors_preset = 15
 anchor_left = 0.0
 anchor_right = 0.0
-offset_left = 16.0
-offset_right = 420.0
+offset_left = 8.0
+offset_right = 368.0
 anchor_bottom = 1.0
-mouse_filter = 1
+z_index = 3
+mouse_filter = 0
 clip_contents = true
 script = ExtResource("11_leaf")
 [node name="InventoryOuter" type="PanelContainer" parent="Margin/Layout/MainContent"]
 custom_minimum_size = Vector2(220, 0)
+size_flags_horizontal = 0
 size_flags_vertical = 3
+z_index = 2
 [node name="InventoryScroll" type="ScrollContainer" parent="Margin/Layout/MainContent/InventoryOuter"]
 horizontal_scroll_mode = 0
 [node name="InventoryPanel" type="VBoxContainer" parent="Margin/Layout/MainContent/InventoryOuter/InventoryScroll"]
@@ -257,28 +279,6 @@ text = "Close"
 unique_name_in_owner = true
 theme_override_constants/separation = 6
 script = ExtResource("8_shop")
-[node name="InterfaceLayer" parent="." instance=ExtResource("15_interface")]
-unique_name_in_owner = true
-[node name="PipelineToggle" type="Button" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -244.0
-offset_top = 14.0
-offset_right = -16.0
-offset_bottom = 50.0
-grow_horizontal = 0
-text = "Настройка UI"
-[node name="PipelineEditor" type="Control" parent="."]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-script = ExtResource("12_pipeline")
-[node name="PipelinePanel" parent="." instance=ExtResource("16_pipeline_panel")]
 [connection signal="pressed" from="Margin/Layout/TopBar/ShopButton" to="." method="_on_shop_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/WaterButton" to="." method="_on_water_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/SprayButton" to="." method="_on_spray_pressed"]
@@ -289,11 +289,8 @@ script = ExtResource("12_pipeline")
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/CancelButton" to="." method="_on_cancel_pressed"]
 [connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LeafLabButton" to="." method="_on_leaf_lab_pressed"]
 [connection signal="pressed" from="Margin/Layout/OffersPanel/OffersLayout/OfferButtons/OfferOne" to="." method="_on_offer_one_pressed"]
-[connection signal="pressed" from="InterfaceLayer/LightingButton" to="." method="_on_light_pressed"]
-[connection signal="pressed" from="InterfaceLayer/LightingOptions/SunnyButton" to="." method="_on_lighting_stub_pressed"]
-[connection signal="pressed" from="InterfaceLayer/LightingOptions/VentilationButton" to="." method="_on_lighting_stub_pressed"]
-[connection signal="pressed" from="InterfaceLayer/LightingOptions/BlindsButton" to="." method="_on_lighting_stub_pressed"]
-[connection signal="pressed" from="InterfaceLayer/LightingOptions/CurtainsButton" to="." method="_on_lighting_stub_pressed"]
-[connection signal="pressed" from="PipelineToggle" to="." method="_on_pipeline_pressed"]
-[connection signal="pressed" from="PipelinePanel/PipelineControls/SavePipeline" to="." method="_on_pipeline_save_pressed"]
-[connection signal="pressed" from="PipelinePanel/PipelineControls/ResetPipeline" to="." method="_on_pipeline_reset_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LightingButton" to="." method="_on_light_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions/SunnyButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions/VentilationButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions/BlindsButton" to="." method="_on_lighting_stub_pressed"]
+[connection signal="pressed" from="Margin/Layout/MainContent/ToolsPanel/Tools/LightingOptions/CurtainsButton" to="." method="_on_lighting_stub_pressed"]
