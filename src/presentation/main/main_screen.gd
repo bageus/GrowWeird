@@ -162,6 +162,8 @@ func _refresh_side_panels() -> void:
 	inventory_outer.visible = true
 	art_preview.visible = _art_lab_visible and not _leaf_lab_visible
 	leaf_point_preview.visible = _leaf_lab_visible
+	art_preview.mouse_filter = Control.MOUSE_FILTER_STOP if art_preview.visible else Control.MOUSE_FILTER_IGNORE
+	leaf_point_preview.mouse_filter = Control.MOUSE_FILTER_STOP if leaf_point_preview.visible else Control.MOUSE_FILTER_IGNORE
 
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
