@@ -20,7 +20,7 @@ var _buttons: Dictionary = {}
 var _layout: Dictionary = {}
 
 func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_PASS
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_collect_buttons()
 	_layout = _load_layout()
 	resized.connect(_on_resized)
