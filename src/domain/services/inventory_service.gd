@@ -11,17 +11,22 @@ static func fertilizer_count(inventory: InventoryState, fertilizer_id: StringNam
 	return int(inventory.fertilizers.get(String(fertilizer_id), 0)) if inventory != null else 0
 
 static func take_fertilizer(inventory: InventoryState, fertilizer_id: StringName) -> bool:
-	if inventory == null:
-		return false
+	return take_fertilizer_amount(inventory, fertilizer_id, 1) == 1
+
+static func take_fertilizer_amount(inventory: InventoryState, fertilizer_id: StringName, amount: int) -> int:
+	if inventory == null or amount <= 0:
+		return 0
 	var key := String(fertilizer_id)
 	var count := int(inventory.fertilizers.get(key, 0))
-	if count <= 0:
-		return false
-	if count == 1:
+	var taken := mini(count, amount)
+	if taken <= 0:
+		return 0
+	var remaining := count - taken
+	if remaining <= 0:
 		inventory.fertilizers.erase(key)
 	else:
-		inventory.fertilizers[key] = count - 1
-	return true
+		inventory.fertilizers[key] = remaining
+	return taken
 
 static func add_cutting(inventory: InventoryState, cutting: CuttingState) -> void:
 	if inventory != null and cutting != null:
