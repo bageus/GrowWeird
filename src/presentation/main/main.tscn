@@ -1,5 +1,4 @@
 [gd_scene load_steps=13 format=3]
-
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
@@ -12,14 +11,12 @@
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="10_action"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="11_controls"]
 [ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="12_window_art"]
-
 [node name="Main" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_main")
-
 [node name="Shell" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -29,119 +26,96 @@ offset_left = 12.0
 offset_top = 12.0
 offset_right = -12.0
 offset_bottom = -12.0
-
 [node name="Layout" type="HBoxContainer" parent="Shell"]
 layout_mode = 2
 theme_override_constants/separation = 12
-
 [node name="LeftSidebar" type="PanelContainer" parent="Shell/Layout"]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
-
 [node name="LeftScroll" type="ScrollContainer" parent="Shell/Layout/LeftSidebar"]
 layout_mode = 2
 horizontal_scroll_mode = 0
-
 [node name="LeftLayout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll"]
 custom_minimum_size = Vector2(202, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
-
 [node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "GROW WEIRD"
-
 [node name="PlantNameLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Plant"
 autowrap_mode = 2
-
 [node name="StatusLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Loading..."
 autowrap_mode = 2
-
 [node name="EventLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Grow. Graft. Mutate."
 autowrap_mode = 2
-
 [node name="ProgressionPanel" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("9_progress")
-
 [node name="OffersPanel" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 layout_mode = 2
-
 [node name="OffersLayout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel"]
 layout_mode = 2
 theme_override_constants/separation = 5
-
 [node name="OfferLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Fertilizers"
 autowrap_mode = 2
-
 [node name="OfferOne" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "?"
-
 [node name="OfferTwo" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "?"
-
 [node name="OfferThree" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "?"
-
 [node name="SkipOffer" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Skip"
-
 [node name="PotsLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 layout_mode = 2
 text = "Pots"
-
 [node name="PotsScroll" type="ScrollContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
 vertical_scroll_mode = 0
-
 [node name="PotSelector" type="HBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/PotsScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 script = ExtResource("7_pots")
-
 [node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Reset button positions"
-
 [node name="ScenePanel" type="PanelContainer" parent="Shell/Layout"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-
 [node name="SceneRoot" type="Control" parent="Shell/Layout/ScenePanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 clip_contents = true
-
 [node name="WindowView" type="TextureRect" parent="Shell/Layout/ScenePanel/SceneRoot"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -153,14 +127,12 @@ texture = ExtResource("12_window_art")
 expand_mode = 1
 stretch_mode = 5
 script = ExtResource("2_window")
-
 [node name="World" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-
 [node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -172,7 +144,6 @@ offset_top = 20.0
 offset_right = -30.0
 offset_bottom = -58.0
 script = ExtResource("3_plant")
-
 [node name="SoilView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -182,7 +153,6 @@ anchor_right = 0.69
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("4_soil")
-
 [node name="PlantSense" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -192,7 +162,6 @@ anchor_right = 0.70
 anchor_bottom = 0.29
 mouse_filter = 2
 script = ExtResource("5_sense")
-
 [node name="SceneControls" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -202,182 +171,146 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("11_controls")
-
 [node name="WaterButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 text = "Water"
 script = ExtResource("10_action")
 action_id = &"water"
-
 [node name="SprayButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 text = "Spray"
 script = ExtResource("10_action")
 action_id = &"spray"
-
 [node name="LightingButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(138, 38)
-layout_mode = 0
 offset_right = 138.0
 offset_bottom = 38.0
 text = "Lighting"
 script = ExtResource("10_action")
 action_id = &"lighting"
-
 [node name="PruneButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 toggle_mode = true
 text = "Prune"
 script = ExtResource("10_action")
 action_id = &"prune"
-
 [node name="HarvestButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 toggle_mode = true
 text = "Harvest"
 script = ExtResource("10_action")
 action_id = &"harvest"
-
 [node name="SellPlantButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 text = "Sell plant"
 script = ExtResource("10_action")
 action_id = &"sell_plant"
-
 [node name="RecyclePlantButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(120, 38)
-layout_mode = 0
 offset_right = 120.0
 offset_bottom = 38.0
 text = "Compost"
 script = ExtResource("10_action")
 action_id = &"recycle_plant"
-
 [node name="CancelButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(112, 38)
-layout_mode = 0
 offset_right = 112.0
 offset_bottom = 38.0
 text = "Cancel"
 script = ExtResource("10_action")
 action_id = &"cancel"
-
 [node name="LightingOptions" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls"]
 unique_name_in_owner = true
 visible = false
-layout_mode = 0
 z_index = 9
 offset_right = 154.0
 offset_bottom = 166.0
-
 [node name="Options" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions"]
 layout_mode = 2
 theme_override_constants/separation = 4
-
 [node name="SunnyButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Sunny"
-
 [node name="VentilationButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Ventilation"
-
 [node name="BlindsButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Blinds"
-
 [node name="CurtainsButton" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/SceneControls/LightingOptions/Options"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Curtains"
-
 [node name="RightSidebar" type="PanelContainer" parent="Shell/Layout"]
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-
 [node name="RightLayout" type="VBoxContainer" parent="Shell/Layout/RightSidebar"]
 layout_mode = 2
 theme_override_constants/separation = 8
-
 [node name="MoneyLabel" type="Label" parent="Shell/Layout/RightSidebar/RightLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "$0"
 horizontal_alignment = 2
-
 [node name="ShopButton" type="Button" parent="Shell/Layout/RightSidebar/RightLayout"]
 layout_mode = 2
 text = "Shop"
-
 [node name="InventoryTitle" type="Label" parent="Shell/Layout/RightSidebar/RightLayout"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Inventory"
-
 [node name="InventoryOuter" type="PanelContainer" parent="Shell/Layout/RightSidebar/RightLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-
 [node name="InventoryScroll" type="ScrollContainer" parent="Shell/Layout/RightSidebar/RightLayout/InventoryOuter"]
 layout_mode = 2
 horizontal_scroll_mode = 0
-
 [node name="InventoryPanel" type="VBoxContainer" parent="Shell/Layout/RightSidebar/RightLayout/InventoryOuter/InventoryScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 5
 script = ExtResource("6_inventory")
-
 [node name="ShopContainer" type="PanelContainer" parent="Shell/Layout/RightSidebar/RightLayout"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 260)
 layout_mode = 2
-
 [node name="ShopLayout" type="VBoxContainer" parent="Shell/Layout/RightSidebar/RightLayout/ShopContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
-
 [node name="CloseShopButton" type="Button" parent="Shell/Layout/RightSidebar/RightLayout/ShopContainer/ShopLayout"]
 layout_mode = 2
 text = "Close shop"
-
 [node name="ShopPanel" type="VBoxContainer" parent="Shell/Layout/RightSidebar/RightLayout/ShopContainer/ShopLayout"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 6
 script = ExtResource("8_shop")
-
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout/OfferOne" to="." method="_on_offer_one_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout/OfferTwo" to="." method="_on_offer_two_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/OffersPanel/OffersLayout/OfferThree" to="." method="_on_offer_three_pressed"]
