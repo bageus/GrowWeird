@@ -131,15 +131,16 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "Click the window to cycle light.\nClick its handle to open/close.\n\nGenetic items can be sold or composted."
 autowrap_mode = 2
-[node name="WorldPanel" type="PanelContainer" parent="Margin/Layout/MainContent"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-[node name="World" type="Control" parent="Margin/Layout/MainContent/WorldPanel"]
-layout_mode = 2
-clip_contents = true
-[node name="WindowView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="World" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+clip_contents = false
+[node name="WindowView" type="Control" parent="World"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -148,7 +149,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_window")
-[node name="PlantView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="PlantView" type="Control" parent="World"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -161,7 +162,7 @@ offset_bottom = -58.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_plant")
-[node name="SoilView" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="SoilView" type="Control" parent="World"]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.31
@@ -172,7 +173,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_soil")
-[node name="PlantSense" type="Control" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="PlantSense" type="Control" parent="World"]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.30
@@ -183,23 +184,30 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("5_sense")
-[node name="ArtPreview" type="PanelContainer" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="ArtPreview" type="PanelContainer" parent="."]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
-anchor_right = 1.0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 16.0
+offset_right = 420.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 clip_contents = true
 script = ExtResource("10_garden")
-[node name="LeafPointPreview" type="PanelContainer" parent="Margin/Layout/MainContent/WorldPanel/World"]
+[node name="LeafPointPreview" type="PanelContainer" parent="."]
 visible = false
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
-anchor_right = 1.0
+anchor_left = 0.0
+anchor_right = 0.0
+offset_left = 16.0
+offset_right = 420.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -309,13 +317,17 @@ layout_mode = 2
 theme_override_constants/separation = 6
 script = ExtResource("8_shop")
 [node name="InterfaceLayer" parent="." instance=ExtResource("15_interface")]
+unique_name_in_owner = true
 [node name="PipelineToggle" type="Button" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 176.0
-offset_bottom = 52.0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -244.0
+offset_top = 14.0
+offset_right = -16.0
+offset_bottom = 50.0
+grow_horizontal = 0
 text = "Настройка UI"
 [node name="PipelineEditor" type="Control" parent="."]
 unique_name_in_owner = true
