@@ -31,3 +31,14 @@ static func add_starter_inventory_item(state: GameState, plant: PlantState) -> v
 	cutting.source_branch_id = branch.branch_id
 	cutting.genome = GeneticsService.snapshot_branch(branch)
 	InventoryService.add_cutting(state.inventory, cutting)
+
+static func ensure_inventory_bootstrap(state: GameState, plant: PlantState) -> void:
+	const marker_path := "user://growweird_inventory_bootstrap_v1"
+	if FileAccess.file_exists(marker_path):
+		return
+	var has_items := not state.inventory.cuttings.is_empty() or not state.inventory.seeds.is_empty() or not state.inventory.fruits.is_empty() or not state.inventory.fertilizers.is_empty()
+	if not has_items and plant != null:
+		add_starter_inventory_item(state, plant)
+	var file := FileAccess.open(marker_path, FileAccess.WRITE)
+	if file != null:
+		file.store_string("1")
