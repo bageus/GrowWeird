@@ -4,33 +4,33 @@ extends Control
 @onready var plant_name_label: Label = %PlantNameLabel
 @onready var status_label: Label = %StatusLabel
 @onready var event_label: Label = %EventLabel
-@onready var offer_label: Label = %OfferLabel
 @onready var window_view: WindowView = %WindowView
 @onready var plant_view: PlantView = %PlantView
-@onready var inventory_panel: InventoryPanel = %InventoryPanel
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
-@onready var shop_panel: ShopPanel = %ShopPanel
-@onready var shop_container: PanelContainer = %ShopContainer
-@onready var inventory_details: PanelContainer = %InventoryDetails
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
-@onready var offer_one: Button = %OfferOne
-@onready var offer_two: Button = %OfferTwo
-@onready var offer_three: Button = %OfferThree
-@onready var skip_offer: Button = %SkipOffer
-@onready var inventory_slot_one: Button = %InventorySlotOne
-@onready var inventory_slot_two: Button = %InventorySlotTwo
-@onready var inventory_slot_three: Button = %InventorySlotThree
-@onready var lighting_button: SceneActionButton = %LightingButton
-@onready var prune_button: SceneActionButton = %PruneButton
-@onready var harvest_button: SceneActionButton = %HarvestButton
-@onready var sell_plant_button: SceneActionButton = %SellPlantButton
-@onready var recycle_plant_button: SceneActionButton = %RecyclePlantButton
-@onready var cancel_button: SceneActionButton = %CancelButton
-@onready var sunny_button: Button = %SunnyButton
-@onready var ventilation_button: Button = %VentilationButton
-@onready var blinds_button: Button = %BlindsButton
-@onready var curtains_button: Button = %CurtainsButton
+@onready var offer_label: Label = scene_controls.get_node("OffersPanel/OffersLayout/OfferLabel")
+@onready var offer_one: Button = scene_controls.get_node("OffersPanel/OffersLayout/OfferOne")
+@onready var offer_two: Button = scene_controls.get_node("OffersPanel/OffersLayout/OfferTwo")
+@onready var offer_three: Button = scene_controls.get_node("OffersPanel/OffersLayout/OfferThree")
+@onready var skip_offer: Button = scene_controls.get_node("OffersPanel/OffersLayout/SkipOffer")
+@onready var inventory_slot_one: Button = scene_controls.get_node("InventoryHud/InventoryHudLayout/Slots/InventorySlotOne")
+@onready var inventory_slot_two: Button = scene_controls.get_node("InventoryHud/InventoryHudLayout/Slots/InventorySlotTwo")
+@onready var inventory_slot_three: Button = scene_controls.get_node("InventoryHud/InventoryHudLayout/Slots/InventorySlotThree")
+@onready var inventory_details: PanelContainer = scene_controls.get_node("InventoryDetails")
+@onready var inventory_panel: InventoryPanel = scene_controls.get_node("InventoryDetails/InventoryDetailsLayout/InventoryScroll/InventoryPanel")
+@onready var shop_container: PanelContainer = scene_controls.get_node("ShopContainer")
+@onready var shop_panel: ShopPanel = scene_controls.get_node("ShopContainer/ShopLayout/ShopPanel")
+@onready var lighting_button: SceneActionButton = scene_controls.get_node("LightingButton")
+@onready var prune_button: SceneActionButton = scene_controls.get_node("PruneButton")
+@onready var harvest_button: SceneActionButton = scene_controls.get_node("HarvestButton")
+@onready var sell_plant_button: SceneActionButton = scene_controls.get_node("SellPlantButton")
+@onready var recycle_plant_button: SceneActionButton = scene_controls.get_node("RecyclePlantButton")
+@onready var cancel_button: SceneActionButton = scene_controls.get_node("CancelButton")
+@onready var sunny_button: Button = scene_controls.get_node("LightingOptions/Options/SunnyButton")
+@onready var ventilation_button: Button = scene_controls.get_node("LightingOptions/Options/VentilationButton")
+@onready var blinds_button: Button = scene_controls.get_node("LightingOptions/Options/BlindsButton")
+@onready var curtains_button: Button = scene_controls.get_node("LightingOptions/Options/CurtainsButton")
 
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id := ""
@@ -58,6 +58,15 @@ func _ready() -> void:
 	ventilation_button.pressed.connect(_on_environment_preset.bind(&"ventilation"))
 	blinds_button.pressed.connect(_on_environment_preset.bind(&"blinds"))
 	curtains_button.pressed.connect(_on_environment_preset.bind(&"curtains"))
+	offer_one.pressed.connect(_on_offer_one_pressed)
+	offer_two.pressed.connect(_on_offer_two_pressed)
+	offer_three.pressed.connect(_on_offer_three_pressed)
+	skip_offer.pressed.connect(_on_skip_offer_pressed)
+	inventory_slot_one.pressed.connect(_on_inventory_hud_pressed)
+	inventory_slot_two.pressed.connect(_on_inventory_hud_pressed)
+	inventory_slot_three.pressed.connect(_on_inventory_hud_pressed)
+	scene_controls.get_node("InventoryDetails/InventoryDetailsLayout/InventoryHeader/CloseInventoryButton").pressed.connect(_on_close_inventory_pressed)
+	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
 
@@ -189,19 +198,16 @@ func _on_prune_pressed() -> void:
 		event_label.text = "There is nothing to prune."
 		return
 	_begin_branch_mode(PlantView.MODE_PRUNE, "Prune mode: click any existing branch.")
-
 func _on_harvest_pressed() -> void:
 	if not _has_ready_fruit(GameApp.active_plant()):
 		event_label.text = "No ripe fruit yet."
 		return
 	_begin_branch_mode(PlantView.MODE_HARVEST, "Harvest mode: click a branch with ripe fruit.")
-
 func _begin_branch_mode(mode: StringName, message: String) -> void:
 	_pending_item_id = ""
 	_pending_plant_kind = &""
 	_set_interaction_mode(mode)
 	event_label.text = message
-
 func _on_cancel_pressed() -> void:
 	_cancel_action()
 	event_label.text = "Action cancelled."
@@ -229,7 +235,6 @@ func _on_cutting_graft_requested(item_id: String) -> void:
 	event_label.text = "Graft mode: choose one glowing empty branch slot."
 func _on_cutting_plant_requested(item_id: String) -> void: _begin_plant_target(&"cutting", item_id)
 func _on_seed_plant_requested(item_id: String) -> void: _begin_plant_target(&"seed", item_id)
-
 func _begin_plant_target(kind: StringName, item_id: String) -> void:
 	_pending_item_id = item_id
 	_pending_plant_kind = kind
@@ -248,8 +253,7 @@ func _handle_pot_click(pot_id: String) -> void:
 	else: event_label.text = "Cannot plant there."
 	_cancel_action()
 
-func _on_inventory_hud_pressed() -> void:
-	scene_controls.set_inventory_details_visible(not inventory_details.visible)
+func _on_inventory_hud_pressed() -> void: scene_controls.set_inventory_details_visible(not inventory_details.visible)
 func _on_close_inventory_pressed() -> void: scene_controls.set_inventory_details_visible(false)
 func _on_inventory_fertilizer(fertilizer_id: StringName) -> void:
 	if GameApp.use_inventory_fertilizer(fertilizer_id).is_empty(): event_label.text = "Fertilizer used. No visible mutation yet."
