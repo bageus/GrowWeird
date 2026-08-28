@@ -127,7 +127,7 @@ func _refresh_offer() -> void:
 	var price := GameApp.current_offer_skip_price()
 	refresh_offer.text = "Refresh · $%d" % price if price > 0 else "Refresh"
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-	offer_label.text = "Fertilizers\n%.0fs" % GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else "Fertilizers"
+	
 
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
