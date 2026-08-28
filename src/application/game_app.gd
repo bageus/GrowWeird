@@ -6,7 +6,6 @@ signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
 
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
-const STARTER_SPECIES: StringName = &"starter_sprout"
 
 var state: GameState
 var registry := ContentRegistry.new()
@@ -334,30 +333,4 @@ func _has_living_plant() -> bool:
 	return false
 
 func _create_new_game() -> GameState:
-	var new_state := GameState.new()
-	new_state.money = rules.starting_money
-	var first_pot := PotState.new()
-	first_pot.pot_id = "pot-1"
-	first_pot.plant = PlantState.new()
-	first_pot.plant.instance_id = IdFactory.make("plant")
-	first_pot.plant.species_id = STARTER_SPECIES
-	first_pot.plant.initialize_native_branches()
-	var second_pot := PotState.new()
-	second_pot.pot_id = "pot-2"
-	new_state.pots = [first_pot, second_pot]
-	new_state.active_pot_id = first_pot.pot_id
-	_add_starter_inventory_item(new_state, first_pot.plant)
-	FertilizerOfferService.initialize_rng(new_state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
-	FertilizerOfferService.schedule_initial(new_state.fertilizer_offer, rules)
-	return new_state
-
-func _add_starter_inventory_item(new_state: GameState, plant: PlantState) -> void:
-	var branch := plant.branch_at(&"center")
-	if branch == null:
-		return
-	var cutting := CuttingState.new()
-	cutting.item_id = IdFactory.make("cutting")
-	cutting.source_plant_id = plant.instance_id
-	cutting.source_branch_id = branch.branch_id
-	cutting.genome = GeneticsService.snapshot_branch(branch)
-	InventoryService.add_cutting(new_state.inventory, cutting)
+	return NewGameFactory.create(rules)
