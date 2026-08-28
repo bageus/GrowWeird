@@ -23,6 +23,7 @@ func _init() -> void:
 func _test_presentation_resources_load() -> void:
 	var paths := [
 		"res://src/presentation/main/main.tscn",
+		"res://src/presentation/main/scene_controls.tscn",
 		"res://src/presentation/main/main_screen.gd",
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/main/scene_action_button.gd",
@@ -67,10 +68,12 @@ func _test_scene_hud_contract() -> void:
 	_expect(panel.normalized_position().distance_to(Vector2(0.6, 0.7)) < 0.001, "scene HUD: draggable panels must use normalized coordinates")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("fertilizers"), "scene HUD: fertilizer block must be movable on scene")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("inventory"), "scene HUD: inventory block must be movable on scene")
-	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
-	_expect(scene_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
-	_expect(scene_text.contains("InventorySlotOne") and scene_text.contains("InventorySlotThree"), "scene HUD: compact three-slot inventory missing")
-	_expect(not scene_text.contains("SoilView") and not scene_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must be removed")
+	var main_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
+	var hud_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
+	_expect(main_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
+	_expect(hud_text.contains("InventorySlotOne") and hud_text.contains("InventorySlotThree"), "scene HUD: compact three-slot inventory missing")
+	_expect(hud_text.contains("OffersPanel") and hud_text.contains("ShopButton"), "scene HUD: fertilizers and shop must live on the scene")
+	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must be removed")
 	host.free()
 
 func _test_window_asset_mapping() -> void:
