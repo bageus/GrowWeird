@@ -63,8 +63,8 @@ func _rebuild(inventory: InventoryState) -> void:
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
 	button.custom_minimum_size = Vector2(48.0, 48.0)
-	button.text = "●"
-	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.text = title + (" ×%d" % count if count > 1 else "")
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var count_suffix := ""
 	if count > 1:
 		count_suffix = " ×%d" % count
