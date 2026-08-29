@@ -59,7 +59,7 @@ func show_for(
 	_title = title
 	_unit_value = maxi(0, unit_value)
 	_recycle_yield = maxi(0, recycle_yield)
-	recycle_action.visible = kind != &"fertilizer" and _recycle_yield > 0
+	recycle_action.visible = true
 	actions.visible = true
 	sell_popup.visible = false
 	recycle_popup.visible = false
@@ -88,8 +88,6 @@ func _open_sell() -> void:
 	_place_left(sell_popup)
 
 func _open_recycle() -> void:
-	if _kind == &"fertilizer" or _recycle_yield <= 0:
-		return
 	actions.visible = false
 	sell_popup.visible = false
 	recycle_popup.visible = true

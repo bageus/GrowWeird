@@ -292,8 +292,11 @@ func _on_close_shop_pressed() -> void:
 func _set_cancel_visibility() -> void:
 	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 func _on_save_layout_pressed() -> void:
-	pot_visual.save_asset_layout()
-	event_label.text = "HUD and asset layout saved." if scene_controls.save_layout() else "Asset layout saved, but HUD layout could not be saved."
+	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
+
+func _on_save_assets_layout_pressed() -> void:
+	pot_visual.save_asset_layout(); tree_growth_preview.save_asset_layout()
+	event_label.text = "Pot, soil, stand and tree asset layout saved."
 func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
 	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
@@ -343,5 +346,4 @@ func _environment_name(pot: PotState) -> String:
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
 func _on_tree_stage_selected(stage: int) -> void:
-	tree_growth_preview.set_stage(stage)
-	event_label.text = "Tree growth test: stage %d." % (stage + 1)
+	tree_growth_preview.set_stage(stage); event_label.text = "Tree growth test: stage %d." % (stage + 1)
