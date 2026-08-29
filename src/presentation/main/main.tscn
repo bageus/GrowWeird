@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="6_window_art"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/pot_visual.tscn" id="8_pot_visual"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/tree_growth_preview.tscn" id="9_tree_preview"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -140,6 +141,14 @@ offset_top = 170.0
 offset_right = -120.0
 offset_bottom = -20.0
 
+[node name="TreeGrowthPreview" parent="Shell/Layout/ScenePanel/SceneRoot/World" instance=ExtResource("9_tree_preview")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+z_index = 1
+
 [node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
 layout_mode = 1
@@ -151,6 +160,41 @@ offset_top = 20.0
 offset_right = -30.0
 offset_bottom = -42.0
 script = ExtResource("3_plant")
+
+[node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/ScenePanel/SceneRoot"]
+z_index = 6
+offset_left = 12.0
+offset_top = 220.0
+offset_right = 108.0
+offset_bottom = 398.0
+
+[node name="Layout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+layout_mode = 2
+text = "Tree test"
+
+[node name="Stage1Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Growth 1"
+
+[node name="Stage2Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Growth 2"
+
+[node name="Stage3Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Growth 3"
+
+[node name="Stage4Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Growth 4"
 
 [node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
 unique_name_in_owner = true
