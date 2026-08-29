@@ -26,6 +26,7 @@ static func create(rules: GameRules) -> GameState:
 
 static func add_starter_inventory_item(state: GameState, plant: PlantState) -> void:
 	InventoryService.add_fertilizer(state.inventory, STARTER_FERTILIZER, 1)
+	state.inventory.misc["dead_mouse"] = 1
 	var branch := plant.branch_at(&"center")
 	if branch == null:
 		return

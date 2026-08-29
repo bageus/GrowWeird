@@ -10,36 +10,38 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
 script = ExtResource("1_script")
 
 [node name="Stand" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+layout_mode = 0
+position = Vector2(0, 0)
+size = Vector2(700, 700)
 texture = ExtResource("2_stand")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 0
 
 [node name="Ground" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 0.72
-offset_left = 40.0
-offset_top = 120.0
-offset_right = -40.0
-offset_bottom = -30.0
+layout_mode = 0
+position = Vector2(80, 150)
+size = Vector2(540, 360)
 texture = ExtResource("3_ground")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 0
 
 [node name="Pot" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+layout_mode = 0
+position = Vector2(0, 0)
+size = Vector2(700, 700)
 texture = ExtResource("4_pot")
 expand_mode = 1
 stretch_mode = 5
+mouse_filter = 0
+
+[node name="SaveLayoutButton" type="Button" parent="."]
+layout_mode = 0
+position = Vector2(12, 12)
+size = Vector2(160, 36)
+text = "Save asset layout"
+tooltip_text = "Hold Ctrl + drag an asset. Hold Ctrl + mouse wheel to scale it."
