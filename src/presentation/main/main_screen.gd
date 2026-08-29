@@ -268,7 +268,6 @@ func _on_cutting_graft_requested(item_id: String) -> void:
 func _on_inventory_sell_requested(kind: StringName, item_id: String, quantity: int) -> void:
 	var amount := GameApp.sell_inventory_items(kind, item_id, quantity)
 	event_label.text = "Sold for $%d." % amount if amount > 0 else "Could not sell item."
-
 func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity: int) -> void:
 	var total := 0
 	for _index in range(maxi(1, quantity)):
@@ -277,69 +276,53 @@ func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity
 			break
 		total += amount
 	event_label.text = "Ground into Compost Mix ×%d." % total if total > 0 else "Could not grind item."
-
 func _handle_pot_click(pot_id: String) -> void:
 	GameApp.switch_pot(pot_id)
-
 func _on_sell_plant_pressed() -> void:
 	var amount := GameApp.sell_active_plant()
 	event_label.text = "Plant sold for $%d." % amount if amount > 0 else "Could not sell plant."
 	_cancel_action()
-
 func _on_recycle_plant_pressed() -> void:
 	var amount := GameApp.recycle_active_dead_plant()
 	event_label.text = "Remains ground into Compost Mix ×%d." % amount if amount > 0 else "Only dead plants can be composted."
 	_cancel_action()
-
 func _on_shop_pressed() -> void:
 	scene_controls.set_shop_visible(not shop_container.visible)
 	_set_cancel_visibility()
 	shop_panel.invalidate()
 	_refresh()
-
 func _on_close_shop_pressed() -> void:
 	scene_controls.set_shop_visible(false)
 	_set_cancel_visibility()
-
 func _set_cancel_visibility() -> void:
 	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
-
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
-
 func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
 	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
-
 func _on_shop_fertilizer_requested(id: StringName) -> void:
 	var success := GameApp.buy_shop_fertilizer(id)
 	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Item is locked or unaffordable."
-
 func _on_shop_seed_requested(species_id: StringName) -> void:
 	var seed_id := GameApp.buy_shop_seed(species_id)
 	event_label.text = "%s seed added to inventory." % _pretty_id(String(species_id)) if not seed_id.is_empty() else "Seed is locked or unaffordable."
-
 func _on_shop_pot_requested() -> void:
 	var pot_id := GameApp.buy_new_pot()
 	event_label.text = "%s purchased." % pot_id if not pot_id.is_empty() else "Not enough money for a new pot."
 	pot_selector.invalidate()
-
 func _on_offer_one_pressed() -> void: _choose_offer(0)
 func _on_offer_two_pressed() -> void: _choose_offer(1)
 func _on_offer_three_pressed() -> void: _choose_offer(2)
-
 func _choose_offer(index: int) -> void:
 	var ids := GameApp.current_offer_ids()
 	if index >= ids.size():
 		return
 	GameApp.choose_fertilizer_offer(ids[index])
-
 func _on_refresh_offer_pressed() -> void:
 	event_label.text = "Fertilizers refreshed." if GameApp.refresh_fertilizer_offer() else "Cannot refresh fertilizers."
-
 func _on_skip_offer_pressed() -> void:
 	event_label.text = "Fertilizers skipped." if GameApp.skip_fertilizer_offer() else "Cannot skip fertilizers."
-
 func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	if events.is_empty():
 		return
@@ -347,10 +330,8 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	for event in events:
 		texts.append("%s changed: %s" % [event["branch_id"], _pretty_id(String(event["trait_id"]))])
 	event_label.text = " · ".join(texts)
-
 func _on_offer_ready(_ids: Array[StringName]) -> void:
 	event_label.text = "Three new fertilizers appeared."
-
 func _has_regrowth(plant: PlantState) -> bool:
 	if plant == null or not plant.alive:
 		return false
@@ -358,12 +339,10 @@ func _has_regrowth(plant: PlantState) -> bool:
 		if plant.branch_at(slot) == null and plant.regrowth_progress_at(slot) > 0.0:
 			return true
 	return false
-
 func _environment_name(pot: PotState) -> String:
 	if pot.window_open: return "Open window"
 	if pot.light_mode == PotState.LightMode.DARK: return "Curtains"
 	if pot.light_mode == PotState.LightMode.DIFFUSED: return "Blinds"
 	return "Normal light"
-
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
