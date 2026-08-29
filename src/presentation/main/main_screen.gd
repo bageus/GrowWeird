@@ -5,6 +5,7 @@ extends Control
 @onready var event_label: Label = %EventLabel
 @onready var window_view: WindowView = %WindowView
 @onready var plant_view: PlantView = %PlantView
+@onready var pot_visual: PotVisual = %PotVisual
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
@@ -79,6 +80,8 @@ func _refresh() -> void:
 	shop_panel.set_shop(GameApp.shop_catalog(), GameApp.species_shop_catalog(), GameApp.next_pot_price(), GameApp.state.money)
 	_refresh_offer()
 	_refresh_actions(pot, plant)
+	if pot != null:
+		pot_visual.set_pot_state(pot)
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:
