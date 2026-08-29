@@ -38,6 +38,7 @@ var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
 var _water_submenu_visible := false
 var _lighting_submenu_visible := false
+var _prune_cursor := load("res://assets/ui/prune_cursor.svg")
 
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -134,7 +135,8 @@ func _set_interaction_mode(mode: StringName) -> void:
 	plant_view.set_interaction_mode(mode)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
-	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty()
+	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
+	Input.set_custom_mouse_cursor(_prune_cursor if mode == PlantView.MODE_PRUNE else null)
 
 func _cancel_action() -> void:
 	_pending_item_id = ""
@@ -154,17 +156,20 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 func _on_water_pressed() -> void:
 	_water_submenu_visible = not _water_submenu_visible
 	_lighting_submenu_visible = false
+	_set_cancel_visibility()
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(false)
 
 func _on_spray_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
+	_set_cancel_visibility()
 	event_label.text = "Sprayed plant." if GameApp.water_active(true) else "Nothing to water."
 
 func _on_pour_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
+	_set_cancel_visibility()
 	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."
 
 func _on_light_pressed() -> void:
@@ -186,6 +191,7 @@ func _on_environment_preset(preset: StringName) -> void:
 	GameApp.set_light_mode(light_mode)
 	GameApp.set_window_open(window_open)
 	_lighting_submenu_visible = false
+	_set_cancel_visibility()
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset))
 
@@ -200,6 +206,12 @@ func _on_prune_pressed() -> void:
 
 func _on_cancel_pressed() -> void:
 	_cancel_action()
+	_water_submenu_visible = false
+	_lighting_submenu_visible = false
+	scene_controls.set_water_options_visible(false)
+	scene_controls.set_lighting_options_visible(false)
+	scene_controls.set_shop_visible(false)
+	_set_cancel_visibility()
 	event_label.text = "Action cancelled."
 
 func _on_branch_selected(slot: StringName) -> void:
@@ -274,11 +286,16 @@ func _on_recycle_plant_pressed() -> void:
 
 func _on_shop_pressed() -> void:
 	scene_controls.set_shop_visible(not shop_container.visible)
+	_set_cancel_visibility()
 	shop_panel.invalidate()
 	_refresh()
 
 func _on_close_shop_pressed() -> void:
 	scene_controls.set_shop_visible(false)
+	_set_cancel_visibility()
+
+func _set_cancel_visibility() -> void:
+	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
