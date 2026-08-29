@@ -4,7 +4,7 @@ extends Control
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
-const LAYOUT_VERSION := 4
+const LAYOUT_VERSION := 5
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -14,7 +14,6 @@ const DEFAULT_POSITIONS := {
 	"cancel": Vector2(0.42, 0.86),
 	"wallet": Vector2(0.72, 0.03),
 	"fertilizers": Vector2(0.16, 0.04),
-	"inventory": Vector2(0.77, 0.50),
 }
 
 var _controls: Dictionary = {}
@@ -69,9 +68,6 @@ func _collect_controls() -> void:
 			button.drag_moved.connect(_on_control_drag_moved)
 		elif child is SceneDraggablePanel:
 			_register_panel(child as SceneDraggablePanel)
-	var inventory := get_node_or_null("InventoryHud") as SceneDraggablePanel
-	if inventory != null and not _controls.has("inventory"):
-		_register_panel(inventory)
 
 func _register_panel(panel: SceneDraggablePanel) -> void:
 	if panel == null or panel.layout_id.is_empty():
@@ -125,9 +121,6 @@ func _reposition_open_popups() -> void:
 	var shop := get_node_or_null("ShopContainer") as Control
 	if shop != null and shop.visible:
 		_place_popup(shop, _controls.get("wallet") as Control)
-	var dialogs := get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs
-	if dialogs != null:
-		dialogs.refresh_position()
 
 func _place_popup(popup: Control, source: Control) -> void:
 	if popup == null or source == null:
