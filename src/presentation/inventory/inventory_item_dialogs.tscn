@@ -38,17 +38,17 @@ theme_override_styles/panel = SubResource("StyleBox_popup")
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="RecycleAction" type="Button" parent="ActionMenu/Actions"]
+[node name="UseAction" type="Button" parent="ActionMenu/Actions"]
 layout_mode = 2
-text = "Grind"
+text = "Use"
 
 [node name="SellAction" type="Button" parent="ActionMenu/Actions"]
 layout_mode = 2
 text = "Sell"
 
-[node name="UseAction" type="Button" parent="ActionMenu/Actions"]
+[node name="RecycleAction" type="Button" parent="ActionMenu/Actions"]
 layout_mode = 2
-text = "Use"
+text = "Grind"
 
 [node name="SellPopup" type="PanelContainer" parent="."]
 visible = false
