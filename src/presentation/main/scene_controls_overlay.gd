@@ -11,7 +11,7 @@ const DEFAULT_POSITIONS := {
 	"prune": Vector2(0.05, 0.47),
 	"sell_plant": Vector2(0.05, 0.64),
 	"recycle_plant": Vector2(0.05, 0.72),
-	"cancel": Vector2(0.42, 0.86),
+	"cancel": Vector2(0.45, 0.05),
 	"wallet": Vector2(0.72, 0.03),
 	"fertilizers": Vector2(0.16, 0.04),
 	"inventory": Vector2(0.77, 0.50),
