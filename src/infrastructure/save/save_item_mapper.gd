@@ -118,4 +118,6 @@ static func _fruit_from_dictionary(data: Dictionary) -> FruitState:
 	return item
 
 static func _dictionary_copy(source: Variant) -> Dictionary:
-	return source.duplicate(true) if source is Dictionary else {}
+	if source is Dictionary:
+		return source.duplicate(true)
+	return {}
