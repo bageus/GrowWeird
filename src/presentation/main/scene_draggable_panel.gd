@@ -38,6 +38,32 @@ func normalized_position() -> Vector2:
 		position.y / maxf(available.y, 1.0)
 	)
 
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			if not get_global_rect().has_point(event.position):
+				return
+			var hovered := get_viewport().gui_get_hovered_control()
+			if hovered != null and hovered is BaseButton:
+				return
+			_tracking = true
+			_dragging = false
+			_press_local = get_local_mouse_position()
+			_press_global = get_global_mouse_position()
+			mouse_default_cursor_shape = Control.CURSOR_MOVE
+			get_viewport().set_input_as_handled()
+		else:
+			if not _tracking:
+				return
+			if _dragging:
+				position_committed.emit(layout_id, normalized_position())
+			_tracking = false
+			_dragging = false
+			mouse_default_cursor_shape = Control.CURSOR_ARROW
+			get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion and _tracking:
+		_handle_mouse_motion()
+
 func _get_drag_region_height() -> float:
 	if drag_handle_height <= 0.0:
 		return size.y
