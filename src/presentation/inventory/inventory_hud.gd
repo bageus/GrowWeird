@@ -58,7 +58,10 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	button.custom_minimum_size = Vector2(48.0, 48.0)
 	button.text = "●"
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.tooltip_text = "%s%s · click for actions" % [title, " ×%d" % count if count > 1 else ""]
+	var count_suffix := ""
+	if count > 1:
+		count_suffix = " ×%d" % count
+	button.tooltip_text = "%s%s · click for actions" % [title, count_suffix]
 	button.pressed.connect(_emit_selected.bind(kind, item_id, count, title))
 	items.add_child(button)
 

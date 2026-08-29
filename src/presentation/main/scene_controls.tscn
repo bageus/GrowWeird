@@ -170,54 +170,54 @@ z_index = 7
 [node name="WaterOptions" type="PanelContainer" parent="."]
 visible = false
 z_index = 10
-custom_minimum_size = Vector2(212, 50)
-offset_right = 212.0
-offset_bottom = 50.0
+custom_minimum_size = Vector2(112, 84)
+offset_right = 112.0
+offset_bottom = 84.0
 theme_override_styles/panel = SubResource("StyleBox_popup")
 
-[node name="Options" type="HBoxContainer" parent="WaterOptions"]
+[node name="Options" type="VBoxContainer" parent="WaterOptions"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="SprayButton" type="Button" parent="WaterOptions/Options"]
-custom_minimum_size = Vector2(94, 34)
+custom_minimum_size = Vector2(96, 34)
 layout_mode = 2
 text = "Spray"
 
 [node name="PourButton" type="Button" parent="WaterOptions/Options"]
-custom_minimum_size = Vector2(94, 34)
+custom_minimum_size = Vector2(96, 34)
 layout_mode = 2
 text = "Pour"
 
 [node name="LightingOptions" type="PanelContainer" parent="."]
 visible = false
 z_index = 10
-custom_minimum_size = Vector2(474, 50)
-offset_right = 474.0
-offset_bottom = 50.0
+custom_minimum_size = Vector2(140, 164)
+offset_right = 140.0
+offset_bottom = 164.0
 theme_override_styles/panel = SubResource("StyleBox_popup")
 
-[node name="Options" type="HBoxContainer" parent="LightingOptions"]
+[node name="Options" type="VBoxContainer" parent="LightingOptions"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="CurtainsButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(106, 34)
+custom_minimum_size = Vector2(124, 34)
 layout_mode = 2
 text = "Curtains"
 
 [node name="OpenWindowButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(112, 34)
+custom_minimum_size = Vector2(124, 34)
 layout_mode = 2
 text = "Open window"
 
 [node name="BlindsButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(96, 34)
+custom_minimum_size = Vector2(124, 34)
 layout_mode = 2
 text = "Blinds"
 
 [node name="NormalLightButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(120, 34)
+custom_minimum_size = Vector2(124, 34)
 layout_mode = 2
 text = "Normal light"
 
