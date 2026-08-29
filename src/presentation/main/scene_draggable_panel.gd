@@ -41,10 +41,9 @@ func normalized_position() -> Vector2:
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
-			if not get_global_rect().has_point(event.position):
+			if not Input.is_key_pressed(KEY_CTRL):
 				return
-			var hovered := get_viewport().gui_get_hovered_control()
-			if hovered != null and hovered is BaseButton:
+			if not get_global_rect().has_point(event.position):
 				return
 			_tracking = true
 			_dragging = false

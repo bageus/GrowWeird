@@ -4,7 +4,7 @@ extends Control
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
-const LAYOUT_VERSION := 4
+const LAYOUT_VERSION := 5
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -53,7 +53,11 @@ func set_shop_visible(enabled: bool) -> void:
 
 func save_layout() -> bool:
 	_capture_layout()
-	return _save_layout()
+	var saved := _save_layout()
+	if saved:
+		_layout = _load_layout()
+		_apply_layout()
+	return saved
 
 func reset_layout() -> void:
 	_layout = DEFAULT_POSITIONS.duplicate(true)
@@ -113,7 +117,9 @@ func _apply_layout() -> void:
 
 func _capture_layout() -> void:
 	for key in _controls:
-		_layout[key] = _controls[key].normalized_position()
+		var control := _controls[key] as Control
+		if control is SceneDraggablePanel:
+			_layout[key] = (control as SceneDraggablePanel).normalized_position()
 
 func _reposition_open_popups() -> void:
 	var water := get_node_or_null("WaterOptions") as Control
