@@ -38,7 +38,7 @@ var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
 var _water_submenu_visible := false
 var _lighting_submenu_visible := false
-var _prune_cursor := load("res://assets/ui/prune_cursor.svg")
+var _prune_cursor: Texture2D = null
 
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -136,7 +136,13 @@ func _set_interaction_mode(mode: StringName) -> void:
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
-	Input.set_custom_mouse_cursor(_prune_cursor if mode == PlantView.MODE_PRUNE else null)
+	if mode == PlantView.MODE_PRUNE:
+		if _prune_cursor == null:
+			_prune_cursor = load("res://assets/ui/prune_cursor.svg") as Texture2D
+		if _prune_cursor != null:
+			Input.set_custom_mouse_cursor(_prune_cursor)
+	else:
+		Input.set_custom_mouse_cursor(null)
 
 func _cancel_action() -> void:
 	_pending_item_id = ""
@@ -175,6 +181,7 @@ func _on_pour_pressed() -> void:
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
 	_water_submenu_visible = false
+	_set_cancel_visibility()
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	scene_controls.set_water_options_visible(false)
 
