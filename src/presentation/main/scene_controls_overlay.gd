@@ -13,7 +13,7 @@ const DEFAULT_POSITIONS := {
 	"cancel": Vector2(0.42, 0.86),
 	"wallet": Vector2(0.72, 0.03),
 	"fertilizers": Vector2(0.16, 0.04),
-	"inventory": Vector2(0.76, 0.34),
+	"inventory": Vector2(0.80, 0.50),
 }
 
 var _controls: Dictionary = {}
