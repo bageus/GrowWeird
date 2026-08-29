@@ -16,8 +16,6 @@ extends Control
 @onready var offer_three: Button = scene_controls.get_node("OffersPanel/Row/OfferThree")
 @onready var refresh_offer: Button = scene_controls.get_node("OffersPanel/Row/RefreshOffer")
 @onready var skip_offer: Button = scene_controls.get_node("OffersPanel/Row/SkipOffer")
-@onready var inventory_hud: InventoryHud = scene_controls.get_node("InventoryHud")
-@onready var inventory_dialogs: InventoryItemDialogs = scene_controls.get_node("InventoryItemDialogs")
 @onready var shop_container: PanelContainer = scene_controls.get_node("ShopContainer")
 @onready var shop_panel: ShopPanel = scene_controls.get_node("ShopContainer/ShopLayout/ShopPanel")
 
@@ -46,10 +44,6 @@ func _ready() -> void:
 	plant_view.branch_selected.connect(_on_branch_selected)
 	pot_selector.pot_selected.connect(_handle_pot_click)
 	scene_controls.action_requested.connect(_on_scene_action_requested)
-	inventory_hud.item_selected.connect(_on_inventory_item_selected)
-	inventory_dialogs.use_requested.connect(_on_inventory_use_requested)
-	inventory_dialogs.sell_requested.connect(_on_inventory_sell_requested)
-	inventory_dialogs.recycle_requested.connect(_on_inventory_recycle_requested)
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
@@ -73,7 +67,6 @@ func _refresh() -> void:
 	var plant := GameApp.active_plant()
 	money_label.text = "$%d" % GameApp.state.money
 	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
-	inventory_hud.set_inventory(GameApp.state.inventory)
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
 	shop_panel.set_shop(GameApp.shop_catalog(), GameApp.species_shop_catalog(), GameApp.next_pot_price(), GameApp.state.money)
 	_refresh_offer()
@@ -210,54 +203,6 @@ func _on_branch_selected(slot: StringName) -> void:
 		var success := GameApp.graft_cutting(_pending_item_id, slot)
 		event_label.text = "Cutting used on plant." if success else "Graft failed."
 	_cancel_action()
-
-func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
-	var price := GameApp.inventory_item_sale_value(kind, item_id)
-	var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
-	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield)
-
-func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
-	match kind:
-		&"fertilizer":
-			if GameApp.active_plant() == null or not GameApp.active_plant().alive:
-				event_label.text = "Select a living plant first."
-				return
-			GameApp.use_inventory_fertilizer(StringName(item_id))
-			event_label.text = "Fertilizer used on current plant."
-		&"cutting":
-			_on_cutting_graft_requested(item_id)
-		&"seed":
-			var pot := GameApp.active_pot()
-			if pot == null or not pot.is_empty():
-				event_label.text = "The current pot must be empty to use this seed."
-				return
-			event_label.text = "Seed planted." if GameApp.plant_seed(item_id, pot.pot_id) else "Could not use seed."
-		&"fruit":
-			var seed_id := GameApp.create_seed_from_fruit(item_id)
-			event_label.text = "Fruit converted into a seed." if not seed_id.is_empty() else "Could not use fruit."
-
-func _on_cutting_graft_requested(item_id: String) -> void:
-	var plant := GameApp.active_plant()
-	if plant == null or not plant.alive:
-		event_label.text = "Select a living plant first."
-		return
-	_pending_item_id = item_id
-	_pending_plant_kind = &""
-	_set_interaction_mode(PlantView.MODE_GRAFT)
-	event_label.text = "Use cutting: choose an empty branch slot."
-
-func _on_inventory_sell_requested(kind: StringName, item_id: String, quantity: int) -> void:
-	var amount := GameApp.sell_inventory_items(kind, item_id, quantity)
-	event_label.text = "Sold for $%d." % amount if amount > 0 else "Could not sell item."
-
-func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity: int) -> void:
-	var total := 0
-	for _index in range(maxi(1, quantity)):
-		var amount := GameApp.recycle_inventory_item(kind, item_id)
-		if amount <= 0:
-			break
-		total += amount
-	event_label.text = "Ground into Compost Mix ×%d." % total if total > 0 else "Could not grind item."
 
 func _handle_pot_click(pot_id: String) -> void:
 	GameApp.switch_pot(pot_id)
