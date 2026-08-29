@@ -9,12 +9,14 @@ static func create(rules: GameRules) -> GameState:
 	state.money = rules.starting_money
 	var first_pot := PotState.new()
 	first_pot.pot_id = "pot-1"
+	first_pot.soil_moisture = 0.30
 	first_pot.plant = PlantState.new()
 	first_pot.plant.instance_id = IdFactory.make("plant")
 	first_pot.plant.species_id = STARTER_SPECIES
 	first_pot.plant.initialize_native_branches()
 	var second_pot := PotState.new()
 	second_pot.pot_id = "pot-2"
+	second_pot.soil_moisture = 0.30
 	state.pots = [first_pot, second_pot]
 	state.active_pot_id = first_pot.pot_id
 	add_starter_inventory_item(state, first_pot.plant)
