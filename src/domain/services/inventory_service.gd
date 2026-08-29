@@ -44,9 +44,9 @@ static func take_cutting(inventory: InventoryState, item_id: String) -> CuttingS
 	var index := _find_item_index(inventory.cuttings, item_id)
 	return inventory.cuttings.pop_at(index) if index >= 0 else null
 
-static func add_seed(inventory: InventoryState, seed: SeedState) -> void:
-	if inventory != null and seed != null:
-		inventory.seeds.append(seed)
+static func add_seed(inventory: InventoryState, seed_state: SeedState) -> void:
+	if inventory != null and seed_state != null:
+		inventory.seeds.append(seed_state)
 
 static func find_seed(inventory: InventoryState, item_id: String) -> SeedState:
 	if inventory == null:
