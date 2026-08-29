@@ -3,7 +3,7 @@ extends SceneDraggablePanel
 
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
 
-@onready var items: VBoxContainer = $Layout/Items
+@onready var items: VBoxContainer = $Layout/Scroll/Items
 
 var _signature := ""
 
