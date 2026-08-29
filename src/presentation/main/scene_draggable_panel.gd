@@ -75,9 +75,14 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and _tracking:
 		_handle_mouse_motion()
 
+func _get_drag_region_height() -> float:
+	if drag_handle_height <= 0.0:
+		return size.y
+	return minf(drag_handle_height, size.y)
+
 func _handle_mouse_button(event: InputEventMouseButton) -> void:
 	if event.pressed:
-		if event.position.y > drag_handle_height:
+		if event.position.y > _get_drag_region_height():
 			return
 		_tracking = true
 		_dragging = false
