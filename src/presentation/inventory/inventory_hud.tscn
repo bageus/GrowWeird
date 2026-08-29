@@ -29,6 +29,7 @@ drag_handle_height = 0.0
 
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 5
 
 [node name="Title" type="Label" parent="Layout"]
@@ -40,10 +41,12 @@ text = "Inventory"
 [node name="Scroll" type="ScrollContainer" parent="Layout"]
 custom_minimum_size = Vector2(160, 148)
 layout_mode = 2
+mouse_filter = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
 [node name="Items" type="VBoxContainer" parent="Layout/Scroll"]
 layout_mode = 2
+mouse_filter = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
