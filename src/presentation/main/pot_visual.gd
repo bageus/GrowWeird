@@ -50,8 +50,8 @@ func _load_asset_layout() -> void:
 	if config.load(LAYOUT_PATH) != OK:
 		return
 	for node in _assets():
-		var saved_position := config.get_value("assets", node.name + "_position", node.position)
-		var saved_scale := config.get_value("assets", node.name + "_scale", node.scale)
+		var saved_position: Variant = config.get_value("assets", node.name + "_position", node.position)
+		var saved_scale: Variant = config.get_value("assets", node.name + "_scale", node.scale)
 		if saved_position is Vector2:
 			node.position = saved_position
 		if saved_scale is Vector2:
