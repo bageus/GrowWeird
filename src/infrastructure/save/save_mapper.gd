@@ -36,7 +36,7 @@ static func _pot_to_dictionary(pot: PotState) -> Dictionary:
 		"soil_moisture": pot.soil_moisture,
 		"light_mode": pot.light_mode,
 		"window_open": pot.window_open,
-		"plant": null if pot.plant == null else _plant_to_dictionary(pot.plant),
+		"plant": _plant_to_dictionary(pot.plant) if pot.plant != null else {},
 	}
 
 static func _pot_from_dictionary(data: Dictionary) -> PotState:
