@@ -88,7 +88,7 @@ func _open_sell() -> void:
 	_place_left(sell_popup)
 
 func _open_recycle() -> void:
-		actions.visible = false
+	actions.visible = false
 	sell_popup.visible = false
 	recycle_popup.visible = true
 	recycle_title.text = "Grind · %s" % _title
