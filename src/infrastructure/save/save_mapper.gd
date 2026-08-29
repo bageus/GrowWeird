@@ -86,8 +86,13 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.rng_state = int(data.get("rng_state", 0))
 	var branch_data: Variant = data.get("branches", {})
 	for slot in BranchState.VALID_SLOTS:
-		var value: Variant = branch_data.get(String(slot)) if branch_data is Dictionary else null
-		plant.branches[String(slot)] = _branch_from_dictionary(value) if value is Dictionary else null
+		var value: Variant = null
+		if branch_data is Dictionary:
+			value = branch_data.get(String(slot))
+		if value is Dictionary:
+			plant.branches[String(slot)] = _branch_from_dictionary(value)
+		else:
+			plant.branches[String(slot)] = null
 		if plant.branch_at(slot) != null:
 			plant.clear_regrowth_progress(slot)
 		else:
