@@ -31,12 +31,15 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	return state
 
 static func _pot_to_dictionary(pot: PotState) -> Dictionary:
+	var plant_data: Variant = null
+	if pot.plant != null:
+		plant_data = _plant_to_dictionary(pot.plant)
 	return {
 		"pot_id": pot.pot_id,
 		"soil_moisture": pot.soil_moisture,
 		"light_mode": pot.light_mode,
 		"window_open": pot.window_open,
-		"plant": _plant_to_dictionary(pot.plant) if pot.plant != null else {},
+		"plant": plant_data,
 	}
 
 static func _pot_from_dictionary(data: Dictionary) -> PotState:
