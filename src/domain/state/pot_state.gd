@@ -11,7 +11,7 @@ enum LightMode {
 const LIGHT_VALUES: Array[float] = [0.05, 0.4, 0.75, 1.0]
 
 var pot_id: String = ""
-var soil_moisture: float = 0.5
+var soil_moisture: float = 0.30
 var light_mode: int = LightMode.DIFFUSED
 var window_open: bool = false
 var plant: PlantState
