@@ -165,6 +165,8 @@ layout_mode = 2
 text = "Skip"
 
 [node name="InventoryHud" parent="." instance=ExtResource("5_inventory")]
+visible = false
+mouse_filter = 2
 z_index = 7
 
 [node name="WaterOptions" type="PanelContainer" parent="."]
@@ -253,3 +255,5 @@ theme_override_constants/separation = 6
 script = ExtResource("4_shop")
 
 [node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
+visible = false
+mouse_filter = 2
