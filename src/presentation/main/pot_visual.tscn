@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/main/pot_visual.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/pot/window_potground_01.png" id="2_stand"]
+[ext_resource type="Texture2D" path="res://assets/pot/pot_ground/ground_01.png" id="3_ground"]
+[ext_resource type="Texture2D" path="res://assets/pot/pot_01.png" id="4_pot"]
+
+[node name="PotVisual" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Stand" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_stand")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 0.72
+offset_left = 40.0
+offset_top = 120.0
+offset_right = -40.0
+offset_bottom = -30.0
+texture = ExtResource("3_ground")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Pot" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("4_pot")
+expand_mode = 1
+stretch_mode = 5

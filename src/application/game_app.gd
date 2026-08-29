@@ -124,7 +124,11 @@ func skip_fertilizer_offer() -> bool:
 func refresh_fertilizer_offer() -> bool:
 	if state == null or not _has_living_plant():
 		return false
+	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
+	if price <= 0 or not EconomyService.spend(state, price):
+		return false
 	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_fertilizers(), rules):
+		EconomyService.credit(state, price)
 		return false
 	state_changed.emit()
 	return true

@@ -50,5 +50,6 @@ static func buy_pot(state: GameState, rules: GameRules) -> String:
 		return ""
 	var pot := PotState.new()
 	pot.pot_id = "pot-%d" % (state.pots.size() + 1)
+	pot.soil_moisture = 0.30
 	state.pots.append(pot)
 	return pot.pot_id
