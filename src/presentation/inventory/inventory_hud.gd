@@ -50,6 +50,13 @@ func _rebuild(inventory: InventoryState) -> void:
 			continue
 		_add_item(&"fruit", fruit.item_id, 1, _genetic_title("Fruit", fruit.genome))
 		added += 1
+	var misc_ids := inventory.misc.keys()
+	misc_ids.sort()
+	for raw_id in misc_ids:
+		var count := int(inventory.misc[raw_id])
+		if count > 0:
+			_add_item(&"misc", String(raw_id), count, _pretty_id(String(raw_id)))
+			added += 1
 	if added == 0:
 		_add_empty()
 
@@ -82,7 +89,7 @@ func _genetic_title(prefix: String, genome: GenomeSnapshot) -> String:
 func _inventory_signature(inventory: InventoryState) -> String:
 	if inventory == null:
 		return "null"
-	var parts: Array[String] = [str(inventory.fertilizers)]
+	var parts: Array[String] = [str(inventory.fertilizers), str(inventory.misc)]
 	for cutting in inventory.cuttings:
 		parts.append("c:%s" % cutting.item_id)
 	for seed_state in inventory.seeds:
