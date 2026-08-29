@@ -18,6 +18,7 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_NONE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	pressed.connect(_on_native_pressed)
 
 func apply_normalized_position(value: Vector2) -> void:
 	var parent_control := get_parent() as Control
@@ -39,13 +40,21 @@ func normalized_position() -> Vector2:
 		position.y / maxf(available.y, 1.0)
 	)
 
+func _on_native_pressed() -> void:
+	if not _tracking and not disabled:
+		activated.emit(action_id)
+
 func _gui_input(event: InputEvent) -> void:
+	if not Input.is_key_pressed(KEY_CTRL):
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_mouse_button(event)
 	elif event is InputEventMouseMotion and _tracking:
 		_handle_mouse_motion()
 
 func _handle_mouse_button(event: InputEventMouseButton) -> void:
+	if not Input.is_key_pressed(KEY_CTRL):
+		return
 	if event.pressed:
 		_tracking = true
 		_dragging = false
