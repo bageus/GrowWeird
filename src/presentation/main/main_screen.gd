@@ -1,5 +1,4 @@
 extends Control
-
 @onready var plant_name_label: Label = %PlantNameLabel
 @onready var status_label: Label = %StatusLabel
 @onready var event_label: Label = %EventLabel
@@ -9,7 +8,6 @@ extends Control
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
-
 @onready var money_label: Label = scene_controls.get_node("WalletHud/WalletLayout/MoneyLabel")
 @onready var shop_button: Button = scene_controls.get_node("WalletHud/WalletLayout/ShopButton")
 @onready var offer_one: Button = scene_controls.get_node("OffersPanel/Row/OfferOne")
@@ -21,7 +19,6 @@ extends Control
 @onready var inventory_dialogs: InventoryItemDialogs = scene_controls.get_node("InventoryItemDialogs")
 @onready var shop_container: PanelContainer = scene_controls.get_node("ShopContainer")
 @onready var shop_panel: ShopPanel = scene_controls.get_node("ShopContainer/ShopLayout/ShopPanel")
-
 @onready var lighting_button: SceneActionButton = scene_controls.get_node("LightingButton")
 @onready var prune_button: SceneActionButton = scene_controls.get_node("PruneButton")
 @onready var sell_plant_button: SceneActionButton = scene_controls.get_node("SellPlantButton")
@@ -33,14 +30,12 @@ extends Control
 @onready var open_window_button: Button = scene_controls.get_node("LightingOptions/Options/OpenWindowButton")
 @onready var blinds_button: Button = scene_controls.get_node("LightingOptions/Options/BlindsButton")
 @onready var normal_light_button: Button = scene_controls.get_node("LightingOptions/Options/NormalLightButton")
-
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
 var _water_submenu_visible := false
 var _lighting_submenu_visible := false
 var _prune_cursor: Texture2D = null
-
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
 	GameApp.mutations_resolved.connect(_on_mutations_resolved)
@@ -70,7 +65,6 @@ func _ready() -> void:
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
-
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
@@ -104,7 +98,6 @@ func _refresh() -> void:
 	status_label.text = "%s · %s" % [_pretty_id(String(lifecycle.get("growth_stage", &"sprout"))), _pretty_id(String(lifecycle.get("condition", &"healthy")))]
 	if _has_regrowth(plant): status_label.text += " · New branch forming"
 	if not plant.alive: status_label.text += " · Final state"
-
 func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	lighting_button.disabled = pot == null
@@ -116,7 +109,6 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	recycle_plant_button.visible = plant != null and not plant.alive
 	recycle_plant_button.disabled = compost_yield <= 0
 	recycle_plant_button.text = "Compost · ×%d" % compost_yield
-
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
 	var plant := GameApp.active_plant()
@@ -125,7 +117,7 @@ func _refresh_offer() -> void:
 		var button := buttons[index]
 		if index < ids.size():
 			button.text = _pretty_id(String(ids[index]))
-			button.icon = _fertilizer_texture(ids[index])
+			button.icon = FertilizerOfferArt.texture_for(ids[index])
 			button.expand_icon = true
 			button.disabled = plant == null or not plant.alive
 		else:
@@ -137,7 +129,6 @@ func _refresh_offer() -> void:
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-	
 
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
@@ -152,13 +143,11 @@ func _set_interaction_mode(mode: StringName) -> void:
 			Input.set_custom_mouse_cursor(_prune_cursor)
 	else:
 		Input.set_custom_mouse_cursor(null)
-
 func _cancel_action() -> void:
 	_pending_item_id = ""
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_NONE)
 	pot_selector.invalidate()
-
 func _on_scene_action_requested(action_id: StringName) -> void:
 	match action_id:
 		&"water": _on_water_pressed()
@@ -167,33 +156,28 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 		&"sell_plant": _on_sell_plant_pressed()
 		&"recycle_plant": _on_recycle_plant_pressed()
 		&"cancel": _on_cancel_pressed()
-
 func _on_water_pressed() -> void:
 	_water_submenu_visible = not _water_submenu_visible
 	_lighting_submenu_visible = false
 	_set_cancel_visibility()
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(false)
-
 func _on_spray_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Sprayed plant." if GameApp.water_active(true) else "Nothing to water."
-
 func _on_pour_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."
-
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
 	_water_submenu_visible = false
 	_set_cancel_visibility()
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	scene_controls.set_water_options_visible(false)
-
 func _on_environment_preset(preset: StringName) -> void:
 	if GameApp.active_pot() == null:
 		return
@@ -210,7 +194,6 @@ func _on_environment_preset(preset: StringName) -> void:
 	_set_cancel_visibility()
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset))
-
 func _on_prune_pressed() -> void:
 	if GameApp.active_plant() == null:
 		event_label.text = "There is nothing to prune."
@@ -219,7 +202,6 @@ func _on_prune_pressed() -> void:
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_PRUNE)
 	event_label.text = "Prune mode: click an existing branch."
-
 func _on_cancel_pressed() -> void:
 	_cancel_action()
 	_water_submenu_visible = false
@@ -229,7 +211,6 @@ func _on_cancel_pressed() -> void:
 	scene_controls.set_shop_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Action cancelled."
-
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
@@ -238,12 +219,10 @@ func _on_branch_selected(slot: StringName) -> void:
 		var success := GameApp.graft_cutting(_pending_item_id, slot)
 		event_label.text = "Cutting used on plant." if success else "Graft failed."
 	_cancel_action()
-
 func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var price := GameApp.inventory_item_sale_value(kind, item_id)
 	var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
 	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield)
-
 func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 	match kind:
 		&"fertilizer":
@@ -263,7 +242,6 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 		&"fruit":
 			var seed_id := GameApp.create_seed_from_fruit(item_id)
 			event_label.text = "Fruit converted into a seed." if not seed_id.is_empty() else "Could not use fruit."
-
 func _on_cutting_graft_requested(item_id: String) -> void:
 	var plant := GameApp.active_plant()
 	if plant == null or not plant.alive:
@@ -273,7 +251,6 @@ func _on_cutting_graft_requested(item_id: String) -> void:
 	_pending_plant_kind = &""
 	_set_interaction_mode(PlantView.MODE_GRAFT)
 	event_label.text = "Use cutting: choose an empty branch slot."
-
 func _on_inventory_sell_requested(kind: StringName, item_id: String, quantity: int) -> void:
 	var amount := GameApp.sell_inventory_items(kind, item_id, quantity)
 	event_label.text = "Sold for $%d." % amount if amount > 0 else "Could not sell item."
