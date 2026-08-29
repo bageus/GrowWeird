@@ -4,7 +4,9 @@ extends RefCounted
 signal initialized(success: bool)
 signal cloud_load_completed(payload: String)
 signal cloud_save_completed(success: bool)
+@warning_ignore("unused_signal")
 signal pause_requested
+@warning_ignore("unused_signal")
 signal resume_requested
 signal ad_closed(was_shown: bool)
 

@@ -31,10 +31,10 @@ static func plant_cutting(
 	pot.plant = plant
 	return true
 
-static func plant_seed(seed: SeedState, pot: PotState, plant_id: String) -> bool:
-	if seed == null or seed.genome == null or pot == null or not pot.is_empty():
+static func plant_seed(seed_state: SeedState, pot: PotState, plant_id: String) -> bool:
+	if seed_state == null or seed_state.genome == null or pot == null or not pot.is_empty():
 		return false
-	var plant := GeneticsService.plant_from_genome(seed.genome, plant_id)
+	var plant := GeneticsService.plant_from_genome(seed_state.genome, plant_id)
 	if plant == null:
 		return false
 	pot.plant = plant
@@ -72,8 +72,8 @@ static func create_fruit(
 static func seed_from_fruit(fruit: FruitState, item_id: String) -> SeedState:
 	if fruit == null or fruit.genome == null:
 		return null
-	var seed := SeedState.new()
-	seed.item_id = item_id
-	seed.source_plant_id = fruit.source_plant_id
-	seed.genome = fruit.genome.duplicate_snapshot()
-	return seed
+	var seed_state := SeedState.new()
+	seed_state.item_id = item_id
+	seed_state.source_plant_id = fruit.source_plant_id
+	seed_state.genome = fruit.genome.duplicate_snapshot()
+	return seed_state
