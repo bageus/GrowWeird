@@ -21,7 +21,6 @@ const GROUND_TEXTURES := {
 @onready var stand: TextureRect = $Stand
 @onready var ground: TextureRect = $Ground
 @onready var pot: TextureRect = $Pot
-@onready var save_layout_button: Button = $SaveLayoutButton
 
 var _drag_target: Control
 var _drag_offset := Vector2.ZERO
@@ -29,7 +28,6 @@ var _drag_offset := Vector2.ZERO
 func _ready() -> void:
 	for node in _assets():
 		node.gui_input.connect(_on_asset_gui_input.bind(node))
-	save_layout_button.pressed.connect(save_asset_layout)
 	_load_asset_layout()
 
 func set_pot_state(state: PotState) -> void:
