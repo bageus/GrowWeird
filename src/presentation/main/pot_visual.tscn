@@ -39,9 +39,3 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 0
 
-[node name="SaveLayoutButton" type="Button" parent="."]
-layout_mode = 0
-position = Vector2(12, 12)
-size = Vector2(160, 36)
-text = "Save asset layout"
-tooltip_text = "Hold Ctrl + drag an asset. Hold Ctrl + mouse wheel to scale it."
