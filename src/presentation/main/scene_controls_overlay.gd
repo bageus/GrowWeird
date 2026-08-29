@@ -4,6 +4,7 @@ extends Control
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
+const LAYOUT_VERSION := 2
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -149,6 +150,8 @@ func _load_layout() -> Dictionary:
 	var parsed = JSON.parse_string(file.get_as_text())
 	if not (parsed is Dictionary):
 		return result
+	if int(parsed.get("layout_version", 0)) < LAYOUT_VERSION:
+		return result
 	for key in DEFAULT_POSITIONS:
 		var value = parsed.get(key)
 		if value is Array and value.size() >= 2:
@@ -156,7 +159,7 @@ func _load_layout() -> Dictionary:
 	return result
 
 func _save_layout() -> bool:
-	var payload := {}
+	var payload := {"layout_version": LAYOUT_VERSION}
 	for key in DEFAULT_POSITIONS:
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS[key])
 		payload[key] = [point.x, point.y]
