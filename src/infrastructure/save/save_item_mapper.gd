@@ -16,6 +16,7 @@ static func inventory_to_dictionary(inventory: InventoryState) -> Dictionary:
 		"cuttings": cuttings,
 		"seeds": seeds,
 		"fruits": fruits,
+		"misc": inventory.misc.duplicate(true),
 	}
 
 static func inventory_from_dictionary(source: Variant) -> InventoryState:
@@ -38,6 +39,12 @@ static func inventory_from_dictionary(source: Variant) -> InventoryState:
 	for value in data.get("fruits", []):
 		if value is Dictionary:
 			inventory.fruits.append(_fruit_from_dictionary(value))
+	var misc: Variant = data.get("misc", {})
+	if misc is Dictionary:
+		for key in misc:
+			var count := maxi(0, int(misc[key]))
+			if count > 0:
+				inventory.misc[String(key)] = count
 	return inventory
 
 static func genome_to_dictionary(genome: GenomeSnapshot) -> Dictionary:
