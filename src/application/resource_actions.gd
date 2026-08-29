@@ -24,11 +24,11 @@ static func item_value(
 				cutting, registry.get_plant(cutting.genome.species_id), rules
 			)
 		SEED:
-			var seed := InventoryService.find_seed(state.inventory, item_id)
-			if seed == null or seed.genome == null:
+			var seed_state := InventoryService.find_seed(state.inventory, item_id)
+			if seed_state == null or seed_state.genome == null:
 				return 0
 			return GeneticItemValuationService.seed_value(
-				seed, registry.get_plant(seed.genome.species_id), rules
+				seed_state, registry.get_plant(seed_state.genome.species_id), rules
 			)
 		FRUIT:
 			var fruit := InventoryService.find_fruit(state.inventory, item_id)

@@ -2,14 +2,14 @@ class_name GeneticItemValuationService
 extends RefCounted
 
 static func seed_value(
-	seed: SeedState,
+	seed_state: SeedState,
 	species: PlantSpeciesDefinition,
 	rules: GameRules
 ) -> int:
-	if seed == null or seed.genome == null or species == null:
+	if seed_state == null or seed_state.genome == null or species == null:
 		return 0
 	var base := int(round(float(species.shop_seed_price) * rules.seed_sale_multiplier))
-	return maxi(1, base + _genome_bonus(seed.genome, rules))
+	return maxi(1, base + _genome_bonus(seed_state.genome, rules))
 
 static func cutting_value(
 	cutting: CuttingState,

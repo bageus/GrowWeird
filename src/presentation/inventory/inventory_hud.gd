@@ -40,10 +40,10 @@ func _rebuild(inventory: InventoryState) -> void:
 			continue
 		_add_item(&"cutting", cutting.item_id, 1, _genetic_title("Cutting", cutting.genome))
 		added += 1
-	for seed in inventory.seeds:
-		if seed == null:
+	for seed_state in inventory.seeds:
+		if seed_state == null:
 			continue
-		_add_item(&"seed", seed.item_id, 1, _genetic_title("Seed", seed.genome))
+		_add_item(&"seed", seed_state.item_id, 1, _genetic_title("Seed", seed_state.genome))
 		added += 1
 	for fruit in inventory.fruits:
 		if fruit == null:
@@ -82,8 +82,8 @@ func _inventory_signature(inventory: InventoryState) -> String:
 	var parts: Array[String] = [str(inventory.fertilizers)]
 	for cutting in inventory.cuttings:
 		parts.append("c:%s" % cutting.item_id)
-	for seed in inventory.seeds:
-		parts.append("s:%s" % seed.item_id)
+	for seed_state in inventory.seeds:
+		parts.append("s:%s" % seed_state.item_id)
 	for fruit in inventory.fruits:
 		parts.append("f:%s" % fruit.item_id)
 	return "|".join(parts)

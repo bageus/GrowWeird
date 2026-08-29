@@ -195,12 +195,12 @@ func _draw_thorns(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 		return
 	var vector := end - start
 	var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
-	var scale := float(phenotype.get("thorn_scale", 1.0))
+	var thorn_scale := float(phenotype.get("thorn_scale", 1.0))
 	for index in range(count):
 		var t := (float(index) + 1.0) / (float(count) + 1.0)
 		var anchor := start.lerp(end, t)
 		var side := -1.0 if index % 2 == 0 else 1.0
-		draw_line(anchor, anchor + normal * side * 10.0 * scale, Color(0.23, 0.16, 0.11), 2.5, true)
+		draw_line(anchor, anchor + normal * side * 10.0 * thorn_scale, Color(0.23, 0.16, 0.11), 2.5, true)
 
 func _draw_crystal_thorns(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("crystal_thorn_count", 0))
@@ -208,12 +208,12 @@ func _draw_crystal_thorns(start: Vector2, end: Vector2, phenotype: Dictionary) -
 		return
 	var vector := end - start
 	var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
-	var scale := float(phenotype.get("crystal_thorn_scale", 1.0))
+	var crystal_scale := float(phenotype.get("crystal_thorn_scale", 1.0))
 	for index in range(count):
 		var t := (float(index) + 1.0) / (float(count) + 1.0)
 		var anchor := start.lerp(end, t)
 		var side := -1.0 if index % 2 == 0 else 1.0
-		var tip := anchor + normal * side * 13.0 * scale
+		var tip := anchor + normal * side * 13.0 * crystal_scale
 		draw_line(anchor, tip, Color(0.48, 0.86, 0.92), 4.0, true)
 		draw_circle(tip, 2.2, Color(0.82, 0.98, 1.0))
 
@@ -223,16 +223,16 @@ func _draw_fungi(start: Vector2, end: Vector2, phenotype: Dictionary, vitality: 
 		return
 	var vector := end - start
 	var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
-	var scale := float(phenotype.get("fungus_scale", 1.0))
+	var fungus_scale := float(phenotype.get("fungus_scale", 1.0))
 	var glow := float(phenotype.get("fungus_glow", 0.0)) * vitality
 	for index in range(count):
 		var t := (float(index) + 1.0) / (float(count) + 1.0)
 		var side := -1.0 if index % 2 == 0 else 1.0
 		var anchor := start.lerp(end, t) + normal * side * 7.0
 		if glow > 0.0:
-			draw_circle(anchor, 9.0 * scale, Color(0.42, 0.94, 0.82, glow * 0.22))
-		draw_line(anchor, anchor + normal * side * 5.0 * scale, Color(0.72, 0.67, 0.52), 2.0, true)
-		draw_circle(anchor + normal * side * 6.0 * scale, 4.5 * scale, Color(0.57, 0.31, 0.55).lerp(Color(0.38, 0.90, 0.76), glow))
+			draw_circle(anchor, 9.0 * fungus_scale, Color(0.42, 0.94, 0.82, glow * 0.22))
+		draw_line(anchor, anchor + normal * side * 5.0 * fungus_scale, Color(0.72, 0.67, 0.52), 2.0, true)
+		draw_circle(anchor + normal * side * 6.0 * fungus_scale, 4.5 * fungus_scale, Color(0.57, 0.31, 0.55).lerp(Color(0.38, 0.90, 0.76), glow))
 
 func _draw_spore_traps(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("spore_trap_count", 0))
@@ -252,21 +252,21 @@ func _draw_flowers(end: Vector2, phenotype: Dictionary, vitality: float) -> void
 	var count := int(phenotype.get("flower_count", 0))
 	if count <= 0:
 		return
-	var scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality)
+	var flower_scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality)
 	var lure := float(phenotype.get("lure_strength", 0.0))
 	var crown := float(phenotype.get("crown_bloom_strength", 0.0))
 	var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
 	for index in range(count):
 		var angle := TAU * float(index) / float(count)
-		var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * scale
+		var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * flower_scale
 		if flower_glow > 0.0:
-			draw_circle(center, 13.0 * scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
+			draw_circle(center, 13.0 * flower_scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
 		var petal := Color(0.88, 0.39, 0.55).lerp(Color(0.68, 0.12, 0.34), lure)
 		petal = petal.lerp(Color(0.96, 0.62, 0.20), crown * 0.55)
 		petal = Color(0.37, 0.28, 0.22).lerp(petal, vitality)
-		draw_circle(center, 7.0 * scale, petal)
+		draw_circle(center, 7.0 * flower_scale, petal)
 		var center_color := Color(0.96, 0.79, 0.24).lerp(Color(0.18, 0.06, 0.08), lure)
-		draw_circle(center, 2.5 * scale, center_color)
+		draw_circle(center, 2.5 * flower_scale, center_color)
 
 func _detect_trait_increases(plant: PlantState) -> void:
 	for slot in BranchState.VALID_SLOTS:

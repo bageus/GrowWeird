@@ -32,15 +32,15 @@ static func buy_species_seed(
 		return ""
 	if not EconomyService.spend(state, definition.shop_seed_price):
 		return ""
-	var seed := SeedState.new()
-	seed.item_id = IdFactory.make("seed")
-	seed.source_plant_id = "shop"
-	seed.genome = GeneticsService.fresh_species_snapshot(species_id)
-	if seed.genome == null:
+	var seed_state := SeedState.new()
+	seed_state.item_id = IdFactory.make("seed")
+	seed_state.source_plant_id = "shop"
+	seed_state.genome = GeneticsService.fresh_species_snapshot(species_id)
+	if seed_state.genome == null:
 		EconomyService.credit(state, definition.shop_seed_price)
 		return ""
-	InventoryService.add_seed(state.inventory, seed)
-	return seed.item_id
+	InventoryService.add_seed(state.inventory, seed_state)
+	return seed_state.item_id
 
 static func buy_pot(state: GameState, rules: GameRules) -> String:
 	if state == null:
