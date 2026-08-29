@@ -3,7 +3,9 @@ extends Node
 signal initialized(platform_id: StringName, cloud_available: bool)
 signal cloud_load_completed(payload: String)
 signal cloud_save_completed(success: bool)
+@warning_ignore("unused_signal")
 signal pause_requested
+@warning_ignore("unused_signal")
 signal resume_requested
 signal ad_closed(was_shown: bool)
 
@@ -21,7 +23,12 @@ func initialize() -> void:
 	if _initializing:
 		return
 	_initializing = true
-	_set_adapter(YandexPlatformAdapter.new() if OS.has_feature("web") else LocalPlatformAdapter.new())
+	var adapter: PlatformAdapter
+	if OS.has_feature("web"):
+		adapter = YandexPlatformAdapter.new()
+	else:
+		adapter = LocalPlatformAdapter.new()
+	_set_adapter(adapter)
 	_adapter.initialize()
 
 func is_initialized() -> bool:
