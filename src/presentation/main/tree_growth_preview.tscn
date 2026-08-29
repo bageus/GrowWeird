@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/main/tree_growth_preview.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/tree/tree_01.png" id="2_tree"]
+
+[node name="TreeGrowthPreview" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Tree" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 120.0
+offset_top = 20.0
+offset_right = -120.0
+offset_bottom = -120.0
+texture = ExtResource("2_tree")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
