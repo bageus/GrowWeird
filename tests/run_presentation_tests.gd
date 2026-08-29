@@ -89,6 +89,8 @@ func _test_inventory_hud_contract() -> void:
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
 	_expect(hud_text.contains("drag_handle_height = 0.0"), "inventory HUD: panel must be draggable outside item buttons")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("extends SceneDraggablePanel"), "inventory HUD: must use shared draggable panel")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn").count("ExtResource(\"5_inventory\")") == 1, "scene HUD: exactly one InventoryHud instance")
 	_expect(dialogs_text.contains("RecycleAction") and dialogs_text.contains("SellAction") and dialogs_text.contains("UseAction"), "inventory HUD: item action menu incomplete")
 	_expect(dialogs_text.contains("QuantitySlider") and dialogs_text.contains("ValueLabel"), "inventory HUD: sale quantity/value popup missing")
 	_expect(dialogs_text.contains("OutputLabel") and dialogs_text.contains("Grind into fertilizer"), "inventory HUD: recycling preview missing")
