@@ -34,6 +34,15 @@ extends Control
 @onready var blinds_button: Button = scene_controls.get_node("LightingOptions/Options/BlindsButton")
 @onready var normal_light_button: Button = scene_controls.get_node("LightingOptions/Options/NormalLightButton")
 
+const FERTILIZER_ART := [
+	preload("res://assets/fertilizers/fertilizers_01.png"),
+	preload("res://assets/fertilizers/fertilizers_02.png"),
+	preload("res://assets/fertilizers/fertilizers_03.png"),
+	preload("res://assets/fertilizers/fertilizers_04.png"),
+	preload("res://assets/fertilizers/fertilizers_05.png"),
+	preload("res://assets/fertilizers/fertilizers_06.png"),
+]
+
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
@@ -66,6 +75,7 @@ func _ready() -> void:
 	offer_two.pressed.connect(_on_offer_two_pressed)
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
+	skip_offer.pressed.connect(_on_skip_offer_pressed)
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -124,13 +134,18 @@ func _refresh_offer() -> void:
 		var button := buttons[index]
 		if index < ids.size():
 			button.text = _pretty_id(String(ids[index]))
+			button.icon = _fertilizer_texture(ids[index])
+			button.expand_icon = true
 			button.disabled = plant == null or not plant.alive
 		else:
-			button.text = "?"
+			button.text = ""
+			button.icon = null
 			button.disabled = true
 	var price := GameApp.current_offer_skip_price()
 	refresh_offer.text = "Refresh · $%d" % price if price > 0 else "Refresh"
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
+	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
+	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	
 
 func _set_interaction_mode(mode: StringName) -> void:
@@ -349,3 +364,5 @@ func _environment_name(pot: PotState) -> String:
 	return "Normal light"
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
+func _fertilizer_texture(id: StringName) -> Texture2D:
+	return FERTILIZER_ART[posmod(int(String(id).hash()), FERTILIZER_ART.size())]
