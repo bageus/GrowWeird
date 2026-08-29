@@ -10,6 +10,7 @@ extends Control
 @onready var stage_two_button: Button = %Stage2Button
 @onready var stage_three_button: Button = %Stage3Button
 @onready var stage_four_button: Button = %Stage4Button
+@onready var save_assets_layout_button: Button = %SaveAssetsLayoutButton
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
@@ -292,8 +293,12 @@ func _on_close_shop_pressed() -> void:
 func _set_cancel_visibility() -> void:
 	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 func _on_save_layout_pressed() -> void:
+	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
+
+func _on_save_assets_layout_pressed() -> void:
 	pot_visual.save_asset_layout()
-	event_label.text = "HUD and asset layout saved." if scene_controls.save_layout() else "Asset layout saved, but HUD layout could not be saved."
+	tree_growth_preview.save_asset_layout()
+	event_label.text = "Pot, soil, stand and tree asset layout saved."
 func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
 	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
