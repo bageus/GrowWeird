@@ -346,5 +346,4 @@ func _environment_name(pot: PotState) -> String:
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
 func _on_tree_stage_selected(stage: int) -> void:
-	tree_growth_preview.set_stage(stage)
-	event_label.text = "Tree growth test: stage %d." % (stage + 1)
+	tree_growth_preview.set_stage(stage); event_label.text = "Tree growth test: stage %d." % (stage + 1)
