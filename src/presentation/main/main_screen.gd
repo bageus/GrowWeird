@@ -34,15 +34,6 @@ extends Control
 @onready var blinds_button: Button = scene_controls.get_node("LightingOptions/Options/BlindsButton")
 @onready var normal_light_button: Button = scene_controls.get_node("LightingOptions/Options/NormalLightButton")
 
-const FERTILIZER_ART := [
-	preload("res://assets/fertilizers/fertilizers_01.png"),
-	preload("res://assets/fertilizers/fertilizers_02.png"),
-	preload("res://assets/fertilizers/fertilizers_03.png"),
-	preload("res://assets/fertilizers/fertilizers_04.png"),
-	preload("res://assets/fertilizers/fertilizers_05.png"),
-	preload("res://assets/fertilizers/fertilizers_06.png"),
-]
-
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
@@ -364,5 +355,3 @@ func _environment_name(pot: PotState) -> String:
 	return "Normal light"
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
-func _fertilizer_texture(id: StringName) -> Texture2D:
-	return FERTILIZER_ART[posmod(int(String(id).hash()), FERTILIZER_ART.size())]
