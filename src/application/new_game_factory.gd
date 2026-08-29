@@ -38,6 +38,8 @@ static func add_starter_inventory_item(state: GameState, plant: PlantState) -> v
 	InventoryService.add_cutting(state.inventory, cutting)
 
 static func ensure_inventory_bootstrap(state: GameState, plant: PlantState) -> void:
-	var has_items := not state.inventory.cuttings.is_empty() or not state.inventory.seeds.is_empty() or not state.inventory.fruits.is_empty() or not state.inventory.fertilizers.is_empty()
+	if not state.inventory.misc.has("dead_mouse"):
+		state.inventory.misc["dead_mouse"] = 1
+	var has_items := not state.inventory.cuttings.is_empty() or not state.inventory.seeds.is_empty() or not state.inventory.fruits.is_empty() or not state.inventory.fertilizers.is_empty() or not state.inventory.misc.is_empty()
 	if not has_items and plant != null:
 		add_starter_inventory_item(state, plant)
