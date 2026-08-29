@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="5_progress"]
 [ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="6_window_art"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/pot_visual.tscn" id="8_pot_visual"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -127,6 +128,17 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
+
+[node name="PotVisual" parent="Shell/Layout/ScenePanel/SceneRoot/World" instance=ExtResource("8_pot_visual")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 120.0
+offset_top = 170.0
+offset_right = -120.0
+offset_bottom = -20.0
 
 [node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
