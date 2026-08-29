@@ -95,6 +95,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Save HUD layout"
 
+[node name="SaveAssetsLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save assets layout"
+
 [node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -200,4 +205,5 @@ text = "Growth 4"
 unique_name_in_owner = true
 
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveLayoutButton" to="." method="_on_save_layout_pressed"]
+[connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveAssetsLayoutButton" to="." method="_on_save_assets_layout_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/ResetLayoutButton" to="." method="_on_reset_layout_pressed"]
