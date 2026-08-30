@@ -53,6 +53,11 @@ custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Grind"
 
+[node name="CancelAction" type="Button" parent="ActionMenu/Actions"]
+custom_minimum_size = Vector2(150, 42)
+layout_mode = 2
+text = "Cancel"
+
 [node name="SellPopup" type="PanelContainer" parent="."]
 visible = false
 custom_minimum_size = Vector2(270, 190)

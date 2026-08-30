@@ -73,6 +73,8 @@ func clear_testing_preview() -> void:
 	set_plant(_plant)
 
 func has_prunable_branch() -> bool:
+	if _testing_stage >= 0:
+		return stage in [6, 7, 9, 10, 11]
 	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
 
 func set_prune_mode(enabled: bool) -> void:

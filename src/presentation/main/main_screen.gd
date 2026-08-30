@@ -208,7 +208,6 @@ func _on_environment_preset(preset: StringName) -> void:
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset))
 func _on_prune_pressed() -> void:
-	tree_growth_preview.clear_testing_preview()
 	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
 		return
