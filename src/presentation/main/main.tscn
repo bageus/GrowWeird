@@ -90,21 +90,6 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 6
 script = ExtResource("4_pots")
 
-[node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Save HUD layout"
-
-[node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Reset HUD layout"
-
-[node name="SaveAssetsLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Save assets layout"
-
 [node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 custom_minimum_size = Vector2(0, 460)
 layout_mode = 2
@@ -186,6 +171,22 @@ text = "13 · Left cut / right not grown"
 unique_name_in_owner = true
 layout_mode = 2
 text = "14 · Right cut / left not grown"
+
+
+[node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save HUD layout"
+
+[node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset HUD layout"
+
+[node name="SaveAssetsLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Save assets layout"
 
 [node name="ScenePanel" type="PanelContainer" parent="Shell/Layout"]
 layout_mode = 2
