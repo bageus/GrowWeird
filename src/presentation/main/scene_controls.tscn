@@ -51,34 +51,34 @@ mouse_filter = 2
 script = ExtResource("1_controls")
 
 [node name="WaterButton" type="Button" parent="."]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
 text = "Water"
 script = ExtResource("2_action")
 action_id = &"water"
 
 [node name="LightingButton" type="Button" parent="."]
-custom_minimum_size = Vector2(122, 38)
-offset_right = 122.0
-offset_bottom = 38.0
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
 text = "Lighting"
 script = ExtResource("2_action")
 action_id = &"lighting"
 
 [node name="PruneButton" type="Button" parent="."]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
 toggle_mode = true
 text = "Prune"
 script = ExtResource("2_action")
 action_id = &"prune"
 
 [node name="SellPlantButton" type="Button" parent="."]
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
 text = "Sell plant"
 script = ExtResource("2_action")
 action_id = &"sell_plant"
@@ -101,15 +101,29 @@ text = "Cancel"
 script = ExtResource("2_action")
 action_id = &"cancel"
 
+[node name="ShopActionButton" type="Button" parent="."]
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
+script = ExtResource("2_action")
+action_id = &"shop"
+
+[node name="TasksButton" type="Button" parent="."]
+custom_minimum_size = Vector2(150, 76)
+offset_right = 150.0
+offset_bottom = 76.0
+script = ExtResource("2_action")
+action_id = &"tasks"
+
 [node name="WalletHud" type="PanelContainer" parent="."]
 z_index = 7
-custom_minimum_size = Vector2(220, 48)
-offset_right = 220.0
-offset_bottom = 48.0
+custom_minimum_size = Vector2(240, 100)
+offset_right = 240.0
+offset_bottom = 100.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
 layout_id = &"wallet"
-drag_handle_height = 48.0
+drag_handle_height = 100.0
 
 [node name="WalletLayout" type="HBoxContainer" parent="WalletHud"]
 layout_mode = 2
@@ -118,46 +132,49 @@ theme_override_constants/separation = 8
 [node name="MoneyLabel" type="Label" parent="WalletHud/WalletLayout"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
 text = "$0"
 vertical_alignment = 1
 
 [node name="ShopButton" type="Button" parent="WalletHud/WalletLayout"]
-custom_minimum_size = Vector2(86, 34)
+custom_minimum_size = Vector2(58, 58)
 layout_mode = 2
 text = "Shop"
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
-custom_minimum_size = Vector2(590, 54)
-offset_right = 590.0
-offset_bottom = 54.0
+custom_minimum_size = Vector2(620, 112)
+offset_right = 620.0
+offset_bottom = 112.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
 layout_id = &"fertilizers"
-drag_handle_height = 54.0
+drag_handle_height = 112.0
 
 [node name="PotSelector" type="PanelContainer" parent="."]
 z_index = 7
-custom_minimum_size = Vector2(142, 78)
-offset_right = 142.0
-offset_bottom = 78.0
+custom_minimum_size = Vector2(210, 120)
+offset_right = 210.0
+offset_bottom = 120.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("7_pots")
 layout_id = &"pots"
-drag_handle_height = 78.0
+drag_handle_height = 120.0
 
 [node name="Row" type="HBoxContainer" parent="PotSelector"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
 [node name="PreviousPot" type="Button" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(30, 60)
+custom_minimum_size = Vector2(46, 72)
 layout_mode = 2
 text = "‹"
 
 [node name="PotThumbnail" type="TextureRect" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(62, 62)
+custom_minimum_size = Vector2(86, 86)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("8_pot")
@@ -165,7 +182,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="NextPot" type="Button" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(30, 60)
+custom_minimum_size = Vector2(46, 72)
 layout_mode = 2
 text = "›"
 
@@ -174,27 +191,27 @@ layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="RefreshOffer" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(108, 36)
+custom_minimum_size = Vector2(112, 72)
 layout_mode = 2
 text = "Refresh"
 
 [node name="OfferOne" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(108, 36)
+custom_minimum_size = Vector2(92, 72)
 layout_mode = 2
 text = "?"
 
 [node name="OfferTwo" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(108, 36)
+custom_minimum_size = Vector2(92, 72)
 layout_mode = 2
 text = "?"
 
 [node name="OfferThree" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(108, 36)
+custom_minimum_size = Vector2(92, 72)
 layout_mode = 2
 text = "?"
 
 [node name="SkipOffer" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(108, 36)
+custom_minimum_size = Vector2(112, 72)
 layout_mode = 2
 text = "Skip"
 
@@ -214,12 +231,12 @@ layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="SprayButton" type="Button" parent="WaterOptions/Options"]
-custom_minimum_size = Vector2(96, 34)
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Spray"
 
 [node name="PourButton" type="Button" parent="WaterOptions/Options"]
-custom_minimum_size = Vector2(96, 34)
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Pour"
 
@@ -236,22 +253,22 @@ layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="CurtainsButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(124, 34)
+custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Curtains"
 
 [node name="OpenWindowButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(124, 34)
+custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Open window"
 
 [node name="BlindsButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(124, 34)
+custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Blinds"
 
 [node name="NormalLightButton" type="Button" parent="LightingOptions/Options"]
-custom_minimum_size = Vector2(124, 34)
+custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Normal light"
 

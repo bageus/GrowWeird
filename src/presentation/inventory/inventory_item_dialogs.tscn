@@ -39,14 +39,17 @@ layout_mode = 2
 theme_override_constants/separation = 5
 
 [node name="UseAction" type="Button" parent="ActionMenu/Actions"]
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Use"
 
 [node name="SellAction" type="Button" parent="ActionMenu/Actions"]
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Sell"
 
 [node name="RecycleAction" type="Button" parent="ActionMenu/Actions"]
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Grind"
 
@@ -91,6 +94,7 @@ layout_mode = 2
 text = "Value: $0"
 
 [node name="Confirm" type="Button" parent="SellPopup/Layout"]
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Sell"
 
@@ -135,5 +139,6 @@ layout_mode = 2
 text = "Output: Compost Mix ×0"
 
 [node name="Confirm" type="Button" parent="RecyclePopup/Layout"]
+custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Grind into fertilizer"

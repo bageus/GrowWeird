@@ -7,6 +7,10 @@ signal item_selected(kind: StringName, item_id: String, count: int, title: Strin
 
 var _signature := ""
 
+func _ready() -> void:
+	super()
+	add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.HUD_INVENTORY, Vector4(12.0, 18.0, 12.0, 18.0)))
+
 func set_inventory(inventory: InventoryState) -> void:
 	var signature := _inventory_signature(inventory)
 	if signature == _signature:
@@ -59,12 +63,19 @@ func _rebuild(inventory: InventoryState) -> void:
 			added += 1
 	if added == 0:
 		_add_empty()
+	else:
+		while added < 3:
+			_add_empty_slot()
+			added += 1
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(48.0, 48.0)
+	button.custom_minimum_size = Vector2(150.0, 126.0)
 	button.text = title + (" ×%d" % count if count > 1 else "")
-	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	button.add_theme_stylebox_override(&"normal", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
+	button.add_theme_stylebox_override(&"hover", UiAtlas.panel_style(UiAtlas.background2(0), Vector4(14.0, 14.0, 14.0, 14.0)))
 	var count_suffix := ""
 	if count > 1:
 		count_suffix = " ×%d" % count
@@ -73,10 +84,17 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	items.add_child(button)
 
 func _add_empty() -> void:
-	var label := Label.new()
-	label.text = "Inventory empty"
-	label.modulate = Color(1.0, 1.0, 1.0, 0.55)
-	items.add_child(label)
+	for index in range(3):
+		_add_empty_slot("Inventory empty" if index == 0 else "")
+
+func _add_empty_slot(label := "") -> void:
+	var slot := Button.new()
+	slot.custom_minimum_size = Vector2(150.0, 126.0)
+	slot.text = label
+	slot.disabled = true
+	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_theme_stylebox_override(&"disabled", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
+	items.add_child(slot)
 
 func _emit_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
 	item_selected.emit(kind, item_id, count, title)
