@@ -42,6 +42,7 @@ func _ready() -> void:
 	GameApp.mutations_resolved.connect(_on_mutations_resolved)
 	GameApp.fertilizer_offer_ready.connect(_on_offer_ready)
 	plant_view.branch_selected.connect(_on_branch_selected)
+	tree_growth_preview.tree_branch_pruned.connect(_on_tree_branch_pruned)
 	pot_selector.pot_selected.connect(_handle_pot_click)
 	scene_controls.action_requested.connect(_on_scene_action_requested)
 	inventory_hud.item_selected.connect(_on_inventory_item_selected)
@@ -215,6 +216,10 @@ func _on_cancel_pressed() -> void:
 	scene_controls.set_shop_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Action cancelled."
+func _on_tree_branch_pruned(side: StringName) -> void:
+	var cutting_id := GameApp.prune_active_branch(side)
+	event_label.text = "Tree cutting added to inventory." if not cutting_id.is_empty() else "Branch visual was cut; no game branch was available."
+
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
