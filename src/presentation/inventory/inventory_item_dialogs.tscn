@@ -36,7 +36,7 @@ theme_override_styles/panel = SubResource("StyleBox_popup")
 
 [node name="Actions" type="VBoxContainer" parent="ActionMenu"]
 layout_mode = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = -6
 
 [node name="UseAction" type="Button" parent="ActionMenu/Actions"]
 custom_minimum_size = Vector2(150, 70)
@@ -52,11 +52,6 @@ text = "Sell"
 custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Grind"
-
-[node name="CancelAction" type="Button" parent="ActionMenu/Actions"]
-custom_minimum_size = Vector2(150, 42)
-layout_mode = 2
-text = "Cancel"
 
 [node name="SellPopup" type="PanelContainer" parent="."]
 visible = false

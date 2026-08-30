@@ -4,12 +4,12 @@ extends Control
 signal use_requested(kind: StringName, item_id: String)
 signal sell_requested(kind: StringName, item_id: String, quantity: int)
 signal recycle_requested(kind: StringName, item_id: String, quantity: int)
+signal closed
 
 @onready var actions: PanelContainer = $ActionMenu
 @onready var recycle_action: Button = $ActionMenu/Actions/RecycleAction
 @onready var sell_action: Button = $ActionMenu/Actions/SellAction
 @onready var use_action: Button = $ActionMenu/Actions/UseAction
-@onready var cancel_action: Button = $ActionMenu/Actions/CancelAction
 @onready var sell_popup: PanelContainer = $SellPopup
 @onready var sell_title: Label = $SellPopup/Layout/Header/Title
 @onready var sell_slider: HSlider = $SellPopup/Layout/QuantitySlider
@@ -37,7 +37,6 @@ func _ready() -> void:
 	recycle_action.pressed.connect(_open_recycle)
 	sell_action.pressed.connect(_open_sell)
 	use_action.pressed.connect(_use)
-	cancel_action.pressed.connect(close_all)
 	$SellPopup/Layout/Header/Close.pressed.connect(close_all)
 	$SellPopup/Layout/Confirm.pressed.connect(_confirm_sell)
 	$RecyclePopup/Layout/Header/Close.pressed.connect(close_all)
@@ -77,6 +76,10 @@ func close_all() -> void:
 	actions.visible = false
 	sell_popup.visible = false
 	recycle_popup.visible = false
+	closed.emit()
+
+func is_open() -> bool:
+	return actions.visible or sell_popup.visible or recycle_popup.visible
 
 func refresh_position() -> void:
 	if actions.visible:

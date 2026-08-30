@@ -71,13 +71,14 @@ func _rebuild(inventory: InventoryState) -> void:
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(112.0, 112.0)
+	button.custom_minimum_size = Vector2(124.0, 124.0)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.add_theme_stylebox_override(&"normal", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
-	button.add_theme_stylebox_override(&"hover", UiAtlas.panel_style(UiAtlas.background2(0), Vector4(14.0, 14.0, 14.0, 14.0)))
+	button.add_theme_stylebox_override(&"hover", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
+	button.add_theme_stylebox_override(&"pressed", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
 	var count_suffix := ""
 	if count > 1:
 		count_suffix = " ×%d" % count
@@ -91,7 +92,7 @@ func _add_empty() -> void:
 
 func _add_empty_slot(label := "") -> void:
 	var slot := Button.new()
-	slot.custom_minimum_size = Vector2(112.0, 112.0)
+	slot.custom_minimum_size = Vector2(124.0, 124.0)
 	slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	slot.text = label
 	slot.disabled = true

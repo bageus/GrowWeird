@@ -49,6 +49,7 @@ func _ready() -> void:
 	inventory_dialogs.use_requested.connect(_on_inventory_use_requested)
 	inventory_dialogs.sell_requested.connect(_on_inventory_sell_requested)
 	inventory_dialogs.recycle_requested.connect(_on_inventory_recycle_requested)
+	inventory_dialogs.closed.connect(_set_cancel_visibility)
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
@@ -216,7 +217,7 @@ func _on_prune_pressed() -> void:
 	_set_interaction_mode(PlantView.MODE_PRUNE)
 	event_label.text = "Prune mode: click an existing branch."
 func _on_cancel_pressed() -> void:
-	_cancel_action()
+	inventory_dialogs.close_all(); _cancel_action()
 	_water_submenu_visible = false
 	_lighting_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
@@ -238,7 +239,7 @@ func _on_branch_selected(slot: StringName) -> void:
 func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var price := GameApp.inventory_item_sale_value(kind, item_id)
 	var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
-	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield)
+	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield); _set_cancel_visibility()
 func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 	match kind:
 		&"fertilizer":
@@ -297,7 +298,7 @@ func _on_close_shop_pressed() -> void:
 	scene_controls.set_shop_visible(false)
 	_set_cancel_visibility()
 func _set_cancel_visibility() -> void:
-	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
+	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible or inventory_dialogs.is_open()
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_save_assets_layout_pressed() -> void:
