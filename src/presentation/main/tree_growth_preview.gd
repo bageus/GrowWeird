@@ -58,6 +58,9 @@ func _set_stage(value: int) -> void:
 	tree.texture = STAGES[stage]
 	_update_hover_visibility()
 
+func preview_stage_for_testing(value: int) -> void:
+	_set_stage(value)
+
 func has_prunable_branch() -> bool:
 	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
 

@@ -84,7 +84,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
 	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
-	_expect(not main_text.contains("TreeGrowthControls"), "scene HUD: debug tree stages must not override domain state")
+	_expect(main_text.contains("TreeGrowthControls") and main_text.contains("preview only"), "scene HUD: isolated tree asset testing controls missing")
 	_expect(main_text.contains("modulate = Color(1, 1, 1, 0)"), "scene HUD: legacy procedural plant renderer must not compete with asset rendering")
 	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
 	_expect(pot_visual_text.contains("GROUND_TEXTURES[state.soil_moisture_stage()]") and pot_visual_text.contains("ground.queue_redraw()"), "pot visual: moisture stage must directly select and redraw the soil asset")
