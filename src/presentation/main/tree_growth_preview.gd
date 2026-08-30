@@ -25,6 +25,7 @@ const STAGES := [
 
 var stage := 0
 var _plant: PlantState
+var _testing_stage := -1
 var _dragging := false
 var _drag_offset := Vector2.ZERO
 var prune_mode := false
@@ -38,6 +39,10 @@ func _ready() -> void:
 
 func set_plant(plant: PlantState) -> void:
 	_plant = plant
+	if _testing_stage >= 0:
+		visible = true
+		_set_stage(_testing_stage)
+		return
 	visible = plant != null
 	_set_stage(stage_for(plant))
 
@@ -59,8 +64,9 @@ func _set_stage(value: int) -> void:
 	_update_hover_visibility()
 
 func preview_stage_for_testing(value: int) -> void:
+	_testing_stage = clampi(value, 0, STAGES.size() - 1)
 	visible = true
-	_set_stage(value)
+	_set_stage(_testing_stage)
 
 func has_prunable_branch() -> bool:
 	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
