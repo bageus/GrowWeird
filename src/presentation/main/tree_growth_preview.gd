@@ -58,6 +58,10 @@ func prune_right() -> void:
 		11: set_stage(13) # tree_12 -> tree_14: right cut, left not grown
 	persisted_stage = _normalized_stage(stage)
 
+func prune_side(side: StringName) -> void:
+	if side == &"left": prune_left()
+	elif side == &"right": prune_right()
+
 func restore_persisted_stage() -> void:
 	set_stage(persisted_stage if persisted_stage >= 0 else _normalized_stage(stage))
 
@@ -111,9 +115,9 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
 		if side == &"left" and stage in [6, 7, 10]:
-			prune_left(); tree_branch_pruned.emit(side); return
+			tree_branch_pruned.emit(side); return
 		if side == &"right" and stage in [7, 9, 11]:
-			prune_right(); tree_branch_pruned.emit(side); return
+			tree_branch_pruned.emit(side); return
 	if not Input.is_key_pressed(KEY_CTRL):
 		return
 	if event is InputEventMouseButton:

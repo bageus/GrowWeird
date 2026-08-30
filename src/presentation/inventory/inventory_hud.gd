@@ -38,7 +38,7 @@ func _rebuild(inventory: InventoryState) -> void:
 	for cutting in inventory.cuttings:
 		if cutting == null:
 			continue
-		_add_item(&"cutting", cutting.item_id, 1, _genetic_title("Cutting", cutting.genome))
+		_add_item(&"cutting", cutting.item_id, 1, _genetic_title("Branch", cutting.genome))
 		added += 1
 	for seed_state in inventory.seeds:
 		if seed_state == null:
