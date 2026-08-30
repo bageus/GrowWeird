@@ -6,18 +6,6 @@ extends Control
 @onready var plant_view: PlantView = %PlantView
 @onready var pot_visual: PotVisual = %PotVisual
 @onready var tree_growth_preview: TreeGrowthPreview = %TreeGrowthPreview
-@onready var stage_one_button: Button = %Stage1Button
-@onready var stage_two_button: Button = %Stage2Button
-@onready var stage_three_button: Button = %Stage3Button
-@onready var stage_four_button: Button = %Stage4Button
-@onready var stage_five_button: Button = %Stage5Button
-@onready var stage_six_button: Button = %Stage6Button
-@onready var stage_seven_button: Button = %Stage7Button
-@onready var stage_eight_button: Button = %Stage8Button
-@onready var stage_nine_button: Button = %Stage9Button
-@onready var stage_ten_button: Button = %Stage10Button
-@onready var stage_eleven_button: Button = %Stage11Button
-@onready var stage_twelve_button: Button = %Stage12Button
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
@@ -75,18 +63,8 @@ func _ready() -> void:
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
-	stage_one_button.pressed.connect(_on_tree_stage_selected.bind(0))
-	stage_two_button.pressed.connect(_on_tree_stage_selected.bind(1))
-	stage_three_button.pressed.connect(_on_tree_stage_selected.bind(2))
-	stage_four_button.pressed.connect(_on_tree_stage_selected.bind(3))
-	stage_five_button.pressed.connect(_on_tree_stage_selected.bind(4))
-	stage_six_button.pressed.connect(_on_tree_stage_selected.bind(5))
-	stage_seven_button.pressed.connect(_on_tree_stage_selected.bind(6))
-	stage_eight_button.pressed.connect(_on_tree_stage_selected.bind(7))
-	stage_nine_button.pressed.connect(_on_tree_stage_selected.bind(8))
-	stage_ten_button.pressed.connect(_on_tree_stage_selected.bind(9))
-	stage_eleven_button.pressed.connect(_on_tree_stage_selected.bind(10))
-	stage_twelve_button.pressed.connect(_on_tree_stage_selected.bind(11))
+	for stage in range(12):
+		get_node("%Stage%dButton" % (stage + 1)).pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
