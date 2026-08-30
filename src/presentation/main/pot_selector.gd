@@ -11,9 +11,9 @@ const POT_TEXTURES := [
 	preload("res://assets/pot/pot_05.png"),
 ]
 
-@onready var previous_button: Button = $Row/PreviousPot
-@onready var thumbnail: TextureRect = $Row/PotThumbnail
-@onready var next_button: Button = $Row/NextPot
+@onready var previous_button: Button = $Layers/PreviousPot
+@onready var thumbnail: TextureRect = $Layers/PotThumbnail
+@onready var next_button: Button = $Layers/NextPot
 
 var _state: GameState
 var _planting_target := false

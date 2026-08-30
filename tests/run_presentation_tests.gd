@@ -84,6 +84,10 @@ func _test_scene_hud_contract() -> void:
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("UiAtlas.HUD_INVENTORY") and FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("background2(1)"), "inventory HUD: inventory and three slot atlas art are not wired")
 	_expect(hud_text.contains("OffersPanel") and hud_text.contains("RefreshOffer") and hud_text.contains("SkipOffer"), "scene HUD: fertilizers need refresh left and skip right controls")
 	_expect(hud_text.contains("PotSelector") and hud_text.contains("PreviousPot") and hud_text.contains("NextPot") and hud_text.contains("PotThumbnail"), "scene HUD: pot selector needs one thumbnail between navigation arrows")
+	_expect(hud_text.contains("PotCircle") and hud_text.contains("PotSelector/Layers/PreviousPot"), "scene HUD: pot circle must stay square with arrows outside")
+	_expect(hud_text.contains("WalletHud/Layers/ShopButton"), "scene HUD: balance plus hit area must use fixed atlas coordinates")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_hud_slot"), "scene HUD: fertilizer menu needs three separate atlas backgrounds")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override') and FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override'), "scene HUD: water and lighting dark popup backgrounds must be removed")
 	_expect(not main_text.contains("PotsScroll"), "scene HUD: pot selector must not remain in the sidebar")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
@@ -108,6 +112,13 @@ func _test_scene_hud_contract() -> void:
 	overlay._capture_layout()
 	_expect((overlay.get("_layout") as Dictionary)["water"].distance_to(Vector2(0.4, 0.3)) < 0.001, "scene HUD: action button layout must be captured")
 	overlay.free()
+	var controls := (load("res://src/presentation/main/scene_controls.tscn") as PackedScene).instantiate() as SceneControlsOverlay
+	root.add_child(controls)
+	var pot_circle := controls.get_node("PotSelector/Layers/PotCircle") as TextureRect
+	_expect(is_equal_approx(pot_circle.size.x, pot_circle.size.y), "scene HUD: pots atlas circle is being stretched")
+	_expect((controls.get_node("WaterOptions") as PanelContainer).get_theme_stylebox(&"panel") is StyleBoxEmpty, "scene HUD: water popup retained its dark background")
+	_expect((controls.get_node("LightingOptions") as PanelContainer).get_theme_stylebox(&"panel") is StyleBoxEmpty, "scene HUD: lighting popup retained its dark background")
+	controls.free()
 	host.free()
 
 func _test_inventory_hud_contract() -> void:

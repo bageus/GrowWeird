@@ -125,13 +125,16 @@ script = ExtResource("3_drag")
 layout_id = &"wallet"
 drag_handle_height = 100.0
 
-[node name="WalletLayout" type="HBoxContainer" parent="WalletHud"]
+[node name="Layers" type="Control" parent="WalletHud"]
 layout_mode = 2
-theme_override_constants/separation = 8
+mouse_filter = 1
 
-[node name="MoneyLabel" type="Label" parent="WalletHud/WalletLayout"]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="MoneyLabel" type="Label" parent="WalletHud/Layers"]
+layout_mode = 0
+offset_left = 64.0
+offset_top = 18.0
+offset_right = 178.0
+offset_bottom = 82.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
 theme_override_constants/outline_size = 5
@@ -139,9 +142,12 @@ theme_override_font_sizes/font_size = 24
 text = "$0"
 vertical_alignment = 1
 
-[node name="ShopButton" type="Button" parent="WalletHud/WalletLayout"]
-custom_minimum_size = Vector2(58, 58)
-layout_mode = 2
+[node name="ShopButton" type="Button" parent="WalletHud/Layers"]
+layout_mode = 0
+offset_left = 181.0
+offset_top = 21.0
+offset_right = 237.0
+offset_bottom = 79.0
 text = "Shop"
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
@@ -164,26 +170,44 @@ script = ExtResource("7_pots")
 layout_id = &"pots"
 drag_handle_height = 120.0
 
-[node name="Row" type="HBoxContainer" parent="PotSelector"]
+[node name="Layers" type="Control" parent="PotSelector"]
 layout_mode = 2
-theme_override_constants/separation = 4
+mouse_filter = 1
 
-[node name="PreviousPot" type="Button" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(46, 72)
-layout_mode = 2
+[node name="PotCircle" type="TextureRect" parent="PotSelector/Layers"]
+layout_mode = 0
+offset_left = 49.0
+offset_top = 4.0
+offset_right = 165.0
+offset_bottom = 120.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PreviousPot" type="Button" parent="PotSelector/Layers"]
+layout_mode = 0
+offset_top = 30.0
+offset_right = 48.0
+offset_bottom = 90.0
 text = "‹"
 
-[node name="PotThumbnail" type="TextureRect" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(86, 86)
-layout_mode = 2
+[node name="PotThumbnail" type="TextureRect" parent="PotSelector/Layers"]
+layout_mode = 0
+offset_left = 66.0
+offset_top = 20.0
+offset_right = 148.0
+offset_bottom = 102.0
 mouse_filter = 2
 texture = ExtResource("8_pot")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="NextPot" type="Button" parent="PotSelector/Row"]
-custom_minimum_size = Vector2(46, 72)
-layout_mode = 2
+[node name="NextPot" type="Button" parent="PotSelector/Layers"]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 30.0
+offset_right = 214.0
+offset_bottom = 90.0
 text = "›"
 
 [node name="Row" type="HBoxContainer" parent="OffersPanel"]
@@ -196,17 +220,17 @@ layout_mode = 2
 text = "Refresh"
 
 [node name="OfferOne" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(92, 72)
+custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 text = "?"
 
 [node name="OfferTwo" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(92, 72)
+custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 text = "?"
 
 [node name="OfferThree" type="Button" parent="OffersPanel/Row"]
-custom_minimum_size = Vector2(92, 72)
+custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 text = "?"
 
@@ -228,7 +252,7 @@ theme_override_styles/panel = SubResource("StyleBox_popup")
 
 [node name="Options" type="VBoxContainer" parent="WaterOptions"]
 layout_mode = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = -6
 
 [node name="SprayButton" type="Button" parent="WaterOptions/Options"]
 custom_minimum_size = Vector2(150, 70)
@@ -250,7 +274,7 @@ theme_override_styles/panel = SubResource("StyleBox_popup")
 
 [node name="Options" type="VBoxContainer" parent="LightingOptions"]
 layout_mode = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = -6
 
 [node name="CurtainsButton" type="Button" parent="LightingOptions/Options"]
 custom_minimum_size = Vector2(160, 70)
