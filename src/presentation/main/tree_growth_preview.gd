@@ -20,8 +20,8 @@ const STAGES := [
 ]
 
 @onready var tree: TextureRect = $Tree
-@onready var left_hover: TextureRect = $LeftHover
-@onready var right_hover: TextureRect = $RightHover
+@onready var left_hover: TextureRect = $Tree/LeftHover
+@onready var right_hover: TextureRect = $Tree/RightHover
 
 var stage := 0
 var _dragging := false

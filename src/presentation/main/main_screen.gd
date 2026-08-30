@@ -104,7 +104,6 @@ func _refresh() -> void:
 	if _has_regrowth(plant): status_label.text += " · New branch forming"
 	if not plant.alive: status_label.text += " · Final state"
 func _refresh_actions(pot: PotState, plant: PlantState) -> void:
-	var living := plant != null and plant.alive
 	lighting_button.disabled = pot == null
 	lighting_button.text = "Lighting · %s" % _environment_name(pot) if pot != null else "Lighting"
 	prune_button.disabled = pot == null
