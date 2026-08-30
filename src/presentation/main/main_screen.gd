@@ -64,8 +64,11 @@ func _ready() -> void:
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
-	for stage in range(12):
-		get_node("%Stage%dButton" % (stage + 1)).pressed.connect(_on_tree_stage_selected.bind(stage))
+	for stage in range(14):
+		var path := "Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)
+		var button := get_node_or_null(path) as Button
+		if button != null:
+			button.pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
