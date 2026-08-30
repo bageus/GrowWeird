@@ -42,15 +42,15 @@ func set_stage(value: int) -> void:
 
 func prune_left() -> void:
 	match stage:
-		7: set_stage(9) # tree_08 -> tree_10: left remains, right cut
+		7: set_stage(10) # tree_08 -> tree_11: right was cut, left remains
 		6: set_stage(12) # tree_07 -> tree_13: left cut, right not grown
-		10: set_stage(13) # tree_11 -> tree_14: right was cut, left now cut
+		10: set_stage(8) # tree_11 -> tree_09: both side branches cut
 	persisted_stage = _normalized_stage(stage)
 
 func prune_right() -> void:
 	match stage:
 		7: set_stage(10) # tree_08 -> tree_11: right cut, left remains
-		9: set_stage(13) # tree_10 -> tree_14: right cut
+		9: set_stage(8) # tree_10 -> tree_09: both side branches cut
 		11: set_stage(12) # tree_12 -> tree_13: right cut
 	persisted_stage = _normalized_stage(stage)
 
@@ -94,7 +94,7 @@ func _update_hover_visibility() -> void:
 
 func _on_tree_gui_input(event: InputEvent) -> void:
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		var side := _branch_side_at(get_local_mouse_position())
+		var side := _branch_side_at(tree.get_local_mouse_position())
 		if side == &"left" and stage in [6, 7, 10]:
 			prune_left(); tree_branch_pruned.emit(side); return
 		if side == &"right" and stage in [7, 9, 11]:

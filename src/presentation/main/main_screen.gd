@@ -65,7 +65,7 @@ func _ready() -> void:
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
 	for stage in range(14):
-		var button := get_node_or_null("Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
+		var button := get_node_or_null("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
 		if button != null: button.pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
@@ -139,7 +139,7 @@ func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
 	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
-	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE else Control.MOUSE_FILTER_STOP
+	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE or mode == PlantView.MODE_PRUNE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 	if mode == PlantView.MODE_PRUNE:
