@@ -3,6 +3,7 @@ extends SceneTree
 var _failures: Array[String] = []
 
 func _init() -> void:
+	_test_pour_moistens_soil_one_stage()
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
 	_test_offer_contains_three_unique_items()
@@ -20,6 +21,17 @@ func _init() -> void:
 	for failure in _failures:
 		push_error(failure)
 	quit(1)
+
+func _test_pour_moistens_soil_one_stage() -> void:
+	var pot := PotState.new()
+	var expected := [0.30, 0.48, 0.68, 0.86, 1.0, 1.0]
+	var starting_values := [0.0, 0.20, 0.40, 0.60, 0.80, 1.0]
+	for index in range(starting_values.size()):
+		pot.soil_moisture = starting_values[index]
+		var stage_before := pot.soil_moisture_stage()
+		pot.moisten_soil_one_stage()
+		_expect(is_equal_approx(pot.soil_moisture, expected[index]), "pour: soil moisture did not advance to the next stage")
+		_expect(pot.soil_moisture_stage() == mini(stage_before + 1, 5), "pour: soil visual stage did not advance exactly once")
 
 func _test_seed_snapshot_is_immutable() -> void:
 	var plant := _plant("parent")

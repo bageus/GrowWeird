@@ -92,10 +92,4 @@ func _pot_index(pot_id: String) -> int:
 	return posmod(int(digits) - 1, POT_TEXTURES.size())
 
 func _soil_key(moisture: float) -> String:
-	var value := clampf(moisture, 0.0, 1.0)
-	if value <= 0.08: return "very_dry"
-	if value <= 0.30: return "dry"
-	if value <= 0.48: return "drying"
-	if value <= 0.68: return "moist"
-	if value <= 0.86: return "wet"
-	return "very_wet"
+	return ["very_dry", "dry", "drying", "moist", "wet", "very_wet"][PotState.soil_moisture_stage_for(moisture)]
