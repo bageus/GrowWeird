@@ -107,7 +107,7 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	lighting_button.disabled = pot == null
 	lighting_button.text = "Lighting · %s" % _environment_name(pot) if pot != null else "Lighting"
-	prune_button.disabled = not living
+	prune_button.disabled = not living and not tree_growth_preview.has_prunable_branch()
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = "Sell · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
 	var compost_yield := GameApp.active_dead_plant_compost_yield()
@@ -134,7 +134,6 @@ func _refresh_offer() -> void:
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
@@ -201,7 +200,7 @@ func _on_environment_preset(preset: StringName) -> void:
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset))
 func _on_prune_pressed() -> void:
-	if GameApp.active_plant() == null:
+	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
 		return
 	_pending_item_id = ""
@@ -220,7 +219,6 @@ func _on_cancel_pressed() -> void:
 func _on_tree_branch_pruned(side: StringName) -> void:
 	var cutting_id := GameApp.prune_active_branch(side)
 	event_label.text = "Tree cutting added to inventory." if not cutting_id.is_empty() else "Branch visual was cut; no game branch was available."
-
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
@@ -294,7 +292,6 @@ func _set_cancel_visibility() -> void:
 	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
-
 func _on_save_assets_layout_pressed() -> void:
 	pot_visual.save_asset_layout()
 	tree_growth_preview.save_asset_layout()
@@ -347,4 +344,7 @@ func _environment_name(pot: PotState) -> String:
 	return "Normal light"
 func _pretty_id(value: String) -> String:
 	return value.replace("_", " ").capitalize()
-func _on_tree_stage_selected(stage: int) -> void: tree_growth_preview.set_stage(stage); event_label.text = "Tree growth test: stage %d." % (stage + 1)
+func _on_tree_stage_selected(stage: int) -> void:
+	tree_growth_preview.set_stage(stage)
+	_refresh_actions(GameApp.active_pot(), GameApp.active_plant())
+	event_label.text = "Tree growth test: stage %d." % (stage + 1)

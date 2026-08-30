@@ -40,18 +40,21 @@ func set_stage(value: int) -> void:
 	tree.texture = STAGES[stage]
 	_update_hover_visibility()
 
+func has_prunable_branch() -> bool:
+	return stage in [6, 7, 9, 10, 11]
+
 func prune_left() -> void:
 	match stage:
-		7: set_stage(10) # tree_08 -> tree_11: right was cut, left remains
+		7: set_stage(9) # tree_08 -> tree_10: left cut
 		6: set_stage(12) # tree_07 -> tree_13: left cut, right not grown
 		10: set_stage(8) # tree_11 -> tree_09: both side branches cut
 	persisted_stage = _normalized_stage(stage)
 
 func prune_right() -> void:
 	match stage:
-		7: set_stage(10) # tree_08 -> tree_11: right cut, left remains
+		7: set_stage(10) # tree_08 -> tree_11: right cut
 		9: set_stage(8) # tree_10 -> tree_09: both side branches cut
-		11: set_stage(12) # tree_12 -> tree_13: right cut
+		11: set_stage(13) # tree_12 -> tree_14: right cut, left not grown
 	persisted_stage = _normalized_stage(stage)
 
 func restore_persisted_stage() -> void:
