@@ -4,6 +4,7 @@ var _failures: Array[String] = []
 
 func _init() -> void:
 	_test_pour_moistens_soil_one_stage()
+	_test_pour_waters_empty_active_pot()
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
 	_test_offer_contains_three_unique_items()
@@ -32,6 +33,19 @@ func _test_pour_moistens_soil_one_stage() -> void:
 		pot.moisten_soil_one_stage()
 		_expect(is_equal_approx(pot.soil_moisture, expected[index]), "pour: soil moisture did not advance to the next stage")
 		_expect(pot.soil_moisture_stage() == mini(stage_before + 1, 5), "pour: soil visual stage did not advance exactly once")
+
+func _test_pour_waters_empty_active_pot() -> void:
+	var app = load("res://src/application/game_app.gd").new()
+	var state := GameState.new()
+	var pot := PotState.new()
+	pot.pot_id = "empty-water-test"
+	pot.soil_moisture = 0.30
+	state.pots = [pot]
+	state.active_pot_id = pot.pot_id
+	app.state = state
+	_expect(app.water_active(false), "pour: an empty active pot must still accept water")
+	_expect(pot.soil_moisture_stage() == 2, "pour: empty pot soil asset stage did not advance")
+	app.free()
 
 func _test_seed_snapshot_is_immutable() -> void:
 	var plant := _plant("parent")

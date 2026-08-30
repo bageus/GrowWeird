@@ -88,7 +88,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(main_text.contains("modulate = Color(1, 1, 1, 0)"), "scene HUD: legacy procedural plant renderer must not compete with asset rendering")
 	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
 	_expect(pot_visual_text.contains("GROUND_TEXTURES[state.soil_moisture_stage()]") and pot_visual_text.contains("ground.queue_redraw()"), "pot visual: moisture stage must directly select and redraw the soil asset")
-	_expect(FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.tscn").contains("[node name=\"Ground\" type=\"TextureRect\" parent=\".\"]\nz_index = 4"), "pot visual: soil must render above the tree asset at the pot opening")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.tscn").contains("[node name=\"Ground\" type=\"TextureRect\" parent=\".\"]\nz_index = 2"), "pot visual: tree must render above the soil layer")
 	var overlay := SceneControlsOverlay.new()
 	overlay.size = Vector2(1000.0, 600.0)
 	var water := SceneActionButton.new()
@@ -156,6 +156,11 @@ func _test_growth_stage_geometry() -> void:
 	_expect(preview.visible and preview.stage == 3, "tree preview: test selection must reveal the selected asset without a plant")
 	preview.set_plant(null)
 	_expect(preview.visible and preview.stage == 3, "tree preview: game refresh must not hide an active test preview")
+	var plant_for_pruning := _plant()
+	plant_for_pruning.growth_ratio = 1.0
+	preview.set_plant(plant_for_pruning)
+	preview.clear_testing_preview()
+	_expect(preview.stage == 7 and preview.has_prunable_branch(), "tree preview: prune mode must leave test preview and restore domain branches")
 	preview.free()
 	var plant := _plant()
 	plant.growth_ratio = 1.0
