@@ -1,9 +1,8 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
 [ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
-[ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="4_pots"]
 [ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="5_progress"]
 [ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="6_window_art"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
@@ -73,22 +72,6 @@ autowrap_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_progress")
-
-[node name="PotsLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-layout_mode = 2
-text = "Pots"
-
-[node name="PotsScroll" type="ScrollContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-vertical_scroll_mode = 0
-
-[node name="PotSelector" type="HBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/PotsScroll"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 6
-script = ExtResource("4_pots")
 
 [node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 custom_minimum_size = Vector2(0, 460)
