@@ -30,6 +30,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/main/scene_action_button.gd",
 		"res://src/presentation/main/scene_draggable_panel.gd",
 		"res://src/presentation/main/scene_controls_overlay.gd",
+		"res://src/presentation/ui/ui_atlas.gd",
 		"res://src/presentation/environment/window_view.gd",
 		"res://src/presentation/plant/plant_view.gd",
 		"res://src/presentation/plant/branch_mutation_renderer.gd",
@@ -59,6 +60,7 @@ func _test_scene_button_contract() -> void:
 	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: spray must be contextual under water")
 	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("harvest"), "scene buttons: harvest button must be removed")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("wallet"), "scene buttons: wallet block must be movable")
+	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop") and SceneControlsOverlay.DEFAULT_POSITIONS.has("tasks"), "scene buttons: shop and tasks atlas controls missing")
 	host.free()
 
 func _test_scene_hud_contract() -> void:
@@ -77,6 +79,9 @@ func _test_scene_hud_contract() -> void:
 	var hud_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(main_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
 	_expect(hud_text.contains("WalletHud") and hud_text.contains("MoneyLabel") and hud_text.contains("ShopButton"), "scene HUD: balance and shop must share a wallet block")
+	_expect(FileAccess.file_exists("res://assets/ui/hud_balance.png") and FileAccess.file_exists("res://assets/ui/buttons.png"), "scene HUD: new UI atlases are missing")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("UiAtlas.HUD_BALANCE") and FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_balance_plus"), "scene HUD: balance art and plus hover are not wired")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("UiAtlas.HUD_INVENTORY") and FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("background2(1)"), "inventory HUD: inventory and three slot atlas art are not wired")
 	_expect(hud_text.contains("OffersPanel") and hud_text.contains("RefreshOffer") and hud_text.contains("SkipOffer"), "scene HUD: fertilizers need refresh left and skip right controls")
 	_expect(hud_text.contains("PotSelector") and hud_text.contains("PreviousPot") and hud_text.contains("NextPot") and hud_text.contains("PotThumbnail"), "scene HUD: pot selector needs one thumbnail between navigation arrows")
 	_expect(not main_text.contains("PotsScroll"), "scene HUD: pot selector must not remain in the sidebar")

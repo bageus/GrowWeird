@@ -73,7 +73,7 @@ func _ready() -> void:
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
-	money_label.text = "$%d" % GameApp.state.money
+	money_label.text = "%d" % GameApp.state.money
 	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
 	inventory_hud.set_inventory(GameApp.state.inventory)
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
@@ -106,14 +106,17 @@ func _refresh() -> void:
 	if not plant.alive: status_label.text += " · Final state"
 func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	lighting_button.disabled = pot == null
-	lighting_button.text = "Lighting · %s" % _environment_name(pot) if pot != null else "Lighting"
+	lighting_button.text = ""
+	lighting_button.tooltip_text = "Lighting"
 	prune_button.disabled = pot == null
 	sell_plant_button.disabled = plant == null
-	sell_plant_button.text = "Sell · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
+	sell_plant_button.text = ""
+	sell_plant_button.tooltip_text = "Sell · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
 	var compost_yield := GameApp.active_dead_plant_compost_yield()
 	recycle_plant_button.visible = plant != null and not plant.alive
 	recycle_plant_button.disabled = compost_yield <= 0
-	recycle_plant_button.text = "Compost · ×%d" % compost_yield
+	recycle_plant_button.text = ""
+	recycle_plant_button.tooltip_text = "Grind · ×%d" % compost_yield
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
 	var plant := GameApp.active_plant()
@@ -130,9 +133,11 @@ func _refresh_offer() -> void:
 			button.icon = null
 			button.disabled = true
 	var price := GameApp.current_offer_skip_price()
-	refresh_offer.text = "Refresh · $%d" % price if price > 0 else "Refresh"
+	refresh_offer.text = ""
+	refresh_offer.tooltip_text = "Refresh · %d" % price if price > 0 else "Refresh"
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
+	skip_offer.text = ""
+	skip_offer.tooltip_text = "Skip · %d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
@@ -161,6 +166,8 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 		&"sell_plant": _on_sell_plant_pressed()
 		&"recycle_plant": _on_recycle_plant_pressed()
 		&"cancel": _on_cancel_pressed()
+		&"shop": _on_shop_pressed()
+		&"tasks": progression_panel.visible = not progression_panel.visible
 func _on_water_pressed() -> void:
 	_water_submenu_visible = not _water_submenu_visible
 	_lighting_submenu_visible = false
@@ -339,12 +346,5 @@ func _has_regrowth(plant: PlantState) -> bool:
 		if plant.branch_at(slot) == null and plant.regrowth_progress_at(slot) > 0.0:
 			return true
 	return false
-func _environment_name(pot: PotState) -> String:
-	if pot.window_open: return "Open window"
-	if pot.light_mode == PotState.LightMode.DARK: return "Curtains"
-	if pot.light_mode == PotState.LightMode.DIFFUSED: return "Blinds"
-	return "Normal light"
 func _pretty_id(value: String) -> String: return value.replace("_", " ").capitalize()
-func _on_tree_stage_selected(stage: int) -> void:
-	tree_growth_preview.preview_stage_for_testing(stage)
-	event_label.text = "Tree asset preview: stage %d. Game state unchanged." % (stage + 1)
+func _on_tree_stage_selected(stage: int) -> void: tree_growth_preview.preview_stage_for_testing(stage); event_label.text = "Tree asset preview: stage %d. Game state unchanged." % (stage + 1)

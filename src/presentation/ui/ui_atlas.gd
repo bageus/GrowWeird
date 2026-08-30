@@ -1,0 +1,75 @@
+class_name UiAtlas
+extends RefCounted
+
+const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
+const BUTTONS_HOVER: Texture2D = preload("res://assets/ui/buttons_hover.png")
+const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
+const HUD_BALANCE_PLUS_HOVER: Texture2D = preload("res://assets/ui/hud_balance_plus_hover.png")
+const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
+const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
+const HUD_INVENTORY: Texture2D = preload("res://assets/ui/hud_background_inventory.png")
+const CELL := 512.0
+
+static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
+	var texture := AtlasTexture.new()
+	texture.atlas = source
+	texture.region = region
+	return texture
+
+static func button_texture(row: int, column: int, hover := false, mirror_x := false) -> Texture2D:
+	var source := BUTTONS_HOVER if hover else BUTTONS
+	var texture: Texture2D = atlas_region(source, Rect2(column * CELL, row * CELL + 88.0, CELL, 336.0))
+	if not mirror_x:
+		return texture
+	var image := texture.get_image()
+	image.flip_x()
+	return ImageTexture.create_from_image(image)
+
+static func configure_button(button: Button, row: int, column: int, mirror_x := false) -> void:
+	if button == null:
+		return
+	button.text = ""
+	button.icon = button_texture(row, column, false, mirror_x)
+	button.expand_icon = true
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.mouse_entered.connect(_set_button_hover.bind(button, row, column, mirror_x, true))
+	button.mouse_exited.connect(_set_button_hover.bind(button, row, column, mirror_x, false))
+
+static func configure_balance_plus(button: Button) -> void:
+	if button == null:
+		return
+	button.text = ""
+	button.icon = null
+	button.expand_icon = true
+	button.tooltip_text = "Open balance and shop"
+	for state in [&"normal", &"hover", &"pressed", &"focus"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.mouse_entered.connect(_set_balance_hover.bind(button, true))
+	button.mouse_exited.connect(_set_balance_hover.bind(button, false))
+
+static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = texture
+	style.content_margin_left = margins.x
+	style.content_margin_top = margins.y
+	style.content_margin_right = margins.z
+	style.content_margin_bottom = margins.w
+	return style
+
+static func background(index: int) -> Texture2D:
+	return atlas_region(HUD_BACKGROUND, Rect2(index * CELL, 0.0, CELL, CELL))
+
+static func background2(index: int) -> Texture2D:
+	return atlas_region(HUD_BACKGROUND2, Rect2(index * CELL, 0.0, CELL, CELL))
+
+static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
+	if is_instance_valid(button):
+		button.icon = button_texture(row, column, hovered, mirror_x)
+
+static func _set_balance_hover(button: Button, hovered: bool) -> void:
+	if not is_instance_valid(button):
+		return
+	button.icon = atlas_region(HUD_BALANCE_PLUS_HOVER, Rect2(768.0, 112.0, 256.0, 288.0)) if hovered else null

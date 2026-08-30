@@ -4,7 +4,7 @@ extends Control
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
-const LAYOUT_VERSION := 6
+const LAYOUT_VERSION := 7
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -12,9 +12,11 @@ const DEFAULT_POSITIONS := {
 	"sell_plant": Vector2(0.05, 0.64),
 	"recycle_plant": Vector2(0.05, 0.72),
 	"cancel": Vector2(0.45, 0.05),
+	"shop": Vector2(0.84, 0.12),
+	"tasks": Vector2(0.84, 0.22),
 	"wallet": Vector2(0.72, 0.03),
-	"pots": Vector2(0.02, 0.04),
-	"fertilizers": Vector2(0.17, 0.04),
+	"pots": Vector2(0.02, 0.82),
+	"fertilizers": Vector2(0.18, 0.82),
 	"inventory": Vector2(0.77, 0.50),
 }
 
@@ -23,10 +25,39 @@ var _layout: Dictionary = {}
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_apply_ui_atlases()
 	_collect_controls()
 	_layout = _load_layout()
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
+
+func _apply_ui_atlases() -> void:
+	if get_node_or_null("WalletHud") == null:
+		return
+	var wallet := get_node("WalletHud") as PanelContainer
+	wallet.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.HUD_BALANCE, Vector4(62.0, 30.0, 18.0, 28.0)))
+	UiAtlas.configure_balance_plus(get_node("WalletHud/WalletLayout/ShopButton") as Button)
+	var offers := get_node("OffersPanel") as PanelContainer
+	offers.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.background(0), Vector4(18.0, 18.0, 18.0, 18.0)))
+	var pots := get_node("PotSelector") as PanelContainer
+	pots.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.background(1), Vector4(24.0, 24.0, 24.0, 24.0)))
+	UiAtlas.configure_button(get_node("WaterButton") as Button, 1, 1)
+	UiAtlas.configure_button(get_node("LightingButton") as Button, 2, 3)
+	UiAtlas.configure_button(get_node("PruneButton") as Button, 1, 2)
+	UiAtlas.configure_button(get_node("SellPlantButton") as Button, 1, 3)
+	UiAtlas.configure_button(get_node("RecyclePlantButton") as Button, 3, 2)
+	UiAtlas.configure_button(get_node("ShopActionButton") as Button, 0, 0)
+	UiAtlas.configure_button(get_node("TasksButton") as Button, 0, 1)
+	UiAtlas.configure_button(get_node("OffersPanel/Row/RefreshOffer") as Button, 0, 3)
+	UiAtlas.configure_button(get_node("OffersPanel/Row/SkipOffer") as Button, 0, 2)
+	UiAtlas.configure_button(get_node("WaterOptions/Options/SprayButton") as Button, 1, 0)
+	UiAtlas.configure_button(get_node("WaterOptions/Options/PourButton") as Button, 1, 1)
+	UiAtlas.configure_button(get_node("LightingOptions/Options/CurtainsButton") as Button, 2, 0)
+	UiAtlas.configure_button(get_node("LightingOptions/Options/BlindsButton") as Button, 2, 1)
+	UiAtlas.configure_button(get_node("LightingOptions/Options/OpenWindowButton") as Button, 2, 2)
+	UiAtlas.configure_button(get_node("LightingOptions/Options/NormalLightButton") as Button, 2, 3)
+	UiAtlas.configure_button(get_node("PotSelector/Row/PreviousPot") as Button, 3, 3, true)
+	UiAtlas.configure_button(get_node("PotSelector/Row/NextPot") as Button, 3, 3)
 
 func set_water_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("WaterOptions") as Control
