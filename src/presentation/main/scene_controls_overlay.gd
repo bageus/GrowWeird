@@ -35,12 +35,18 @@ func _apply_ui_atlases() -> void:
 	if get_node_or_null("WalletHud") == null:
 		return
 	var wallet := get_node("WalletHud") as PanelContainer
-	wallet.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.HUD_BALANCE, Vector4(62.0, 30.0, 18.0, 28.0)))
-	UiAtlas.configure_balance_plus(get_node("WalletHud/WalletLayout/ShopButton") as Button)
+	wallet.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.HUD_BALANCE, Vector4.ZERO))
+	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button)
 	var offers := get_node("OffersPanel") as PanelContainer
-	offers.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.background(0), Vector4(18.0, 18.0, 18.0, 18.0)))
+	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferOne") as Button)
+	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferTwo") as Button)
+	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferThree") as Button)
 	var pots := get_node("PotSelector") as PanelContainer
-	pots.add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.background(1), Vector4(24.0, 24.0, 24.0, 24.0)))
+	pots.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	(get_node("PotSelector/Layers/PotCircle") as TextureRect).texture = UiAtlas.background(1)
+	(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	UiAtlas.configure_button(get_node("WaterButton") as Button, 1, 1)
 	UiAtlas.configure_button(get_node("LightingButton") as Button, 2, 3)
 	UiAtlas.configure_button(get_node("PruneButton") as Button, 1, 2)
@@ -56,8 +62,8 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_button(get_node("LightingOptions/Options/BlindsButton") as Button, 2, 1)
 	UiAtlas.configure_button(get_node("LightingOptions/Options/OpenWindowButton") as Button, 2, 2)
 	UiAtlas.configure_button(get_node("LightingOptions/Options/NormalLightButton") as Button, 2, 3)
-	UiAtlas.configure_button(get_node("PotSelector/Row/PreviousPot") as Button, 3, 3, true)
-	UiAtlas.configure_button(get_node("PotSelector/Row/NextPot") as Button, 3, 3)
+	UiAtlas.configure_button(get_node("PotSelector/Layers/PreviousPot") as Button, 3, 3, true)
+	UiAtlas.configure_button(get_node("PotSelector/Layers/NextPot") as Button, 3, 3)
 
 func set_water_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("WaterOptions") as Control
@@ -65,7 +71,7 @@ func set_water_options_visible(enabled: bool) -> void:
 		return
 	menu.visible = enabled
 	if enabled:
-		_place_popup(menu, _controls.get("water") as Control)
+		_place_popup(menu, _controls.get("water") as Control, 2.0)
 
 func set_lighting_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("LightingOptions") as Control
@@ -73,7 +79,7 @@ func set_lighting_options_visible(enabled: bool) -> void:
 		return
 	menu.visible = enabled
 	if enabled:
-		_place_popup(menu, _controls.get("lighting") as Control)
+		_place_popup(menu, _controls.get("lighting") as Control, 2.0)
 
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
@@ -160,10 +166,10 @@ func _capture_layout() -> void:
 func _reposition_open_popups() -> void:
 	var water := get_node_or_null("WaterOptions") as Control
 	if water != null and water.visible:
-		_place_popup(water, _controls.get("water") as Control)
+		_place_popup(water, _controls.get("water") as Control, 2.0)
 	var lighting := get_node_or_null("LightingOptions") as Control
 	if lighting != null and lighting.visible:
-		_place_popup(lighting, _controls.get("lighting") as Control)
+		_place_popup(lighting, _controls.get("lighting") as Control, 2.0)
 	var shop := get_node_or_null("ShopContainer") as Control
 	if shop != null and shop.visible:
 		_place_popup(shop, _controls.get("wallet") as Control)
@@ -171,10 +177,9 @@ func _reposition_open_popups() -> void:
 	if dialogs != null:
 		dialogs.refresh_position()
 
-func _place_popup(popup: Control, source: Control) -> void:
+func _place_popup(popup: Control, source: Control, gap := 8.0) -> void:
 	if popup == null or source == null:
 		return
-	var gap := 8.0
 	var target := source.position + Vector2(source.size.x + gap, 0.0)
 	if target.x + popup.size.x > size.x:
 		target.x = source.position.x - popup.size.x - gap

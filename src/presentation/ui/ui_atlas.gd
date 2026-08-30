@@ -33,6 +33,7 @@ static func configure_button(button: Button, row: int, column: int, mirror_x := 
 	button.expand_icon = true
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	button.mouse_entered.connect(_set_button_hover.bind(button, row, column, mirror_x, true))
@@ -49,6 +50,14 @@ static func configure_balance_plus(button: Button) -> void:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	button.mouse_entered.connect(_set_balance_hover.bind(button, true))
 	button.mouse_exited.connect(_set_balance_hover.bind(button, false))
+
+static func configure_hud_slot(button: Button) -> void:
+	if button == null:
+		return
+	var style := panel_style(background(0), Vector4(10.0, 10.0, 10.0, 10.0))
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
