@@ -28,30 +28,30 @@ stretch_mode = 5
 mouse_filter = 0
 
 
-[node name="LeftHover" type="TextureRect" parent="."]
+[node name="LeftHover" type="TextureRect" parent="Tree"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 120.0
-offset_top = 20.0
-offset_right = -120.0
-offset_bottom = -120.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 texture = ExtResource("3_left")
 expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 visible = false
 
-[node name="RightHover" type="TextureRect" parent="."]
+[node name="RightHover" type="TextureRect" parent="Tree"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 120.0
-offset_top = 20.0
-offset_right = -120.0
-offset_bottom = -120.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
 texture = ExtResource("4_right")
 expand_mode = 1
 stretch_mode = 5
