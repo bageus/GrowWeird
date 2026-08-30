@@ -176,6 +176,7 @@ func _on_pour_pressed() -> void:
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."
+	_refresh()
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
 	_water_submenu_visible = false
@@ -217,7 +218,8 @@ func _on_cancel_pressed() -> void:
 	event_label.text = "Action cancelled."
 func _on_tree_branch_pruned(side: StringName) -> void:
 	var cutting_id := GameApp.prune_active_branch(side)
-	event_label.text = "Tree cutting added to inventory." if not cutting_id.is_empty() else "Branch visual was cut; no game branch was available."
+	if not cutting_id.is_empty(): tree_growth_preview.prune_side(side)
+	event_label.text = "Plant branch added to inventory." if not cutting_id.is_empty() else "That branch cannot be cut."
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
@@ -341,8 +343,7 @@ func _environment_name(pot: PotState) -> String:
 	if pot.light_mode == PotState.LightMode.DARK: return "Curtains"
 	if pot.light_mode == PotState.LightMode.DIFFUSED: return "Blinds"
 	return "Normal light"
-func _pretty_id(value: String) -> String:
-	return value.replace("_", " ").capitalize()
+func _pretty_id(value: String) -> String: return value.replace("_", " ").capitalize()
 func _on_tree_stage_selected(stage: int) -> void:
 	tree_growth_preview.set_stage(stage)
 	_refresh_actions(GameApp.active_pot(), GameApp.active_plant())

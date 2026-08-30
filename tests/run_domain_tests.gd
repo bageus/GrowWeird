@@ -111,6 +111,13 @@ func _test_cutting_plant_and_graft_flow() -> void:
 	_expect(not PropagationService.graft_cutting(cutting, host, &"right", "blocked"), "cutting flow: graft must fail when slot is occupied")
 	host.cut_branch(&"right")
 	_expect(PropagationService.graft_cutting(cutting, host, &"right", "graft-flow"), "cutting flow: graft should succeed after slot is freed")
+	var state := GameState.new()
+	state.inventory = InventoryState.new()
+	var source := _plant("prune-source")
+	var source_branch_id := source.branch_at(&"left").branch_id
+	var cutting_id := PropagationActions.prune(state, source, &"left")
+	_expect(not cutting_id.is_empty() and state.inventory.cuttings.size() == 1, "prune flow: cut plant branch was not added to inventory")
+	_expect(state.inventory.cuttings[0].source_branch_id == source_branch_id, "prune flow: inventory branch lost its source identity")
 
 func _test_fruit_lifecycle_and_harvest() -> void:
 	var registry := ContentRegistry.new()
