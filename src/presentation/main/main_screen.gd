@@ -134,7 +134,6 @@ func _refresh_offer() -> void:
 	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	skip_offer.text = "Skip · $%d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
@@ -220,7 +219,6 @@ func _on_cancel_pressed() -> void:
 func _on_tree_branch_pruned(side: StringName) -> void:
 	var cutting_id := GameApp.prune_active_branch(side)
 	event_label.text = "Tree cutting added to inventory." if not cutting_id.is_empty() else "Branch visual was cut; no game branch was available."
-
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)
@@ -294,7 +292,6 @@ func _set_cancel_visibility() -> void:
 	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
-
 func _on_save_assets_layout_pressed() -> void:
 	pot_visual.save_asset_layout()
 	tree_growth_preview.save_asset_layout()
