@@ -10,6 +10,14 @@ extends Control
 @onready var stage_two_button: Button = %Stage2Button
 @onready var stage_three_button: Button = %Stage3Button
 @onready var stage_four_button: Button = %Stage4Button
+@onready var stage_five_button: Button = %Stage5Button
+@onready var stage_six_button: Button = %Stage6Button
+@onready var stage_seven_button: Button = %Stage7Button
+@onready var stage_eight_button: Button = %Stage8Button
+@onready var stage_nine_button: Button = %Stage9Button
+@onready var stage_ten_button: Button = %Stage10Button
+@onready var stage_eleven_button: Button = %Stage11Button
+@onready var stage_twelve_button: Button = %Stage12Button
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
@@ -71,6 +79,14 @@ func _ready() -> void:
 	stage_two_button.pressed.connect(_on_tree_stage_selected.bind(1))
 	stage_three_button.pressed.connect(_on_tree_stage_selected.bind(2))
 	stage_four_button.pressed.connect(_on_tree_stage_selected.bind(3))
+	stage_five_button.pressed.connect(_on_tree_stage_selected.bind(4))
+	stage_six_button.pressed.connect(_on_tree_stage_selected.bind(5))
+	stage_seven_button.pressed.connect(_on_tree_stage_selected.bind(6))
+	stage_eight_button.pressed.connect(_on_tree_stage_selected.bind(7))
+	stage_nine_button.pressed.connect(_on_tree_stage_selected.bind(8))
+	stage_ten_button.pressed.connect(_on_tree_stage_selected.bind(9))
+	stage_eleven_button.pressed.connect(_on_tree_stage_selected.bind(10))
+	stage_twelve_button.pressed.connect(_on_tree_stage_selected.bind(11))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -142,6 +158,7 @@ func _refresh_offer() -> void:
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
+	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
