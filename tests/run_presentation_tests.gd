@@ -84,6 +84,22 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
 	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
+	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
+	_expect(pot_visual_text.contains("GROUND_TEXTURES[_soil_key(state.soil_moisture)]") and pot_visual_text.contains("ground.queue_redraw()"), "pot visual: moisture changes must select and redraw the soil asset")
+	var overlay := SceneControlsOverlay.new()
+	overlay.size = Vector2(1000.0, 600.0)
+	var water := SceneActionButton.new()
+	water.action_id = &"water"
+	water.size = Vector2(112.0, 38.0)
+	overlay.add_child(water)
+	host.add_child(overlay)
+	overlay._collect_controls()
+	overlay.reset_layout()
+	_expect(water.normalized_position().distance_to(SceneControlsOverlay.DEFAULT_POSITIONS["water"]) < 0.001, "scene HUD: action button layout must be restored")
+	water.apply_normalized_position(Vector2(0.4, 0.3))
+	overlay._capture_layout()
+	_expect((overlay.get("_layout") as Dictionary)["water"].distance_to(Vector2(0.4, 0.3)) < 0.001, "scene HUD: action button layout must be captured")
+	overlay.free()
 	host.free()
 
 func _test_inventory_hud_contract() -> void:
