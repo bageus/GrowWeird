@@ -9,14 +9,14 @@ const POT_TEXTURES := [
 	preload("res://assets/pot/pot_04.png"),
 	preload("res://assets/pot/pot_05.png"),
 ]
-const GROUND_TEXTURES := {
-	"very_dry": preload("res://assets/pot/pot_ground/ground_06.png"),
-	"dry": preload("res://assets/pot/pot_ground/ground_01.png"),
-	"drying": preload("res://assets/pot/pot_ground/ground_05.png"),
-	"moist": preload("res://assets/pot/pot_ground/ground_04.png"),
-	"wet": preload("res://assets/pot/pot_ground/ground_02.png"),
-	"very_wet": preload("res://assets/pot/pot_ground/ground_03.png"),
-}
+const GROUND_TEXTURES := [
+	preload("res://assets/pot/pot_ground/ground_06.png"),
+	preload("res://assets/pot/pot_ground/ground_01.png"),
+	preload("res://assets/pot/pot_ground/ground_05.png"),
+	preload("res://assets/pot/pot_ground/ground_04.png"),
+	preload("res://assets/pot/pot_ground/ground_02.png"),
+	preload("res://assets/pot/pot_ground/ground_03.png"),
+]
 
 @onready var stand: TextureRect = $Stand
 @onready var ground: TextureRect = $Ground
@@ -34,8 +34,7 @@ func set_pot_state(state: PotState) -> void:
 	if state == null:
 		return
 	pot.texture = POT_TEXTURES[_pot_index(state.pot_id)]
-	var next_ground: Texture2D = GROUND_TEXTURES[_soil_key(state.soil_moisture)]
-	ground.texture = next_ground
+	ground.texture = GROUND_TEXTURES[state.soil_moisture_stage()]
 	ground.queue_redraw()
 
 func save_asset_layout() -> void:
@@ -92,6 +91,3 @@ func _pot_index(pot_id: String) -> int:
 	if digits.is_empty():
 		return 0
 	return posmod(int(digits) - 1, POT_TEXTURES.size())
-
-func _soil_key(moisture: float) -> String:
-	return ["very_dry", "dry", "drying", "moist", "wet", "very_wet"][PotState.soil_moisture_stage_for(moisture)]

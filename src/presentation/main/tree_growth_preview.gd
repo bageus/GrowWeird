@@ -24,56 +24,42 @@ const STAGES := [
 @onready var right_hover: TextureRect = $Tree/RightHover
 
 var stage := 0
+var _plant: PlantState
 var _dragging := false
 var _drag_offset := Vector2.ZERO
 var prune_mode := false
-var persisted_stage := -1
 var _hovered_branch: StringName = &""
 signal tree_branch_pruned(side: StringName)
 
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
 	_load_asset_layout()
-	set_stage(stage)
+	_set_stage(stage)
 
-func set_stage(value: int) -> void:
+func set_plant(plant: PlantState) -> void:
+	_plant = plant
+	visible = plant != null
+	_set_stage(stage_for(plant))
+
+static func stage_for(plant: PlantState) -> int:
+	if plant == null:
+		return 0
+	if plant.growth_ratio < 0.75:
+		return clampi(int(floor(plant.growth_ratio / 0.75 * 7.0)), 0, 6)
+	var has_left := plant.branch_at(&"left") != null
+	var has_right := plant.branch_at(&"right") != null
+	if has_left and has_right: return 7
+	if has_left: return 10
+	if has_right: return 9
+	return 8
+
+func _set_stage(value: int) -> void:
 	stage = clampi(value, 0, STAGES.size() - 1)
 	tree.texture = STAGES[stage]
 	_update_hover_visibility()
 
 func has_prunable_branch() -> bool:
-	return stage in [6, 7, 9, 10, 11]
-
-func prune_left() -> void:
-	match stage:
-		7: set_stage(9) # tree_08 -> tree_10: left cut
-		6: set_stage(12) # tree_07 -> tree_13: left cut, right not grown
-		10: set_stage(8) # tree_11 -> tree_09: both side branches cut
-	persisted_stage = _normalized_stage(stage)
-
-func prune_right() -> void:
-	match stage:
-		7: set_stage(10) # tree_08 -> tree_11: right cut
-		9: set_stage(8) # tree_10 -> tree_09: both side branches cut
-		11: set_stage(13) # tree_12 -> tree_14: right cut, left not grown
-	persisted_stage = _normalized_stage(stage)
-
-func prune_side(side: StringName) -> void:
-	if side == &"left": prune_left()
-	elif side == &"right": prune_right()
-
-func restore_persisted_stage() -> void:
-	set_stage(persisted_stage if persisted_stage >= 0 else _normalized_stage(stage))
-
-func _normalized_stage(value: int) -> int:
-	match value:
-		8: return 5 # tree_09 -> tree_06 after reload
-		9: return 6 # tree_10 -> tree_07 after reload
-		10: return 6 # tree_11 -> tree_07 after reload
-		11: return 5 # tree_12 -> tree_06 after reload
-		12: return 5 # tree_13 -> tree_06 after reload
-		13: return 5 # tree_14 -> tree_06 after reload
-	return value
+	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
 
 func set_prune_mode(enabled: bool) -> void:
 	prune_mode = enabled

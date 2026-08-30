@@ -64,9 +64,6 @@ func _ready() -> void:
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
-	for stage in range(14):
-		var button := get_node_or_null("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
-		if button != null: button.pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -82,6 +79,7 @@ func _refresh() -> void:
 	_refresh_actions(pot, plant)
 	if pot != null:
 		pot_visual.set_pot_state(pot)
+	tree_growth_preview.set_plant(plant)
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:
@@ -218,7 +216,6 @@ func _on_cancel_pressed() -> void:
 	event_label.text = "Action cancelled."
 func _on_tree_branch_pruned(side: StringName) -> void:
 	var cutting_id := GameApp.prune_active_branch(side)
-	if not cutting_id.is_empty(): tree_growth_preview.prune_side(side)
 	event_label.text = "Plant branch added to inventory." if not cutting_id.is_empty() else "That branch cannot be cut."
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
@@ -344,7 +341,3 @@ func _environment_name(pot: PotState) -> String:
 	if pot.light_mode == PotState.LightMode.DIFFUSED: return "Blinds"
 	return "Normal light"
 func _pretty_id(value: String) -> String: return value.replace("_", " ").capitalize()
-func _on_tree_stage_selected(stage: int) -> void:
-	tree_growth_preview.set_stage(stage)
-	_refresh_actions(GameApp.active_pot(), GameApp.active_plant())
-	event_label.text = "Tree growth test: stage %d." % (stage + 1)
