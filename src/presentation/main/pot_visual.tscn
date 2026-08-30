@@ -22,7 +22,7 @@ stretch_mode = 5
 mouse_filter = 0
 
 [node name="Ground" type="TextureRect" parent="."]
-z_index = 2
+z_index = 4
 layout_mode = 0
 position = Vector2(80, 150)
 size = Vector2(540, 360)
@@ -40,4 +40,3 @@ texture = ExtResource("4_pot")
 expand_mode = 1
 stretch_mode = 5
 mouse_filter = 0
-

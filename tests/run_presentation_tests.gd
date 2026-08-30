@@ -88,6 +88,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(main_text.contains("modulate = Color(1, 1, 1, 0)"), "scene HUD: legacy procedural plant renderer must not compete with asset rendering")
 	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
 	_expect(pot_visual_text.contains("GROUND_TEXTURES[state.soil_moisture_stage()]") and pot_visual_text.contains("ground.queue_redraw()"), "pot visual: moisture stage must directly select and redraw the soil asset")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.tscn").contains("[node name=\"Ground\" type=\"TextureRect\" parent=\".\"]\nz_index = 4"), "pot visual: soil must render above the tree asset at the pot opening")
 	var overlay := SceneControlsOverlay.new()
 	overlay.size = Vector2(1000.0, 600.0)
 	var water := SceneActionButton.new()
@@ -135,6 +136,16 @@ func _test_window_asset_mapping() -> void:
 	view.free()
 
 func _test_growth_stage_geometry() -> void:
+	var pot_preview := (load("res://src/presentation/main/pot_visual.tscn") as PackedScene).instantiate() as PotVisual
+	root.add_child(pot_preview)
+	var pot_state := PotState.new()
+	pot_state.soil_moisture = 0.30
+	pot_preview.set_pot_state(pot_state)
+	var dry_ground := pot_preview.ground.texture
+	pot_state.moisten_soil_one_stage()
+	pot_preview.set_pot_state(pot_state)
+	_expect(pot_preview.ground.texture != dry_ground, "pot visual: one pour must replace the displayed ground asset")
+	pot_preview.free()
 	var preview_scene := load("res://src/presentation/main/tree_growth_preview.tscn") as PackedScene
 	var preview := preview_scene.instantiate() as TreeGrowthPreview
 	root.add_child(preview)
@@ -143,6 +154,8 @@ func _test_growth_stage_geometry() -> void:
 	preview.set_plant(null)
 	preview.preview_stage_for_testing(3)
 	_expect(preview.visible and preview.stage == 3, "tree preview: test selection must reveal the selected asset without a plant")
+	preview.set_plant(null)
+	_expect(preview.visible and preview.stage == 3, "tree preview: game refresh must not hide an active test preview")
 	preview.free()
 	var plant := _plant()
 	plant.growth_ratio = 1.0
