@@ -57,7 +57,10 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 	var branches := {}
 	for slot in BranchState.VALID_SLOTS:
 		var branch := plant.branch_at(slot)
-		branches[String(slot)] = null if branch == null else _branch_to_dictionary(branch)
+		if branch == null:
+			branches[String(slot)] = null
+		else:
+			branches[String(slot)] = _branch_to_dictionary(branch)
 	return {
 		"instance_id": plant.instance_id,
 		"custom_name": plant.custom_name,

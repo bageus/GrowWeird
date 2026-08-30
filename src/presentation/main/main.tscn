@@ -105,41 +105,6 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Save assets layout"
 
-[node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-z_index = 6
-offset_left = 12.0
-offset_top = 220.0
-offset_right = 108.0
-offset_bottom = 398.0
-
-[node name="Layout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-layout_mode = 2
-text = "Tree test"
-
-[node name="Stage1Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 1"
-
-[node name="Stage2Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 2"
-
-[node name="Stage3Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 3"
-
-[node name="Stage4Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 4"
-
 [node name="ScenePanel" type="PanelContainer" parent="Shell/Layout"]
 layout_mode = 2
 size_flags_horizontal = 3
