@@ -68,6 +68,10 @@ func preview_stage_for_testing(value: int) -> void:
 	visible = true
 	_set_stage(_testing_stage)
 
+func clear_testing_preview() -> void:
+	_testing_stage = -1
+	set_plant(_plant)
+
 func has_prunable_branch() -> bool:
 	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
 
