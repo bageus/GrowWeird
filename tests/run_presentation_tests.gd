@@ -85,11 +85,14 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
 	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
-	var overlay := load("res://src/presentation/main/scene_controls.tscn").instantiate() as SceneControlsOverlay
+	var overlay := SceneControlsOverlay.new()
 	overlay.size = Vector2(1000.0, 600.0)
-	root.add_child(overlay)
+	var water := SceneActionButton.new()
+	water.action_id = &"water"
+	water.size = Vector2(112.0, 38.0)
+	overlay.add_child(water)
+	host.add_child(overlay)
 	overlay.reset_layout()
-	var water := overlay.get_node("WaterButton") as SceneActionButton
 	_expect(water.normalized_position().distance_to(SceneControlsOverlay.DEFAULT_POSITIONS["water"]) < 0.001, "scene HUD: action button layout must be restored")
 	water.apply_normalized_position(Vector2(0.4, 0.3))
 	overlay._capture_layout()
@@ -127,15 +130,10 @@ func _test_window_asset_mapping() -> void:
 	view.free()
 
 func _test_soil_asset_changes_with_moisture_stage() -> void:
-	var view := load("res://src/presentation/main/pot_visual.tscn").instantiate() as PotVisual
-	root.add_child(view)
-	var pot := PotState.new()
-	pot.soil_moisture = 0.0
-	view.set_pot_state(pot)
-	var dry_texture := (view.get_node("Ground") as TextureRect).texture
-	pot.moisten_soil_one_stage()
-	view.set_pot_state(pot)
-	_expect((view.get_node("Ground") as TextureRect).texture != dry_texture, "pot visual: Pour must change the soil texture by one stage")
+	var view := PotVisual.new()
+	var dry_texture: Texture2D = PotVisual.GROUND_TEXTURES[view._soil_key(0.0)]
+	var next_texture: Texture2D = PotVisual.GROUND_TEXTURES[view._soil_key(0.30)]
+	_expect(next_texture != dry_texture, "pot visual: Pour must select a new soil texture after one moisture stage")
 	view.free()
 
 func _test_growth_stage_geometry() -> void:

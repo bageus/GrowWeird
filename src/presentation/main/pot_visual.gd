@@ -34,7 +34,8 @@ func set_pot_state(state: PotState) -> void:
 	if state == null:
 		return
 	pot.texture = POT_TEXTURES[_pot_index(state.pot_id)]
-	ground.texture = GROUND_TEXTURES[_soil_key(state.soil_moisture)]
+	var next_ground: Texture2D = GROUND_TEXTURES[_soil_key(state.soil_moisture)]
+	ground.texture = next_ground
 	ground.queue_redraw()
 
 func save_asset_layout() -> void:
