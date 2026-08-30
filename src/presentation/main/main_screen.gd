@@ -6,11 +6,6 @@ extends Control
 @onready var plant_view: PlantView = %PlantView
 @onready var pot_visual: PotVisual = %PotVisual
 @onready var tree_growth_preview: TreeGrowthPreview = %TreeGrowthPreview
-@onready var stage_one_button: Button = %Stage1Button
-@onready var stage_two_button: Button = %Stage2Button
-@onready var stage_three_button: Button = %Stage3Button
-@onready var stage_four_button: Button = %Stage4Button
-@onready var save_assets_layout_button: Button = %SaveAssetsLayoutButton
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var pot_selector: PotSelector = %PotSelector
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
@@ -68,10 +63,8 @@ func _ready() -> void:
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
-	stage_one_button.pressed.connect(_on_tree_stage_selected.bind(0))
-	stage_two_button.pressed.connect(_on_tree_stage_selected.bind(1))
-	stage_three_button.pressed.connect(_on_tree_stage_selected.bind(2))
-	stage_four_button.pressed.connect(_on_tree_stage_selected.bind(3))
+	for stage in range(12):
+		get_node("%Stage%dButton" % (stage + 1)).pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -143,6 +136,7 @@ func _refresh_offer() -> void:
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
+	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
