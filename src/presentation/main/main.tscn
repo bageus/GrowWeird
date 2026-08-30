@@ -171,7 +171,7 @@ z_index = 6
 offset_left = 12.0
 offset_top = 220.0
 offset_right = 108.0
-offset_bottom = 398.0
+offset_bottom = 650.0
 
 [node name="Layout" type="VBoxContainer" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls"]
 layout_mode = 2
@@ -200,6 +200,46 @@ text = "Growth 3"
 unique_name_in_owner = true
 layout_mode = 2
 text = "Growth 4"
+
+[node name="Stage5Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "5 · Young tree / cutting start"
+
+[node name="Stage6Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "6 · Full tree"
+
+[node name="Stage7Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "7 · Full + left branch"
+
+[node name="Stage8Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "8 · Full + both branches"
+
+[node name="Stage9Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "9 · Both branches cut"
+
+[node name="Stage10Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "10 · Left cut / right available"
+
+[node name="Stage11Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "11 · Right cut / left available"
+
+[node name="Stage12Button" type="Button" parent="Shell/Layout/ScenePanel/SceneRoot/TreeGrowthControls/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "12 · Right branch only"
 
 [node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
 unique_name_in_owner = true
