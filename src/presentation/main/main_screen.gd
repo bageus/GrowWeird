@@ -107,7 +107,7 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	lighting_button.disabled = pot == null
 	lighting_button.text = "Lighting · %s" % _environment_name(pot) if pot != null else "Lighting"
-	prune_button.disabled = not living and not tree_growth_preview.has_prunable_branch()
+	prune_button.disabled = pot == null
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = "Sell · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
 	var compost_yield := GameApp.active_dead_plant_compost_yield()
