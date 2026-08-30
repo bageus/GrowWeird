@@ -28,6 +28,7 @@ var _dragging := false
 var _drag_offset := Vector2.ZERO
 var prune_mode := false
 var persisted_stage := -1
+var _hovered_branch: StringName = &""
 signal tree_branch_pruned(side: StringName)
 
 func _ready() -> void:
@@ -72,6 +73,7 @@ func _normalized_stage(value: int) -> int:
 
 func set_prune_mode(enabled: bool) -> void:
 	prune_mode = enabled
+	_hovered_branch = &""
 	_update_hover_visibility()
 
 func save_asset_layout() -> void:
@@ -92,10 +94,20 @@ func _load_asset_layout() -> void:
 		tree.scale = saved_scale
 
 func _update_hover_visibility() -> void:
-	left_hover.visible = prune_mode and stage in [6, 7, 10]
-	right_hover.visible = prune_mode and stage in [7, 9, 11]
+	left_hover.visible = prune_mode and _hovered_branch == &"left" and stage in [6, 7, 10]
+	right_hover.visible = prune_mode and _hovered_branch == &"right" and stage in [7, 9, 11]
+	left_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	right_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _set_hovered_branch(side: StringName) -> void:
+	if side != _hovered_branch:
+		_hovered_branch = side
+		_update_hover_visibility()
 
 func _on_tree_gui_input(event: InputEvent) -> void:
+	if prune_mode and event is InputEventMouseMotion:
+		_set_hovered_branch(_branch_side_at(tree.get_local_mouse_position()))
+		return
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
 		if side == &"left" and stage in [6, 7, 10]:
@@ -120,13 +132,20 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 		tree.global_position = get_global_mouse_position() - _drag_offset
 
 func _branch_side_at(point: Vector2) -> StringName:
-	var width := tree.size.x
-	if width <= 0.0:
-		return &""
-	if point.x < width * 0.45:
-		return &"left"
-	if point.x > width * 0.55:
-		return &"right"
+	var normalized := Vector2(
+		clampf(point.x / maxf(tree.size.x, 1.0), 0.0, 1.0),
+		clampf(point.y / maxf(tree.size.y, 1.0), 0.0, 1.0)
+	)
+	var left_image := left_hover.texture.get_image() if left_hover.texture != null else null
+	var right_image := right_hover.texture.get_image() if right_hover.texture != null else null
+	if left_image != null:
+		var left_px := Vector2i(int(normalized.x * float(left_image.get_width() - 1)), int(normalized.y * float(left_image.get_height() - 1)))
+		if left_image.get_pixelv(left_px).a > 0.08 and stage in [6, 7, 10]:
+			return &"left"
+	if right_image != null:
+		var right_px := Vector2i(int(normalized.x * float(right_image.get_width() - 1)), int(normalized.y * float(right_image.get_height() - 1)))
+		if right_image.get_pixelv(right_px).a > 0.08 and stage in [7, 9, 11]:
+			return &"right"
 	return &""
 
 func _scale_tree(factor: float) -> void:
