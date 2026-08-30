@@ -38,6 +38,10 @@ var _water_submenu_visible := false
 var _lighting_submenu_visible := false
 var _prune_cursor: Texture2D = null
 func _ready() -> void:
+	var tree_test := get_node_or_null("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls")
+	var left_layout := get_node_or_null("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout")
+	if tree_test != null and left_layout != null:
+		left_layout.move_child(tree_test, 4)
 	GameApp.state_changed.connect(_refresh)
 	GameApp.mutations_resolved.connect(_on_mutations_resolved)
 	GameApp.fertilizer_offer_ready.connect(_on_offer_ready)
@@ -107,7 +111,7 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	var living := plant != null and plant.alive
 	lighting_button.disabled = pot == null
 	lighting_button.text = "Lighting · %s" % _environment_name(pot) if pot != null else "Lighting"
-	prune_button.disabled = not living and not tree_growth_preview.has_prunable_branch()
+	prune_button.disabled = pot == null
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = "Sell · $%d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
 	var compost_yield := GameApp.active_dead_plant_compost_yield()
