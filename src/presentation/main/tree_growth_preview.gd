@@ -7,13 +7,26 @@ const STAGES := [
 	preload("res://assets/tree/tree_02.png"),
 	preload("res://assets/tree/tree_03.png"),
 	preload("res://assets/tree/tree_04.png"),
+	preload("res://assets/tree/tree_05.png"),
+	preload("res://assets/tree/tree_06.png"),
+	preload("res://assets/tree/tree_07.png"),
+	preload("res://assets/tree/tree_08.png"),
+	preload("res://assets/tree/tree_09.png"),
+	preload("res://assets/tree/tree_10.png"),
+	preload("res://assets/tree/tree_11.png"),
+	preload("res://assets/tree/tree_12.png"),
 ]
+const LEFT_HOVER := preload("res://assets/tree/tree_left.png")
+const RIGHT_HOVER := preload("res://assets/tree/tree_right.png")
 
 @onready var tree: TextureRect = $Tree
+@onready var left_hover: TextureRect = $LeftHover
+@onready var right_hover: TextureRect = $RightHover
 
 var stage := 0
 var _dragging := false
 var _drag_offset := Vector2.ZERO
+var prune_mode := false
 
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
@@ -23,6 +36,11 @@ func _ready() -> void:
 func set_stage(value: int) -> void:
 	stage = clampi(value, 0, STAGES.size() - 1)
 	tree.texture = STAGES[stage]
+	_update_hover_visibility()
+
+func set_prune_mode(enabled: bool) -> void:
+	prune_mode = enabled
+	_update_hover_visibility()
 
 func save_asset_layout() -> void:
 	var config := ConfigFile.new()
@@ -40,6 +58,10 @@ func _load_asset_layout() -> void:
 		tree.position = saved_position
 	if saved_scale is Vector2:
 		tree.scale = saved_scale
+
+func _update_hover_visibility() -> void:
+	left_hover.visible = prune_mode and stage in [6, 7, 10, 11]
+	right_hover.visible = prune_mode and stage in [7, 9, 11]
 
 func _on_tree_gui_input(event: InputEvent) -> void:
 	if not Input.is_key_pressed(KEY_CTRL):
