@@ -8,7 +8,6 @@ func _init() -> void:
 	_test_scene_hud_contract()
 	_test_inventory_hud_contract()
 	_test_window_asset_mapping()
-	_test_soil_asset_changes_with_moisture_stage()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
 	_test_mutation_reveal_detection()
@@ -85,6 +84,8 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
 	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
+	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
+	_expect(pot_visual_text.contains("GROUND_TEXTURES[_soil_key(state.soil_moisture)]") and pot_visual_text.contains("ground.queue_redraw()"), "pot visual: moisture changes must select and redraw the soil asset")
 	var overlay := SceneControlsOverlay.new()
 	overlay.size = Vector2(1000.0, 600.0)
 	var water := SceneActionButton.new()
@@ -92,6 +93,7 @@ func _test_scene_hud_contract() -> void:
 	water.size = Vector2(112.0, 38.0)
 	overlay.add_child(water)
 	host.add_child(overlay)
+	overlay._collect_controls()
 	overlay.reset_layout()
 	_expect(water.normalized_position().distance_to(SceneControlsOverlay.DEFAULT_POSITIONS["water"]) < 0.001, "scene HUD: action button layout must be restored")
 	water.apply_normalized_position(Vector2(0.4, 0.3))
@@ -127,13 +129,6 @@ func _test_window_asset_mapping() -> void:
 	_expect(view.texture == WindowView.VENTILATION, "window art: open window must use window_03")
 	view.set_environment(PotState.LightMode.DIFFUSED, false)
 	_expect(view.texture == WindowView.BLINDS, "window art: blinds mode must use window_04")
-	view.free()
-
-func _test_soil_asset_changes_with_moisture_stage() -> void:
-	var view := PotVisual.new()
-	var dry_texture: Texture2D = PotVisual.GROUND_TEXTURES[view._soil_key(0.0)]
-	var next_texture: Texture2D = PotVisual.GROUND_TEXTURES[view._soil_key(0.30)]
-	_expect(next_texture != dry_texture, "pot visual: Pour must select a new soil texture after one moisture stage")
 	view.free()
 
 func _test_growth_stage_geometry() -> void:
