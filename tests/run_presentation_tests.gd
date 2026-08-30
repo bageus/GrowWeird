@@ -137,8 +137,12 @@ func _test_window_asset_mapping() -> void:
 func _test_growth_stage_geometry() -> void:
 	var preview_scene := load("res://src/presentation/main/tree_growth_preview.tscn") as PackedScene
 	var preview := preview_scene.instantiate() as TreeGrowthPreview
+	root.add_child(preview)
 	_expect(preview.get_node_or_null("Tree/LeftHover") != null, "tree preview: left hover asset path is invalid")
 	_expect(preview.get_node_or_null("Tree/RightHover") != null, "tree preview: right hover asset path is invalid")
+	preview.set_plant(null)
+	preview.preview_stage_for_testing(3)
+	_expect(preview.visible and preview.stage == 3, "tree preview: test selection must reveal the selected asset without a plant")
 	preview.free()
 	var plant := _plant()
 	plant.growth_ratio = 1.0

@@ -59,6 +59,7 @@ func _set_stage(value: int) -> void:
 	_update_hover_visibility()
 
 func preview_stage_for_testing(value: int) -> void:
+	visible = true
 	_set_stage(value)
 
 func has_prunable_branch() -> bool:
