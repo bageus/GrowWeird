@@ -28,6 +28,7 @@ var _dragging := false
 var _drag_offset := Vector2.ZERO
 var prune_mode := false
 var persisted_stage := -1
+signal tree_branch_pruned(side: StringName)
 
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
@@ -92,6 +93,12 @@ func _update_hover_visibility() -> void:
 	right_hover.visible = prune_mode and stage in [7, 9, 11]
 
 func _on_tree_gui_input(event: InputEvent) -> void:
+	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var side := _branch_side_at(get_local_mouse_position())
+		if side == &"left" and stage in [6, 7, 10]:
+			prune_left(); tree_branch_pruned.emit(side); return
+		if side == &"right" and stage in [7, 9, 11]:
+			prune_right(); tree_branch_pruned.emit(side); return
 	if not Input.is_key_pressed(KEY_CTRL):
 		return
 	if event is InputEventMouseButton:
@@ -108,6 +115,16 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 			_scale_tree(0.9)
 	elif event is InputEventMouseMotion and _dragging and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		tree.global_position = get_global_mouse_position() - _drag_offset
+
+func _branch_side_at(point: Vector2) -> StringName:
+	var width := tree.size.x
+	if width <= 0.0:
+		return &""
+	if point.x < width * 0.45:
+		return &"left"
+	if point.x > width * 0.55:
+		return &"right"
+	return &""
 
 func _scale_tree(factor: float) -> void:
 	var next_scale := tree.scale * factor
