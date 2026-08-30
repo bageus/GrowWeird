@@ -176,6 +176,7 @@ func _on_pour_pressed() -> void:
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."
+	pot_visual.set_pot_state(GameApp.active_pot())
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
 	_water_submenu_visible = false

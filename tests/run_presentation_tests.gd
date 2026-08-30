@@ -8,6 +8,7 @@ func _init() -> void:
 	_test_scene_hud_contract()
 	_test_inventory_hud_contract()
 	_test_window_asset_mapping()
+	_test_soil_asset_changes_with_moisture_stage()
 	_test_growth_stage_geometry()
 	_test_phenotype_descriptor()
 	_test_mutation_reveal_detection()
@@ -84,6 +85,16 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
 	_expect(not main_text.contains("SoilView") and not main_text.contains("PlantSense"), "scene HUD: legacy pot/comfort overlays must stay removed")
+	var overlay := load("res://src/presentation/main/scene_controls.tscn").instantiate() as SceneControlsOverlay
+	overlay.size = Vector2(1000.0, 600.0)
+	root.add_child(overlay)
+	overlay.reset_layout()
+	var water := overlay.get_node("WaterButton") as SceneActionButton
+	_expect(water.normalized_position().distance_to(SceneControlsOverlay.DEFAULT_POSITIONS["water"]) < 0.001, "scene HUD: action button layout must be restored")
+	water.apply_normalized_position(Vector2(0.4, 0.3))
+	overlay._capture_layout()
+	_expect((overlay.get("_layout") as Dictionary)["water"].distance_to(Vector2(0.4, 0.3)) < 0.001, "scene HUD: action button layout must be captured")
+	overlay.free()
 	host.free()
 
 func _test_inventory_hud_contract() -> void:
@@ -113,6 +124,18 @@ func _test_window_asset_mapping() -> void:
 	_expect(view.texture == WindowView.VENTILATION, "window art: open window must use window_03")
 	view.set_environment(PotState.LightMode.DIFFUSED, false)
 	_expect(view.texture == WindowView.BLINDS, "window art: blinds mode must use window_04")
+	view.free()
+
+func _test_soil_asset_changes_with_moisture_stage() -> void:
+	var view := load("res://src/presentation/main/pot_visual.tscn").instantiate() as PotVisual
+	root.add_child(view)
+	var pot := PotState.new()
+	pot.soil_moisture = 0.0
+	view.set_pot_state(pot)
+	var dry_texture := (view.get_node("Ground") as TextureRect).texture
+	pot.moisten_soil_one_stage()
+	view.set_pot_state(pot)
+	_expect((view.get_node("Ground") as TextureRect).texture != dry_texture, "pot visual: Pour must change the soil texture by one stage")
 	view.free()
 
 func _test_growth_stage_geometry() -> void:

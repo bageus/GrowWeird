@@ -35,6 +35,7 @@ func set_pot_state(state: PotState) -> void:
 		return
 	pot.texture = POT_TEXTURES[_pot_index(state.pot_id)]
 	ground.texture = GROUND_TEXTURES[_soil_key(state.soil_moisture)]
+	ground.queue_redraw()
 
 func save_asset_layout() -> void:
 	var config := ConfigFile.new()
