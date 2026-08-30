@@ -73,89 +73,6 @@ unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_progress")
 
-[node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
-custom_minimum_size = Vector2(0, 460)
-layout_mode = 2
-
-[node name="Layout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-layout_mode = 2
-text = "Tree test"
-
-[node name="Stage1Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 1"
-
-[node name="Stage2Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 2"
-
-[node name="Stage3Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 3"
-
-[node name="Stage4Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Growth 4"
-
-[node name="Stage5Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "5 · Young tree / cutting start"
-
-[node name="Stage6Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "6 · Full tree"
-
-[node name="Stage7Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "7 · Full + left branch"
-
-[node name="Stage8Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "8 · Full + both branches"
-
-[node name="Stage9Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "9 · Both branches cut"
-
-[node name="Stage10Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "10 · Left cut / right available"
-
-[node name="Stage11Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "11 · Right cut / left available"
-
-[node name="Stage12Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "12 · Right branch only"
-
-[node name="Stage13Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "13 · Left cut / right not grown"
-
-[node name="Stage14Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "14 · Right cut / left not grown"
-
-
 [node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -222,6 +139,7 @@ z_index = 3
 
 [node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
 unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
