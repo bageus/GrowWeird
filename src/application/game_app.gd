@@ -89,10 +89,8 @@ func water_active(use_sprayer: bool = false) -> bool:
 	var pot := active_pot()
 	if pot == null or pot.plant == null or not pot.plant.alive:
 		return false
-	if use_sprayer:
-		pot.soil_moisture = clampf(pot.soil_moisture + rules.sprayer_soil_amount, 0.0, 1.0)
-	else:
-		pot.moisten_soil_one_stage()
+	if use_sprayer: pot.soil_moisture = clampf(pot.soil_moisture + rules.sprayer_soil_amount, 0.0, 1.0)
+	else: pot.moisten_soil_one_stage()
 	_progress(&"watered")
 	state_changed.emit()
 	return true
