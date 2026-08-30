@@ -64,6 +64,9 @@ func _ready() -> void:
 	offer_three.pressed.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
+	for stage in range(14):
+		var button := get_node("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
+		button.pressed.connect(_on_tree_stage_selected.bind(stage))
 	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
@@ -341,3 +344,6 @@ func _environment_name(pot: PotState) -> String:
 	if pot.light_mode == PotState.LightMode.DIFFUSED: return "Blinds"
 	return "Normal light"
 func _pretty_id(value: String) -> String: return value.replace("_", " ").capitalize()
+func _on_tree_stage_selected(stage: int) -> void:
+	tree_growth_preview.preview_stage_for_testing(stage)
+	event_label.text = "Tree asset preview: stage %d. Game state unchanged." % (stage + 1)
