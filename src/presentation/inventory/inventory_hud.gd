@@ -9,7 +9,8 @@ var _signature := ""
 
 func _ready() -> void:
 	super()
-	add_theme_stylebox_override(&"panel", UiAtlas.panel_style(UiAtlas.HUD_INVENTORY, Vector4(12.0, 18.0, 12.0, 18.0)))
+	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+	$Background.texture = UiAtlas.HUD_INVENTORY
 
 func set_inventory(inventory: InventoryState) -> void:
 	var signature := _inventory_signature(inventory)
@@ -70,7 +71,8 @@ func _rebuild(inventory: InventoryState) -> void:
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(150.0, 126.0)
+	button.custom_minimum_size = Vector2(112.0, 112.0)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -89,7 +91,8 @@ func _add_empty() -> void:
 
 func _add_empty_slot(label := "") -> void:
 	var slot := Button.new()
-	slot.custom_minimum_size = Vector2(150.0, 126.0)
+	slot.custom_minimum_size = Vector2(112.0, 112.0)
+	slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	slot.text = label
 	slot.disabled = true
 	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE

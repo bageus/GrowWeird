@@ -9,6 +9,7 @@ signal recycle_requested(kind: StringName, item_id: String, quantity: int)
 @onready var recycle_action: Button = $ActionMenu/Actions/RecycleAction
 @onready var sell_action: Button = $ActionMenu/Actions/SellAction
 @onready var use_action: Button = $ActionMenu/Actions/UseAction
+@onready var cancel_action: Button = $ActionMenu/Actions/CancelAction
 @onready var sell_popup: PanelContainer = $SellPopup
 @onready var sell_title: Label = $SellPopup/Layout/Header/Title
 @onready var sell_slider: HSlider = $SellPopup/Layout/QuantitySlider
@@ -36,6 +37,7 @@ func _ready() -> void:
 	recycle_action.pressed.connect(_open_recycle)
 	sell_action.pressed.connect(_open_sell)
 	use_action.pressed.connect(_use)
+	cancel_action.pressed.connect(close_all)
 	$SellPopup/Layout/Header/Close.pressed.connect(close_all)
 	$SellPopup/Layout/Confirm.pressed.connect(_confirm_sell)
 	$RecyclePopup/Layout/Header/Close.pressed.connect(close_all)
@@ -47,6 +49,7 @@ func _ready() -> void:
 	UiAtlas.configure_button(recycle_action, 3, 2)
 	UiAtlas.configure_button($SellPopup/Layout/Confirm as Button, 1, 3)
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 3, 2)
+	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func show_for(
 	source: Control,
