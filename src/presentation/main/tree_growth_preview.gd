@@ -16,8 +16,6 @@ const STAGES := [
 	preload("res://assets/tree/tree_11.png"),
 	preload("res://assets/tree/tree_12.png"),
 ]
-const LEFT_HOVER := preload("res://assets/tree/tree_left.png")
-const RIGHT_HOVER := preload("res://assets/tree/tree_right.png")
 
 @onready var tree: TextureRect = $Tree
 @onready var left_hover: TextureRect = $LeftHover
@@ -60,7 +58,7 @@ func _load_asset_layout() -> void:
 		tree.scale = saved_scale
 
 func _update_hover_visibility() -> void:
-	left_hover.visible = prune_mode and stage in [6, 7, 10, 11]
+	left_hover.visible = prune_mode and stage in [6, 7, 10]
 	right_hover.visible = prune_mode and stage in [7, 9, 11]
 
 func _on_tree_gui_input(event: InputEvent) -> void:
