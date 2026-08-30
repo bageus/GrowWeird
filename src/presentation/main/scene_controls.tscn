@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="4_shop"]
 [ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_hud.tscn" id="5_inventory"]
 [ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_item_dialogs.tscn" id="6_dialogs"]
+[ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
+[ext_resource type="Texture2D" path="res://assets/pot/pot_01.png" id="8_pot"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
@@ -134,6 +136,38 @@ theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
 layout_id = &"fertilizers"
 drag_handle_height = 54.0
+
+[node name="PotSelector" type="PanelContainer" parent="."]
+z_index = 7
+custom_minimum_size = Vector2(142, 78)
+offset_right = 142.0
+offset_bottom = 78.0
+theme_override_styles/panel = SubResource("StyleBox_hud")
+script = ExtResource("7_pots")
+layout_id = &"pots"
+drag_handle_height = 78.0
+
+[node name="Row" type="HBoxContainer" parent="PotSelector"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PreviousPot" type="Button" parent="PotSelector/Row"]
+custom_minimum_size = Vector2(30, 60)
+layout_mode = 2
+text = "‹"
+
+[node name="PotThumbnail" type="TextureRect" parent="PotSelector/Row"]
+custom_minimum_size = Vector2(62, 62)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("8_pot")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NextPot" type="Button" parent="PotSelector/Row"]
+custom_minimum_size = Vector2(30, 60)
+layout_mode = 2
+text = "›"
 
 [node name="Row" type="HBoxContainer" parent="OffersPanel"]
 layout_mode = 2

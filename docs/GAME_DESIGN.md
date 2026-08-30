@@ -29,7 +29,7 @@ There is no ideal final specimen. Any living plant can continue mutating indefin
 - Right: vertical inventory for fruit, seeds, fertilizer, cuttings and later item types.
 - A compact current-goal card teaches the first-session loop without hiding normal gameplay controls.
 - Bottom-center: periodic three-item fertilizer offer.
-- Below offers: pot selector; switching pot switches that pot's environment.
+- Left of the fertilizer offers: one active-pot thumbnail with previous/next arrows; switching pot switches that pot's environment.
 - Start: 1 pot with a sprout + 1 empty pot.
 - Extra pots come from Shop. Decorative rooms/pots are out of current scope.
 

@@ -4,7 +4,7 @@ extends Control
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
-const LAYOUT_VERSION := 5
+const LAYOUT_VERSION := 6
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -13,7 +13,8 @@ const DEFAULT_POSITIONS := {
 	"recycle_plant": Vector2(0.05, 0.72),
 	"cancel": Vector2(0.45, 0.05),
 	"wallet": Vector2(0.72, 0.03),
-	"fertilizers": Vector2(0.16, 0.04),
+	"pots": Vector2(0.02, 0.04),
+	"fertilizers": Vector2(0.17, 0.04),
 	"inventory": Vector2(0.77, 0.50),
 }
 
