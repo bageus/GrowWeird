@@ -156,10 +156,10 @@ vertical_alignment = 1
 
 [node name="ShopButton" type="Button" parent="WalletHud/Layers"]
 layout_mode = 0
-offset_left = 188.0
-offset_top = 31.0
-offset_right = 238.0
-offset_bottom = 89.0
+offset_left = 184.0
+offset_top = 34.0
+offset_right = 234.0
+offset_bottom = 92.0
 text = "Shop"
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
@@ -198,9 +198,10 @@ stretch_mode = 0
 
 [node name="PreviousPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_top = 30.0
-offset_right = 62.0
-offset_bottom = 96.0
+offset_left = -4.0
+offset_top = 23.0
+offset_right = 76.0
+offset_bottom = 103.0
 text = "‹"
 
 [node name="PotThumbnail" type="TextureRect" parent="PotSelector/Layers"]
@@ -216,10 +217,10 @@ stretch_mode = 5
 
 [node name="NextPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = 152.0
-offset_top = 30.0
-offset_right = 214.0
-offset_bottom = 96.0
+offset_left = 138.0
+offset_top = 23.0
+offset_right = 218.0
+offset_bottom = 103.0
 text = "›"
 
 [node name="Row" type="HBoxContainer" parent="OffersPanel"]

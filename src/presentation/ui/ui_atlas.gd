@@ -77,6 +77,7 @@ static func background2(index: int) -> Texture2D:
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
 	if is_instance_valid(button):
 		button.icon = button_texture(row, column, hovered, mirror_x)
+		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
 
 static func _set_balance_hover(button: Button, hovered: bool) -> void:
 	if not is_instance_valid(button):
