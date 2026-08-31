@@ -8,6 +8,8 @@ func _init() -> void:
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
 	_test_offer_contains_three_unique_items()
+	_test_fertilizer_atlas_catalog()
+	_test_atlas_offer_is_consumed_as_food()
 	_test_multi_axis_mutation_consumes_requirements()
 	_test_cutting_plant_and_graft_flow()
 	_test_fruit_lifecycle_and_harvest()
@@ -92,6 +94,32 @@ func _test_offer_contains_three_unique_items() -> void:
 	_expect(generated, "fertilizer offer: expected an offer")
 	_expect(offer.offered_ids.size() == 3, "fertilizer offer: expected exactly three items")
 	_expect(unique.size() == 3, "fertilizer offer: items must be unique")
+
+func _test_fertilizer_atlas_catalog() -> void:
+	var definitions := FertilizerAssetCatalog.definitions()
+	var ids := {}
+	for definition in definitions:
+		ids[String(definition.id)] = true
+	_expect(definitions.size() == 126, "fertilizer atlas: expected 126 selectable frames")
+	_expect(ids.size() == 126, "fertilizer atlas: frame ids must be unique")
+	_expect(not ids.has("fertilizer_atlas_2_r1_c6"), "fertilizer atlas: first grind result leaked into offers")
+	_expect(not ids.has("fertilizer_atlas_2_r4_c1"), "fertilizer atlas: second grind result leaked into offers")
+	var sample := definitions[0]
+	_expect(sample.mutation_contributions.is_empty(), "fertilizer atlas: unconfigured items must not mutate plants")
+	_expect(float(sample.care_effects.get("health", 0.0)) > 0.0, "fertilizer atlas: selected item must act as food")
+
+func _test_atlas_offer_is_consumed_as_food() -> void:
+	var registry := ContentRegistry.new()
+	registry.load_all()
+	var state := GameState.new()
+	var plant := _plant("atlas-food")
+	plant.health = 0.5
+	var fertilizer_id := FertilizerAssetCatalog.id_for(0, 0, 0)
+	state.fertilizer_offer.offered_ids = [fertilizer_id]
+	var result := FertilizerActions.choose_offer(state, plant, fertilizer_id, registry, GameRules.new())
+	_expect(bool(result.get("success", false)), "fertilizer atlas: offered frame should be selectable")
+	_expect(plant.health > 0.5, "fertilizer atlas: selected frame should feed the plant immediately")
+	_expect(not state.fertilizer_offer.is_active(), "fertilizer atlas: choosing one frame must consume the offer")
 
 func _test_multi_axis_mutation_consumes_requirements() -> void:
 	var plant := _plant("synergy")
