@@ -29,7 +29,7 @@ static func advance(
 			offer_created = FertilizerOfferService.advance(
 				state.fertilizer_offer,
 				step_seconds,
-				registry.all_fertilizers(),
+				registry.all_offer_fertilizers(),
 				rules
 			) or offer_created
 

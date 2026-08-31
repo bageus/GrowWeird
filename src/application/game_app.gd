@@ -39,7 +39,7 @@ func _process(delta: float) -> void:
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
-	if _has_living_plant() and FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_fertilizers(), rules):
+	if _has_living_plant() and FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_offer_fertilizers(), rules):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
 	if changed:
@@ -127,7 +127,7 @@ func refresh_fertilizer_offer() -> bool:
 	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
 	if price <= 0 or not EconomyService.spend(state, price):
 		return false
-	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_fertilizers(), rules):
+	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_offer_fertilizers(), rules):
 		EconomyService.credit(state, price)
 		return false
 	state_changed.emit()

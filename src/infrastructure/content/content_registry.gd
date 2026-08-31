@@ -8,16 +8,20 @@ const PROGRESSION_DIR := "res://content/progression"
 
 var _plants: Dictionary = {}
 var _fertilizers: Dictionary = {}
+var _offer_fertilizers: Dictionary = {}
 var _mutations: Dictionary = {}
 var _progression: Dictionary = {}
 
 func load_all() -> void:
 	_plants.clear()
 	_fertilizers.clear()
+	_offer_fertilizers.clear()
 	_mutations.clear()
 	_progression.clear()
 	_load_directory(PLANT_DIR, _plants)
 	_load_directory(FERTILIZER_DIR, _fertilizers)
+	for definition in FertilizerAssetCatalog.definitions():
+		_offer_fertilizers[String(definition.id)] = definition
 	_load_directory(MUTATION_DIR, _mutations)
 	_load_directory(PROGRESSION_DIR, _progression)
 
@@ -25,7 +29,10 @@ func get_plant(id: StringName) -> PlantSpeciesDefinition:
 	return _plants.get(String(id)) as PlantSpeciesDefinition
 
 func get_fertilizer(id: StringName) -> FertilizerDefinition:
-	return _fertilizers.get(String(id)) as FertilizerDefinition
+	var key := String(id)
+	if _fertilizers.has(key):
+		return _fertilizers.get(key) as FertilizerDefinition
+	return _offer_fertilizers.get(key) as FertilizerDefinition
 
 func all_plants() -> Array[PlantSpeciesDefinition]:
 	var result: Array[PlantSpeciesDefinition] = []
@@ -38,6 +45,14 @@ func all_plants() -> Array[PlantSpeciesDefinition]:
 func all_fertilizers() -> Array[FertilizerDefinition]:
 	var result: Array[FertilizerDefinition] = []
 	for value in _fertilizers.values():
+		var definition := value as FertilizerDefinition
+		if definition != null:
+			result.append(definition)
+	return result
+
+func all_offer_fertilizers() -> Array[FertilizerDefinition]:
+	var result: Array[FertilizerDefinition] = []
+	for value in _offer_fertilizers.values():
 		var definition := value as FertilizerDefinition
 		if definition != null:
 			result.append(definition)

@@ -125,7 +125,7 @@ func _refresh_offer() -> void:
 	for index in range(buttons.size()):
 		var button := buttons[index]
 		if index < ids.size():
-			button.text = _pretty_id(String(ids[index]))
+			button.text = ""
 			button.icon = FertilizerOfferArt.texture_for(ids[index])
 			button.expand_icon = true
 			button.disabled = plant == null or not plant.alive
