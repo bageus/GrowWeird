@@ -124,7 +124,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("extends SceneDraggablePanel"), "inventory HUD: must use shared draggable panel")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn").count("ExtResource(\"5_inventory\")") == 1, "scene HUD: exactly one InventoryHud instance")
 	_expect(dialogs_text.contains("RecycleAction") and dialogs_text.contains("SellAction") and dialogs_text.contains("UseAction"), "inventory HUD: item action menu incomplete")
-	_expect(dialogs_text.contains("CancelAction"), "inventory HUD: item action menu needs an explicit cancel button")
+	_expect(not dialogs_text.contains("CancelAction") and FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").contains("inventory_dialogs.is_open()"), "inventory HUD: item menu must use the shared scene cancel button")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.gd").contains('actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())'), "inventory HUD: item action menu retained its dark panel")
 	_expect(dialogs_text.contains("QuantitySlider") and dialogs_text.contains("ValueLabel"), "inventory HUD: sale quantity/value popup missing")
 	_expect(dialogs_text.contains("OutputLabel") and dialogs_text.contains("Grind into fertilizer"), "inventory HUD: recycling preview missing")
