@@ -1,50 +1,71 @@
 class_name FertilizerAssetCatalog
 extends RefCounted
 
-const ATLAS_COUNT := 2
-const GRID_SIZE := 8
 const FRAME_SIZE := 512
 const FOOD_HEALTH := 0.02
 const ID_PREFIX := "fertilizer_atlas_"
+const MANIFEST_PATHS := [
+	"res://assets/fertilizers/fertilizers_01.json",
+	"res://assets/fertilizers/fertilizers_02.json",
+]
 
 static func definitions() -> Array[FertilizerDefinition]:
 	var result: Array[FertilizerDefinition] = []
-	for atlas_index in range(ATLAS_COUNT):
-		for row in range(GRID_SIZE):
-			for column in range(GRID_SIZE):
-				if _is_reserved_grind_result(atlas_index, row, column):
-					continue
-				var definition := FertilizerDefinition.new()
-				definition.id = id_for(atlas_index, row, column)
-				definition.display_name_key = "fertilizer.atlas_item"
-				definition.offer_weight = 1.0
-				definition.care_effects = {"health": FOOD_HEALTH}
-				result.append(definition)
+	for atlas_index in range(MANIFEST_PATHS.size()):
+		for item in _items_for_atlas(atlas_index):
+			if _is_reserved_grind_result(atlas_index, item):
+				continue
+			var definition := FertilizerDefinition.new()
+			definition.id = _offer_id(atlas_index, String(item.get("id", "")))
+			definition.display_name_key = "fertilizer.%s" % String(item.get("id", ""))
+			definition.offer_weight = 1.0
+			definition.care_effects = {"health": FOOD_HEALTH}
+			result.append(definition)
 	return result
 
 static func id_for(atlas_index: int, row: int, column: int) -> StringName:
-	return StringName("%s%d_r%d_c%d" % [ID_PREFIX, atlas_index + 1, row + 1, column + 1])
+	for item in _items_for_atlas(atlas_index):
+		if int(item.get("row", 0)) == row + 1 and int(item.get("position", 0)) == column + 1:
+			return _offer_id(atlas_index, String(item.get("id", "")))
+	return &""
 
 static func descriptor_for(id: StringName) -> Dictionary:
-	var value := String(id)
-	if not value.begins_with(ID_PREFIX):
-		return {}
-	var parts := value.trim_prefix(ID_PREFIX).split("_")
-	if parts.size() != 3 or not parts[1].begins_with("r") or not parts[2].begins_with("c"):
-		return {}
-	var atlas_index := int(parts[0]) - 1
-	var row := int(parts[1].trim_prefix("r")) - 1
-	var column := int(parts[2].trim_prefix("c")) - 1
-	if atlas_index < 0 or atlas_index >= ATLAS_COUNT:
-		return {}
-	if row < 0 or row >= GRID_SIZE or column < 0 or column >= GRID_SIZE:
-		return {}
-	if _is_reserved_grind_result(atlas_index, row, column):
-		return {}
-	return {"atlas_index": atlas_index, "row": row, "column": column}
+	for atlas_index in range(MANIFEST_PATHS.size()):
+		for item in _items_for_atlas(atlas_index):
+			if _is_reserved_grind_result(atlas_index, item):
+				continue
+			if _offer_id(atlas_index, String(item.get("id", ""))) == id:
+				return {
+					"atlas_index": atlas_index,
+					"row": int(item.get("row", 1)) - 1,
+					"column": int(item.get("position", 1)) - 1,
+					"item_id": StringName(item.get("id", "")),
+				}
+	return {}
 
 static func is_offer_id(id: StringName) -> bool:
 	return not descriptor_for(id).is_empty()
 
-static func _is_reserved_grind_result(atlas_index: int, row: int, column: int) -> bool:
-	return atlas_index == 1 and ((row == 0 and column == 5) or (row == 3 and column == 0))
+static func _items_for_atlas(atlas_index: int) -> Array:
+	if atlas_index < 0 or atlas_index >= MANIFEST_PATHS.size():
+		return []
+	var file := FileAccess.open(MANIFEST_PATHS[atlas_index], FileAccess.READ)
+	if file == null:
+		push_error("Fertilizer atlas manifest not found: %s" % MANIFEST_PATHS[atlas_index])
+		return []
+	var data: Variant = JSON.parse_string(file.get_as_text())
+	if not data is Dictionary:
+		push_error("Invalid fertilizer atlas manifest: %s" % MANIFEST_PATHS[atlas_index])
+		return []
+	var items: Variant = data.get("items", [])
+	return items if items is Array else []
+
+static func _offer_id(atlas_index: int, item_id: String) -> StringName:
+	return StringName("%s%d_%s" % [ID_PREFIX, atlas_index + 1, item_id])
+
+static func _is_reserved_grind_result(atlas_index: int, item: Dictionary) -> bool:
+	if atlas_index != 1:
+		return false
+	var row := int(item.get("row", 0))
+	var position := int(item.get("position", 0))
+	return (row == 1 and position == 6) or (row == 4 and position == 1)

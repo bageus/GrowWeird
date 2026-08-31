@@ -102,8 +102,9 @@ func _test_fertilizer_atlas_catalog() -> void:
 		ids[String(definition.id)] = true
 	_expect(definitions.size() == 126, "fertilizer atlas: expected 126 selectable frames")
 	_expect(ids.size() == 126, "fertilizer atlas: frame ids must be unique")
-	_expect(not ids.has("fertilizer_atlas_2_r1_c6"), "fertilizer atlas: first grind result leaked into offers")
-	_expect(not ids.has("fertilizer_atlas_2_r4_c1"), "fertilizer atlas: second grind result leaked into offers")
+	_expect(not ids.has("fertilizer_atlas_2_bag_of_fertilizer"), "fertilizer atlas: first grind result leaked into offers")
+	_expect(not ids.has("fertilizer_atlas_2_pile_of_fertilizers"), "fertilizer atlas: second grind result leaked into offers")
+	_expect(ids.has("fertilizer_atlas_1_eggshell"), "fertilizer atlas: navigation id was not used")
 	var sample := definitions[0]
 	_expect(sample.mutation_contributions.is_empty(), "fertilizer atlas: unconfigured items must not mutate plants")
 	_expect(float(sample.care_effects.get("health", 0.0)) > 0.0, "fertilizer atlas: selected item must act as food")
