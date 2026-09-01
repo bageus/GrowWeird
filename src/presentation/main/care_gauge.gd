@@ -54,7 +54,7 @@ func _draw_gauge_arc(center: Vector2, radius: float, color: Color, component: Di
 func _draw_boundary(center: Vector2, radius: float, angle: float) -> void:
 	var normal := Vector2.from_angle(angle)
 	for offset in [-4.0, 1.0]:
-		var from := center + normal * (radius + offset)
+		var from: Vector2 = center + normal * (radius + float(offset))
 		draw_line(from, from + normal * 3.0, Color("fff0c2"), 1.5, true)
 
 func _draw_pointer(center: Vector2, progress: float) -> void:
