@@ -4,6 +4,11 @@ extends SceneDraggablePanel
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
 
 @onready var items: VBoxContainer = $Layout/Scroll/Items
+@onready var scroll: ScrollContainer = $Layout/Scroll
+@onready var scroll_up: Button = $Layout/ScrollUp
+@onready var scroll_down: Button = $Layout/ScrollDown
+
+const SCROLL_STEP := 100
 
 var _signature := ""
 
@@ -11,6 +16,10 @@ func _ready() -> void:
 	super()
 	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	$Background.texture = UiAtlas.HUD_INVENTORY
+	scroll_up.pressed.connect(_scroll_inventory.bind(-1))
+	scroll_down.pressed.connect(_scroll_inventory.bind(1))
+	scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
+	call_deferred("_update_scroll_buttons")
 
 func set_inventory(inventory: InventoryState) -> void:
 	var signature := _inventory_signature(inventory)
@@ -68,6 +77,19 @@ func _rebuild(inventory: InventoryState) -> void:
 		while added < 3:
 			_add_empty_slot()
 			added += 1
+	call_deferred("_update_scroll_buttons")
+
+func _scroll_inventory(direction: int) -> void:
+	scroll.scroll_vertical += direction * SCROLL_STEP
+	call_deferred("_update_scroll_buttons")
+
+func _on_scroll_changed(_value: float) -> void:
+	_update_scroll_buttons()
+
+func _update_scroll_buttons() -> void:
+	var bar := scroll.get_v_scroll_bar()
+	scroll_up.disabled = scroll.scroll_vertical <= 0
+	scroll_down.disabled = scroll.scroll_vertical >= int(maxf(0.0, bar.max_value - bar.page))
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()

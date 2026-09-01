@@ -4,8 +4,8 @@
 
 [node name="InventoryHud" type="PanelContainer"]
 clip_contents = true
-custom_minimum_size = Vector2(190, 520)
-offset_right = 190.0
+custom_minimum_size = Vector2(164, 520)
+offset_right = 164.0
 offset_bottom = 520.0
 script = ExtResource("1_hud")
 layout_id = &"inventory"
@@ -20,7 +20,7 @@ stretch_mode = 5
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 5
+theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Layout"]
 visible = false
@@ -29,18 +29,30 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 15
 text = ""
 
+[node name="ScrollUp" type="Button" parent="Layout"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+text = "▲"
+focus_mode = 0
+
 [node name="Scroll" type="ScrollContainer" parent="Layout"]
 clip_contents = true
-custom_minimum_size = Vector2(166, 480)
+custom_minimum_size = Vector2(140, 438)
 layout_mode = 2
 mouse_filter = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
 [node name="Items" type="VBoxContainer" parent="Layout/Scroll"]
-custom_minimum_size = Vector2(0, 450)
+custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
 mouse_filter = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = -10
+theme_override_constants/separation = -24
 alignment = 2
+
+[node name="ScrollDown" type="Button" parent="Layout"]
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+text = "▼"
+focus_mode = 0
