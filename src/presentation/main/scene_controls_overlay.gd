@@ -82,6 +82,12 @@ func set_lighting_options_visible(enabled: bool) -> void:
 	if enabled:
 		_place_popup(menu, _controls.get("lighting") as Control, 2.0)
 
+func set_offer_cooldown(seconds: float) -> void:
+	var overlay := get_node("OffersPanel/CooldownCenter/CooldownOverlay") as Control
+	overlay.visible = seconds > 0.0
+	var total := maxi(0, int(ceil(seconds)))
+	(get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label).text = "Next fertilizers %02d:%02d" % [total / 60, total % 60]
+
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
 	if panel == null:

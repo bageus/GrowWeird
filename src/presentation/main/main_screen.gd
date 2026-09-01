@@ -122,7 +122,6 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	recycle_plant_button.tooltip_text = "Grind · ×%d" % compost_yield
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
-	var plant := GameApp.active_plant()
 	var buttons: Array[Button] = [offer_one, offer_two, offer_three]
 	for index in range(buttons.size()):
 		var button := buttons[index]
@@ -130,7 +129,7 @@ func _refresh_offer() -> void:
 			button.text = ""
 			button.icon = FertilizerOfferArt.texture_for(ids[index])
 			button.expand_icon = true
-			button.disabled = plant == null or not plant.alive
+			button.disabled = false
 		else:
 			button.text = ""
 			button.icon = null
@@ -142,6 +141,7 @@ func _refresh_offer() -> void:
 	skip_offer.text = ""
 	skip_offer.tooltip_text = "Skip · %d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
+	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
