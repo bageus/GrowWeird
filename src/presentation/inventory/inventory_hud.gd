@@ -3,10 +3,10 @@ extends SceneDraggablePanel
 
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
 
-@onready var items: VBoxContainer = $Layout/Scroll/Items
-@onready var scroll: ScrollContainer = $Layout/Scroll
-@onready var scroll_up: Button = $Arrows/ScrollUp
-@onready var scroll_down: Button = $Arrows/ScrollDown
+@onready var items: VBoxContainer = $Layers/Scroll/Items
+@onready var scroll: ScrollContainer = $Layers/Scroll
+@onready var scroll_up: Button = $Layers/ScrollUp
+@onready var scroll_down: Button = $Layers/ScrollDown
 
 const SCROLL_STEP := 100
 
@@ -15,7 +15,7 @@ var _signature := ""
 func _ready() -> void:
 	super()
 	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	$Background.texture = UiAtlas.HUD_INVENTORY
+	$Layers/Background.texture = UiAtlas.HUD_INVENTORY
 	UiAtlas.configure_inventory_arrow(scroll_up, true)
 	UiAtlas.configure_inventory_arrow(scroll_down, false)
 	scroll_up.pressed.connect(_scroll_inventory.bind(-1))
@@ -37,10 +37,9 @@ func _rebuild(inventory: InventoryState) -> void:
 	for child in items.get_children():
 		items.remove_child(child)
 		child.queue_free()
-	_add_edge_spacer()
 	if inventory == null:
 		_add_empty()
-		_add_edge_spacer()
+		call_deferred("_update_scroll_buttons")
 		return
 	var added := 0
 	var fertilizer_ids := inventory.fertilizers.keys()
@@ -81,14 +80,7 @@ func _rebuild(inventory: InventoryState) -> void:
 		while added < 3:
 			_add_empty_slot()
 			added += 1
-	_add_edge_spacer()
 	call_deferred("_update_scroll_buttons")
-
-func _add_edge_spacer() -> void:
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0.0, 52.0)
-	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	items.add_child(spacer)
 
 func _scroll_inventory(direction: int) -> void:
 	scroll.scroll_vertical += direction * SCROLL_STEP
