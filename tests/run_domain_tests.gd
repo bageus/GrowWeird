@@ -141,6 +141,9 @@ func _test_atlas_offer_is_consumed_as_food() -> void:
 	_expect(bool(result.get("success", false)), "fertilizer atlas: offered frame should be selectable")
 	_expect(plant.health > 0.5, "fertilizer atlas: selected frame should feed the plant immediately")
 	_expect(not state.fertilizer_offer.is_active(), "fertilizer atlas: choosing one frame must consume the offer")
+	state.fertilizer_offer.offered_ids = [fertilizer_id]
+	result = FertilizerActions.choose_offer(state, null, fertilizer_id, registry, GameRules.new())
+	_expect(bool(result.get("success", false)) and not state.fertilizer_offer.is_active(), "fertilizer atlas: test-mode selection must work without a plant")
 
 func _test_multi_axis_mutation_consumes_requirements() -> void:
 	var plant := _plant("synergy")
