@@ -87,6 +87,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(cooldown_text.contains("CooldownOverlay") and cooldown_text.contains("Next fertilizers 01:00"), "scene HUD: fertilizer cooldown overlay is missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("_set_slot_hover"), "scene HUD: fertilizer slots need hover highlighting")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("ACTION_MODE_BUTTON_PRESS"), "scene HUD: fertilizer selection must fire on mouse press")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").count("button_down.connect(_on_offer_") == 3, "scene HUD: all fertilizer slots must connect directly on button down")
 	_expect(hud_text.contains("PotSelector") and hud_text.contains("PreviousPot") and hud_text.contains("NextPot") and hud_text.contains("PotThumbnail"), "scene HUD: pot selector needs one thumbnail between navigation arrows")
 	_expect(hud_text.contains("PotCircle") and hud_text.contains('name="PreviousPot" type="Button" parent="PotSelector/Layers"'), "scene HUD: pot circle must stay square with arrows outside")
 	_expect(hud_text.contains('name="ShopButton" type="Button" parent="WalletHud/Layers"'), "scene HUD: balance plus hit area must use fixed atlas coordinates")

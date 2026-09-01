@@ -61,9 +61,9 @@ func _ready() -> void:
 	open_window_button.pressed.connect(_on_environment_preset.bind(&"open_window"))
 	blinds_button.pressed.connect(_on_environment_preset.bind(&"blinds"))
 	normal_light_button.pressed.connect(_on_environment_preset.bind(&"normal_light"))
-	offer_one.pressed.connect(_on_offer_one_pressed)
-	offer_two.pressed.connect(_on_offer_two_pressed)
-	offer_three.pressed.connect(_on_offer_three_pressed)
+	offer_one.button_down.connect(_on_offer_one_pressed)
+	offer_two.button_down.connect(_on_offer_two_pressed)
+	offer_three.button_down.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
 	for stage in range(14):

@@ -9,11 +9,13 @@ static func choose_offer(
 	rules: GameRules
 ) -> Dictionary:
 	var fertilizer := registry.get_fertilizer(fertilizer_id)
-	if state == null or plant == null or not plant.alive or fertilizer == null:
+	if state == null or fertilizer == null:
 		return _failure()
 	if not FertilizerOfferService.can_choose(state.fertilizer_offer, fertilizer_id):
 		return _failure()
-	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
+	var events: Array[Dictionary] = []
+	if plant != null and plant.alive:
+		events = FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
 	if not FertilizerOfferService.resolve_choice(state.fertilizer_offer, fertilizer_id, rules):
 		return _failure()
 	return {"success": true, "events": events}
