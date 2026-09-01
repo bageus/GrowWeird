@@ -21,12 +21,12 @@ func _ready() -> void:
 		state = _create_new_game()
 	else:
 		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
+	if _has_living_plant(): FertilizerOfferService.ensure_active(state.fertilizer_offer, registry.all_offer_fertilizers(), rules)
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
 	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
 	_persistence.start(state, registry, rules, PlatformRuntime)
 	state_changed.emit()
-
 func _process(delta: float) -> void:
 	if state == null:
 		return
