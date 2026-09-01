@@ -58,6 +58,9 @@ static func configure_hud_slot(button: Button) -> void:
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
+	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
 
 static func configure_inventory_arrow(button: TextureButton, points_up: bool) -> void:
 	if button == null:
@@ -97,3 +100,7 @@ static func _set_balance_hover(button: Button, hovered: bool) -> void:
 	if not is_instance_valid(button):
 		return
 	button.icon = atlas_region(HUD_BALANCE_PLUS_HOVER, Rect2(768.0, 112.0, 256.0, 288.0)) if hovered else null
+
+static func _set_slot_hover(button: Button, hovered: bool) -> void:
+	if is_instance_valid(button):
+		button.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
