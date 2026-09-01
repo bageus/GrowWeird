@@ -58,6 +58,7 @@ static func configure_hud_slot(button: Button) -> void:
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
 	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
