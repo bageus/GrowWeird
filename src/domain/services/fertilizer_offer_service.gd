@@ -25,6 +25,16 @@ static func schedule_initial(offer: FertilizerOfferState, rules: GameRules) -> v
 	if offer != null and not offer.is_active():
 		offer.seconds_until_offer = rules.initial_offer_delay_seconds
 
+static func ensure_active(
+	offer: FertilizerOfferState,
+	fertilizers: Array[FertilizerDefinition],
+	rules: GameRules
+) -> bool:
+	if offer == null or offer.is_active():
+		return false
+	offer.seconds_until_offer = 0.0
+	return _generate(offer, fertilizers, rules.fertilizer_offer_count)
+
 static func can_choose(offer: FertilizerOfferState, fertilizer_id: StringName) -> bool:
 	return offer != null and offer.offered_ids.has(fertilizer_id)
 

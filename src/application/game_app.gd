@@ -21,12 +21,12 @@ func _ready() -> void:
 		state = _create_new_game()
 	else:
 		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
+	FertilizerOfferService.ensure_active(state.fertilizer_offer, registry.all_offer_fertilizers(), rules)
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
 	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
 	_persistence.start(state, registry, rules, PlatformRuntime)
 	state_changed.emit()
-
 func _process(delta: float) -> void:
 	if state == null:
 		return
@@ -39,7 +39,7 @@ func _process(delta: float) -> void:
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
-	if _has_living_plant() and FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_offer_fertilizers(), rules):
+	if FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_offer_fertilizers(), rules):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
 	if changed:
@@ -122,7 +122,7 @@ func skip_fertilizer_offer() -> bool:
 	return true
 
 func refresh_fertilizer_offer() -> bool:
-	if state == null or not _has_living_plant():
+	if state == null:
 		return false
 	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
 	if price <= 0 or not EconomyService.spend(state, price):

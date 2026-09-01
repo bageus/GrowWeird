@@ -110,6 +110,10 @@ func _test_offer_contains_three_unique_items() -> void:
 	_expect(generated, "fertilizer offer: expected an offer")
 	_expect(offer.offered_ids.size() == 3, "fertilizer offer: expected exactly three items")
 	_expect(unique.size() == 3, "fertilizer offer: items must be unique")
+	offer.clear()
+	offer.seconds_until_offer = 30.0
+	_expect(FertilizerOfferService.ensure_active(offer, definitions, rules), "fertilizer offer: initial HUD offer must be generated immediately")
+	_expect(offer.offered_ids.size() == 3 and offer.seconds_until_offer == 0.0, "fertilizer offer: immediate offer state is invalid")
 
 func _test_fertilizer_atlas_catalog() -> void:
 	var definitions := FertilizerAssetCatalog.definitions()
