@@ -5,8 +5,8 @@ signal item_selected(kind: StringName, item_id: String, count: int, title: Strin
 
 @onready var items: VBoxContainer = $Layout/Scroll/Items
 @onready var scroll: ScrollContainer = $Layout/Scroll
-@onready var scroll_up: Button = $Layout/ScrollUp
-@onready var scroll_down: Button = $Layout/ScrollDown
+@onready var scroll_up: Button = $Arrows/ScrollUp
+@onready var scroll_down: Button = $Arrows/ScrollDown
 
 const SCROLL_STEP := 100
 
@@ -16,6 +16,8 @@ func _ready() -> void:
 	super()
 	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	$Background.texture = UiAtlas.HUD_INVENTORY
+	UiAtlas.configure_inventory_arrow(scroll_up, true)
+	UiAtlas.configure_inventory_arrow(scroll_down, false)
 	scroll_up.pressed.connect(_scroll_inventory.bind(-1))
 	scroll_down.pressed.connect(_scroll_inventory.bind(1))
 	scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
