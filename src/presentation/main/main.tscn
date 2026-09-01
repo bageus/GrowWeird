@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
 [ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/pot_visual.tscn" id="8_pot_visual"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/tree_growth_preview.tscn" id="9_tree_preview"]
+[ext_resource type="Script" path="res://src/presentation/main/care_gauge.gd" id="10_care_gauge"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -204,6 +205,20 @@ offset_top = 20.0
 offset_right = -30.0
 offset_bottom = -42.0
 script = ExtResource("3_plant")
+
+[node name="CareGauge" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -105.0
+offset_top = 24.0
+offset_right = 105.0
+offset_bottom = 132.0
+z_index = 8
+mouse_filter = 2
+script = ExtResource("10_care_gauge")
 
 [node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
 unique_name_in_owner = true

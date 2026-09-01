@@ -35,10 +35,12 @@ static func _advance_pot(
 			0.0,
 			1.0
 		)
+		plant.nutrition = clampf(plant.nutrition - species.nutrition_decay_per_second * delta_seconds, 0.0, 1.0)
 	plant.age_seconds += delta_seconds
 
 	var comfort := ComfortEvaluator.evaluate(pot, species)
 	var overall := float(comfort["overall"])
+	plant.record_care_sample(overall, delta_seconds)
 	if policy.advance_growth:
 		var size_multiplier := lerpf(
 			rules.young_growth_multiplier,
@@ -49,6 +51,9 @@ static func _advance_pot(
 			1.0,
 			plant.growth_ratio + species.base_growth_per_second * size_multiplier * overall * delta_seconds
 		)
+		var next_care_stage := CareGaugeService.stage_index(plant.growth_ratio)
+		if next_care_stage != plant.care_stage_index:
+			plant.finish_care_stage(next_care_stage)
 
 	if policy.advance_health:
 		if overall < rules.critical_comfort_threshold:

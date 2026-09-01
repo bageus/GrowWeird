@@ -74,14 +74,14 @@ func _test_progression_save_round_trip() -> void:
 	state.progression.complete(&"water_the_sprout")
 	state.progression.set_progress(&"tune_environment", 1)
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
-	_expect(restored.schema_version == 5, "progression save: schema should be v5")
+	_expect(restored.schema_version == GameState.SCHEMA_VERSION, "progression save: schema should be current")
 	_expect(restored.progression.is_completed(&"water_the_sprout"), "progression save: completed milestone was lost")
 	_expect(restored.progression.progress_for(&"tune_environment") == 1, "progression save: partial milestone progress was lost")
 	_expect(not restored.progression.skip_onboarding, "progression save: new-game onboarding flag should remain active")
 
 func _test_v4_migration_skips_onboarding() -> void:
 	var migrated := SaveMigrator.migrate({"schema_version": 4, "pots": []})
-	_expect(int(migrated.get("schema_version", 0)) == 5, "progression migration: v4 should migrate to v5")
+	_expect(int(migrated.get("schema_version", 0)) == GameState.SCHEMA_VERSION, "progression migration: v4 should reach current schema")
 	var progression: Dictionary = migrated.get("progression", {})
 	_expect(bool(progression.get("skip_onboarding", false)), "progression migration: existing players should bypass onboarding")
 

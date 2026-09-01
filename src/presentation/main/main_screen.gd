@@ -6,6 +6,7 @@ extends Control
 @onready var plant_view: PlantView = %PlantView
 @onready var pot_visual: PotVisual = %PotVisual
 @onready var tree_growth_preview: TreeGrowthPreview = %TreeGrowthPreview
+@onready var care_gauge: CareGauge = %CareGauge
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
 @onready var pot_selector: PotSelector = scene_controls.get_node("PotSelector")
@@ -84,6 +85,7 @@ func _refresh() -> void:
 	if pot != null:
 		pot_visual.set_pot_state(pot)
 	tree_growth_preview.set_plant(plant)
+	care_gauge.set_gauge(CareGaugeService.evaluate(pot, GameApp.active_species_definition()) if pot != null and plant != null else {})
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:
@@ -337,11 +339,9 @@ func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	for event in events:
 		texts.append("%s changed: %s" % [event["branch_id"], _pretty_id(String(event["trait_id"]))])
 	event_label.text = " · ".join(texts)
-func _on_offer_ready(_ids: Array[StringName]) -> void:
-	event_label.text = "Three new fertilizers appeared."
+func _on_offer_ready(_ids: Array[StringName]) -> void: event_label.text = "Three new fertilizers appeared."
 func _has_regrowth(plant: PlantState) -> bool:
-	if plant == null or not plant.alive:
-		return false
+	if plant == null or not plant.alive: return false
 	for slot in BranchState.VALID_SLOTS:
 		if plant.branch_at(slot) == null and plant.regrowth_progress_at(slot) > 0.0:
 			return true

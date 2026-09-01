@@ -69,6 +69,11 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 		"growth_ratio": plant.growth_ratio,
 		"health": plant.health,
 		"alive": plant.alive,
+		"nutrition": plant.nutrition,
+		"care_stage_index": plant.care_stage_index,
+		"care_stage_score_sum": plant.care_stage_score_sum,
+		"care_stage_sample_seconds": plant.care_stage_sample_seconds,
+		"completed_care_scores": plant.completed_care_scores.duplicate(),
 		"mutation_energy": _plain_dictionary(plant.mutation_energy),
 		"branches": branches,
 		"regrowth_progress": _plain_dictionary(plant.regrowth_progress),
@@ -84,6 +89,12 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.growth_ratio = clampf(float(data.get("growth_ratio", 0.0)), 0.0, 1.0)
 	plant.health = clampf(float(data.get("health", 1.0)), 0.0, 1.0)
 	plant.alive = bool(data.get("alive", true)) and plant.health > 0.0
+	plant.nutrition = clampf(float(data.get("nutrition", 0.5)), 0.0, 1.0)
+	plant.care_stage_index = maxi(0, int(data.get("care_stage_index", 0)))
+	plant.care_stage_score_sum = maxf(0.0, float(data.get("care_stage_score_sum", 0.0)))
+	plant.care_stage_sample_seconds = maxf(0.0, float(data.get("care_stage_sample_seconds", 0.0)))
+	for score in data.get("completed_care_scores", []):
+		plant.completed_care_scores.append(clampf(float(score), 0.0, 1.0))
 	plant.mutation_energy = _plain_dictionary(data.get("mutation_energy", {}))
 	plant.regrowth_progress = _plain_dictionary(data.get("regrowth_progress", {}))
 	plant.rng_state = int(data.get("rng_state", 0))
