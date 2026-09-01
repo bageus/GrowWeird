@@ -26,45 +26,56 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Scroll" type="ScrollContainer" parent="Layers"]
+[node name="FrameContent" type="Control" parent="Layers"]
+clip_contents = true
+layout_mode = 1
+anchor_left = 0.080078
+anchor_top = 0.16183
+anchor_right = 0.919922
+anchor_bottom = 0.873654
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Layers/FrameContent"]
 clip_contents = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 54.0
-offset_right = -12.0
-offset_bottom = -54.0
+offset_left = 7.0
+offset_top = 31.0
+offset_right = -7.0
+offset_bottom = -31.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 horizontal_scroll_mode = 0
 
-[node name="Items" type="VBoxContainer" parent="Layers/Scroll"]
-custom_minimum_size = Vector2(0, 412)
+[node name="Items" type="VBoxContainer" parent="Layers/FrameContent/Scroll"]
+custom_minimum_size = Vector2(0, 308)
 layout_mode = 2
 mouse_filter = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = -24
+theme_override_constants/separation = -32
 alignment = 1
 
-[node name="ScrollUp" type="TextureButton" parent="Layers"]
+[node name="ScrollUp" type="TextureButton" parent="Layers/FrameContent"]
 z_index = 5
 layout_mode = 1
 anchors_preset = 10
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -22.0
-offset_top = 8.0
-offset_right = 22.0
-offset_bottom = 52.0
+offset_left = -18.0
+offset_top = 2.0
+offset_right = 18.0
+offset_bottom = 30.0
 grow_horizontal = 2
 focus_mode = 0
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="ScrollDown" type="TextureButton" parent="Layers"]
+[node name="ScrollDown" type="TextureButton" parent="Layers/FrameContent"]
 z_index = 5
 layout_mode = 1
 anchors_preset = 12
@@ -72,10 +83,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -22.0
-offset_top = -52.0
-offset_right = 22.0
-offset_bottom = -8.0
+offset_left = -18.0
+offset_top = -30.0
+offset_right = 18.0
+offset_bottom = -2.0
 grow_horizontal = 2
 grow_vertical = 0
 focus_mode = 0

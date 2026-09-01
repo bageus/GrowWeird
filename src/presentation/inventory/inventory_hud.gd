@@ -3,10 +3,10 @@ extends SceneDraggablePanel
 
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
 
-@onready var items: VBoxContainer = $Layers/Scroll/Items
-@onready var scroll: ScrollContainer = $Layers/Scroll
-@onready var scroll_up: TextureButton = $Layers/ScrollUp
-@onready var scroll_down: TextureButton = $Layers/ScrollDown
+@onready var items: VBoxContainer = $Layers/FrameContent/Scroll/Items
+@onready var scroll: ScrollContainer = $Layers/FrameContent/Scroll
+@onready var scroll_up: TextureButton = $Layers/FrameContent/ScrollUp
+@onready var scroll_down: TextureButton = $Layers/FrameContent/ScrollDown
 
 const SCROLL_STEP := 100
 
