@@ -49,7 +49,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = -24
 alignment = 1
 
-[node name="ScrollUp" type="Button" parent="Layers"]
+[node name="ScrollUp" type="TextureButton" parent="Layers"]
 z_index = 5
 layout_mode = 1
 anchors_preset = 10
@@ -61,8 +61,10 @@ offset_right = 22.0
 offset_bottom = 52.0
 grow_horizontal = 2
 focus_mode = 0
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="ScrollDown" type="Button" parent="Layers"]
+[node name="ScrollDown" type="TextureButton" parent="Layers"]
 z_index = 5
 layout_mode = 1
 anchors_preset = 12
@@ -77,3 +79,5 @@ offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
 focus_mode = 0
+ignore_texture_size = true
+stretch_mode = 5

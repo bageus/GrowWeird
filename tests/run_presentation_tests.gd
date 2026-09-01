@@ -123,6 +123,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(hud_text.contains("offset_top = 54.0") and hud_text.contains("offset_bottom = -54.0"), "inventory HUD: scrolling cells must remain inset inside the frame")
 	_expect(hud_text.contains("Vector2(164, 520)"), "inventory HUD: frame must use the narrow layout")
 	_expect(hud_text.contains('parent="Layers"') and hud_text.contains("ScrollUp") and hud_text.contains("ScrollDown"), "inventory HUD: paging arrows must share the clipped HUD layer")
+	_expect(hud_text.count('type="TextureButton"') == 2, "inventory HUD: atlas arrows must use reliable texture buttons")
 	var inventory_script := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
 	_expect(inventory_script.contains("SCROLL_STEP") and inventory_script.contains("_scroll_inventory"), "inventory HUD: arrow paging behavior is missing")
 	_expect(hud_text.contains("clip_contents = true") and hud_text.contains("z_index = 5"), "inventory HUD: cells and arrows must be clipped inside the frame")

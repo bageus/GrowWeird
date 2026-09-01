@@ -5,8 +5,8 @@ signal item_selected(kind: StringName, item_id: String, count: int, title: Strin
 
 @onready var items: VBoxContainer = $Layers/Scroll/Items
 @onready var scroll: ScrollContainer = $Layers/Scroll
-@onready var scroll_up: Button = $Layers/ScrollUp
-@onready var scroll_down: Button = $Layers/ScrollDown
+@onready var scroll_up: TextureButton = $Layers/ScrollUp
+@onready var scroll_down: TextureButton = $Layers/ScrollDown
 
 const SCROLL_STEP := 100
 
