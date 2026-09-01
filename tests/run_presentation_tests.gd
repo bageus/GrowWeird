@@ -120,7 +120,7 @@ func _test_inventory_hud_contract() -> void:
 	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
-	_expect(hud_text.contains("offset_top = 31.0") and hud_text.contains("offset_bottom = -31.0"), "inventory HUD: scrolling cells must remain inset between the frame arrows")
+	_expect(hud_text.contains("offset_top = 38.0") and hud_text.contains("offset_bottom = -38.0"), "inventory HUD: scrolling cells must remain inset between the frame arrows")
 	_expect(hud_text.contains("Vector2(164, 520)"), "inventory HUD: frame must use the narrow layout")
 	_expect(hud_text.contains('[node name="FrameContent" type="Control" parent="Layers"]') and hud_text.contains('parent="Layers/FrameContent"'), "inventory HUD: paging arrows must stay inside the visible frame")
 	_expect(hud_text.count('type="TextureButton"') == 2, "inventory HUD: atlas arrows must use reliable texture buttons")
