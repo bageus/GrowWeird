@@ -17,6 +17,7 @@ func _init() -> void:
 	_test_shop_transactions()
 	_test_species_seed_unlock_progression()
 	_test_save_round_trip_preserves_new_state()
+	_test_care_gauge_ranges_and_stage_history()
 	if _failures.is_empty():
 		print("GrowWeird domain tests passed")
 		quit(0)
@@ -35,6 +36,21 @@ func _test_pour_moistens_soil_one_stage() -> void:
 		pot.moisten_soil_one_stage()
 		_expect(is_equal_approx(pot.soil_moisture, expected[index]), "pour: soil moisture did not advance to the next stage")
 		_expect(pot.soil_moisture_stage() == mini(stage_before + 1, 5), "pour: soil visual stage did not advance exactly once")
+
+func _test_care_gauge_ranges_and_stage_history() -> void:
+	var pot := PotState.new()
+	pot.plant = _plant("care-gauge")
+	pot.soil_moisture = 0.5
+	pot.plant.nutrition = 0.5
+	var species := PlantSpeciesDefinition.new()
+	var gauge := CareGaugeService.evaluate(pot, species)
+	_expect(int((gauge["water"] as Dictionary)["direction"]) == 0, "care gauge: optimal water should be in the favorable zone")
+	pot.plant.nutrition = 1.0
+	gauge = CareGaugeService.evaluate(pot, species)
+	_expect(int((gauge["food"] as Dictionary)["direction"]) == 1, "care gauge: excess food should be detected")
+	pot.plant.record_care_sample(0.8, 10.0)
+	pot.plant.finish_care_stage(1)
+	_expect(pot.plant.completed_care_scores.size() == 1 and is_equal_approx(pot.plant.completed_care_scores[0], 0.8), "care gauge: completed stage quality should use the full stage history")
 
 func _test_pour_waters_empty_active_pot() -> void:
 	var app = load("res://src/application/game_app.gd").new()

@@ -8,6 +8,11 @@ var age_seconds: float = 0.0
 var growth_ratio: float = 0.0
 var health: float = 1.0
 var alive: bool = true
+var nutrition: float = 0.5
+var care_stage_index: int = 0
+var care_stage_score_sum: float = 0.0
+var care_stage_sample_seconds: float = 0.0
+var completed_care_scores: Array[float] = []
 var mutation_energy: Dictionary = {}
 var branches: Dictionary = {}
 var regrowth_progress: Dictionary = {}
@@ -71,3 +76,19 @@ func clear_regrowth_progress(slot: StringName) -> void:
 func add_mutation_energy(axis: StringName, amount: float) -> void:
 	var key := String(axis)
 	mutation_energy[key] = float(mutation_energy.get(key, 0.0)) + amount
+
+func record_care_sample(score: float, delta_seconds: float) -> void:
+	care_stage_score_sum += clampf(score, 0.0, 1.0) * maxf(delta_seconds, 0.0)
+	care_stage_sample_seconds += maxf(delta_seconds, 0.0)
+
+func finish_care_stage(next_stage: int) -> void:
+	if care_stage_sample_seconds > 0.0:
+		completed_care_scores.append(care_stage_score_sum / care_stage_sample_seconds)
+	care_stage_index = next_stage
+	care_stage_score_sum = 0.0
+	care_stage_sample_seconds = 0.0
+
+func current_care_score() -> float:
+	if care_stage_sample_seconds <= 0.0:
+		return 1.0
+	return clampf(care_stage_score_sum / care_stage_sample_seconds, 0.0, 1.0)

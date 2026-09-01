@@ -5,17 +5,11 @@ const ATLAS_TEXTURES := [
 	preload("res://assets/fertilizers/fertilizers_01.png"),
 	preload("res://assets/fertilizers/fertilizers_02.png"),
 ]
-const LEGACY_TEXTURES := [
-	preload("res://assets/fertilizers/fertilizers_03.png"),
-	preload("res://assets/fertilizers/fertilizers_04.png"),
-	preload("res://assets/fertilizers/fertilizers_05.png"),
-	preload("res://assets/fertilizers/fertilizers_06.png"),
-]
 
 static func texture_for(id: StringName) -> Texture2D:
 	var descriptor := FertilizerAssetCatalog.descriptor_for(id)
 	if descriptor.is_empty():
-		return LEGACY_TEXTURES[posmod(int(String(id).hash()), LEGACY_TEXTURES.size())]
+		descriptor = _fallback_descriptor(id)
 	var texture := AtlasTexture.new()
 	texture.atlas = ATLAS_TEXTURES[int(descriptor["atlas_index"])]
 	texture.region = Rect2(
@@ -25,3 +19,13 @@ static func texture_for(id: StringName) -> Texture2D:
 		FertilizerAssetCatalog.FRAME_SIZE
 	)
 	return texture
+
+static func _fallback_descriptor(id: StringName) -> Dictionary:
+	var hash_value := posmod(int(String(id).hash()), 126)
+	var atlas_index := 0 if hash_value < 64 else 1
+	var local_index := hash_value if atlas_index == 0 else hash_value - 64
+	return {
+		"atlas_index": atlas_index,
+		"row": local_index / 8,
+		"column": local_index % 8,
+	}

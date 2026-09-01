@@ -19,7 +19,7 @@ static func definitions() -> Array[FertilizerDefinition]:
 			definition.id = _offer_id(atlas_index, String(item.get("id", "")))
 			definition.display_name_key = "fertilizer.%s" % String(item.get("id", ""))
 			definition.offer_weight = 1.0
-			definition.care_effects = {"health": FOOD_HEALTH}
+			definition.care_effects = {"health": FOOD_HEALTH, "nutrition": 0.18}
 			result.append(definition)
 	return result
 

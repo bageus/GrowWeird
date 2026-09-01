@@ -2,14 +2,16 @@ class_name ComfortEvaluator
 extends RefCounted
 
 static func evaluate(pot: PotState, species: PlantSpeciesDefinition) -> Dictionary:
-	var water := _range_component(pot.soil_moisture, species.moisture_min, species.moisture_max)
-	var light := _range_component(pot.light_level(), species.light_min, species.light_max)
+	var gauge := CareGaugeService.evaluate(pot, species)
+	var water: Dictionary = gauge["water"]
+	var food: Dictionary = gauge["food"]
+	var light: Dictionary = gauge["environment"]
 	var air := _air_component(pot.window_open, species.open_window_preference)
 
 	var components := {
 		"water": water,
 		"light": light,
-		"air": air,
+		"food": food,
 	}
 	var main_issue := "water"
 	var lowest_score := 2.0
@@ -26,6 +28,7 @@ static func evaluate(pot: PotState, species: PlantSpeciesDefinition) -> Dictiona
 		"direction": int(components[main_issue]["direction"]),
 		"water": float(water["score"]),
 		"light": float(light["score"]),
+		"food": float(food["score"]),
 		"air": float(air["score"]),
 	}
 
