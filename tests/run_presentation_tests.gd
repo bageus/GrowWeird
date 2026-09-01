@@ -83,6 +83,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("UiAtlas.HUD_BALANCE") and FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_balance_plus"), "scene HUD: balance art and plus hover are not wired")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("UiAtlas.HUD_INVENTORY") and FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("background2(1)"), "inventory HUD: inventory and three slot atlas art are not wired")
 	_expect(hud_text.contains("OffersPanel") and hud_text.contains("RefreshOffer") and hud_text.contains("SkipOffer"), "scene HUD: fertilizers need refresh left and skip right controls")
+	_expect(hud_text.contains("Vector2(520, 112)"), "scene HUD: fertilizer timer must center on the visible offer block")
 	var cooldown_text := FileAccess.get_file_as_string("res://src/presentation/main/fertilizer_cooldown_overlay.tscn")
 	_expect(cooldown_text.contains("CooldownOverlay") and cooldown_text.contains("Next fertilizers 01:00"), "scene HUD: fertilizer cooldown overlay is missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("_set_slot_hover"), "scene HUD: fertilizer slots need hover highlighting")
