@@ -59,6 +59,18 @@ static func configure_hud_slot(button: Button) -> void:
 		button.add_theme_stylebox_override(state, style)
 	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
 
+static func configure_inventory_arrow(button: Button, points_up: bool) -> void:
+	if button == null:
+		return
+	var image := button_texture(3, 3).get_image()
+	image.rotate_90(COUNTERCLOCKWISE if points_up else CLOCKWISE)
+	button.text = ""
+	button.icon = ImageTexture.create_from_image(image)
+	button.expand_icon = true
+	button.add_theme_color_override(&"icon_disabled_color", Color(1.0, 1.0, 1.0, 0.35))
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
 	style.texture = texture
