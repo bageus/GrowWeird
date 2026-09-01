@@ -120,6 +120,7 @@ func _test_inventory_hud_contract() -> void:
 	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
+	_expect(hud_text.contains("alignment = 2"), "inventory HUD: item cells must align to the bottom of the frame")
 	_expect(hud_text.contains("drag_handle_height = 0.0"), "inventory HUD: panel must be draggable outside item buttons")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("extends SceneDraggablePanel"), "inventory HUD: must use shared draggable panel")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn").count("ExtResource(\"5_inventory\")") == 1, "scene HUD: exactly one InventoryHud instance")
@@ -131,6 +132,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(scene_text.contains("CurtainsButton") and scene_text.contains("OpenWindowButton") and scene_text.contains("BlindsButton") and scene_text.contains("NormalLightButton"), "lighting HUD: four requested modes missing")
 	var main_scene_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
 	_expect(main_scene_text.contains("CareGauge") and main_scene_text.contains("care_gauge.gd"), "care HUD: three-arc gauge is missing from the main scene")
+	_expect(main_scene_text.contains('parent="Shell/Layout/ScenePanel/SceneRoot"') and main_scene_text.contains("z_index = 20"), "care HUD: gauge must render above the scene HUD")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains('_genetic_title("Branch"'), "inventory HUD: pruned plant material must be shown as a branch")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
