@@ -85,7 +85,7 @@ func _refresh() -> void:
 	if pot != null:
 		pot_visual.set_pot_state(pot)
 	tree_growth_preview.set_plant(plant)
-	care_gauge.set_gauge(CareGaugeService.evaluate(pot, GameApp.active_species_definition()) if pot != null and plant != null else {})
+	care_gauge.set_gauge(CareGaugeService.evaluate_or_preview(pot, GameApp.active_species_definition()))
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:

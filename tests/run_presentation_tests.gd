@@ -125,6 +125,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(hud_text.contains('parent="Arrows"') and hud_text.contains("ScrollUp") and hud_text.contains("ScrollDown"), "inventory HUD: paging arrows must be inside the HUD overlay")
 	var inventory_script := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
 	_expect(inventory_script.contains("SCROLL_STEP") and inventory_script.contains("_scroll_inventory"), "inventory HUD: arrow paging behavior is missing")
+	_expect(inventory_script.contains("_add_edge_spacer"), "inventory HUD: tiles need real padding below the top arrow")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("configure_inventory_arrow"), "inventory HUD: paging must use the arrow atlas asset")
 	_expect(hud_text.contains("drag_handle_height = 0.0"), "inventory HUD: panel must be draggable outside item buttons")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("extends SceneDraggablePanel"), "inventory HUD: must use shared draggable panel")
@@ -138,6 +139,7 @@ func _test_inventory_hud_contract() -> void:
 	var main_scene_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
 	_expect(main_scene_text.contains("CareGauge") and main_scene_text.contains("care_gauge.gd"), "care HUD: three-arc gauge is missing from the main scene")
 	_expect(main_scene_text.contains('parent="Shell/Layout/ScenePanel/SceneRoot"') and main_scene_text.contains("z_index = 20"), "care HUD: gauge must render above the scene HUD")
+	_expect(FileAccess.get_file_as_string("res://src/domain/services/care_gauge_service.gd").contains("evaluate_or_preview"), "care HUD: gauge must remain visible for a selected empty pot")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains('_genetic_title("Branch"'), "inventory HUD: pruned plant material must be shown as a branch")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules

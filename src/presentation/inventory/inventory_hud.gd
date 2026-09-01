@@ -37,8 +37,10 @@ func _rebuild(inventory: InventoryState) -> void:
 	for child in items.get_children():
 		items.remove_child(child)
 		child.queue_free()
+	_add_edge_spacer()
 	if inventory == null:
 		_add_empty()
+		_add_edge_spacer()
 		return
 	var added := 0
 	var fertilizer_ids := inventory.fertilizers.keys()
@@ -79,7 +81,14 @@ func _rebuild(inventory: InventoryState) -> void:
 		while added < 3:
 			_add_empty_slot()
 			added += 1
+	_add_edge_spacer()
 	call_deferred("_update_scroll_buttons")
+
+func _add_edge_spacer() -> void:
+	var spacer := Control.new()
+	spacer.custom_minimum_size = Vector2(0.0, 52.0)
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	items.add_child(spacer)
 
 func _scroll_inventory(direction: int) -> void:
 	scroll.scroll_vertical += direction * SCROLL_STEP

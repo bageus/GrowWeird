@@ -62,12 +62,13 @@ static func configure_hud_slot(button: Button) -> void:
 static func configure_inventory_arrow(button: Button, points_up: bool) -> void:
 	if button == null:
 		return
-	var image := button_texture(3, 3).get_image()
+	var arrow_region := Rect2(3.0 * CELL + 128.0, 3.0 * CELL + 80.0, 256.0, 256.0)
+	var image := atlas_region(BUTTONS, arrow_region).get_image()
 	image.rotate_90(COUNTERCLOCKWISE if points_up else CLOCKWISE)
 	button.text = ""
 	button.icon = ImageTexture.create_from_image(image)
 	button.expand_icon = true
-	button.add_theme_color_override(&"icon_disabled_color", Color(1.0, 1.0, 1.0, 0.35))
+	button.add_theme_color_override(&"icon_disabled_color", Color(1.0, 1.0, 1.0, 0.7))
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 
