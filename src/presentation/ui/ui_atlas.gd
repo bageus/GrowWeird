@@ -71,7 +71,7 @@ static func configure_inventory_arrow(button: TextureButton, points_up: bool) ->
 	button.texture_pressed = texture
 	button.texture_disabled = texture
 	button.ignore_texture_size = true
-	button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+	button.stretch_mode = TextureButton.STRETCH_SCALE
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
