@@ -3,6 +3,21 @@ extends RefCounted
 
 const GROWTH_STAGE_COUNT := 8
 
+static func evaluate_or_preview(pot: PotState, species: PlantSpeciesDefinition) -> Dictionary:
+	if pot == null:
+		return {}
+	if pot.plant != null and species != null:
+		return evaluate(pot, species)
+	return {
+		"overall": 1.0,
+		"water": component(pot.soil_moisture, 0.35, 0.7),
+		"food": component(0.5, 0.3, 0.75),
+		"environment": component(pot.light_level(), 0.35, 0.75),
+		"stage_index": 0,
+		"stage_progress": 0.0,
+		"stage_quality": 1.0,
+	}
+
 static func evaluate(pot: PotState, species: PlantSpeciesDefinition) -> Dictionary:
 	if pot == null or pot.plant == null or species == null:
 		return {}
