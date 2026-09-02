@@ -327,7 +327,7 @@ func _choose_offer(index: int) -> void:
 	var ids := GameApp.current_offer_ids()
 	if index >= ids.size():
 		return
-	GameApp.choose_fertilizer_offer(ids[index])
+	event_label.text = "Fertilizer added to inventory." if GameApp.choose_fertilizer_offer(ids[index]) else "Could not take fertilizer."
 func _on_refresh_offer_pressed() -> void:
 	event_label.text = "Fertilizers refreshed." if GameApp.refresh_fertilizer_offer() else "Cannot refresh fertilizers."
 func _on_skip_offer_pressed() -> void:
