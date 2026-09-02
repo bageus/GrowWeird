@@ -244,12 +244,12 @@ func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, 
 	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield); _set_cancel_visibility()
 func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 	match kind:
-		&"fertilizer":
+		&"fertilizer", &"misc":
 			if GameApp.active_plant() == null or not GameApp.active_plant().alive:
 				event_label.text = "Select a living plant first."
 				return
-			GameApp.use_inventory_fertilizer(StringName(item_id))
-			event_label.text = "Fertilizer used on current plant."
+			GameApp.use_inventory_fertilizer(StringName(item_id), kind)
+			event_label.text = "Item used on current plant."
 		&"cutting":
 			_on_cutting_graft_requested(item_id)
 		&"seed":

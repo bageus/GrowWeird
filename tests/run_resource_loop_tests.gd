@@ -108,6 +108,11 @@ func _test_compost_uses_normal_fertilizer_path() -> void:
 	_expect(bool(result.get("success", false)), "resource: compost should use normal fertilizer action")
 	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == 0, "resource: used compost should leave inventory")
 	_expect(plant.health > 0.5, "resource: compost care effect should be applied through fertilizer service")
+	state.inventory.misc["dead_mouse"] = 1
+	var nutrition_before := plant.nutrition
+	result = FertilizerActions.use_inventory(state, plant, &"dead_mouse", registry, &"misc")
+	_expect(bool(result.get("success", false)) and not state.inventory.misc.has("dead_mouse"), "resource: used misc fertilizer should leave inventory")
+	_expect(plant.nutrition > nutrition_before, "resource: used misc fertilizer should feed the plant")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()

@@ -133,8 +133,8 @@ func refresh_fertilizer_offer() -> bool:
 	state_changed.emit()
 	return true
 
-func use_inventory_fertilizer(fertilizer_id: StringName) -> Array[Dictionary]:
-	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry)
+func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = ResourceActions.FERTILIZER) -> Array[Dictionary]:
+	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry, kind)
 	if not bool(result.get("success", false)):
 		return []
 	var events := _events_from_result(result)
