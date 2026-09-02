@@ -201,10 +201,14 @@ func _test_growth_stage_geometry() -> void:
 	_expect(preview.stage == 7 and preview.has_prunable_branch(), "tree preview: prune mode must leave test preview and restore domain branches")
 	preview.free()
 	var plant := _plant()
+	plant.growth_ratio = 0.0
+	_expect(TreeGrowthPreview.stage_for(plant) == -1, "tree preview: planted seed must stay underground during its first gauge cycle")
+	plant.growth_ratio = 0.125
+	_expect(TreeGrowthPreview.stage_for(plant) == 0, "tree preview: first sprout must appear after the first completed gauge cycle")
 	plant.growth_ratio = 1.0
 	_expect(TreeGrowthPreview.stage_for(plant) == 7, "tree preview: intact mature plant must use the two-branch asset")
 	plant.growth_ratio = 0.5
-	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: each completed gauge cycle must advance one growth asset")
+	_expect(TreeGrowthPreview.stage_for(plant) == 3, "tree preview: each completed gauge cycle must advance one growth asset")
 	plant.growth_ratio = 1.0
 	plant.cut_branch(&"left")
 	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: domain branch removal must select the left-cut asset")

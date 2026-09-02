@@ -30,12 +30,7 @@ static func _advance_pot(
 		return
 
 	if policy.advance_environment:
-		pot.soil_moisture = clampf(
-			pot.soil_moisture - species.moisture_decay_per_second * delta_seconds,
-			0.0,
-			1.0
-		)
-		plant.nutrition = clampf(plant.nutrition - species.nutrition_decay_per_second * delta_seconds, 0.0, 1.0)
+		_consume_growth_needs(pot, plant, species, delta_seconds)
 	plant.age_seconds += delta_seconds
 
 	var comfort := ComfortEvaluator.evaluate(pot, species)
@@ -69,3 +64,20 @@ static func _advance_pot(
 
 	if policy.advance_growth and plant.alive:
 		BranchRegrowthService.advance(plant, delta_seconds, species, overall)
+
+static func _consume_growth_needs(
+	pot: PotState,
+	plant: PlantState,
+	species: PlantSpeciesDefinition,
+	delta_seconds: float
+) -> void:
+	pot.soil_moisture = clampf(
+		pot.soil_moisture - species.moisture_decay_per_second * delta_seconds,
+		0.0,
+		1.0
+	)
+	plant.nutrition = clampf(
+		plant.nutrition - species.nutrition_decay_per_second * delta_seconds,
+		0.0,
+		1.0
+	)

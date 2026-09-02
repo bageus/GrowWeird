@@ -18,6 +18,7 @@ func _init() -> void:
 	_test_species_seed_unlock_progression()
 	_test_save_round_trip_preserves_new_state()
 	_test_care_gauge_ranges_and_stage_history()
+	_test_growth_cycle_consumes_water_and_food()
 	_test_independent_pots_and_starter_seed()
 	if _failures.is_empty():
 		print("GrowWeird domain tests passed")
@@ -53,6 +54,23 @@ func _test_care_gauge_ranges_and_stage_history() -> void:
 	pot.plant.finish_care_stage(1)
 	_expect(pot.plant.completed_care_scores.size() == 1 and is_equal_approx(pot.plant.completed_care_scores[0], 0.8), "care gauge: completed stage quality should use the full stage history")
 	_expect(CareGaugeService.stage_progress(0.124) > 0.9 and is_zero_approx(CareGaugeService.stage_progress(0.125)), "care gauge: pointer must restart after each growth cycle")
+
+func _test_growth_cycle_consumes_water_and_food() -> void:
+	var registry := ContentRegistry.new()
+	registry.load_all()
+	var state := GameState.new()
+	var pot := PotState.new()
+	pot.pot_id = "growth-needs"
+	pot.soil_moisture = 0.8
+	pot.plant = _plant("growth-needs-plant")
+	pot.plant.nutrition = 0.8
+	state.pots = [pot]
+	state.active_pot_id = pot.pot_id
+	var growth_before := pot.plant.growth_ratio
+	PlantSimulationService.advance(state, 10.0, registry, GameRules.new())
+	_expect(pot.plant.growth_ratio > growth_before, "growth needs: planted seed must start its growth cycle")
+	_expect(pot.soil_moisture < 0.8, "growth needs: soil must dry while the growth pointer moves")
+	_expect(pot.plant.nutrition < 0.8, "growth needs: nutrition must decrease while the growth pointer moves")
 
 func _test_independent_pots_and_starter_seed() -> void:
 	var state := NewGameFactory.create(GameRules.new())
