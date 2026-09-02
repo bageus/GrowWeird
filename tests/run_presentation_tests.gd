@@ -94,6 +94,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains('name="ShopButton" type="Button" parent="WalletHud/Layers"'), "scene HUD: balance plus hit area must use fixed atlas coordinates")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_hud_slot"), "scene HUD: fertilizer menu needs three separate atlas backgrounds")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('configure_button(get_node("TasksButton")'), "scene HUD: tasks button hover atlas is not configured")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('configure_icon_button(get_node("RecyclePlantButton")'), "scene HUD: plant grinder must use the icon-only atlas crop without the Grind label")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override') and FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override'), "scene HUD: water and lighting dark popup backgrounds must be removed")
 	_expect(not main_text.contains("PotsScroll"), "scene HUD: pot selector must not remain in the sidebar")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
