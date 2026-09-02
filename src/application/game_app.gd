@@ -103,17 +103,12 @@ func rename_active_plant(new_name: String) -> bool:
 	state_changed.emit()
 	return true
 
-func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
+func choose_fertilizer_offer(fertilizer_id: StringName) -> bool:
 	var result := FertilizerActions.choose_offer(state, active_plant(), fertilizer_id, registry, rules)
 	if not bool(result.get("success", false)):
-		return []
-	var events := _events_from_result(result)
-	_progress(&"fertilizer_used")
-	if not events.is_empty():
-		_progress(&"mutation_resolved")
-	_emit_mutation_events(events)
+		return false
 	state_changed.emit()
-	return events
+	return true
 
 func skip_fertilizer_offer() -> bool:
 	if not FertilizerActions.skip_offer(state, rules, registry.all_offer_fertilizers()):
