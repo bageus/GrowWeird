@@ -177,7 +177,7 @@ theme_override_styles/panel = SubResource("Style_trade_popup")
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Preview" type="TextureRect" parent="Confirm/Layout"]
+[node name="ConfirmPreview" type="TextureRect" parent="Confirm/Layout"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2

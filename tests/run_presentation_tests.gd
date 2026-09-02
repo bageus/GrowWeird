@@ -107,7 +107,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(shop_scene.contains("BalanceArt") and shop_scene.contains("BalancePlus") and shop_script.contains("UiAtlas.HUD_BALANCE"), "shop HUD: complete main balance block is missing")
 	_expect(shop_script.contains('"price": 1') and shop_script.contains("range(5)"), "shop HUD: categories must expose five one-coin test items")
 	_expect(shop_script.contains("TextureRect.new()") and shop_script.contains("_quantity_badge") and shop_script.contains('&"cutting"') and shop_script.contains('&"potted_plant"'), "shop HUD: lot cards need previews, quantities, branches, and first-stage potted plants")
-	_expect(shop_scene.contains("QuantitySlider") and shop_scene.contains("QuantityLabel") and shop_script.contains("_refresh_purchase_preview"), "shop HUD: purchase dialog must share the sell dialog quantity flow")
+	_expect(shop_scene.contains("QuantitySlider") and shop_scene.contains("QuantityLabel") and shop_scene.contains('name="ConfirmPreview"') and shop_script.contains("_refresh_purchase_preview"), "shop HUD: purchase dialog must expose its preview and shared quantity flow")
 	_expect(shop_script.contains('_stock[item_id] = maxi(0') and shop_script.contains('if int(item.get("stock", 0)) > 0'), "shop HUD: purchased single-stock items must disappear")
 	_expect(shop_script.contains("UiAtlas.BUTTONS") and shop_scene.contains('text = "BUY"') and shop_scene.contains('text = "CANCEL"'), "shop HUD: asset coin and Buy/Cancel controls are missing")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
