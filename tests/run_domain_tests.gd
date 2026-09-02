@@ -18,6 +18,7 @@ func _init() -> void:
 	_test_species_seed_unlock_progression()
 	_test_save_round_trip_preserves_new_state()
 	_test_care_gauge_ranges_and_stage_history()
+	_test_independent_pots_and_starter_seed()
 	if _failures.is_empty():
 		print("GrowWeird domain tests passed")
 		quit(0)
@@ -51,6 +52,22 @@ func _test_care_gauge_ranges_and_stage_history() -> void:
 	pot.plant.record_care_sample(0.8, 10.0)
 	pot.plant.finish_care_stage(1)
 	_expect(pot.plant.completed_care_scores.size() == 1 and is_equal_approx(pot.plant.completed_care_scores[0], 0.8), "care gauge: completed stage quality should use the full stage history")
+	_expect(CareGaugeService.stage_progress(0.124) > 0.9 and is_zero_approx(CareGaugeService.stage_progress(0.125)), "care gauge: pointer must restart after each growth cycle")
+
+func _test_independent_pots_and_starter_seed() -> void:
+	var state := NewGameFactory.create(GameRules.new())
+	_expect(state.pots.size() >= 2 and state.pots[0].plant != null, "new game: first pot must contain a sprout")
+	_expect(state.pots[1].is_empty() and state.inventory.seeds.size() == 1, "new game: one seed must be available for the empty pot")
+	var first_plant := state.pots[0].plant
+	var seed_id := state.inventory.seeds[0].item_id
+	_expect(PropagationActions.plant_seed(state, seed_id, state.pots[1].pot_id), "new game: starter seed must plant in the free pot")
+	var second_plant := state.pots[1].plant
+	_expect(second_plant != null and second_plant.instance_id != first_plant.instance_id, "pots: planted specimens must have unique identities")
+	state.pots[1].soil_moisture = 0.9
+	state.pots[1].light_mode = PotState.LightMode.DIRECT
+	second_plant.nutrition = 0.2
+	_expect(not is_equal_approx(state.pots[0].soil_moisture, state.pots[1].soil_moisture), "pots: watering must remain independent")
+	_expect(state.pots[0].light_mode != state.pots[1].light_mode and not is_equal_approx(first_plant.nutrition, second_plant.nutrition), "pots: light and nutrition must remain independent")
 
 func _test_pour_waters_empty_active_pot() -> void:
 	var app = load("res://src/application/game_app.gd").new()
