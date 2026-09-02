@@ -105,16 +105,6 @@ static func recycle_yield(kind: StringName, rules: GameRules) -> int:
 			return RecyclingService.misc_yield(rules)
 	return 0
 
-static func recycle_dead_plant(state: GameState, pot: PotState, rules: GameRules) -> int:
-	if state == null or pot == null or pot.plant == null:
-		return 0
-	var amount := RecyclingService.dead_plant_yield(pot.plant, rules)
-	if amount <= 0:
-		return 0
-	pot.plant = null
-	InventoryService.add_fertilizer(state.inventory, RecyclingService.COMPOST_ID, amount)
-	return amount
-
 static func _take_item(state: GameState, kind: StringName, item_id: String) -> bool:
 	match kind:
 		CUTTING:
