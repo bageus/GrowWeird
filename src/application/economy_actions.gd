@@ -19,11 +19,14 @@ static func sell_plant(
 ) -> int:
 	if state == null or pot == null or pot.plant == null:
 		return 0
-	var amount := plant_value(pot.plant, registry, rules)
+	var amount := plant_value(pot.plant, registry, rules) + maxi(0, rules.pot_base_price)
 	if amount <= 0:
 		return 0
 	EconomyService.credit(state, amount)
-	pot.plant = null
+	var sold_pot_id := pot.pot_id
+	state.pots.erase(pot)
+	if state.active_pot_id == sold_pot_id:
+		state.active_pot_id = state.pots[0].pot_id if not state.pots.is_empty() else ""
 	return amount
 
 static func fruit_value(
