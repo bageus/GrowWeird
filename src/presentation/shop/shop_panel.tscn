@@ -62,20 +62,45 @@ theme_override_colors/font_color = Color(0.96, 0.82, 0.45, 1)
 theme_override_font_sizes/font_size = 38
 text = "SHOP"
 
-[node name="Balance" type="HBoxContainer" parent="Window/Content/Header"]
+[node name="Balance" type="Control" parent="Window/Content/Header"]
+custom_minimum_size = Vector2(240, 120)
 layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="Coin" type="Label" parent="Window/Content/Header/Balance"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "●"
+[node name="BalanceArt" type="TextureRect" parent="Window/Content/Header/Balance"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="MoneyLabel" type="Label" parent="Window/Content/Header/Balance"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 26
+layout_mode = 0
+offset_left = 70.0
+offset_top = 34.0
+offset_right = 184.0
+offset_bottom = 88.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
 text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BalancePlus" type="Button" parent="Window/Content/Header/Balance"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 184.0
+offset_top = 34.0
+offset_right = 234.0
+offset_bottom = 92.0
+flat = true
 
 [node name="CloseButton" type="Button" parent="Window/Content/Header"]
 unique_name_in_owner = true
@@ -95,31 +120,18 @@ custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Right" type="VBoxContainer" parent="Window/Content/Body"]
+[node name="CategoryHud" type="PanelContainer" parent="Window/Content/Body"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+size_flags_vertical = 3
 
-[node name="CategoryTitle" type="Label" parent="Window/Content/Body/Right"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 27
-text = "Plants"
-
-[node name="HoverDescription" type="Label" parent="Window/Content/Body/Right"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-modulate = Color(1, 1, 1, 0.76)
-text = "Hover an item to see its description."
-autowrap_mode = 2
-
-[node name="Scroll" type="ScrollContainer" parent="Window/Content/Body/Right"]
+[node name="Scroll" type="ScrollContainer" parent="Window/Content/Body/CategoryHud"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="ItemGrid" type="GridContainer" parent="Window/Content/Body/Right/Scroll"]
+[node name="ItemGrid" type="GridContainer" parent="Window/Content/Body/CategoryHud/Scroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
