@@ -259,6 +259,11 @@ func buy_new_pot() -> String:
 		state_changed.emit()
 	return pot_id
 
+func buy_shop_item(item: Dictionary) -> bool:
+	if not ShopActions.buy_catalog_item(state, item, registry): return false
+	state_changed.emit()
+	return true
+
 func current_comfort() -> Dictionary:
 	var pot := active_pot()
 	if pot == null or pot.plant == null:

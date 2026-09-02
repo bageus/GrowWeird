@@ -41,6 +41,11 @@ static func take_misc(inventory: InventoryState, item_id: String, amount: int = 
 		inventory.misc[item_id] = count - taken
 	return taken
 
+static func add_misc(inventory: InventoryState, item_id: String, amount: int = 1) -> void:
+	if inventory == null or item_id.is_empty() or amount <= 0:
+		return
+	inventory.misc[item_id] = int(inventory.misc.get(item_id, 0)) + amount
+
 static func add_cutting(inventory: InventoryState, cutting: CuttingState) -> void:
 	if inventory != null and cutting != null:
 		inventory.cuttings.append(cutting)
