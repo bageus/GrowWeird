@@ -100,7 +100,6 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	button.custom_minimum_size = Vector2(124.0, 124.0)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	button.clip_contents = true
-	button.icon_max_width = 88
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	var texture := InventoryItemArt.texture_for(kind, item_id)

@@ -26,6 +26,6 @@ static func _fallback_descriptor(id: StringName) -> Dictionary:
 	var local_index := hash_value if atlas_index == 0 else hash_value - 64
 	return {
 		"atlas_index": atlas_index,
-		"row": local_index / 8,
+		"row": floori(float(local_index) / 8.0),
 		"column": local_index % 8,
 	}
