@@ -53,3 +53,61 @@ static func buy_pot(state: GameState, rules: GameRules) -> String:
 	pot.soil_moisture = 0.30
 	state.pots.append(pot)
 	return pot.pot_id
+
+static func buy_catalog_item(state: GameState, item: Dictionary, registry: ContentRegistry) -> bool:
+	if state == null or registry == null or not bool(item.get("unlocked", false)):
+		return false
+	var price := int(item.get("price", 0))
+	if price <= 0 or not EconomyService.spend(state, price):
+		return false
+	var action := StringName(item.get("action", &""))
+	var source_id := StringName(item.get("source_id", item.get("id", &"")))
+	var amount := maxi(1, int(item.get("amount", 1)))
+	var success := false
+	match action:
+		&"pot": success = _add_pots(state, amount)
+		&"potted_plant": success = _add_potted_plants(state, source_id, registry, amount)
+		&"cutting": success = _add_cuttings(state, source_id, registry, amount)
+		&"seed": success = _add_seeds(state, source_id, registry, amount)
+		&"fertilizer": success = registry.get_fertilizer(source_id) != null
+		&"decoration", &"mutagen": success = not String(source_id).is_empty()
+	if success and action == &"fertilizer": InventoryService.add_fertilizer(state.inventory, source_id, amount)
+	if success and action in [&"decoration", &"mutagen"]: InventoryService.add_misc(state.inventory, String(source_id), amount)
+	if not success: EconomyService.credit(state, price)
+	return success
+
+static func _add_pot(state: GameState) -> String:
+	var pot := PotState.new()
+	pot.pot_id = IdFactory.make("pot")
+	pot.soil_moisture = 0.30
+	state.pots.append(pot)
+	return pot.pot_id
+
+static func _add_pots(state: GameState, amount: int) -> bool:
+	for _index in range(amount): _add_pot(state)
+	return true
+
+static func _add_potted_plants(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
+	if registry.get_plant(species_id) == null: return false
+	for _index in range(amount):
+		var plant := GeneticsService.plant_from_genome(GeneticsService.fresh_species_snapshot(species_id), IdFactory.make("plant"))
+		if plant == null: return false
+		plant.growth_ratio = 0.0
+		var pot := PotState.new(); pot.pot_id = IdFactory.make("pot"); pot.soil_moisture = 0.30; pot.plant = plant
+		state.pots.append(pot)
+	return true
+
+static func _add_cuttings(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
+	if registry.get_plant(species_id) == null: return false
+	for _index in range(amount):
+		var cutting := CuttingState.new(); cutting.item_id = IdFactory.make("cutting"); cutting.source_plant_id = "shop"
+		cutting.source_branch_id = "shop-branch"; cutting.genome = GeneticsService.fresh_species_snapshot(species_id)
+		InventoryService.add_cutting(state.inventory, cutting)
+	return true
+
+static func _add_seeds(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
+	if registry.get_plant(species_id) == null: return false
+	for _index in range(amount):
+		var seed := SeedState.new(); seed.item_id = IdFactory.make("seed"); seed.source_plant_id = "shop"
+		seed.genome = GeneticsService.fresh_species_snapshot(species_id); InventoryService.add_seed(state.inventory, seed)
+	return true
