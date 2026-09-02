@@ -149,10 +149,14 @@ func _test_inventory_hud_contract() -> void:
 	_expect(main_scene_text.contains('parent="Shell/Layout/ScenePanel/SceneRoot"') and main_scene_text.contains("z_index = 20"), "care HUD: gauge must render above the scene HUD")
 	_expect(FileAccess.get_file_as_string("res://src/domain/services/care_gauge_service.gd").contains("evaluate_or_preview"), "care HUD: gauge must remain visible for a selected empty pot")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains('_genetic_title("Branch"'), "inventory HUD: pruned plant material must be shown as a branch")
+	var item_art := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_art.gd")
+	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
+	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)
 	_expect(starter.inventory.cuttings.size() == 1, "inventory HUD: new games need one starter item for interaction testing")
+	_expect(starter.inventory.misc.has("dead_mouse") and InventoryService.fertilizer_count(starter.inventory, RecyclingService.COMPOST_ID) == 0, "inventory HUD: recycled fertilizer must only appear after grinding")
 
 func _test_window_asset_mapping() -> void:
 	var view := WindowView.new()

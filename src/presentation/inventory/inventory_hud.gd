@@ -49,7 +49,7 @@ func _rebuild(inventory: InventoryState) -> void:
 		if count <= 0:
 			continue
 		var item_id := String(raw_id)
-		var title := _pretty_id(item_id)
+		var title := "Recycled Fertilizer" if item_id == String(RecyclingService.COMPOST_ID) else _pretty_id(item_id)
 		_add_item(&"fertilizer", item_id, count, title)
 		added += 1
 	for cutting in inventory.cuttings:
@@ -99,6 +99,11 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	button.custom_minimum_size = Vector2(124.0, 124.0)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	button.text = title + (" ×%d" % count if count > 1 else "")
+	var texture := InventoryItemArt.texture_for(kind, item_id)
+	if texture != null:
+		button.icon = texture
+		button.expand_icon = true
+		button.text = ""
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.add_theme_stylebox_override(&"normal", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))

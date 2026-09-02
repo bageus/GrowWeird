@@ -28,6 +28,19 @@ static func take_fertilizer_amount(inventory: InventoryState, fertilizer_id: Str
 		inventory.fertilizers[key] = remaining
 	return taken
 
+static func take_misc(inventory: InventoryState, item_id: String, amount: int = 1) -> int:
+	if inventory == null or amount <= 0:
+		return 0
+	var count := int(inventory.misc.get(item_id, 0))
+	var taken := mini(count, amount)
+	if taken <= 0:
+		return 0
+	if count == taken:
+		inventory.misc.erase(item_id)
+	else:
+		inventory.misc[item_id] = count - taken
+	return taken
+
 static func add_cutting(inventory: InventoryState, cutting: CuttingState) -> void:
 	if inventory != null and cutting != null:
 		inventory.cuttings.append(cutting)

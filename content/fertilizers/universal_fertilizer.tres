@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="FertilizerDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/domain/definitions/fertilizer_definition.gd" id="1_fertilizer"]
+
+[resource]
+script = ExtResource("1_fertilizer")
+id = &"universal_fertilizer"
+display_name_key = "fertilizer.universal_fertilizer"
+shop_price = 50
+offer_weight = 0.0
+mutation_contributions = {"stability": 3.0}
+care_effects = {"health": 0.02, "nutrition": 0.18}

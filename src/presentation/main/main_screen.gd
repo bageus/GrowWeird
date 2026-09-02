@@ -280,7 +280,7 @@ func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity
 		if amount <= 0:
 			break
 		total += amount
-	event_label.text = "Ground into Compost Mix ×%d." % total if total > 0 else "Could not grind item."
+	event_label.text = "Ground into Recycled Fertilizer ×%d." % total if total > 0 else "Could not grind item."
 func _handle_pot_click(pot_id: String) -> void:
 	GameApp.switch_pot(pot_id)
 func _on_sell_plant_pressed() -> void:

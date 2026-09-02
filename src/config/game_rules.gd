@@ -53,6 +53,7 @@ extends Resource
 
 @export_group("Recycling")
 @export_range(0, 20, 1) var fruit_compost_yield: int = 1
+@export_range(0, 20, 1) var misc_compost_yield: int = 1
 @export_range(0, 20, 1) var seed_compost_yield: int = 1
 @export_range(0, 20, 1) var cutting_compost_yield: int = 2
 @export_range(0, 20, 1) var dead_plant_compost_base: int = 1

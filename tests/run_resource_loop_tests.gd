@@ -71,8 +71,12 @@ func _test_item_recycling() -> void:
 	var fruit_yield := ResourceActions.recycle_item(state, &"fruit", fruit.item_id, rules)
 	_expect(fruit_yield == rules.fruit_compost_yield, "resource: fruit compost yield mismatch")
 	_expect(InventoryService.find_fruit(state.inventory, fruit.item_id) == null, "resource: composted fruit should be destroyed")
+	state.inventory.misc["dead_mouse"] = 1
+	var misc_yield := ResourceActions.recycle_item(state, &"misc", "dead_mouse", rules)
+	_expect(misc_yield == rules.misc_compost_yield, "resource: misc compost yield mismatch")
+	_expect(not state.inventory.misc.has("dead_mouse"), "resource: ground misc item should be destroyed")
 
-	var total := seed_yield + cutting_yield + fruit_yield
+	var total := seed_yield + cutting_yield + fruit_yield + misc_yield
 	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == total, "resource: compost stack should equal recycled material")
 
 func _test_dead_plant_recycling() -> void:

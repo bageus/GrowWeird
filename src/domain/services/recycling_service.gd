@@ -6,6 +6,9 @@ const COMPOST_ID: StringName = &"compost_mix"
 static func fruit_yield(rules: GameRules) -> int:
 	return maxi(0, rules.fruit_compost_yield)
 
+static func misc_yield(rules: GameRules) -> int:
+	return maxi(0, rules.misc_compost_yield)
+
 static func seed_yield(rules: GameRules) -> int:
 	return maxi(0, rules.seed_compost_yield)
 
