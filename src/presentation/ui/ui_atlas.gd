@@ -39,6 +39,24 @@ static func configure_button(button: Button, row: int, column: int, mirror_x := 
 	button.mouse_entered.connect(_set_button_hover.bind(button, row, column, mirror_x, true))
 	button.mouse_exited.connect(_set_button_hover.bind(button, row, column, mirror_x, false))
 
+static func configure_icon_button(button: Button, row: int, column: int) -> void:
+	if button == null:
+		return
+	button.text = ""
+	button.icon = _button_icon_crop(row, column, false)
+	button.expand_icon = true
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.mouse_entered.connect(_set_icon_button_hover.bind(button, row, column, true))
+	button.mouse_exited.connect(_set_icon_button_hover.bind(button, row, column, false))
+
+static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
+	var source := BUTTONS_HOVER if hover else BUTTONS
+	return atlas_region(source, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
+
 static func configure_balance_plus(button: Button) -> void:
 	if button == null:
 		return
@@ -95,6 +113,11 @@ static func background2(index: int) -> Texture2D:
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
 	if is_instance_valid(button):
 		button.icon = button_texture(row, column, hovered, mirror_x)
+		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
+
+static func _set_icon_button_hover(button: Button, row: int, column: int, hovered: bool) -> void:
+	if is_instance_valid(button):
+		button.icon = _button_icon_crop(row, column, hovered)
 		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
 
 static func _set_balance_hover(button: Button, hovered: bool) -> void:
