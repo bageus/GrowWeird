@@ -25,6 +25,9 @@ static func harvest(
 	if fruit == null:
 		return null
 	branch.fruit_growth = null
+	branch.fruit_cycle_eligible = plant.fruit_cycle_index + 1
+	if not plant.has_active_fruits():
+		plant.fruit_cycle_index += 1
 	return fruit
 
 static func _advance_pot(
@@ -43,6 +46,8 @@ static func _advance_pot(
 	if growth_factor <= 0.0:
 		return
 	for branch in plant.existing_branches():
+		if branch.fruit_cycle_eligible > plant.fruit_cycle_index:
+			continue
 		if branch.fruit_growth == null:
 			branch.fruit_growth = GrowingFruitState.new()
 			branch.fruit_growth.hybrid = branch.grafted
