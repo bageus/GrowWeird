@@ -42,4 +42,5 @@ static func _native_branch(plant: PlantState, slot: StringName) -> BranchState:
 	branch.source_species_id = plant.species_id
 	branch.ancestry = [plant.instance_id]
 	branch.grafted = false
+	branch.fruit_cycle_eligible = plant.regrowth_fruit_cycle_at(slot)
 	return branch

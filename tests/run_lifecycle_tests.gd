@@ -7,6 +7,7 @@ func _init() -> void:
 	_test_cared_for_adult_survives_long_term()
 	_test_neglected_plant_dies_permanently()
 	_test_native_branch_regrows_in_exact_slot()
+	_test_inactive_pot_branch_regrows_without_refresh()
 	_test_regrowth_waits_for_adulthood()
 	_test_graft_cancels_native_regrowth()
 	_test_regrowth_save_round_trip()
@@ -14,6 +15,8 @@ func _init() -> void:
 	_test_species_silhouettes_are_distinct()
 	_test_low_vitality_droops_geometry()
 	_test_regrowth_is_exposed_to_presentation()
+	_test_pruned_branch_skips_current_fruit_cycle()
+	_test_fruit_cycle_restarts_after_last_harvest()
 	if _failures.is_empty():
 		print("GrowWeird lifecycle tests passed")
 		quit(0)
@@ -94,6 +97,15 @@ func _test_regrowth_waits_for_adulthood() -> void:
 	_expect(plant.branch_at(&"right") == null, "regrowth: juvenile plant must not regrow native branch yet")
 	_expect(plant.regrowth_progress_at(&"right") == 0.0, "regrowth: juvenile wait must not bank progress")
 
+func _test_inactive_pot_branch_regrows_without_refresh() -> void:
+	var registry := _registry(); var species := registry.get_plant(&"starter_sprout"); var state := GameState.new()
+	var active := _comfortable_pot("active"); var inactive := _comfortable_pot("inactive")
+	active.plant.growth_ratio = 1.0; inactive.plant.growth_ratio = 1.0; inactive.plant.cut_branch(&"right")
+	state.pots = [active, inactive]; state.active_pot_id = active.pot_id
+	var policy := SimulationPolicy.realtime(); policy.advance_environment = false; policy.advance_health = false
+	PlantSimulationService.advance(state, species.native_regrowth_seconds, registry, GameRules.new(), policy)
+	_expect(inactive.plant.branch_at(&"right") != null, "regrowth: inactive pot must finish branch growth without switching or manual refresh")
+
 func _test_graft_cancels_native_regrowth() -> void:
 	var plant := _plant("graft-race")
 	plant.cut_branch(&"center")
@@ -113,12 +125,17 @@ func _test_regrowth_save_round_trip() -> void:
 	pot.plant = _plant("save-regrowth-plant")
 	pot.plant.cut_branch(&"left")
 	pot.plant.set_regrowth_progress(&"left", 0.42)
+	pot.plant.regrowth_fruit_cycles["left"] = 4
+	pot.plant.fruit_cycle_index = 3
+	pot.plant.branch_at(&"center").fruit_cycle_eligible = 4
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
 	_expect(restored.schema_version == GameState.SCHEMA_VERSION, "regrowth save: schema should stay current")
 	_expect(restored.pots[0].plant.branch_at(&"left") == null, "regrowth save: empty slot should remain empty")
 	_expect(absf(restored.pots[0].plant.regrowth_progress_at(&"left") - 0.42) < 0.001, "regrowth save: partial progress was lost")
+	_expect(restored.pots[0].plant.fruit_cycle_index == 3 and restored.pots[0].plant.branch_at(&"center").fruit_cycle_eligible == 4, "fruit cycle: save round trip lost cycle eligibility")
+	_expect(int(restored.pots[0].plant.regrowth_fruit_cycles.get("left", 0)) == 4, "fruit cycle: pending regrowth cycle was not persisted")
 
 func _test_v3_migrates_through_current_schema() -> void:
 	var legacy := {
@@ -173,6 +190,32 @@ func _test_regrowth_is_exposed_to_presentation() -> void:
 	var right: Dictionary = layout["slots"]["right"]
 	_expect(right["branch"] == null, "regrowth visual: regrowing slot must remain mechanically empty until complete")
 	_expect(absf(float(right["regrowth"]) - 0.55) < 0.001, "regrowth visual: presentation descriptor lost bud progress")
+
+func _test_pruned_branch_skips_current_fruit_cycle() -> void:
+	var registry := _registry(); var species := registry.get_plant(&"starter_sprout")
+	var state := GameState.new(); var pot := _comfortable_pot("cycle-prune"); pot.plant.growth_ratio = 1.0; state.pots = [pot]
+	FruitLifecycleService.advance(state, 1.0, registry)
+	var first_progress := pot.plant.branch_at(&"center").fruit_growth.progress
+	_expect(is_equal_approx(first_progress, pot.plant.branch_at(&"right").fruit_growth.progress), "fruit cycle: all branches must flower simultaneously")
+	pot.plant.cut_branch(&"left")
+	_expect(TreeGrowthPreview.stage_for(pot.plant) == 11, "regrowth asset: pruned plant must use the no-stump asset after refresh")
+	BranchRegrowthService.advance(pot.plant, species.native_regrowth_seconds, species, 1.0)
+	var regrown := pot.plant.branch_at(&"left")
+	_expect(regrown != null and regrown.fruit_growth == null, "fruit cycle: branch must regrow without its removed flower or fruit")
+	FruitLifecycleService.advance(state, species.fruit_ripen_seconds, registry)
+	_expect(regrown.fruit_growth == null, "fruit cycle: regrown branch must skip flowering and fruit in the current cycle")
+
+func _test_fruit_cycle_restarts_after_last_harvest() -> void:
+	var registry := _registry(); var state := GameState.new(); var pot := _comfortable_pot("cycle-harvest")
+	pot.plant.growth_ratio = 1.0; state.pots = [pot]; FruitLifecycleService.advance(state, 1000.0, registry)
+	_expect(FruitLifecycleService.harvest(pot.plant, &"left", "fruit-left") != null, "fruit cycle: first ready fruit should harvest")
+	_expect(pot.plant.fruit_cycle_index == 0 and pot.plant.branch_at(&"left").fruit_growth == null, "fruit cycle: first harvested branch must wait while other fruit remains")
+	_expect(FruitLifecycleService.harvest(pot.plant, &"center", "fruit-center") != null, "fruit cycle: center fruit should harvest")
+	_expect(FruitLifecycleService.harvest(pot.plant, &"right", "fruit-right") != null, "fruit cycle: last fruit should harvest")
+	_expect(pot.plant.fruit_cycle_index == 1, "fruit cycle: last harvested fruit must restart the shared cycle")
+	FruitLifecycleService.advance(state, 1.0, registry)
+	var progress := pot.plant.branch_at(&"left").fruit_growth.progress
+	for branch in pot.plant.existing_branches(): _expect(is_equal_approx(branch.fruit_growth.progress, progress), "fruit cycle: next flowering must start on every branch simultaneously")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
