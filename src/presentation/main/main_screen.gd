@@ -24,7 +24,6 @@ extends Control
 @onready var lighting_button: SceneActionButton = scene_controls.get_node("LightingButton")
 @onready var prune_button: SceneActionButton = scene_controls.get_node("PruneButton")
 @onready var sell_plant_button: SceneActionButton = scene_controls.get_node("SellPlantButton")
-@onready var recycle_plant_button: SceneActionButton = scene_controls.get_node("RecyclePlantButton")
 @onready var cancel_button: SceneActionButton = scene_controls.get_node("CancelButton")
 @onready var spray_button: Button = scene_controls.get_node("WaterOptions/Options/SprayButton")
 @onready var pour_button: Button = scene_controls.get_node("WaterOptions/Options/PourButton")
@@ -112,12 +111,7 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	prune_button.disabled = pot == null
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = ""
-	sell_plant_button.tooltip_text = "Sell · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant"
-	var compost_yield := GameApp.active_dead_plant_compost_yield()
-	recycle_plant_button.visible = plant != null and not plant.alive
-	recycle_plant_button.disabled = compost_yield <= 0
-	recycle_plant_button.text = ""
-	recycle_plant_button.tooltip_text = "Grind · ×%d" % compost_yield
+	sell_plant_button.tooltip_text = "Sell plant + pot · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant + pot"
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
 	var buttons: Array[Button] = [offer_one, offer_two, offer_three]
@@ -165,7 +159,6 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 		&"lighting": _on_light_pressed()
 		&"prune": _on_prune_pressed()
 		&"sell_plant": _on_sell_plant_pressed()
-		&"recycle_plant": _on_recycle_plant_pressed()
 		&"cancel": _on_cancel_pressed()
 		&"shop": _on_shop_pressed()
 		&"tasks": progression_panel.visible = not progression_panel.visible
@@ -283,11 +276,7 @@ func _handle_pot_click(pot_id: String) -> void:
 	GameApp.switch_pot(pot_id)
 func _on_sell_plant_pressed() -> void:
 	var amount := GameApp.sell_active_plant()
-	event_label.text = "Plant sold for $%d." % amount if amount > 0 else "Could not sell plant."
-	_cancel_action()
-func _on_recycle_plant_pressed() -> void:
-	var amount := GameApp.recycle_active_dead_plant()
-	event_label.text = "Remains ground into Compost Mix ×%d." % amount if amount > 0 else "Only dead plants can be composted."
+	event_label.text = "Plant and pot sold for $%d." % amount if amount > 0 else "Could not sell plant and pot."
 	_cancel_action()
 func _on_shop_pressed() -> void:
 	scene_controls.set_shop_visible(not shop_container.visible)
