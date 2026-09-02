@@ -1,6 +1,8 @@
 class_name PropagationService
 extends RefCounted
 
+const CUTTING_START_GROWTH_RATIO := 5.0 / 8.0
+
 static func prune(
 	plant: PlantState,
 	slot: StringName,
@@ -28,6 +30,8 @@ static func plant_cutting(
 	var plant := GeneticsService.plant_from_genome(cutting.genome, plant_id)
 	if plant == null:
 		return false
+	plant.growth_ratio = CUTTING_START_GROWTH_RATIO
+	plant.care_stage_index = CareGaugeService.stage_index(plant.growth_ratio)
 	pot.plant = plant
 	return true
 
