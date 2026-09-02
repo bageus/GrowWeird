@@ -116,7 +116,7 @@ func choose_fertilizer_offer(fertilizer_id: StringName) -> Array[Dictionary]:
 	return events
 
 func skip_fertilizer_offer() -> bool:
-	if not FertilizerActions.skip_offer(state, rules):
+	if not FertilizerActions.skip_offer(state, rules, registry.all_offer_fertilizers()):
 		return false
 	state_changed.emit()
 	return true

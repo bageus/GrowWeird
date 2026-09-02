@@ -144,6 +144,7 @@ func _test_atlas_offer_is_consumed_as_food() -> void:
 	state.fertilizer_offer.offered_ids = [fertilizer_id]
 	result = FertilizerActions.choose_offer(state, null, fertilizer_id, registry, GameRules.new())
 	_expect(bool(result.get("success", false)) and not state.fertilizer_offer.is_active(), "fertilizer atlas: test-mode selection must work without a plant")
+	_expect(FertilizerOfferService.skip_price(state.fertilizer_offer, GameRules.new()) > 0, "fertilizer offer: cooldown controls must remain active")
 
 func _test_multi_axis_mutation_consumes_requirements() -> void:
 	var plant := _plant("synergy")
