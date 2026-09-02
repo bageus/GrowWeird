@@ -22,6 +22,8 @@ static func migrate(source: Dictionary) -> Dictionary:
 				data = _migrate_v4_to_v5(data)
 			5:
 				data = _migrate_v5_to_v6(data)
+			6:
+				data = _migrate_v6_to_v7(data)
 			_:
 				push_error("No save migration registered for schema %d" % version)
 				return {}
@@ -100,4 +102,18 @@ static func _migrate_v5_to_v6(source: Dictionary) -> Dictionary:
 			plant_value["care_stage_sample_seconds"] = 0.0
 			plant_value["completed_care_scores"] = []
 	data["schema_version"] = 6
+	return data
+
+static func _migrate_v6_to_v7(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	for pot_value in data.get("pots", []):
+		if not (pot_value is Dictionary): continue
+		var plant: Variant = pot_value.get("plant")
+		if not (plant is Dictionary): continue
+		plant["fruit_cycle_index"] = 0
+		plant["regrowth_fruit_cycles"] = {}
+		var branches: Dictionary = plant.get("branches", {})
+		for branch in branches.values():
+			if branch is Dictionary: branch["fruit_cycle_eligible"] = 0
+	data["schema_version"] = 7
 	return data
