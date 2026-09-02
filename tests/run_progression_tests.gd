@@ -68,6 +68,9 @@ func _test_fertilizer_shop_unlocks_and_nonshop_compost() -> void:
 			compost_listed = true
 	_expect(not compost_listed, "shop progression: recycled Compost Mix must never be listed as a free shop item")
 	_expect(not ShopActions.buy_fertilizer(state, RecyclingService.COMPOST_ID, registry), "shop progression: zero-price Compost Mix must not be purchasable")
+	var universal := registry.get_fertilizer(&"universal_fertilizer")
+	_expect(universal != null and universal.shop_price > 0, "shop progression: universal fertilizer must be sold in the shop")
+	_expect(ShopActions.buy_fertilizer(state, &"universal_fertilizer", registry), "shop progression: universal fertilizer purchase failed")
 
 func _test_progression_save_round_trip() -> void:
 	var state := _state_with_pots(2)

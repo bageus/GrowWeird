@@ -5,6 +5,7 @@ const CUTTING: StringName = &"cutting"
 const SEED: StringName = &"seed"
 const FRUIT: StringName = &"fruit"
 const FERTILIZER: StringName = &"fertilizer"
+const MISC: StringName = &"misc"
 
 static func item_value(
 	state: GameState,
@@ -100,6 +101,8 @@ static func recycle_yield(kind: StringName, rules: GameRules) -> int:
 			return RecyclingService.seed_yield(rules)
 		FRUIT:
 			return RecyclingService.fruit_yield(rules)
+		MISC:
+			return RecyclingService.misc_yield(rules)
 	return 0
 
 static func recycle_dead_plant(state: GameState, pot: PotState, rules: GameRules) -> int:
@@ -120,4 +123,6 @@ static func _take_item(state: GameState, kind: StringName, item_id: String) -> b
 			return InventoryService.take_seed(state.inventory, item_id) != null
 		FRUIT:
 			return InventoryService.take_fruit(state.inventory, item_id) != null
+		MISC:
+			return InventoryService.take_misc(state.inventory, item_id) == 1
 	return false

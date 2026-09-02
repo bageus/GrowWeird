@@ -2,7 +2,6 @@ class_name NewGameFactory
 extends RefCounted
 
 const STARTER_SPECIES: StringName = &"starter_sprout"
-const STARTER_FERTILIZER: StringName = &"compost_mix"
 
 static func create(rules: GameRules) -> GameState:
 	var state := GameState.new()
@@ -25,7 +24,6 @@ static func create(rules: GameRules) -> GameState:
 	return state
 
 static func add_starter_inventory_item(state: GameState, plant: PlantState) -> void:
-	InventoryService.add_fertilizer(state.inventory, STARTER_FERTILIZER, 1)
 	state.inventory.misc["dead_mouse"] = 1
 	var branch := plant.branch_at(&"center")
 	if branch == null:

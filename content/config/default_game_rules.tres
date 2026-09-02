@@ -43,6 +43,7 @@ genetic_item_ancestry_value = 4
 pot_base_price = 250
 pot_price_growth = 1.55
 fruit_compost_yield = 1
+misc_compost_yield = 1
 seed_compost_yield = 1
 cutting_compost_yield = 2
 dead_plant_compost_base = 1

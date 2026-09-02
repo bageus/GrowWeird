@@ -66,7 +66,7 @@ func show_for(
 	_title = title
 	_unit_value = maxi(0, unit_value)
 	_recycle_yield = maxi(0, recycle_yield)
-	recycle_action.visible = true
+	recycle_action.visible = _recycle_yield > 0
 	actions.visible = true
 	sell_popup.visible = false
 	recycle_popup.visible = false
@@ -122,7 +122,7 @@ func _refresh_sell_preview(value: float) -> void:
 func _refresh_recycle_preview(value: float) -> void:
 	var quantity := maxi(1, int(round(value)))
 	recycle_quantity.text = "Quantity: %d / %d" % [quantity, _count]
-	recycle_output.text = "Output: Compost Mix ×%d" % (_recycle_yield * quantity)
+	recycle_output.text = "Output: Recycled Fertilizer ×%d" % (_recycle_yield * quantity)
 
 func _confirm_sell() -> void:
 	var quantity := maxi(1, int(round(sell_slider.value)))
