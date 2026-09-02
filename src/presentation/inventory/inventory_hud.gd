@@ -98,6 +98,9 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	var button := Button.new()
 	button.custom_minimum_size = Vector2(124.0, 124.0)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.clip_contents = true
+	button.icon_max_width = 88
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	var texture := InventoryItemArt.texture_for(kind, item_id)
 	if texture != null:
@@ -113,8 +116,14 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	if count > 1:
 		count_suffix = " ×%d" % count
 	button.tooltip_text = "%s%s · click for actions" % [title, count_suffix]
+	button.mouse_entered.connect(_set_item_hover.bind(button, true))
+	button.mouse_exited.connect(_set_item_hover.bind(button, false))
 	button.pressed.connect(_emit_selected.bind(kind, item_id, count, title))
 	items.add_child(button)
+
+func _set_item_hover(button: Button, hovered: bool) -> void:
+	if is_instance_valid(button):
+		button.self_modulate = Color(1.18, 1.18, 1.08, 1.0) if hovered else Color.WHITE
 
 func _add_empty() -> void:
 	for index in range(3):

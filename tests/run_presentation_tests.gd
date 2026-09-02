@@ -152,6 +152,7 @@ func _test_inventory_hud_contract() -> void:
 	var item_art := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_art.gd")
 	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
+	_expect(inventory_script.contains("icon_max_width = 88") and inventory_script.contains("_set_item_hover"), "inventory HUD: item art must fit its tile and react to hover")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)

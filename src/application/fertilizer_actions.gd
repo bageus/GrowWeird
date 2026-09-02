@@ -40,14 +40,14 @@ static func use_inventory(
 	state: GameState,
 	plant: PlantState,
 	fertilizer_id: StringName,
-	registry: ContentRegistry
+	registry: ContentRegistry,
+	kind: StringName = ResourceActions.FERTILIZER
 ) -> Dictionary:
 	var fertilizer := registry.get_fertilizer(fertilizer_id)
 	if state == null or plant == null or not plant.alive or fertilizer == null:
 		return _failure()
-	if InventoryService.fertilizer_count(state.inventory, fertilizer_id) <= 0:
-		return _failure()
-	if not InventoryService.take_fertilizer(state.inventory, fertilizer_id):
+	var consumed := InventoryService.take_misc(state.inventory, String(fertilizer_id)) == 1 if kind == ResourceActions.MISC else InventoryService.take_fertilizer(state.inventory, fertilizer_id)
+	if not consumed:
 		return _failure()
 	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
 	return {"success": true, "events": events}
