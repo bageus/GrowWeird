@@ -181,7 +181,8 @@ func create_seed_from_fruit(fruit_id: String) -> String:
 	return item_id
 
 func active_plant_sale_value() -> int:
-	return EconomyActions.plant_value(active_plant(), registry, rules)
+	var value := EconomyActions.plant_value(active_plant(), registry, rules)
+	return value + rules.pot_base_price if value > 0 else 0
 
 func sell_active_plant() -> int:
 	var amount := EconomyActions.sell_plant(state, active_pot(), registry, rules)
@@ -220,15 +221,6 @@ func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
 	if amount > 0:
 		_progress(&"resource_processed")
-		state_changed.emit()
-	return amount
-
-func active_dead_plant_compost_yield() -> int:
-	return RecyclingService.dead_plant_yield(active_plant(), rules)
-
-func recycle_active_dead_plant() -> int:
-	var amount := ResourceActions.recycle_dead_plant(state, active_pot(), rules)
-	if amount > 0:
 		state_changed.emit()
 	return amount
 
