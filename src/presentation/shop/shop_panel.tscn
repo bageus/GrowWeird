@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="1_shop"]
 
@@ -17,6 +17,22 @@ content_margin_left = 22.0
 content_margin_top = 18.0
 content_margin_right = 22.0
 content_margin_bottom = 20.0
+
+[sub_resource type="StyleBoxFlat" id="Style_trade_popup"]
+bg_color = Color(0.03, 0.03, 0.03, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.2)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
 
 [node name="ShopContainer" type="Control"]
 layout_mode = 3
@@ -142,30 +158,32 @@ columns = 3
 [node name="Confirm" type="PanelContainer" parent="."]
 unique_name_in_owner = true
 z_index = 10
-custom_minimum_size = Vector2(480, 330)
+custom_minimum_size = Vector2(330, 390)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -165.0
-offset_right = 240.0
-offset_bottom = 165.0
+offset_left = -165.0
+offset_top = -195.0
+offset_right = 165.0
+offset_bottom = 195.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("Style_window")
+theme_override_styles/panel = SubResource("Style_trade_popup")
 
 [node name="Layout" type="VBoxContainer" parent="Confirm"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Preview" type="ColorRect" parent="Confirm/Layout"]
+[node name="Preview" type="TextureRect" parent="Confirm/Layout"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
 mouse_filter = 2
-color = Color(1, 1, 1, 0.08)
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ConfirmName" type="Label" parent="Confirm/Layout"]
 unique_name_in_owner = true
@@ -181,6 +199,19 @@ size_flags_vertical = 3
 text = "Description"
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="QuantitySlider" type="HSlider" parent="Confirm/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 1.0
+step = 1.0
+value = 1.0
+
+[node name="QuantityLabel" type="Label" parent="Confirm/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quantity: 1 / 1"
 
 [node name="Price" type="HBoxContainer" parent="Confirm/Layout"]
 layout_mode = 2
