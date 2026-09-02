@@ -248,8 +248,7 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 			if GameApp.active_plant() == null or not GameApp.active_plant().alive:
 				event_label.text = "Select a living plant first."
 				return
-			GameApp.use_inventory_fertilizer(StringName(item_id), kind)
-			event_label.text = "Item used on current plant."
+			GameApp.use_inventory_fertilizer(StringName(item_id), kind); event_label.text = "Item used on current plant."
 		&"cutting":
 			_on_cutting_graft_requested(item_id)
 		&"seed":
@@ -262,6 +261,7 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 			var seed_id := GameApp.create_seed_from_fruit(item_id)
 			event_label.text = "Fruit converted into a seed." if not seed_id.is_empty() else "Could not use fruit."
 func _on_cutting_graft_requested(item_id: String) -> void:
+	if GameApp.active_pot() != null and GameApp.active_pot().is_empty(): event_label.text = "Branch planted." if GameApp.plant_cutting(item_id, GameApp.active_pot().pot_id) else "Could not plant branch."; return
 	var plant := GameApp.active_plant()
 	if plant == null or not plant.alive:
 		event_label.text = "Select a living plant first."

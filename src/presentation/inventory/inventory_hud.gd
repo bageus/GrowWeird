@@ -117,7 +117,25 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String) -> 
 	button.mouse_entered.connect(_set_item_hover.bind(button, true))
 	button.mouse_exited.connect(_set_item_hover.bind(button, false))
 	button.pressed.connect(_emit_selected.bind(kind, item_id, count, title))
+	if count > 1:
+		_add_stack_badge(button, count)
 	items.add_child(button)
+
+func _add_stack_badge(button: Button, count: int) -> void:
+	var badge := Label.new()
+	button.add_child(badge)
+	badge.z_index = 10
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	badge.position = Vector2(-42.0, 8.0)
+	badge.size = Vector2(34.0, 34.0)
+	badge.text = str(count)
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.add_theme_font_size_override(&"font_size", 22)
+	badge.add_theme_color_override(&"font_color", Color.WHITE)
+	badge.add_theme_color_override(&"font_outline_color", Color("4a2817"))
+	badge.add_theme_constant_override(&"outline_size", 5)
 
 func _set_item_hover(button: Button, hovered: bool) -> void:
 	if is_instance_valid(button):
