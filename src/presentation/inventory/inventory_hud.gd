@@ -14,6 +14,7 @@ var _signature := ""
 
 func _ready() -> void:
 	super()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	$Layers/Background.texture = UiAtlas.HUD_INVENTORY
 	UiAtlas.configure_inventory_arrow(scroll_up, true)

@@ -136,6 +136,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(hud_text.contains("clip_contents = true") and hud_text.contains("z_index = 5"), "inventory HUD: cells and arrows must be clipped inside the frame")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("configure_inventory_arrow"), "inventory HUD: paging must use the arrow atlas asset")
 	_expect(hud_text.contains("drag_handle_height = 0.0"), "inventory HUD: panel must be draggable outside item buttons")
+	_expect(inventory_script.contains("MOUSE_FILTER_IGNORE") and hud_text.contains('[node name="Layers" type="Control" parent="."]\nlayout_mode = 2\nmouse_filter = 2'), "inventory HUD: transparent padding must not block Shop or Tasks")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("extends SceneDraggablePanel"), "inventory HUD: must use shared draggable panel")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn").count("ExtResource(\"5_inventory\")") == 1, "scene HUD: exactly one InventoryHud instance")
 	_expect(dialogs_text.contains("RecycleAction") and dialogs_text.contains("SellAction") and dialogs_text.contains("UseAction"), "inventory HUD: item action menu incomplete")
