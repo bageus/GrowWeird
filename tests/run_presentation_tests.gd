@@ -157,8 +157,10 @@ func _test_inventory_hud_contract() -> void:
 	_expect(inventory_script.contains("_set_item_hover"), "inventory HUD: items must react to hover")
 	var controls_scene := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	var draggable_script := FileAccess.get_file_as_string("res://src/presentation/main/scene_draggable_panel.gd")
+	var main_screen_script := FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd")
 	_expect(controls_scene.contains("layout_id = &\"wallet\"\ndrag_handle_height = 120.0\nallow_scaling = true"), "wallet HUD: balance block must opt into scaling")
 	_expect(draggable_script.contains("KEY_CTRL") and draggable_script.contains("MOUSE_BUTTON_WHEEL_UP") and draggable_script.contains("scale_committed.emit"), "wallet HUD: Ctrl-wheel scaling contract is missing")
+	_expect(main_screen_script.count("disabled = ids.is_empty()") >= 2, "fertilizer HUD: Skip and Refresh must stay disabled during the next-batch timer")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)

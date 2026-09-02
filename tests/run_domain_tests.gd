@@ -158,6 +158,11 @@ func _test_offer_contains_three_unique_items() -> void:
 	_expect(generated, "fertilizer offer: expected an offer")
 	_expect(offer.offered_ids.size() == 3, "fertilizer offer: expected exactly three items")
 	_expect(unique.size() == 3, "fertilizer offer: items must be unique")
+	_expect(FertilizerOfferService.resolve_skip(offer, rules), "fertilizer offer: skip must remove the active batch")
+	_expect(offer.offered_ids.is_empty() and offer.seconds_until_offer == rules.fertilizer_offer_interval_seconds, "fertilizer offer: skip must start the next-batch timer")
+	_expect(not FertilizerOfferService.advance(offer, rules.fertilizer_offer_interval_seconds - 1.0, definitions, rules), "fertilizer offer: skipped batch must stay empty before timer completion")
+	_expect(FertilizerOfferService.advance(offer, 1.0, definitions, rules), "fertilizer offer: timer completion must generate a new random batch")
+	_expect(offer.offered_ids.size() == 3, "fertilizer offer: post-skip batch must contain three items")
 	offer.clear()
 	offer.seconds_until_offer = 30.0
 	_expect(FertilizerOfferService.ensure_active(offer, definitions, rules), "fertilizer offer: initial HUD offer must be generated immediately")

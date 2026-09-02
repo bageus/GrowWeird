@@ -137,10 +137,10 @@ func _refresh_offer() -> void:
 	var price := GameApp.current_offer_skip_price()
 	refresh_offer.text = ""
 	refresh_offer.tooltip_text = "Refresh · %d" % price if price > 0 else "Refresh"
-	refresh_offer.disabled = price <= 0 or GameApp.state.money < price
+	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	skip_offer.text = ""
 	skip_offer.tooltip_text = "Skip · %d" % price if price > 0 else "Skip"
-	skip_offer.disabled = price <= 0 or GameApp.state.money < price
+	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode

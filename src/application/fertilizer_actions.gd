@@ -23,14 +23,14 @@ static func choose_offer(
 static func skip_offer(
 	state: GameState,
 	rules: GameRules,
-	fertilizers: Array[FertilizerDefinition]
+	_fertilizers: Array[FertilizerDefinition]
 ) -> bool:
-	if state == null:
+	if state == null or not state.fertilizer_offer.is_active():
 		return false
 	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
 	if price <= 0 or not EconomyService.spend(state, price):
 		return false
-	var resolved := FertilizerOfferService.resolve_skip(state.fertilizer_offer, rules) if state.fertilizer_offer.is_active() else FertilizerOfferService.refresh_offer(state.fertilizer_offer, fertilizers, rules)
+	var resolved := FertilizerOfferService.resolve_skip(state.fertilizer_offer, rules)
 	if resolved:
 		return true
 	EconomyService.credit(state, price)
