@@ -10,7 +10,6 @@ const DEFAULT_POSITIONS := {
 	"lighting": Vector2(0.06, 0.14),
 	"prune": Vector2(0.05, 0.47),
 	"sell_plant": Vector2(0.05, 0.64),
-	"recycle_plant": Vector2(0.05, 0.72),
 	"cancel": Vector2(0.45, 0.05),
 	"shop": Vector2(0.84, 0.12),
 	"tasks": Vector2(0.84, 0.22),
@@ -52,7 +51,6 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_button(get_node("LightingButton") as Button, 2, 3)
 	UiAtlas.configure_button(get_node("PruneButton") as Button, 1, 2)
 	UiAtlas.configure_button(get_node("SellPlantButton") as Button, 1, 3)
-	UiAtlas.configure_icon_button(get_node("RecyclePlantButton") as Button, 3, 2)
 	UiAtlas.configure_button(get_node("ShopActionButton") as Button, 0, 0)
 	UiAtlas.configure_button(get_node("TasksButton") as Button, 0, 1)
 	UiAtlas.configure_button(get_node("OffersPanel/Row/RefreshOffer") as Button, 0, 3)
