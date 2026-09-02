@@ -108,6 +108,6 @@ static func _add_cuttings(state: GameState, species_id: StringName, registry: Co
 static func _add_seeds(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
 	if registry.get_plant(species_id) == null: return false
 	for _index in range(amount):
-		var seed := SeedState.new(); seed.item_id = IdFactory.make("seed"); seed.source_plant_id = "shop"
-		seed.genome = GeneticsService.fresh_species_snapshot(species_id); InventoryService.add_seed(state.inventory, seed)
+		var seed_state := SeedState.new(); seed_state.item_id = IdFactory.make("seed"); seed_state.source_plant_id = "shop"
+		seed_state.genome = GeneticsService.fresh_species_snapshot(species_id); InventoryService.add_seed(state.inventory, seed_state)
 	return true
