@@ -1,7 +1,7 @@
 class_name GameState
 extends RefCounted
 
-const SCHEMA_VERSION: int = 6
+const SCHEMA_VERSION: int = 7
 
 var schema_version: int = SCHEMA_VERSION
 var money: int = 0
