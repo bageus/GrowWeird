@@ -79,6 +79,8 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 		"mutation_energy": _plain_dictionary(plant.mutation_energy),
 		"branches": branches,
 		"regrowth_progress": _plain_dictionary(plant.regrowth_progress),
+		"regrowth_fruit_cycles": _plain_dictionary(plant.regrowth_fruit_cycles),
+		"fruit_cycle_index": plant.fruit_cycle_index,
 		"rng_state": plant.rng_state,
 	}
 
@@ -99,6 +101,8 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 		plant.completed_care_scores.append(clampf(float(score), 0.0, 1.0))
 	plant.mutation_energy = _plain_dictionary(data.get("mutation_energy", {}))
 	plant.regrowth_progress = _plain_dictionary(data.get("regrowth_progress", {}))
+	plant.regrowth_fruit_cycles = _plain_dictionary(data.get("regrowth_fruit_cycles", {}))
+	plant.fruit_cycle_index = maxi(0, int(data.get("fruit_cycle_index", 0)))
 	plant.rng_state = int(data.get("rng_state", 0))
 	var branch_data: Variant = data.get("branches", {})
 	for slot in BranchState.VALID_SLOTS:
@@ -111,6 +115,7 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 			plant.branches[String(slot)] = null
 		if plant.branch_at(slot) != null:
 			plant.clear_regrowth_progress(slot)
+			plant.regrowth_fruit_cycles.erase(String(slot))
 		else:
 			plant.set_regrowth_progress(slot, plant.regrowth_progress_at(slot))
 	return plant
@@ -124,6 +129,7 @@ static func _branch_to_dictionary(branch: BranchState) -> Dictionary:
 		"traits": _plain_dictionary(branch.traits),
 		"grafted": branch.grafted,
 		"fruit_growth": _fruit_growth_to_dictionary(branch.fruit_growth),
+		"fruit_cycle_eligible": branch.fruit_cycle_eligible,
 	}
 
 static func _branch_from_dictionary(data: Dictionary) -> BranchState:
@@ -136,6 +142,7 @@ static func _branch_from_dictionary(data: Dictionary) -> BranchState:
 	branch.traits = _plain_dictionary(data.get("traits", {}))
 	branch.grafted = bool(data.get("grafted", false))
 	branch.fruit_growth = _fruit_growth_from_dictionary(data.get("fruit_growth"))
+	branch.fruit_cycle_eligible = maxi(0, int(data.get("fruit_cycle_eligible", 0)))
 	return branch
 
 static func _fruit_growth_to_dictionary(fruit: GrowingFruitState) -> Variant:
