@@ -157,6 +157,7 @@ func _test_inventory_hud_contract() -> void:
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)
 	_expect(starter.inventory.cuttings.size() == 1, "inventory HUD: new games need one starter item for interaction testing")
+	_expect(starter.pots[0].plant != null and starter.inventory.seeds.size() == 1, "inventory HUD: first pot sprout and starter seed are missing")
 	_expect(starter.inventory.misc.has("dead_mouse") and InventoryService.fertilizer_count(starter.inventory, RecyclingService.COMPOST_ID) == 0, "inventory HUD: recycled fertilizer must only appear after grinding")
 
 func _test_window_asset_mapping() -> void:
@@ -201,6 +202,9 @@ func _test_growth_stage_geometry() -> void:
 	var plant := _plant()
 	plant.growth_ratio = 1.0
 	_expect(TreeGrowthPreview.stage_for(plant) == 7, "tree preview: intact mature plant must use the two-branch asset")
+	plant.growth_ratio = 0.5
+	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: each completed gauge cycle must advance one growth asset")
+	plant.growth_ratio = 1.0
 	plant.cut_branch(&"left")
 	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: domain branch removal must select the left-cut asset")
 	plant.cut_branch(&"right")

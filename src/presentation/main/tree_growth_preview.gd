@@ -49,8 +49,9 @@ func set_plant(plant: PlantState) -> void:
 static func stage_for(plant: PlantState) -> int:
 	if plant == null:
 		return 0
-	if plant.growth_ratio < 0.75:
-		return clampi(int(floor(plant.growth_ratio / 0.75 * 7.0)), 0, 6)
+	var growth_stage := CareGaugeService.stage_index(plant.growth_ratio)
+	if growth_stage < CareGaugeService.GROWTH_STAGE_COUNT - 1:
+		return growth_stage
 	var has_left := plant.branch_at(&"left") != null
 	var has_right := plant.branch_at(&"right") != null
 	if has_left and has_right: return 7
