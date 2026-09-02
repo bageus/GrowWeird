@@ -165,8 +165,8 @@ text = "Shop"
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
-custom_minimum_size = Vector2(620, 112)
-offset_right = 620.0
+custom_minimum_size = Vector2(520, 112)
+offset_right = 520.0
 offset_bottom = 112.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
