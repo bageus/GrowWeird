@@ -16,11 +16,14 @@ var completed_care_scores: Array[float] = []
 var mutation_energy: Dictionary = {}
 var branches: Dictionary = {}
 var regrowth_progress: Dictionary = {}
+var regrowth_fruit_cycles: Dictionary = {}
+var fruit_cycle_index: int = 0
 var rng_state: int = 0
 
 func initialize_native_branches() -> void:
 	branches.clear()
 	regrowth_progress.clear()
+	regrowth_fruit_cycles.clear()
 	for slot in BranchState.VALID_SLOTS:
 		var branch := BranchState.new()
 		branch.branch_id = "%s:%s" % [instance_id, String(slot)]
@@ -42,14 +45,30 @@ func cut_branch(slot: StringName) -> BranchState:
 		return null
 	branches[String(slot)] = null
 	set_regrowth_progress(slot, 0.0)
+	regrowth_fruit_cycles[String(slot)] = fruit_cycle_index + 1
+	if removed_last_active_fruit(branch):
+		fruit_cycle_index += 1
 	return branch
+
+func removed_last_active_fruit(removed: BranchState) -> bool:
+	if removed == null or removed.fruit_growth == null: return false
+	for existing in existing_branches():
+		if existing.fruit_growth != null: return false
+	return true
+
+func has_active_fruits() -> bool:
+	for branch in existing_branches():
+		if branch.fruit_growth != null: return true
+	return false
 
 func attach_branch(branch: BranchState, slot: StringName) -> bool:
 	if branch == null or not has_free_slot(slot):
 		return false
 	branch.slot = slot
+	if has_active_fruits(): branch.fruit_cycle_eligible = maxi(branch.fruit_cycle_eligible, fruit_cycle_index + 1)
 	branches[String(slot)] = branch
 	clear_regrowth_progress(slot)
+	regrowth_fruit_cycles.erase(String(slot))
 	return true
 
 func existing_branches() -> Array[BranchState]:
@@ -72,6 +91,9 @@ func set_regrowth_progress(slot: StringName, progress: float) -> void:
 
 func clear_regrowth_progress(slot: StringName) -> void:
 	regrowth_progress.erase(String(slot))
+
+func regrowth_fruit_cycle_at(slot: StringName) -> int:
+	return maxi(0, int(regrowth_fruit_cycles.get(String(slot), fruit_cycle_index + 1)))
 
 func add_mutation_energy(axis: StringName, amount: float) -> void:
 	var key := String(axis)
