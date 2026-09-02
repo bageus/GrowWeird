@@ -13,7 +13,7 @@ drag_handle_height = 0.0
 
 [node name="Layers" type="Control" parent="."]
 layout_mode = 2
-mouse_filter = 1
+mouse_filter = 2
 
 [node name="Background" type="TextureRect" parent="Layers"]
 layout_mode = 1
