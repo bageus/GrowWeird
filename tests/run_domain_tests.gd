@@ -4,6 +4,7 @@ var _failures: Array[String] = []
 
 func _init() -> void:
 	_test_pour_moistens_soil_one_stage()
+	_test_four_sprays_moisten_one_stage()
 	_test_pour_waters_empty_active_pot()
 	_test_seed_snapshot_is_immutable()
 	_test_grafted_branch_creates_hybrid_genome()
@@ -38,6 +39,18 @@ func _test_pour_moistens_soil_one_stage() -> void:
 		pot.moisten_soil_one_stage()
 		_expect(is_equal_approx(pot.soil_moisture, expected[index]), "pour: soil moisture did not advance to the next stage")
 		_expect(pot.soil_moisture_stage() == mini(stage_before + 1, 5), "pour: soil visual stage did not advance exactly once")
+
+func _test_four_sprays_moisten_one_stage() -> void:
+	var pot := PotState.new()
+	pot.soil_moisture = 0.18
+	var starting_stage := pot.soil_moisture_stage()
+	for index in range(3):
+		_expect(not pot.spray_soil(0.035), "spray: first three sprays must not advance the soil stage")
+		_expect(pot.soil_moisture_stage() == starting_stage, "spray: support moisture must remain inside the current stage")
+	_expect(pot.soil_moisture > 0.18, "spray: partial sequence must extend the current stage drying time")
+	_expect(pot.spray_soil(0.035), "spray: fourth consecutive spray must advance one soil stage")
+	_expect(pot.soil_moisture_stage() == starting_stage + 1, "spray: four sprays must advance exactly one stage")
+	_expect(pot.consecutive_sprays == 0, "spray: completed sequence must reset")
 
 func _test_care_gauge_ranges_and_stage_history() -> void:
 	var pot := PotState.new()
@@ -291,6 +304,7 @@ func _test_save_round_trip_preserves_new_state() -> void:
 	state.money = 123
 	var pot := PotState.new()
 	pot.pot_id = "pot-save"
+	pot.consecutive_sprays = 3
 	pot.plant = _plant("save-plant")
 	var growing := GrowingFruitState.new()
 	growing.progress = 0.61
@@ -312,6 +326,7 @@ func _test_save_round_trip_preserves_new_state() -> void:
 	_expect(restored.fertilizer_offer.offered_ids.size() == 3, "save round trip: offer lost")
 	_expect(InventoryService.fertilizer_count(restored.inventory, &"humus") == 2, "save round trip: fertilizer stack lost")
 	_expect(restored.inventory.cuttings.size() == 1, "save round trip: cutting lost")
+	_expect(restored.pots[0].consecutive_sprays == 3, "save round trip: spray sequence lost")
 	var restored_fruit := restored.pots[0].plant.branch_at(&"left").fruit_growth
 	_expect(restored_fruit != null and absf(restored_fruit.progress - 0.61) < 0.001, "save round trip: growing fruit progress lost")
 	_expect(restored_fruit.hybrid, "save round trip: growing fruit hybrid marker lost")

@@ -71,11 +71,14 @@ static func _consume_growth_needs(
 	species: PlantSpeciesDefinition,
 	delta_seconds: float
 ) -> void:
+	var moisture_stage_before := pot.soil_moisture_stage()
 	pot.soil_moisture = clampf(
 		pot.soil_moisture - species.moisture_decay_per_second * delta_seconds,
 		0.0,
 		1.0
 	)
+	if pot.soil_moisture_stage() != moisture_stage_before:
+		pot.reset_spray_streak()
 	plant.nutrition = clampf(
 		plant.nutrition - species.nutrition_decay_per_second * delta_seconds,
 		0.0,
