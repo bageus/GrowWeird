@@ -86,10 +86,10 @@ action_id = &"sell_plant"
 
 [node name="RecyclePlantButton" type="Button" parent="."]
 visible = false
-custom_minimum_size = Vector2(120, 38)
-offset_right = 120.0
-offset_bottom = 38.0
-text = "Compost"
+custom_minimum_size = Vector2(58, 54)
+offset_right = 58.0
+offset_bottom = 54.0
+text = ""
 script = ExtResource("2_action")
 action_id = &"recycle_plant"
 
