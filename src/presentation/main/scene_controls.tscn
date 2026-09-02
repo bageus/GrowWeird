@@ -125,7 +125,7 @@ theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
 layout_id = &"wallet"
 drag_handle_height = 120.0
-
+allow_scaling = true
 [node name="Layers" type="Control" parent="WalletHud"]
 layout_mode = 2
 mouse_filter = 1

@@ -3,11 +3,17 @@ extends PanelContainer
 
 signal position_committed(layout_id: StringName, normalized_position: Vector2)
 signal drag_moved(layout_id: StringName)
+signal scale_committed(layout_id: StringName, scale_factor: float)
 
 const DRAG_THRESHOLD := 5.0
 
 @export var layout_id: StringName = &""
 @export var drag_handle_height := 30.0
+@export var allow_scaling := false
+@export_range(0.4, 1.0, 0.05) var minimum_scale := 0.6
+@export_range(1.0, 3.0, 0.05) var maximum_scale := 1.8
+
+var scale_factor := 1.0
 
 var _tracking := false
 var _dragging := false
@@ -38,7 +44,16 @@ func normalized_position() -> Vector2:
 		position.y / maxf(available.y, 1.0)
 	)
 
+func apply_scale_factor(value: float) -> void:
+	scale_factor = clampf(value, minimum_scale, maximum_scale)
+	scale = Vector2.ONE * scale_factor
+	var parent_control := get_parent() as Control
+	if parent_control != null:
+		position = _clamp_position(parent_control, position)
+
 func _input(event: InputEvent) -> void:
+	if _handle_scale_input(event):
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			if not Input.is_key_pressed(KEY_CTRL):
@@ -62,6 +77,21 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 	elif event is InputEventMouseMotion and _tracking:
 		_handle_mouse_motion()
+
+func _handle_scale_input(event: InputEvent) -> bool:
+	if not allow_scaling or not Input.is_key_pressed(KEY_CTRL):
+		return false
+	if not (event is InputEventMouseButton) or not event.pressed:
+		return false
+	if event.button_index != MOUSE_BUTTON_WHEEL_UP and event.button_index != MOUSE_BUTTON_WHEEL_DOWN:
+		return false
+	if not get_global_rect().has_point(event.position):
+		return false
+	var factor := 1.1 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.0 / 1.1
+	apply_scale_factor(scale_factor * factor)
+	scale_committed.emit(layout_id, scale_factor)
+	get_viewport().set_input_as_handled()
+	return true
 
 func _get_drag_region_height() -> float:
 	if drag_handle_height <= 0.0:
@@ -111,6 +141,6 @@ func _clamp_position(parent_control: Control, value: Vector2) -> Vector2:
 
 func _available_space(parent_control: Control) -> Vector2:
 	return Vector2(
-		maxf(parent_control.size.x - size.x, 0.0),
-		maxf(parent_control.size.y - size.y, 0.0)
+		maxf(parent_control.size.x - size.x * scale_factor, 0.0),
+		maxf(parent_control.size.y - size.y * scale_factor, 0.0)
 	)
