@@ -1,0 +1,202 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="1_shop"]
+
+[sub_resource type="StyleBoxFlat" id="Style_window"]
+bg_color = Color(0.055, 0.11, 0.09, 0.98)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.42, 0.23, 0.08, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+content_margin_left = 22.0
+content_margin_top = 18.0
+content_margin_right = 22.0
+content_margin_bottom = 20.0
+
+[node name="ShopContainer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_shop")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.015, 0.01, 0.02, 0.78)
+
+[node name="Window" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.04
+anchor_top = 0.04
+anchor_right = 0.96
+anchor_bottom = 0.96
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Style_window")
+
+[node name="Content" type="VBoxContainer" parent="Window"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Window/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.96, 0.82, 0.45, 1)
+theme_override_font_sizes/font_size = 38
+text = "SHOP"
+
+[node name="Balance" type="HBoxContainer" parent="Window/Content/Header"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Coin" type="Label" parent="Window/Content/Header/Balance"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "●"
+
+[node name="MoneyLabel" type="Label" parent="Window/Content/Header/Balance"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "0"
+
+[node name="CloseButton" type="Button" parent="Window/Content/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "×"
+
+[node name="Body" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="Tabs" type="VBoxContainer" parent="Window/Content/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Right" type="VBoxContainer" parent="Window/Content/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="CategoryTitle" type="Label" parent="Window/Content/Body/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Plants"
+
+[node name="HoverDescription" type="Label" parent="Window/Content/Body/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+modulate = Color(1, 1, 1, 0.76)
+text = "Hover an item to see its description."
+autowrap_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Window/Content/Body/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemGrid" type="GridContainer" parent="Window/Content/Body/Right/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+columns = 3
+
+[node name="Confirm" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+z_index = 10
+custom_minimum_size = Vector2(480, 330)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -165.0
+offset_right = 240.0
+offset_bottom = 165.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Style_window")
+
+[node name="Layout" type="VBoxContainer" parent="Confirm"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Preview" type="ColorRect" parent="Confirm/Layout"]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.08)
+
+[node name="ConfirmName" type="Label" parent="Confirm/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Item"
+horizontal_alignment = 1
+
+[node name="ConfirmDescription" type="Label" parent="Confirm/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Price" type="HBoxContainer" parent="Confirm/Layout"]
+layout_mode = 2
+alignment = 1
+
+[node name="Coin" type="Label" parent="Confirm/Layout/Price"]
+layout_mode = 2
+text = "●"
+
+[node name="ConfirmPrice" type="Label" parent="Confirm/Layout/Price"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0"
+
+[node name="Actions" type="HBoxContainer" parent="Confirm/Layout"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="BuyButton" type="Button" parent="Confirm/Layout/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 56)
+layout_mode = 2
+text = "BUY"
+
+[node name="CancelButton" type="Button" parent="Confirm/Layout/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 56)
+layout_mode = 2
+text = "CANCEL"
