@@ -165,10 +165,10 @@ func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
 		result.append(_item(item_id, item_id, _pretty(String(item_id)), "A %s item stored in the shared inventory." % _pretty(String(action)), action))
 	return result
 
-func _item(id: StringName, source_id: StringName, name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "") -> Dictionary:
+func _item(id: StringName, source_id: StringName, display_name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "") -> Dictionary:
 	var key := String(id)
 	if not _stock.has(key): _stock[key] = maxi(0, stock)
-	return {"id": id, "source_id": source_id, "name": name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
+	return {"id": id, "source_id": source_id, "name": display_name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
 
 func _preview_texture(item: Dictionary) -> Texture2D:
 	var path := String(item.get("preview_path", ""))
