@@ -3,7 +3,7 @@ extends RefCounted
 
 static func choose_offer(
 	state: GameState,
-	plant: PlantState,
+	_plant: PlantState,
 	fertilizer_id: StringName,
 	registry: ContentRegistry,
 	rules: GameRules
@@ -13,12 +13,10 @@ static func choose_offer(
 		return _failure()
 	if not FertilizerOfferService.can_choose(state.fertilizer_offer, fertilizer_id):
 		return _failure()
-	var events: Array[Dictionary] = []
-	if plant != null and plant.alive:
-		events = FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
 	if not FertilizerOfferService.resolve_choice(state.fertilizer_offer, fertilizer_id, rules):
 		return _failure()
-	return {"success": true, "events": events}
+	InventoryService.add_fertilizer(state.inventory, fertilizer_id)
+	return {"success": true, "events": []}
 
 static func skip_offer(
 	state: GameState,
