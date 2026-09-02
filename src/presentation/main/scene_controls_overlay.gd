@@ -86,7 +86,8 @@ func set_offer_cooldown(seconds: float) -> void:
 	var overlay := get_node("OffersPanel/CooldownCenter/CooldownOverlay") as Control
 	overlay.visible = seconds > 0.0
 	var total := maxi(0, int(ceil(seconds)))
-	(get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label).text = "Next fertilizers %02d:%02d" % [total / 60, total % 60]
+	var minutes := floori(float(total) / 60.0)
+	(get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label).text = "Next fertilizers %02d:%02d" % [minutes, total % 60]
 
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
