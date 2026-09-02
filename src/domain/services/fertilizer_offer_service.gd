@@ -51,7 +51,7 @@ static func resolve_choice(
 	return true
 
 static func skip_price(offer: FertilizerOfferState, rules: GameRules) -> int:
-	return rules.fertilizer_skip_base_price if offer != null and offer.is_active() else 0
+	return rules.fertilizer_skip_base_price if offer != null else 0
 
 static func resolve_skip(offer: FertilizerOfferState, rules: GameRules) -> bool:
 	if offer == null or not offer.is_active():
