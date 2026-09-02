@@ -117,10 +117,10 @@ func _test_seed_snapshot_is_immutable() -> void:
 	var plant := _plant("parent")
 	plant.branch_at(&"left").add_trait(&"thorns", 2)
 	var fruit := PropagationService.create_fruit(plant, &"left", "fruit-1")
-	var seed := PropagationService.seed_from_fruit(fruit, "seed-1")
+	var seed_state := PropagationService.seed_from_fruit(fruit, "seed-1")
 	plant.branch_at(&"left").add_trait(&"thorns", 5)
-	_expect(seed != null, "seed snapshot: seed should be created")
-	_expect(int(seed.genome.traits.get("thorns", 0)) == 2, "seed snapshot: later parent mutation changed existing seed")
+	_expect(seed_state != null, "seed snapshot: seed should be created")
+	_expect(int(seed_state.genome.traits.get("thorns", 0)) == 2, "seed snapshot: later parent mutation changed existing seed")
 
 func _test_grafted_branch_creates_hybrid_genome() -> void:
 	var host := _plant("host")
