@@ -24,12 +24,16 @@ const MUTAGENS := [&"stable_mutagen", &"spore_mutagen", &"crystal_mutagen", &"fl
 @onready var confirm_name: Label = %ConfirmName
 @onready var confirm_description: Label = %ConfirmDescription
 @onready var confirm_price: Label = %ConfirmPrice
+@onready var confirm_preview: TextureRect = %ConfirmPreview
+@onready var quantity_slider: HSlider = %QuantitySlider
+@onready var quantity_label: Label = %QuantityLabel
 @onready var buy_button: Button = %BuyButton
 
 var _catalogs: Dictionary = {}
 var _money := 0
 var _category: StringName = &"plants"
 var _selected: Dictionary = {}
+var _stock: Dictionary = {}
 var _last_signature := ""
 
 func _ready() -> void:
@@ -39,6 +43,7 @@ func _ready() -> void:
 	%CloseButton.pressed.connect(_request_close)
 	%CancelButton.pressed.connect(_hide_confirm)
 	buy_button.pressed.connect(_buy_selected)
+	quantity_slider.value_changed.connect(_refresh_purchase_preview)
 	_build_tabs()
 	confirm.visible = false
 
@@ -66,7 +71,8 @@ func _build_tabs() -> void:
 func _show_category(category: StringName) -> void:
 	_category = category; _hide_confirm(); _apply_category_hud(COLORS[category])
 	for child in grid.get_children(): grid.remove_child(child); child.queue_free()
-	for item in _catalogs.get(category, []): _add_card(item)
+	for item in _catalogs.get(category, []):
+		if int(item.get("stock", 0)) > 0: _add_card(item)
 
 func _add_card(item: Dictionary) -> void:
 	var card := Button.new()
@@ -84,7 +90,7 @@ func _add_card(item: Dictionary) -> void:
 	var spacer := Control.new(); spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL; layout.add_child(spacer)
 	layout.add_child(_price_row(int(item.get("price", 1)), bool(item.get("unlocked", false))))
 	card.add_child(layout)
-	if int(item.get("amount", 1)) > 1: card.add_child(_quantity_badge(int(item["amount"])))
+	if int(item.get("stock", 1)) > 1: card.add_child(_quantity_badge(int(item["stock"])))
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
 
 func _price_row(price: int, unlocked: bool) -> Control:
@@ -97,16 +103,33 @@ func _price_row(price: int, unlocked: bool) -> Control:
 
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item; confirm_name.text = String(item.get("name", "Item"))
-	confirm_description.text = String(item.get("description", "")); confirm_price.text = str(int(item.get("price", 1)))
-	buy_button.disabled = not bool(item.get("unlocked", false)) or _money < int(item.get("price", 1))
+	confirm_description.text = String(item.get("description", "")); confirm_preview.texture = _preview_texture(item)
+	quantity_slider.min_value = 1.0; quantity_slider.max_value = float(int(item.get("stock", 1))); quantity_slider.step = 1.0; quantity_slider.value = 1.0
+	quantity_slider.editable = int(item.get("stock", 1)) > 1
+	_refresh_purchase_preview(1.0)
 	_apply_button_color(buy_button, COLORS[_category]); confirm.visible = true
 
 func _buy_selected() -> void:
 	if _selected.is_empty(): return
-	item_buy_requested.emit(_selected.duplicate(true)); _hide_confirm()
+	var quantity := maxi(1, int(round(quantity_slider.value)))
+	var item_id := String(_selected.get("id", "")); var purchase := _selected.duplicate(true)
+	purchase["amount"] = quantity; purchase["price"] = int(_selected.get("price", 1)) * quantity
+	_stock[item_id] = maxi(0, int(_stock.get(item_id, 0)) - quantity)
+	_hide_confirm(); _rebuild_catalog_stock(); _show_category(_category); item_buy_requested.emit(purchase)
+
+func _refresh_purchase_preview(value: float) -> void:
+	if _selected.is_empty(): return
+	var quantity := maxi(1, int(round(value))); var unit_price := int(_selected.get("price", 1))
+	quantity_label.text = "Quantity: %d / %d" % [quantity, int(_selected.get("stock", 1))]
+	confirm_price.text = str(unit_price * quantity)
+	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * quantity
 
 func _hide_confirm() -> void: _selected = {}; confirm.visible = false
 func _request_close() -> void: _hide_confirm(); close_requested.emit()
+
+func _rebuild_catalog_stock() -> void:
+	for category in _catalogs:
+		for item in _catalogs[category]: item["stock"] = int(_stock.get(String(item.get("id", "")), 0))
 
 func _plant_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -124,7 +147,7 @@ func _pot_items() -> Array[Dictionary]:
 
 func _seed_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for index in range(5): result.append(_item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed"))
+	for index in range(5): result.append(_item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4))
 	return result
 
 func _fertilizer_items(catalog: Array[Dictionary]) -> Array[Dictionary]:
@@ -132,7 +155,7 @@ func _fertilizer_items(catalog: Array[Dictionary]) -> Array[Dictionary]:
 	for index in range(5):
 		var source: Dictionary = catalog[index % catalog.size()] if not catalog.is_empty() else {}
 		var source_id := StringName(source.get("id", &""))
-		result.append(_item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id)) if not String(source_id).is_empty() else "Unavailable", "Universal plant food with hidden effects.", &"fertilizer", not source.is_empty()))
+		result.append(_item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id)) if not String(source_id).is_empty() else "Unavailable", "Universal plant food with hidden effects.", &"fertilizer", not source.is_empty(), 3))
 	return result
 
 func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
@@ -142,8 +165,10 @@ func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
 		result.append(_item(item_id, item_id, _pretty(String(item_id)), "A %s item stored in the shared inventory." % _pretty(String(action)), action))
 	return result
 
-func _item(id: StringName, source_id: StringName, name: String, description: String, action: StringName, unlocked: bool = true, amount: int = 1, preview_path: String = "") -> Dictionary:
-	return {"id": id, "source_id": source_id, "name": name, "price": 1, "amount": amount, "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
+func _item(id: StringName, source_id: StringName, name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "") -> Dictionary:
+	var key := String(id)
+	if not _stock.has(key): _stock[key] = maxi(0, stock)
+	return {"id": id, "source_id": source_id, "name": name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
 
 func _preview_texture(item: Dictionary) -> Texture2D:
 	var path := String(item.get("preview_path", ""))
