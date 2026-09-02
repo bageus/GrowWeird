@@ -155,12 +155,14 @@ func _test_inventory_hud_contract() -> void:
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
 	_expect(inventory_script.contains("_configure_fixed_slot(button)") and inventory_script.contains("button.clip_text = true") and inventory_script.contains("button.expand_icon = true"), "inventory HUD: content must shrink or clip without resizing its fixed tile")
 	_expect(inventory_script.contains("_set_item_hover"), "inventory HUD: items must react to hover")
+	_expect(inventory_script.contains("_add_stack_badge(button, count)") and inventory_script.contains("PRESET_TOP_RIGHT"), "inventory HUD: stacked items must show their count over the asset's top-right corner")
 	var controls_scene := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	var draggable_script := FileAccess.get_file_as_string("res://src/presentation/main/scene_draggable_panel.gd")
 	var main_screen_script := FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd")
 	_expect(controls_scene.contains("layout_id = &\"wallet\"\ndrag_handle_height = 120.0\nallow_scaling = true"), "wallet HUD: balance block must opt into scaling")
 	_expect(draggable_script.contains("KEY_CTRL") and draggable_script.contains("MOUSE_BUTTON_WHEEL_UP") and draggable_script.contains("scale_committed.emit"), "wallet HUD: Ctrl-wheel scaling contract is missing")
 	_expect(main_screen_script.count("disabled = ids.is_empty()") >= 2, "fertilizer HUD: Skip and Refresh must stay disabled during the next-batch timer")
+	_expect(main_screen_script.contains("active_pot().is_empty()") and main_screen_script.contains("GameApp.plant_cutting(item_id, GameApp.active_pot().pot_id)"), "inventory HUD: a branch must plant directly into the selected empty pot")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)
@@ -216,6 +218,8 @@ func _test_growth_stage_geometry() -> void:
 	_expect(TreeGrowthPreview.stage_for(plant) == 7, "tree preview: intact mature plant must use the two-branch asset")
 	plant.growth_ratio = 0.5
 	_expect(TreeGrowthPreview.stage_for(plant) == 3, "tree preview: each completed gauge cycle must advance one growth asset")
+	plant.growth_ratio = PropagationService.CUTTING_START_GROWTH_RATIO
+	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: a planted branch must immediately use tree_05")
 	plant.cut_branch(&"left")
 	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: branch removal must immediately select the left-cut asset before maturity")
 	plant.cut_branch(&"right")
