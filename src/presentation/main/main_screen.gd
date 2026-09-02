@@ -51,9 +51,7 @@ func _ready() -> void:
 	inventory_dialogs.sell_requested.connect(_on_inventory_sell_requested)
 	inventory_dialogs.recycle_requested.connect(_on_inventory_recycle_requested)
 	inventory_dialogs.closed.connect(_set_cancel_visibility)
-	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
-	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
-	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
+	shop_panel.item_buy_requested.connect(_on_shop_item_requested)
 	shop_panel.close_requested.connect(_on_close_shop_pressed)
 	shop_button.pressed.connect(_on_shop_pressed)
 	spray_button.pressed.connect(_on_spray_pressed)
@@ -310,16 +308,10 @@ func _on_save_assets_layout_pressed() -> void:
 func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
 	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
-func _on_shop_fertilizer_requested(id: StringName) -> void:
-	var success := GameApp.buy_shop_fertilizer(id)
-	event_label.text = "%s added to inventory." % _pretty_id(String(id)) if success else "Item is locked or unaffordable."
-func _on_shop_seed_requested(species_id: StringName) -> void:
-	var seed_id := GameApp.buy_shop_seed(species_id)
-	event_label.text = "%s seed added to inventory." % _pretty_id(String(species_id)) if not seed_id.is_empty() else "Seed is locked or unaffordable."
-func _on_shop_pot_requested() -> void:
-	var pot_id := GameApp.buy_new_pot()
-	event_label.text = "%s purchased." % pot_id if not pot_id.is_empty() else "Not enough money for a new pot."
-	pot_selector.invalidate()
+func _on_shop_item_requested(item: Dictionary) -> void:
+	var success := GameApp.buy_shop_item(item)
+	event_label.text = "%s purchased." % String(item.get("name", "Item")) if success else "Item is unavailable or unaffordable."
+	pot_selector.invalidate(); shop_panel.invalidate()
 func _on_offer_one_pressed() -> void: _choose_offer(0)
 func _on_offer_two_pressed() -> void: _choose_offer(1)
 func _on_offer_three_pressed() -> void: _choose_offer(2)
