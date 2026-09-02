@@ -97,9 +97,7 @@ func _update_scroll_buttons() -> void:
 
 func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
 	var button := Button.new()
-	button.custom_minimum_size = Vector2(124.0, 124.0)
-	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	button.clip_contents = true
+	_configure_fixed_slot(button)
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	var texture := InventoryItemArt.texture_for(kind, item_id)
@@ -131,13 +129,21 @@ func _add_empty() -> void:
 
 func _add_empty_slot(label := "") -> void:
 	var slot := Button.new()
-	slot.custom_minimum_size = Vector2(124.0, 124.0)
-	slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_configure_fixed_slot(slot)
 	slot.text = label
 	slot.disabled = true
 	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_theme_stylebox_override(&"disabled", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
 	items.add_child(slot)
+
+func _configure_fixed_slot(button: Button) -> void:
+	button.custom_minimum_size = Vector2(124.0, 124.0)
+	button.size = Vector2(124.0, 124.0)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	button.clip_contents = true
+	button.clip_text = true
+	button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 func _emit_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
 	item_selected.emit(kind, item_id, count, title)

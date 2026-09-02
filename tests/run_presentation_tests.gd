@@ -153,7 +153,12 @@ func _test_inventory_hud_contract() -> void:
 	var item_art := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_art.gd")
 	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
-	_expect(inventory_script.contains("button.expand_icon = true") and inventory_script.contains("button.clip_contents = true") and inventory_script.contains("_set_item_hover"), "inventory HUD: item art must fit its tile and react to hover")
+	_expect(inventory_script.contains("_configure_fixed_slot(button)") and inventory_script.contains("button.clip_text = true") and inventory_script.contains("button.expand_icon = true"), "inventory HUD: content must shrink or clip without resizing its fixed tile")
+	_expect(inventory_script.contains("_set_item_hover"), "inventory HUD: items must react to hover")
+	var controls_scene := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
+	var draggable_script := FileAccess.get_file_as_string("res://src/presentation/main/scene_draggable_panel.gd")
+	_expect(controls_scene.contains("layout_id = &\"wallet\"\ndrag_handle_height = 120.0\nallow_scaling = true"), "wallet HUD: balance block must opt into scaling")
+	_expect(draggable_script.contains("KEY_CTRL") and draggable_script.contains("MOUSE_BUTTON_WHEEL_UP") and draggable_script.contains("scale_committed.emit"), "wallet HUD: Ctrl-wheel scaling contract is missing")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
 	var starter := NewGameFactory.create(rules)

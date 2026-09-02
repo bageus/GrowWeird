@@ -132,6 +132,7 @@ func _register_panel(panel: SceneDraggablePanel) -> void:
 	_register_control(key, panel)
 	panel.position_committed.connect(_on_control_position_committed)
 	panel.drag_moved.connect(_on_control_drag_moved)
+	panel.scale_committed.connect(_on_panel_scale_committed)
 
 func _register_control(key: String, control: Control) -> void:
 	if key.is_empty():
@@ -148,6 +149,10 @@ func _on_control_position_committed(layout_id: StringName, normalized_position: 
 func _on_control_drag_moved(_layout_id: StringName) -> void:
 	_reposition_open_popups()
 
+func _on_panel_scale_committed(layout_id: StringName, scale_factor: float) -> void:
+	_layout["%s_scale" % String(layout_id)] = scale_factor
+	_reposition_open_popups()
+
 func _on_resized() -> void:
 	_apply_layout()
 
@@ -158,7 +163,9 @@ func _apply_layout() -> void:
 		var control := _controls[key] as Control
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS.get(key, Vector2.ZERO))
 		if control is SceneDraggablePanel:
-			(control as SceneDraggablePanel).apply_normalized_position(point)
+			var panel := control as SceneDraggablePanel
+			panel.apply_scale_factor(float(_layout.get("%s_scale" % key, 1.0)))
+			panel.apply_normalized_position(point)
 		elif control is SceneActionButton:
 			(control as SceneActionButton).apply_normalized_position(point)
 	_reposition_open_popups()
@@ -167,7 +174,9 @@ func _capture_layout() -> void:
 	for key in _controls:
 		var control := _controls[key] as Control
 		if control is SceneDraggablePanel:
-			_layout[key] = (control as SceneDraggablePanel).normalized_position()
+			var panel := control as SceneDraggablePanel
+			_layout[key] = panel.normalized_position()
+			_layout["%s_scale" % key] = panel.scale_factor
 		elif control is SceneActionButton:
 			_layout[key] = (control as SceneActionButton).normalized_position()
 
@@ -211,6 +220,9 @@ func _load_layout() -> Dictionary:
 		var value = parsed.get(key)
 		if value is Array and value.size() >= 2:
 			result[key] = Vector2(clampf(float(value[0]), 0.0, 1.0), clampf(float(value[1]), 0.0, 1.0))
+		var saved_scale = parsed.get("%s_scale" % key)
+		if saved_scale is float or saved_scale is int:
+			result["%s_scale" % key] = float(saved_scale)
 	return result
 
 func _save_layout() -> bool:
@@ -218,6 +230,7 @@ func _save_layout() -> bool:
 	for key in DEFAULT_POSITIONS:
 		var point: Vector2 = _layout.get(key, DEFAULT_POSITIONS[key])
 		payload[key] = [point.x, point.y]
+		payload["%s_scale" % key] = float(_layout.get("%s_scale" % key, 1.0))
 	var file := FileAccess.open(FILE_PATH, FileAccess.WRITE)
 	if file == null:
 		return false
