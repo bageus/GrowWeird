@@ -52,7 +52,7 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_button(get_node("LightingButton") as Button, 2, 3)
 	UiAtlas.configure_button(get_node("PruneButton") as Button, 1, 2)
 	UiAtlas.configure_button(get_node("SellPlantButton") as Button, 1, 3)
-	UiAtlas.configure_button(get_node("RecyclePlantButton") as Button, 3, 2)
+	UiAtlas.configure_icon_button(get_node("RecyclePlantButton") as Button, 3, 2)
 	UiAtlas.configure_button(get_node("ShopActionButton") as Button, 0, 0)
 	UiAtlas.configure_button(get_node("TasksButton") as Button, 0, 1)
 	UiAtlas.configure_button(get_node("OffersPanel/Row/RefreshOffer") as Button, 0, 3)
