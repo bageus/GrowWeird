@@ -163,6 +163,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(controls_scene.contains("layout_id = &\"wallet\"\ndrag_handle_height = 120.0\nallow_scaling = true"), "wallet HUD: balance block must opt into scaling")
 	_expect(draggable_script.contains("KEY_CTRL") and draggable_script.contains("MOUSE_BUTTON_WHEEL_UP") and draggable_script.contains("scale_committed.emit"), "wallet HUD: Ctrl-wheel scaling contract is missing")
 	_expect(main_screen_script.count("disabled = ids.is_empty()") >= 2, "fertilizer HUD: Skip and Refresh must stay disabled during the next-batch timer")
+	_expect(main_screen_script.contains("Fertilizer added to inventory."), "fertilizer HUD: selecting an offer must report inventory acquisition instead of immediate use")
 	_expect(main_screen_script.contains("active_pot().is_empty()") and main_screen_script.contains("GameApp.plant_cutting(item_id, GameApp.active_pot().pot_id)"), "inventory HUD: a branch must plant directly into the selected empty pot")
 	_expect(ResourceActions.FERTILIZER == &"fertilizer", "inventory HUD: fertilizer stack economy kind missing")
 	var rules := load("res://content/config/default_game_rules.tres") as GameRules
