@@ -7,6 +7,7 @@ func _init() -> void:
 	_test_events_do_not_bank_before_unlock()
 	_test_species_unlocks_use_milestones_and_pots()
 	_test_fertilizer_shop_unlocks_and_nonshop_compost()
+	_test_catalog_purchases_route_to_pots_and_inventory()
 	_test_progression_save_round_trip()
 	_test_v4_migration_skips_onboarding()
 	if _failures.is_empty():
@@ -81,6 +82,20 @@ func _test_progression_save_round_trip() -> void:
 	_expect(restored.progression.is_completed(&"water_the_sprout"), "progression save: completed milestone was lost")
 	_expect(restored.progression.progress_for(&"tune_environment") == 1, "progression save: partial milestone progress was lost")
 	_expect(not restored.progression.skip_onboarding, "progression save: new-game onboarding flag should remain active")
+
+func _test_catalog_purchases_route_to_pots_and_inventory() -> void:
+	var registry := _registry()
+	var state := _state_with_pots(1)
+	state.money = 4
+	var pot_item := {"action": &"pot", "source_id": &"new_pot", "price": 1, "unlocked": true}
+	var plant_item := {"action": &"potted_plant", "source_id": &"starter_sprout", "price": 1, "unlocked": true}
+	var cutting_item := {"action": &"cutting", "source_id": &"shade_fern", "price": 1, "amount": 2, "unlocked": true}
+	var decor_item := {"action": &"decoration", "source_id": &"garden_gnome", "price": 1, "unlocked": true}
+	_expect(ShopActions.buy_catalog_item(state, pot_item, registry) and state.pots.size() == 2 and state.pots[-1].plant == null, "catalog shop: purchased pot must enter Pots as an empty pot")
+	_expect(ShopActions.buy_catalog_item(state, plant_item, registry) and state.pots.size() == 3 and state.pots[-1].plant != null, "catalog shop: ready plant must enter Pots in its own pot")
+	_expect(ShopActions.buy_catalog_item(state, cutting_item, registry) and state.inventory.cuttings.size() == 2, "catalog shop: branch lot quantity must enter shared inventory")
+	_expect(ShopActions.buy_catalog_item(state, decor_item, registry) and int(state.inventory.misc.get("garden_gnome", 0)) == 1, "catalog shop: non-pot item must enter shared inventory")
+	_expect(state.money == 0, "catalog shop: every lot must cost one coin regardless of quantity")
 
 func _test_v4_migration_skips_onboarding() -> void:
 	var migrated := SaveMigrator.migrate({"schema_version": 4, "pots": []})
