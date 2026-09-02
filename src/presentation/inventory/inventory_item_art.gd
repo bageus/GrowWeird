@@ -9,6 +9,8 @@ const REGIONS := {
 }
 
 static func texture_for(kind: StringName, item_id: String) -> Texture2D:
+	if kind == &"fertilizer" and FertilizerAssetCatalog.is_offer_id(StringName(item_id)):
+		return FertilizerOfferArt.texture_for(StringName(item_id))
 	var cell: Variant = REGIONS.get("%s:%s" % [kind, item_id])
 	if not cell is Vector2i:
 		return null
