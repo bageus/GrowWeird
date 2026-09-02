@@ -43,15 +43,19 @@ func set_plant(plant: PlantState) -> void:
 		visible = true
 		_set_stage(_testing_stage)
 		return
-	visible = plant != null
-	_set_stage(stage_for(plant))
+	var next_stage := stage_for(plant)
+	visible = plant != null and next_stage >= 0
+	if next_stage >= 0:
+		_set_stage(next_stage)
 
 static func stage_for(plant: PlantState) -> int:
 	if plant == null:
-		return 0
+		return -1
 	var growth_stage := CareGaugeService.stage_index(plant.growth_ratio)
+	if growth_stage == 0:
+		return -1
 	if growth_stage < CareGaugeService.GROWTH_STAGE_COUNT - 1:
-		return growth_stage
+		return growth_stage - 1
 	var has_left := plant.branch_at(&"left") != null
 	var has_right := plant.branch_at(&"right") != null
 	if has_left and has_right: return 7
