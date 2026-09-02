@@ -165,6 +165,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(FileAccess.get_file_as_string("res://src/domain/services/care_gauge_service.gd").contains("evaluate_or_preview"), "care HUD: gauge must remain visible for a selected empty pot")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains('_genetic_title("Branch"'), "inventory HUD: pruned plant material must be shown as a branch")
 	var item_art := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_art.gd")
+	_expect(item_art.contains("FertilizerAssetCatalog.is_offer_id") and item_art.contains("FertilizerOfferArt.texture_for"), "inventory HUD: offered fertilizers must reuse their atlas asset instead of text")
 	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
 	_expect(inventory_script.contains("_configure_fixed_slot(button)") and inventory_script.contains("button.clip_text = true") and inventory_script.contains("button.expand_icon = true"), "inventory HUD: content must shrink or clip without resizing its fixed tile")
