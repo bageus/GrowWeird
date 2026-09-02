@@ -59,6 +59,7 @@ func _test_scene_button_contract() -> void:
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("water"), "scene buttons: water control missing")
 	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("spray"), "scene buttons: spray must be contextual under water")
 	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("harvest"), "scene buttons: harvest button must be removed")
+	_expect(not SceneControlsOverlay.DEFAULT_POSITIONS.has("recycle_plant"), "scene buttons: a potted plant must never expose Grind")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("wallet"), "scene buttons: wallet block must be movable")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop") and SceneControlsOverlay.DEFAULT_POSITIONS.has("tasks"), "scene buttons: shop and tasks atlas controls missing")
 	host.free()
@@ -94,7 +95,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains('name="ShopButton" type="Button" parent="WalletHud/Layers"'), "scene HUD: balance plus hit area must use fixed atlas coordinates")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_hud_slot"), "scene HUD: fertilizer menu needs three separate atlas backgrounds")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('configure_button(get_node("TasksButton")'), "scene HUD: tasks button hover atlas is not configured")
-	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('configure_icon_button(get_node("RecyclePlantButton")'), "scene HUD: plant grinder must use the icon-only atlas crop without the Grind label")
+	_expect(not hud_text.contains("RecyclePlantButton") and not FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").contains("recycle_active_dead_plant"), "scene HUD: Grind must only be available for inventory items")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override') and FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override'), "scene HUD: water and lighting dark popup backgrounds must be removed")
 	_expect(not main_text.contains("PotsScroll"), "scene HUD: pot selector must not remain in the sidebar")
 	var shop_scene := FileAccess.get_file_as_string("res://src/presentation/shop/shop_panel.tscn")
@@ -235,9 +236,9 @@ func _test_growth_stage_geometry() -> void:
 	plant.growth_ratio = PropagationService.CUTTING_START_GROWTH_RATIO
 	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: a planted branch must immediately use tree_05")
 	plant.cut_branch(&"left")
-	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: branch removal must immediately select the left-cut asset before maturity")
+	_expect(TreeGrowthPreview.stage_for(plant) == 11, "tree preview: branch removal must select the left-cut asset without a stump")
 	plant.cut_branch(&"right")
-	_expect(TreeGrowthPreview.stage_for(plant) == 8, "tree preview: two domain branch removals must select the cut asset")
+	_expect(TreeGrowthPreview.stage_for(plant) == 13, "tree preview: two branch removals must select the no-stump asset")
 	plant.initialize_native_branches()
 	plant.growth_ratio = 0.05
 	var young := PlantVisualAssembler.build(Vector2(600.0, 400.0), plant)
