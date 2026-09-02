@@ -33,28 +33,28 @@ func _test_seed_sale() -> void:
 	var registry := _registry()
 	var rules := GameRules.new()
 	var state := GameState.new()
-	var seed := SeedState.new()
-	seed.item_id = "seed-sale-item"
-	seed.genome = GeneticsService.fresh_species_snapshot(&"shade_fern")
-	seed.genome.traits["fungi"] = 3
-	seed.genome.ancestry = ["parent-a", "parent-b"]
-	InventoryService.add_seed(state.inventory, seed)
-	var expected := ResourceActions.item_value(state, &"seed", seed.item_id, registry, rules)
-	var amount := ResourceActions.sell_item(state, &"seed", seed.item_id, registry, rules)
+	var seed_state := SeedState.new()
+	seed_state.item_id = "seed-sale-item"
+	seed_state.genome = GeneticsService.fresh_species_snapshot(&"shade_fern")
+	seed_state.genome.traits["fungi"] = 3
+	seed_state.genome.ancestry = ["parent-a", "parent-b"]
+	InventoryService.add_seed(state.inventory, seed_state)
+	var expected := ResourceActions.item_value(state, &"seed", seed_state.item_id, registry, rules)
+	var amount := ResourceActions.sell_item(state, &"seed", seed_state.item_id, registry, rules)
 	_expect(expected > 0 and amount == expected, "resource: seed sale should use genome value")
 	_expect(state.money == amount, "resource: seed sale should credit money")
-	_expect(InventoryService.find_seed(state.inventory, seed.item_id) == null, "resource: sold seed should be consumed")
+	_expect(InventoryService.find_seed(state.inventory, seed_state.item_id) == null, "resource: sold seed should be consumed")
 
 func _test_item_recycling() -> void:
 	var rules := GameRules.new()
 	var state := GameState.new()
-	var seed := SeedState.new()
-	seed.item_id = "seed-compost"
-	seed.genome = GeneticsService.fresh_species_snapshot(&"starter_sprout")
-	InventoryService.add_seed(state.inventory, seed)
-	var seed_yield := ResourceActions.recycle_item(state, &"seed", seed.item_id, rules)
+	var seed_state := SeedState.new()
+	seed_state.item_id = "seed-compost"
+	seed_state.genome = GeneticsService.fresh_species_snapshot(&"starter_sprout")
+	InventoryService.add_seed(state.inventory, seed_state)
+	var seed_yield := ResourceActions.recycle_item(state, &"seed", seed_state.item_id, rules)
 	_expect(seed_yield == rules.seed_compost_yield, "resource: seed compost yield mismatch")
-	_expect(InventoryService.find_seed(state.inventory, seed.item_id) == null, "resource: composted seed should be destroyed")
+	_expect(InventoryService.find_seed(state.inventory, seed_state.item_id) == null, "resource: composted seed should be destroyed")
 
 	var plant := _plant("cutting-compost")
 	var cutting := PropagationService.prune(plant, &"right", "cutting-compost-item")
