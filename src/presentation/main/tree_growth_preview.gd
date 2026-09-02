@@ -53,9 +53,9 @@ static func stage_for(plant: PlantState) -> int:
 		return -1
 	var has_left := plant.branch_at(&"left") != null
 	var has_right := plant.branch_at(&"right") != null
-	if not has_left and not has_right: return 8
-	if not has_left: return 9
-	if not has_right: return 10
+	if not has_left and not has_right: return 13
+	if not has_left: return 11
+	if not has_right: return 12
 	var growth_stage := CareGaugeService.stage_index(plant.growth_ratio)
 	if growth_stage == 0:
 		return -1
@@ -79,7 +79,7 @@ func clear_testing_preview() -> void:
 
 func has_prunable_branch() -> bool:
 	if _testing_stage >= 0:
-		return stage in [6, 7, 9, 10, 11]
+		return stage in [6, 7, 11, 12]
 	return _plant != null and (_plant.branch_at(&"left") != null or _plant.branch_at(&"right") != null)
 
 func set_prune_mode(enabled: bool) -> void:
@@ -105,8 +105,8 @@ func _load_asset_layout() -> void:
 		tree.scale = saved_scale
 
 func _update_hover_visibility() -> void:
-	left_hover.visible = prune_mode and _hovered_branch == &"left" and stage in [6, 7, 10]
-	right_hover.visible = prune_mode and _hovered_branch == &"right" and stage in [7, 9, 11]
+	left_hover.visible = prune_mode and _hovered_branch == &"left" and stage in [6, 7, 12]
+	right_hover.visible = prune_mode and _hovered_branch == &"right" and stage in [7, 11]
 	left_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	right_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -121,9 +121,9 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 		return
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
-		if side == &"left" and stage in [6, 7, 10]:
+		if side == &"left" and stage in [6, 7, 12]:
 			tree_branch_pruned.emit(side); return
-		if side == &"right" and stage in [7, 9, 11]:
+		if side == &"right" and stage in [7, 11]:
 			tree_branch_pruned.emit(side); return
 	if not Input.is_key_pressed(KEY_CTRL):
 		return
@@ -151,11 +151,11 @@ func _branch_side_at(point: Vector2) -> StringName:
 	var right_image := right_hover.texture.get_image() if right_hover.texture != null else null
 	if left_image != null:
 		var left_px := Vector2i(int(normalized.x * float(left_image.get_width() - 1)), int(normalized.y * float(left_image.get_height() - 1)))
-		if left_image.get_pixelv(left_px).a > 0.08 and stage in [6, 7, 10]:
+		if left_image.get_pixelv(left_px).a > 0.08 and stage in [6, 7, 12]:
 			return &"left"
 	if right_image != null:
 		var right_px := Vector2i(int(normalized.x * float(right_image.get_width() - 1)), int(normalized.y * float(right_image.get_height() - 1)))
-		if right_image.get_pixelv(right_px).a > 0.08 and stage in [7, 9, 11]:
+		if right_image.get_pixelv(right_px).a > 0.08 and stage in [7, 11]:
 			return &"right"
 	return &""
 
