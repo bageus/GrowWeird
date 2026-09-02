@@ -226,6 +226,7 @@ func _test_cutting_plant_and_graft_flow() -> void:
 	empty_pot.pot_id = "empty"
 	var planted := PropagationService.plant_cutting(cutting, empty_pot, "child")
 	_expect(planted and empty_pot.plant != null, "cutting flow: cutting should plant in empty pot")
+	_expect(is_equal_approx(empty_pot.plant.growth_ratio, PropagationService.CUTTING_START_GROWTH_RATIO), "cutting flow: planted branch must start at the tree_05 growth cycle")
 	_expect(empty_pot.plant.branch_at(&"left").trait_level(&"thorns") == 4, "cutting flow: planted cutting lost inherited trait")
 	var host := _plant("host-flow")
 	_expect(not PropagationService.graft_cutting(cutting, host, &"right", "blocked"), "cutting flow: graft must fail when slot is occupied")
