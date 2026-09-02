@@ -51,17 +51,17 @@ func set_plant(plant: PlantState) -> void:
 static func stage_for(plant: PlantState) -> int:
 	if plant == null:
 		return -1
+	var has_left := plant.branch_at(&"left") != null
+	var has_right := plant.branch_at(&"right") != null
+	if not has_left and not has_right: return 8
+	if not has_left: return 9
+	if not has_right: return 10
 	var growth_stage := CareGaugeService.stage_index(plant.growth_ratio)
 	if growth_stage == 0:
 		return -1
 	if growth_stage < CareGaugeService.GROWTH_STAGE_COUNT - 1:
 		return growth_stage - 1
-	var has_left := plant.branch_at(&"left") != null
-	var has_right := plant.branch_at(&"right") != null
-	if has_left and has_right: return 7
-	if has_left: return 10
-	if has_right: return 9
-	return 8
+	return 7
 
 func _set_stage(value: int) -> void:
 	stage = clampi(value, 0, STAGES.size() - 1)

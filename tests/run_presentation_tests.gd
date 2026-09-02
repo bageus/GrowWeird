@@ -214,9 +214,8 @@ func _test_growth_stage_geometry() -> void:
 	_expect(TreeGrowthPreview.stage_for(plant) == 7, "tree preview: intact mature plant must use the two-branch asset")
 	plant.growth_ratio = 0.5
 	_expect(TreeGrowthPreview.stage_for(plant) == 3, "tree preview: each completed gauge cycle must advance one growth asset")
-	plant.growth_ratio = 1.0
 	plant.cut_branch(&"left")
-	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: domain branch removal must select the left-cut asset")
+	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: branch removal must immediately select the left-cut asset before maturity")
 	plant.cut_branch(&"right")
 	_expect(TreeGrowthPreview.stage_for(plant) == 8, "tree preview: two domain branch removals must select the cut asset")
 	plant.initialize_native_branches()
