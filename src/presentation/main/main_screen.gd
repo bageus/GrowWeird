@@ -19,8 +19,8 @@ extends Control
 @onready var skip_offer: Button = scene_controls.get_node("OffersPanel/Row/SkipOffer")
 @onready var inventory_hud: InventoryHud = scene_controls.get_node("InventoryHud")
 @onready var inventory_dialogs: InventoryItemDialogs = scene_controls.get_node("InventoryItemDialogs")
-@onready var shop_container: PanelContainer = scene_controls.get_node("ShopContainer")
-@onready var shop_panel: ShopPanel = scene_controls.get_node("ShopContainer/ShopLayout/ShopPanel")
+@onready var shop_container: Control = scene_controls.get_node("ShopContainer")
+@onready var shop_panel: ShopPanel = scene_controls.get_node("ShopContainer")
 @onready var lighting_button: SceneActionButton = scene_controls.get_node("LightingButton")
 @onready var prune_button: SceneActionButton = scene_controls.get_node("PruneButton")
 @onready var sell_plant_button: SceneActionButton = scene_controls.get_node("SellPlantButton")
@@ -54,6 +54,7 @@ func _ready() -> void:
 	shop_panel.fertilizer_buy_requested.connect(_on_shop_fertilizer_requested)
 	shop_panel.species_seed_buy_requested.connect(_on_shop_seed_requested)
 	shop_panel.pot_buy_requested.connect(_on_shop_pot_requested)
+	shop_panel.close_requested.connect(_on_close_shop_pressed)
 	shop_button.pressed.connect(_on_shop_pressed)
 	spray_button.pressed.connect(_on_spray_pressed)
 	pour_button.pressed.connect(_on_pour_pressed)
@@ -69,7 +70,6 @@ func _ready() -> void:
 	for stage in range(14):
 		var button := get_node("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
 		button.pressed.connect(_on_tree_stage_selected.bind(stage))
-	scene_controls.get_node("ShopContainer/ShopLayout/ShopHeader/CloseShopButton").pressed.connect(_on_close_shop_pressed)
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
 func _refresh() -> void:

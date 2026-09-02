@@ -94,8 +94,6 @@ func set_shop_visible(enabled: bool) -> void:
 	if panel == null:
 		return
 	panel.visible = enabled
-	if enabled:
-		_place_popup(panel, _controls.get("wallet") as Control)
 
 func save_layout() -> bool:
 	_capture_layout()
@@ -187,9 +185,6 @@ func _reposition_open_popups() -> void:
 	var lighting := get_node_or_null("LightingOptions") as Control
 	if lighting != null and lighting.visible:
 		_place_popup(lighting, _controls.get("lighting") as Control, 2.0)
-	var shop := get_node_or_null("ShopContainer") as Control
-	if shop != null and shop.visible:
-		_place_popup(shop, _controls.get("wallet") as Control)
 	var dialogs := get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs
 	if dialogs != null:
 		dialogs.refresh_position()

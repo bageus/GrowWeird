@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="3_drag"]
-[ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="4_shop"]
+[ext_resource type="PackedScene" path="res://src/presentation/shop/shop_panel.tscn" id="4_shop"]
 [ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_hud.tscn" id="5_inventory"]
 [ext_resource type="PackedScene" path="res://src/presentation/inventory/inventory_item_dialogs.tscn" id="6_dialogs"]
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
@@ -316,35 +316,8 @@ custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Normal light"
 
-[node name="ShopContainer" type="PanelContainer" parent="."]
+[node name="ShopContainer" parent="." instance=ExtResource("4_shop")]
 visible = false
-z_index = 12
-custom_minimum_size = Vector2(350, 390)
-offset_right = 350.0
-offset_bottom = 390.0
-theme_override_styles/panel = SubResource("StyleBox_popup")
-
-[node name="ShopLayout" type="VBoxContainer" parent="ShopContainer"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="ShopHeader" type="HBoxContainer" parent="ShopContainer/ShopLayout"]
-layout_mode = 2
-
-[node name="ShopTitle" type="Label" parent="ShopContainer/ShopLayout/ShopHeader"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 17
-text = "Shop"
-
-[node name="CloseShopButton" type="Button" parent="ShopContainer/ShopLayout/ShopHeader"]
-layout_mode = 2
-text = "×"
-
-[node name="ShopPanel" type="VBoxContainer" parent="ShopContainer/ShopLayout"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 6
-script = ExtResource("4_shop")
+z_index = 100
 
 [node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
