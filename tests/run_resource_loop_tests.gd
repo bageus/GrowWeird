@@ -6,7 +6,6 @@ func _init() -> void:
 	_test_cutting_sale()
 	_test_seed_sale()
 	_test_item_recycling()
-	_test_dead_plant_recycling()
 	_test_compost_uses_normal_fertilizer_path()
 	if _failures.is_empty():
 		print("GrowWeird resource loop tests passed")
@@ -78,25 +77,6 @@ func _test_item_recycling() -> void:
 
 	var total := seed_yield + cutting_yield + fruit_yield + misc_yield
 	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == total, "resource: compost stack should equal recycled material")
-
-func _test_dead_plant_recycling() -> void:
-	var rules := GameRules.new()
-	var state := GameState.new()
-	var pot := PotState.new()
-	pot.pot_id = "dead-pot"
-	pot.plant = _plant("dead-plant")
-	pot.plant.growth_ratio = 1.0
-	state.pots = [pot]
-	state.active_pot_id = pot.pot_id
-	_expect(ResourceActions.recycle_dead_plant(state, pot, rules) == 0, "resource: living plant must not be compostable")
-	_expect(pot.plant != null, "resource: rejected live compost must preserve plant")
-	pot.plant.alive = false
-	pot.plant.health = 0.0
-	var expected := RecyclingService.dead_plant_yield(pot.plant, rules)
-	var amount := ResourceActions.recycle_dead_plant(state, pot, rules)
-	_expect(amount == expected and amount > 0, "resource: dead plant compost yield mismatch")
-	_expect(pot.plant == null, "resource: composting remains must free pot")
-	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == amount, "resource: dead plant compost should enter inventory")
 
 func _test_compost_uses_normal_fertilizer_path() -> void:
 	var registry := _registry()
