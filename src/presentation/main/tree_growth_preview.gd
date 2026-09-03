@@ -22,6 +22,7 @@ const STAGES := [
 @onready var tree: TextureRect = $Tree
 @onready var left_hover: TextureRect = $Tree/LeftHover
 @onready var right_hover: TextureRect = $Tree/RightHover
+@onready var leaf_layout: LeafLayoutEditor = $Tree/LeafLayout
 
 var stage := 0
 var _plant: PlantState
@@ -66,6 +67,9 @@ static func stage_for(plant: PlantState) -> int:
 func _set_stage(value: int) -> void:
 	stage = clampi(value, 0, STAGES.size() - 1)
 	tree.texture = STAGES[stage]
+	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
+	if leaf_layout.visible:
+		leaf_layout.set_stage(stage)
 	_update_hover_visibility()
 
 func preview_stage_for_testing(value: int) -> void:
