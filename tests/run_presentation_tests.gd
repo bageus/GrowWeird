@@ -218,6 +218,14 @@ func _test_growth_stage_geometry() -> void:
 	_expect(leaf_editor != null and LeafLayoutEditor.FIRST_TREE_STAGE == 4 and LeafLayoutEditor.LAST_TREE_STAGE == 13, "leaf layout: editor must cover tree_05 through tree_14")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("scale_variance") and FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("direction_variance"), "leaf layout: point randomization parameters are missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_controls.gd").contains('find_child("LeafLayout"'), "leaf layout: controls must resolve the editor without a fragile serialized NodePath")
+	leaf_editor.layouts = {"5": [{"x": 0.5, "y": 0.5, "scale": 1.0, "angle": 0.0, "scale_variance": 1.0, "direction_variance": 0.5}]}
+	leaf_editor.selected_index = 0
+	leaf_editor.set_stage(4)
+	_expect(leaf_editor.selected_index == 0, "leaf layout: refresh of the same tree stage must preserve selection")
+	leaf_editor._scale_selected(1.12)
+	leaf_editor._rotate_selected(deg_to_rad(5.0))
+	var edited_leaf: Dictionary = (leaf_editor.layouts["5"] as Array)[0]
+	_expect(float(edited_leaf["scale"]) > 1.0 and float(edited_leaf["angle"]) > 0.0, "leaf layout: wheel scale and Shift-wheel rotation must update the selected leaf")
 	preview.set_plant(null)
 	preview.preview_stage_for_testing(3)
 	_expect(preview.visible and preview.stage == 3, "tree preview: test selection must reveal the selected asset without a plant")
