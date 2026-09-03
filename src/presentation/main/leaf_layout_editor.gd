@@ -22,7 +22,11 @@ func _ready() -> void:
 	queue_redraw()
 
 func set_stage(value: int) -> void:
-	stage = clampi(value, FIRST_TREE_STAGE, LAST_TREE_STAGE)
+	var next_stage := clampi(value, FIRST_TREE_STAGE, LAST_TREE_STAGE)
+	if next_stage == stage:
+		queue_redraw()
+		return
+	stage = next_stage
 	selected_index = -1
 	_emit_selection()
 	queue_redraw()
@@ -61,8 +65,10 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton:
 		_handle_mouse_button(event as InputEventMouseButton)
+		accept_event()
 	elif event is InputEventMouseMotion and _dragging:
 		_move_selected((event as InputEventMouseMotion).position)
+		accept_event()
 
 func _handle_mouse_button(event: InputEventMouseButton) -> void:
 	if event.button_index == MOUSE_BUTTON_LEFT:
@@ -79,10 +85,10 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 		_remove_point_at(event.position)
 	elif event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 		var direction := 1.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -1.0
-		if event.shift_pressed:
+		if event.shift_pressed or Input.is_key_pressed(KEY_SHIFT):
 			_rotate_selected(direction * deg_to_rad(5.0))
 		else:
-			_scale_selected(1.08 if direction > 0.0 else 1.0 / 1.08)
+			_scale_selected(1.12 if direction > 0.0 else 1.0 / 1.12)
 
 func _draw() -> void:
 	var points := _stage_points()
@@ -169,7 +175,15 @@ func _point_at(point_position: Vector2) -> int:
 	var points := _stage_points()
 	for index in range(points.size() - 1, -1, -1):
 		var point: Dictionary = points[index]
-		if point_position.distance_to(_position_for(point)) <= HIT_RADIUS * float(point.get("scale", 1.0)):
+		var center := _position_for(point)
+		var scale_factor := float(point.get("scale", 1.0))
+		if point_position.distance_to(center) <= HIT_RADIUS * scale_factor:
+			return index
+		var rendered_scale := scale_factor * _random_scale(index, point)
+		var rendered_angle := float(point.get("angle", 0.0)) + _random_angle(index, point)
+		var leaf_local := (point_position - center).rotated(-rendered_angle)
+		var half_size := BASE_LEAF_SIZE * rendered_scale * 0.5
+		if absf(leaf_local.x) <= half_size.x and absf(leaf_local.y) <= half_size.y:
 			return index
 	return -1
 
