@@ -217,6 +217,7 @@ func _test_growth_stage_geometry() -> void:
 	var leaf_editor := preview.get_node_or_null("Tree/LeafLayout") as LeafLayoutEditor
 	_expect(leaf_editor != null and LeafLayoutEditor.FIRST_TREE_STAGE == 4 and LeafLayoutEditor.LAST_TREE_STAGE == 13, "leaf layout: editor must cover tree_05 through tree_14")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("scale_variance") and FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("direction_variance"), "leaf layout: point randomization parameters are missing")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_controls.gd").contains('find_child("LeafLayout"'), "leaf layout: controls must resolve the editor without a fragile serialized NodePath")
 	preview.set_plant(null)
 	preview.preview_stage_for_testing(3)
 	_expect(preview.visible and preview.stage == 3, "tree preview: test selection must reveal the selected asset without a plant")
