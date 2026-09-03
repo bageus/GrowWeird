@@ -88,37 +88,37 @@ func _draw() -> void:
 	var points := _stage_points()
 	for index in range(points.size()):
 		var point: Dictionary = points[index]
-		var position := _position_for(point)
+		var point_position := _position_for(point)
 		var scale_factor := float(point.get("scale", 1.0)) * _random_scale(index, point)
 		var base_angle := float(point.get("angle", 0.0))
 		var angle := base_angle + _random_angle(index, point)
-		_draw_leaf(position, scale_factor, angle)
+		_draw_leaf(point_position, scale_factor, angle)
 		if enabled:
-			_draw_marker(position, float(point.get("scale", 1.0)), base_angle, index == selected_index)
+			_draw_marker(point_position, float(point.get("scale", 1.0)), base_angle, index == selected_index)
 
-func _draw_leaf(position: Vector2, scale_factor: float, angle: float) -> void:
+func _draw_leaf(point_position: Vector2, scale_factor: float, angle: float) -> void:
 	var source := Rect2(Vector2.ZERO, Vector2(512.0, 512.0))
 	var leaf_size := BASE_LEAF_SIZE * scale_factor
-	draw_set_transform(position, angle, Vector2.ONE)
+	draw_set_transform(point_position, angle, Vector2.ONE)
 	draw_texture_rect_region(LEAF_SHEET, Rect2(-leaf_size * 0.5, leaf_size), source)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-func _draw_marker(position: Vector2, scale_factor: float, angle: float, selected: bool) -> void:
+func _draw_marker(point_position: Vector2, scale_factor: float, angle: float, selected: bool) -> void:
 	var color := Color("fff06a") if selected else Color("55d9ff")
 	var radius := 7.0 * scale_factor
 	var direction := Vector2.from_angle(angle)
-	draw_circle(position, radius, Color(color, 0.42))
-	draw_arc(position, radius, 0.0, TAU, 18, color, 2.0, true)
-	draw_line(position, position + direction * (24.0 * scale_factor), color, 3.0, true)
-	var tip := position + direction * (24.0 * scale_factor)
+	draw_circle(point_position, radius, Color(color, 0.42))
+	draw_arc(point_position, radius, 0.0, TAU, 18, color, 2.0, true)
+	draw_line(point_position, point_position + direction * (24.0 * scale_factor), color, 3.0, true)
+	var tip := point_position + direction * (24.0 * scale_factor)
 	draw_line(tip, tip - direction.rotated(0.55) * 8.0, color, 3.0, true)
 	draw_line(tip, tip - direction.rotated(-0.55) * 8.0, color, 3.0, true)
 
-func _add_point(position: Vector2) -> int:
+func _add_point(point_position: Vector2) -> int:
 	var points := _stage_points()
 	points.append({
-		"x": clampf(position.x / maxf(size.x, 1.0), 0.0, 1.0),
-		"y": clampf(position.y / maxf(size.y, 1.0), 0.0, 1.0),
+		"x": clampf(point_position.x / maxf(size.x, 1.0), 0.0, 1.0),
+		"y": clampf(point_position.y / maxf(size.y, 1.0), 0.0, 1.0),
 		"scale": 1.0,
 		"angle": 0.0,
 		"scale_variance": 1.0,
@@ -127,13 +127,13 @@ func _add_point(position: Vector2) -> int:
 	_store_stage_points(points)
 	return points.size() - 1
 
-func _move_selected(position: Vector2) -> void:
+func _move_selected(point_position: Vector2) -> void:
 	var points := _stage_points()
 	if selected_index < 0 or selected_index >= points.size():
 		return
 	var point: Dictionary = points[selected_index]
-	point["x"] = clampf(position.x / maxf(size.x, 1.0), 0.0, 1.0)
-	point["y"] = clampf(position.y / maxf(size.y, 1.0), 0.0, 1.0)
+	point["x"] = clampf(point_position.x / maxf(size.x, 1.0), 0.0, 1.0)
+	point["y"] = clampf(point_position.y / maxf(size.y, 1.0), 0.0, 1.0)
 	points[selected_index] = point
 	_store_stage_points(points)
 	queue_redraw()
@@ -154,8 +154,8 @@ func _change_selected(property: String, transform: Callable) -> void:
 	_store_stage_points(points)
 	queue_redraw()
 
-func _remove_point_at(position: Vector2) -> void:
-	var index := _point_at(position)
+func _remove_point_at(point_position: Vector2) -> void:
+	var index := _point_at(point_position)
 	if index < 0:
 		return
 	var points := _stage_points()
@@ -165,11 +165,11 @@ func _remove_point_at(position: Vector2) -> void:
 	_emit_selection()
 	queue_redraw()
 
-func _point_at(position: Vector2) -> int:
+func _point_at(point_position: Vector2) -> int:
 	var points := _stage_points()
 	for index in range(points.size() - 1, -1, -1):
 		var point: Dictionary = points[index]
-		if position.distance_to(_position_for(point)) <= HIT_RADIUS * float(point.get("scale", 1.0)):
+		if point_position.distance_to(_position_for(point)) <= HIT_RADIUS * float(point.get("scale", 1.0)):
 			return index
 	return -1
 

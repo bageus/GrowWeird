@@ -1,7 +1,6 @@
 class_name LeafLayoutControls
 extends VBoxContainer
 
-@export var editor_path: NodePath
 @onready var toggle: Button = $Toggle
 @onready var scale_variance: HSlider = $ScaleVariance
 @onready var direction_variance: HSlider = $DirectionVariance
@@ -12,7 +11,11 @@ var editor: LeafLayoutEditor
 var _syncing := false
 
 func _ready() -> void:
-	editor = get_node(editor_path) as LeafLayoutEditor
+	editor = get_tree().current_scene.find_child("LeafLayout", true, false) as LeafLayoutEditor
+	if editor == null:
+		push_error("Leaf layout editor was not found in the current scene")
+		set_process(false)
+		return
 	toggle.toggled.connect(_on_toggled)
 	scale_variance.value_changed.connect(_on_variance_changed)
 	direction_variance.value_changed.connect(_on_variance_changed)
