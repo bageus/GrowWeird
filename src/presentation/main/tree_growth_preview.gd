@@ -23,6 +23,7 @@ const STAGES := [
 @onready var left_hover: TextureRect = $Tree/LeftHover
 @onready var right_hover: TextureRect = $Tree/RightHover
 @onready var leaf_layout: LeafLayoutEditor = $Tree/LeafLayout
+@onready var flower_layout: FlowerLayoutEditor = $Tree/FlowerLayout
 
 var stage := 0
 var _plant: PlantState
@@ -70,6 +71,9 @@ func _set_stage(value: int) -> void:
 	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
 	if leaf_layout.visible:
 		leaf_layout.set_stage(stage)
+	flower_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
+	if flower_layout.visible:
+		flower_layout.set_stage(stage)
 	_update_hover_visibility()
 
 func preview_stage_for_testing(value: int) -> void:
