@@ -36,7 +36,7 @@ func refresh() -> void:
 	var app := _app()
 	if not is_node_ready() or app.state == null:
 		return
-	var now_unix := _platform().now_unix()
+	var now_unix: int = int(_platform().now_unix())
 	var remaining := RewardedAdService.remaining_claims(app.state, now_unix)
 	balance_label.text = "Balance: %d coins" % app.state.money
 	ad_button.disabled = _ad_pending or remaining <= 0
