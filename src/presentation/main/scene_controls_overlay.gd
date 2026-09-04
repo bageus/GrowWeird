@@ -45,7 +45,9 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferThree") as Button)
 	var pots := get_node("PotSelector") as PanelContainer
 	pots.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	(get_node("PotSelector/Layers/PotCircle") as TextureRect).texture = UiAtlas.background(1)
+	var pot_art := get_node("PotSelector/Layers/PotCircle") as TextureRect
+	pot_art.texture = UiAtlas.HUD_POT
+	var pot_hover := get_node("PotSelector/Layers/PotHover") as TextureRect
 	(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	UiAtlas.configure_button(get_node("WaterButton") as Button, 1, 1)
@@ -62,8 +64,20 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_button(get_node("LightingOptions/Options/BlindsButton") as Button, 2, 1)
 	UiAtlas.configure_button(get_node("LightingOptions/Options/OpenWindowButton") as Button, 2, 2)
 	UiAtlas.configure_button(get_node("LightingOptions/Options/NormalLightButton") as Button, 2, 3)
-	UiAtlas.configure_button(get_node("PotSelector/Layers/PreviousPot") as Button, 3, 3, true)
-	UiAtlas.configure_button(get_node("PotSelector/Layers/NextPot") as Button, 3, 3)
+	_configure_pot_arrow(get_node("PotSelector/Layers/PreviousPot") as Button, pot_hover, true)
+	_configure_pot_arrow(get_node("PotSelector/Layers/NextPot") as Button, pot_hover, false)
+
+func _configure_pot_arrow(button: Button, hover_art: TextureRect, left: bool) -> void:
+	button.text = ""
+	button.icon = null
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	button.mouse_entered.connect(func() -> void:
+		hover_art.texture = UiAtlas.HUD_POT_HOVER_LEFT if left else UiAtlas.HUD_POT_HOVER_RIGHT
+	)
+	button.mouse_exited.connect(func() -> void: hover_art.texture = null)
 
 func set_water_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("WaterOptions") as Control

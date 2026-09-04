@@ -35,8 +35,8 @@ static func evaluate(pot: PotState, species: PlantSpeciesDefinition) -> Dictiona
 		"water": water,
 		"food": food,
 		"environment": environment,
-		"stage_index": stage_index(plant.growth_ratio),
-		"stage_progress": stage_progress(plant.growth_ratio),
+		"stage_index": plant.growth_cycle_index,
+		"stage_progress": GrowthCycleService.progress(plant),
 		"stage_quality": plant.current_care_score(),
 	}
 

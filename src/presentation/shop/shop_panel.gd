@@ -147,15 +147,22 @@ func _pot_items() -> Array[Dictionary]:
 
 func _seed_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for index in range(5): result.append(_item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4))
+	for index in range(5):
+		var item := _item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4)
+		item["seed_frame"] = index
+		result.append(item)
 	return result
 
 func _fertilizer_items(catalog: Array[Dictionary]) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for index in range(5):
-		var source: Dictionary = catalog[index % catalog.size()] if not catalog.is_empty() else {}
+	var stage_catalog: Array[Dictionary] = []
+	for source in catalog:
+		if String(source.get("id", "")).begins_with("fertilizer_atlas_3_"):
+			stage_catalog.append(source)
+	for index in range(stage_catalog.size()):
+		var source: Dictionary = stage_catalog[index]
 		var source_id := StringName(source.get("id", &""))
-		result.append(_item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id)) if not String(source_id).is_empty() else "Unavailable", "Universal plant food with hidden effects.", &"fertilizer", not source.is_empty(), 3))
+		result.append(_item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id).trim_prefix("fertilizer_atlas_3_")), "Doubles growth and holds nutrition in the favorable zone during its matching stage.", &"fertilizer", true, 3))
 	return result
 
 func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
@@ -171,6 +178,14 @@ func _item(id: StringName, source_id: StringName, display_name: String, descript
 	return {"id": id, "source_id": source_id, "name": display_name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
 
 func _preview_texture(item: Dictionary) -> Texture2D:
+	if StringName(item.get("action", &"")) == &"fertilizer":
+		return FertilizerOfferArt.texture_for(StringName(item.get("source_id", &"")))
+	if item.has("seed_frame"):
+		var texture := AtlasTexture.new()
+		var frame := int(item["seed_frame"]) % 8
+		texture.atlas = preload("res://assets/tree/seeds.png")
+		texture.region = Rect2((frame % 4) * 512, floori(float(frame) / 4.0) * 512, 512, 512)
+		return texture
 	var path := String(item.get("preview_path", ""))
 	if not path.is_empty() and ResourceLoader.exists(path): return load(path) as Texture2D
 	return UiAtlas.background(CATEGORIES.find(_category) % 2)

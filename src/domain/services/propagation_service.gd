@@ -31,7 +31,9 @@ static func plant_cutting(
 	if plant == null:
 		return false
 	plant.growth_ratio = CUTTING_START_GROWTH_RATIO
-	plant.care_stage_index = CareGaugeService.stage_index(plant.growth_ratio)
+	plant.growth_cycle_index = 5
+	plant.growth_cycle_elapsed = 0.0
+	plant.care_stage_index = 5
 	pot.plant = plant
 	return true
 

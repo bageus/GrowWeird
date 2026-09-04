@@ -26,6 +26,8 @@ static func migrate(source: Dictionary) -> Dictionary:
 				data = _migrate_v6_to_v7(data)
 			7:
 				data = _migrate_v7_to_v8(data)
+			8:
+				data = _migrate_v8_to_v9(data)
 			_:
 				push_error("No save migration registered for schema %d" % version)
 				return {}
@@ -124,4 +126,17 @@ static func _migrate_v7_to_v8(source: Dictionary) -> Dictionary:
 	var data := source.duplicate(true)
 	data["rewarded_ad_claims"] = []
 	data["schema_version"] = 8
+	return data
+
+static func _migrate_v8_to_v9(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	for pot_value in data.get("pots", []):
+		if not (pot_value is Dictionary): continue
+		var plant: Variant = pot_value.get("plant")
+		if not (plant is Dictionary): continue
+		var growth := clampf(float(plant.get("growth_ratio", 0.0)), 0.0, 1.0)
+		plant["growth_cycle_index"] = mini(8, floori(growth * 9.0))
+		plant["growth_cycle_elapsed"] = 0.0
+		plant["boosted_growth_cycle"] = -1
+	data["schema_version"] = 9
 	return data

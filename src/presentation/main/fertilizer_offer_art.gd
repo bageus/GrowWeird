@@ -4,6 +4,7 @@ extends RefCounted
 const ATLAS_TEXTURES := [
 	preload("res://assets/fertilizers/fertilizers_01.png"),
 	preload("res://assets/fertilizers/fertilizers_02.png"),
+	preload("res://assets/fertilizers/fertilizers_03.png"),
 ]
 
 static func texture_for(id: StringName) -> Texture2D:

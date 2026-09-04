@@ -72,6 +72,9 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 		"species_id": String(plant.species_id),
 		"age_seconds": plant.age_seconds,
 		"growth_ratio": plant.growth_ratio,
+		"growth_cycle_index": plant.growth_cycle_index,
+		"growth_cycle_elapsed": plant.growth_cycle_elapsed,
+		"boosted_growth_cycle": plant.boosted_growth_cycle,
 		"health": plant.health,
 		"alive": plant.alive,
 		"nutrition": plant.nutrition,
@@ -94,6 +97,9 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.species_id = StringName(data.get("species_id", ""))
 	plant.age_seconds = maxf(0.0, float(data.get("age_seconds", 0.0)))
 	plant.growth_ratio = clampf(float(data.get("growth_ratio", 0.0)), 0.0, 1.0)
+	plant.growth_cycle_index = clampi(int(data.get("growth_cycle_index", 0)), 0, GrowthCycleService.LAST_CYCLE)
+	plant.growth_cycle_elapsed = maxf(0.0, float(data.get("growth_cycle_elapsed", 0.0)))
+	plant.boosted_growth_cycle = int(data.get("boosted_growth_cycle", -1))
 	plant.health = clampf(float(data.get("health", 1.0)), 0.0, 1.0)
 	plant.alive = bool(data.get("alive", true)) and plant.health > 0.0
 	plant.nutrition = clampf(float(data.get("nutrition", 0.5)), 0.0, 1.0)

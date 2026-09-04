@@ -58,10 +58,10 @@ static func stage_for(plant: PlantState) -> int:
 	if not has_left and not has_right: return 13
 	if not has_left: return 11
 	if not has_right: return 12
-	var growth_stage := CareGaugeService.stage_index(plant.growth_ratio)
+	var growth_stage := plant.growth_cycle_index
 	if growth_stage == 0:
 		return -1
-	if growth_stage < CareGaugeService.GROWTH_STAGE_COUNT - 1:
+	if growth_stage <= 11:
 		return growth_stage - 1
 	return 7
 
@@ -71,7 +71,7 @@ func _set_stage(value: int) -> void:
 	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
 	if leaf_layout.visible:
 		leaf_layout.set_stage(stage)
-	flower_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
+	flower_layout.visible = _testing_stage >= 0 or (_plant != null and _plant.growth_cycle_index == 9)
 	if flower_layout.visible:
 		flower_layout.set_stage(stage)
 	_update_hover_visibility()

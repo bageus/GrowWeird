@@ -6,6 +6,9 @@ var custom_name: String = ""
 var species_id: StringName
 var age_seconds: float = 0.0
 var growth_ratio: float = 0.0
+var growth_cycle_index: int = 0
+var growth_cycle_elapsed: float = 0.0
+var boosted_growth_cycle: int = -1
 var health: float = 1.0
 var alive: bool = true
 var nutrition: float = 0.5

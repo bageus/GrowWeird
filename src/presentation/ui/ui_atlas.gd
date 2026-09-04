@@ -8,6 +8,11 @@ const HUD_BALANCE_PLUS_HOVER: Texture2D = preload("res://assets/ui/hud_balance_p
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
 const HUD_INVENTORY: Texture2D = preload("res://assets/ui/hud_background_inventory.png")
+const HUD_INVENTORY_HOVER_UP: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverup.png")
+const HUD_INVENTORY_HOVER_DOWN: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverdown.png")
+const HUD_POT: Texture2D = preload("res://assets/ui/hud_background_pot.png")
+const HUD_POT_HOVER_LEFT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverleft.png")
+const HUD_POT_HOVER_RIGHT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverright.png")
 const CELL := 512.0
 
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
@@ -84,16 +89,13 @@ static func configure_hud_slot(button: Button) -> void:
 static func configure_inventory_arrow(button: TextureButton, points_up: bool) -> void:
 	if button == null:
 		return
-	var arrow_region := Rect2(3.0 * CELL + 128.0, 3.0 * CELL + 80.0, 256.0, 256.0)
-	var image := atlas_region(BUTTONS, arrow_region).get_image()
-	image.rotate_90(COUNTERCLOCKWISE if points_up else CLOCKWISE)
-	var texture := ImageTexture.create_from_image(image)
-	button.texture_normal = texture
-	button.texture_hover = texture
-	button.texture_pressed = texture
-	button.texture_disabled = texture
+	button.texture_normal = null
+	button.texture_hover = null
+	button.texture_pressed = null
+	button.texture_disabled = null
 	button.ignore_texture_size = true
 	button.stretch_mode = TextureButton.STRETCH_SCALE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
@@ -109,6 +111,11 @@ static func background(index: int) -> Texture2D:
 
 static func background2(index: int) -> Texture2D:
 	return atlas_region(HUD_BACKGROUND2, Rect2(index * CELL, 0.0, CELL, CELL))
+
+static func prune_cursor() -> Texture2D:
+	var image := background(1).get_image()
+	image.resize(72, 72, Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(image)
 
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
 	if is_instance_valid(button):
