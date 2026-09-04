@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://src/presentation/main/pot_selector.gd" id="7_pots"]
 [ext_resource type="Texture2D" path="res://assets/pot/pot_01.png" id="8_pot"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/fertilizer_cooldown_overlay.tscn" id="9_cooldown"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/wallet_topup_panel.tscn" id="10_topup"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
@@ -310,5 +311,9 @@ text = "Normal light"
 [node name="ShopContainer" parent="." instance=ExtResource("4_shop")]
 visible = false
 z_index = 100
+
+[node name="WalletTopupPanel" parent="." instance=ExtResource("10_topup")]
+visible = false
+z_index = 110
 
 [node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
