@@ -215,9 +215,11 @@ func _test_growth_stage_geometry() -> void:
 	_expect(preview.get_node_or_null("Tree/LeftHover") != null, "tree preview: left hover asset path is invalid")
 	_expect(preview.get_node_or_null("Tree/RightHover") != null, "tree preview: right hover asset path is invalid")
 	var leaf_editor := preview.get_node_or_null("Tree/LeafLayout") as LeafLayoutEditor
+	var flower_editor := preview.get_node_or_null("Tree/FlowerLayout") as FlowerLayoutEditor
 	_expect(leaf_editor != null and LeafLayoutEditor.FIRST_TREE_STAGE == 4 and LeafLayoutEditor.LAST_TREE_STAGE == 13, "leaf layout: editor must cover tree_05 through tree_14")
+	_expect(flower_editor != null and FileAccess.file_exists("res://content/visual/tree_flower_layouts.json"), "flower layout: independent editor and storage are missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("scale_variance") and FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_editor.gd").contains("direction_variance"), "leaf layout: point randomization parameters are missing")
-	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_controls.gd").contains('find_child("LeafLayout"'), "leaf layout: controls must resolve the editor without a fragile serialized NodePath")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/leaf_layout_controls.gd").contains("find_child(String(editor_node_name)"), "placement layout: controls must resolve either editor without a fragile serialized NodePath")
 	leaf_editor.layouts = {"5": [{"x": 0.5, "y": 0.5, "scale": 1.0, "angle": 0.0, "scale_variance": 1.0, "direction_variance": 0.5}]}
 	leaf_editor.selected_index = 0
 	leaf_editor.set_stage(4)

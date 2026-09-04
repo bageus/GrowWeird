@@ -1,6 +1,8 @@
 class_name LeafLayoutControls
 extends VBoxContainer
 
+@export var editor_node_name: StringName = &"LeafLayout"
+@export var item_label := "Leaf"
 @onready var toggle: Button = $Toggle
 @onready var scale_variance: HSlider = $ScaleVariance
 @onready var direction_variance: HSlider = $DirectionVariance
@@ -11,9 +13,10 @@ var editor: LeafLayoutEditor
 var _syncing := false
 
 func _ready() -> void:
-	editor = get_tree().current_scene.find_child("LeafLayout", true, false) as LeafLayoutEditor
+	add_to_group(&"placement_layout_controls")
+	editor = get_tree().current_scene.find_child(String(editor_node_name), true, false) as LeafLayoutEditor
 	if editor == null:
-		push_error("Leaf layout editor was not found in the current scene")
+		push_error("%s layout editor was not found in the current scene" % item_label)
 		set_process(false)
 		return
 	toggle.toggled.connect(_on_toggled)
@@ -25,8 +28,19 @@ func _ready() -> void:
 	_update_labels()
 
 func _on_toggled(enabled: bool) -> void:
-	toggle.text = "Leaf points: ON" if enabled else "Leaf points: OFF"
+	if enabled:
+		for peer in get_tree().get_nodes_in_group(&"placement_layout_controls"):
+			if peer != self:
+				peer.deactivate_from_peer()
+	toggle.text = "%s points: %s" % [item_label, "ON" if enabled else "OFF"]
 	editor.set_editing(enabled)
+
+func deactivate_from_peer() -> void:
+	if not toggle.button_pressed:
+		return
+	toggle.set_pressed_no_signal(false)
+	toggle.text = "%s points: OFF" % item_label
+	editor.set_editing(false)
 
 func _on_variance_changed(_value: float) -> void:
 	_update_labels()
