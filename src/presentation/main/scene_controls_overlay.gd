@@ -26,6 +26,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_apply_ui_atlases()
 	_collect_controls()
+	(get_node("WalletHud/Layers/ShopButton") as Button).pressed.connect(_toggle_wallet_topup)
 	_layout = _load_layout()
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
@@ -92,6 +93,23 @@ func set_shop_visible(enabled: bool) -> void:
 	if panel == null:
 		return
 	panel.visible = enabled
+	if enabled:
+		set_wallet_topup_visible(false)
+
+func set_wallet_topup_visible(enabled: bool) -> void:
+	var panel := get_node_or_null("WalletTopupPanel") as WalletTopupPanel
+	if panel == null:
+		return
+	if enabled: panel.open()
+	else: panel.close()
+
+func _toggle_wallet_topup() -> void:
+	var panel := get_node_or_null("WalletTopupPanel") as WalletTopupPanel
+	if panel != null:
+		var opening := not panel.visible
+		if opening:
+			set_shop_visible(false)
+		set_wallet_topup_visible(opening)
 
 func save_layout() -> bool:
 	_capture_layout()

@@ -11,7 +11,6 @@ extends Control
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
 @onready var pot_selector: PotSelector = scene_controls.get_node("PotSelector")
 @onready var money_label: Label = scene_controls.get_node("WalletHud/Layers/MoneyLabel")
-@onready var shop_button: Button = scene_controls.get_node("WalletHud/Layers/ShopButton")
 @onready var offer_one: Button = scene_controls.get_node("OffersPanel/Row/OfferOne")
 @onready var offer_two: Button = scene_controls.get_node("OffersPanel/Row/OfferTwo")
 @onready var offer_three: Button = scene_controls.get_node("OffersPanel/Row/OfferThree")
@@ -52,7 +51,6 @@ func _ready() -> void:
 	inventory_dialogs.closed.connect(_set_cancel_visibility)
 	shop_panel.item_buy_requested.connect(_on_shop_item_requested)
 	shop_panel.close_requested.connect(_on_close_shop_pressed)
-	shop_button.pressed.connect(_on_shop_pressed)
 	spray_button.pressed.connect(_on_spray_pressed)
 	pour_button.pressed.connect(_on_pour_pressed)
 	curtains_button.pressed.connect(_on_environment_preset.bind(&"curtains"))

@@ -42,6 +42,8 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/inventory/inventory_item_dialogs.tscn",
 		"res://src/presentation/progression/progression_panel.gd",
 		"res://src/presentation/shop/shop_panel.gd",
+		"res://src/presentation/main/wallet_topup_panel.gd",
+		"res://src/presentation/main/wallet_topup_panel.tscn",
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
@@ -93,6 +95,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(hud_text.contains("PotSelector") and hud_text.contains("PreviousPot") and hud_text.contains("NextPot") and hud_text.contains("PotThumbnail"), "scene HUD: pot selector needs one thumbnail between navigation arrows")
 	_expect(hud_text.contains("PotCircle") and hud_text.contains('name="PreviousPot" type="Button" parent="PotSelector/Layers"'), "scene HUD: pot circle must stay square with arrows outside")
 	_expect(hud_text.contains('name="ShopButton" type="Button" parent="WalletHud/Layers"'), "scene HUD: balance plus hit area must use fixed atlas coordinates")
+	_expect(hud_text.contains("WalletTopupPanel") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.tscn").contains("1000 coins\\n259 ₽"), "wallet HUD: coin packs and modal top-up panel are missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("configure_hud_slot"), "scene HUD: fertilizer menu needs three separate atlas backgrounds")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains('configure_button(get_node("TasksButton")'), "scene HUD: tasks button hover atlas is not configured")
 	_expect(not hud_text.contains("RecyclePlantButton") and not FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").contains("recycle_active_dead_plant"), "scene HUD: Grind must only be available for inventory items")

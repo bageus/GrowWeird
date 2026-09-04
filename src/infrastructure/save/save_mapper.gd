@@ -10,6 +10,7 @@ static func to_dictionary(state: GameState) -> Dictionary:
 		"money": state.money,
 		"active_pot_id": state.active_pot_id,
 		"last_saved_unix": state.last_saved_unix,
+		"rewarded_ad_claims": state.rewarded_ad_claims.duplicate(),
 		"pots": pots,
 		"inventory": SaveItemMapper.inventory_to_dictionary(state.inventory),
 		"fertilizer_offer": _offer_to_dictionary(state.fertilizer_offer),
@@ -22,6 +23,8 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	state.money = int(data.get("money", 0))
 	state.active_pot_id = String(data.get("active_pot_id", ""))
 	state.last_saved_unix = int(data.get("last_saved_unix", 0))
+	for claim_time in data.get("rewarded_ad_claims", []):
+		state.rewarded_ad_claims.append(maxi(0, int(claim_time)))
 	state.inventory = SaveItemMapper.inventory_from_dictionary(data.get("inventory", {}))
 	state.fertilizer_offer = _offer_from_dictionary(data.get("fertilizer_offer", {}))
 	state.progression = _progression_from_dictionary(data.get("progression", {}))
