@@ -112,7 +112,7 @@ func _test_rewarded_ad_window() -> void:
 	_expect(state.money == 40 and not RewardedAdService.claim(state, now_unix + 4), "rewarded ad: fifth claim inside eight hours must fail")
 	_expect(RewardedAdService.claim(state, now_unix + RewardedAdService.WINDOW_SECONDS + 1), "rewarded ad: an expired claim must free a slot")
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
-	_expect(restored.rewarded_ad_claims.size() == RewardedAdService.MAX_CLAIMS, "rewarded ad: claim timestamps must survive save round trip")
+	_expect(restored.rewarded_ad_claims == state.rewarded_ad_claims, "rewarded ad: claim timestamps must survive save round trip")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
