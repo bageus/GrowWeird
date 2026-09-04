@@ -23,9 +23,11 @@ func _ready() -> void:
 		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
 	FertilizerOfferService.ensure_active(state.fertilizer_offer, registry.all_offer_fertilizers(), rules)
 	_persistence.reconciled.connect(_on_persistence_reconciled)
-	PlatformRuntime.pause_requested.connect(_on_platform_pause_requested)
-	PlatformRuntime.resume_requested.connect(_on_platform_resume_requested)
-	_persistence.start(state, registry, rules, PlatformRuntime)
+	var platform := _platform_runtime()
+	if platform != null:
+		platform.pause_requested.connect(_on_platform_pause_requested)
+		platform.resume_requested.connect(_on_platform_resume_requested)
+	_persistence.start(state, registry, rules, platform)
 	state_changed.emit()
 func _process(delta: float) -> void:
 	if state == null:
@@ -269,17 +271,17 @@ func current_offer_ids() -> Array[StringName]:
 func current_offer_skip_price() -> int:
 	return FertilizerOfferService.skip_price(state.fertilizer_offer, rules) if state != null else 0
 
-func platform_id() -> StringName:
-	return PlatformRuntime.platform_id()
+func platform_id() -> StringName: return _platform_runtime().platform_id()
 
-func cloud_save_available() -> bool:
-	return PlatformRuntime.cloud_available()
+func cloud_save_available() -> bool: return _platform_runtime().cloud_available()
 
 func set_gameplay_active(active: bool) -> void:
-	PlatformRuntime.set_gameplay_active(active)
+	_platform_runtime().set_gameplay_active(active)
 
 func show_fullscreen_ad() -> void:
-	PlatformRuntime.show_fullscreen_ad()
+	_platform_runtime().show_fullscreen_ad()
+
+func _platform_runtime() -> Node: return get_node("/root/PlatformRuntime")
 
 func claim_rewarded_ad(now_unix: int) -> bool:
 	if not RewardedAdService.claim(state, now_unix): return false
