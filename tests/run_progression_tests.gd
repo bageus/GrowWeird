@@ -10,6 +10,7 @@ func _init() -> void:
 	_test_catalog_purchases_route_to_pots_and_inventory()
 	_test_progression_save_round_trip()
 	_test_v4_migration_skips_onboarding()
+	_test_rewarded_ad_window()
 	if _failures.is_empty():
 		print("GrowWeird progression tests passed")
 		quit(0)
@@ -102,6 +103,16 @@ func _test_v4_migration_skips_onboarding() -> void:
 	_expect(int(migrated.get("schema_version", 0)) == GameState.SCHEMA_VERSION, "progression migration: v4 should reach current schema")
 	var progression: Dictionary = migrated.get("progression", {})
 	_expect(bool(progression.get("skip_onboarding", false)), "progression migration: existing players should bypass onboarding")
+
+func _test_rewarded_ad_window() -> void:
+	var state := GameState.new()
+	var now_unix := 100000
+	for index in range(RewardedAdService.MAX_CLAIMS):
+		_expect(RewardedAdService.claim(state, now_unix + index), "rewarded ad: one of four claims failed")
+	_expect(state.money == 40 and not RewardedAdService.claim(state, now_unix + 4), "rewarded ad: fifth claim inside eight hours must fail")
+	_expect(RewardedAdService.claim(state, now_unix + RewardedAdService.WINDOW_SECONDS + 1), "rewarded ad: an expired claim must free a slot")
+	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
+	_expect(restored.rewarded_ad_claims.size() == RewardedAdService.MAX_CLAIMS, "rewarded ad: claim timestamps must survive save round trip")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
