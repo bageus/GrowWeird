@@ -1,1 +1,500 @@
-{}
+{
+	"10": [
+		{
+			"angle": 0.0,
+			"direction_variance": 1.5,
+			"scale": 1.0,
+			"scale_variance": 11.0,
+			"x": 0.688115584885967,
+			"y": 0.701492046487742
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.57351936,
+			"scale_variance": 4.0,
+			"x": 0.746732945694167,
+			"y": 0.495818916408495
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.57351936,
+			"scale_variance": 1.0,
+			"x": 0.677921314182453,
+			"y": 0.389309674843975
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.0,
+			"scale_variance": 1.0,
+			"x": 0.680469821005733,
+			"y": 0.598655437601024
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 1.12,
+			"scale_variance": 2.0,
+			"x": 0.690664335119641,
+			"y": 0.202000322013066
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.0,
+			"scale_variance": 10.0,
+			"x": 0.509715360753677,
+			"y": 0.0550909809682561
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 1.5,
+			"scale": 1.57351936,
+			"scale_variance": 4.0,
+			"x": 0.407772288602941,
+			"y": 0.235054893055181
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.57351936,
+			"scale_variance": 3.0,
+			"x": 0.604012669024178,
+			"y": 0.0881455520103718
+		}
+	],
+	"11": [
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.7623416832,
+			"scale_variance": 1.0,
+			"x": 0.522458259985668,
+			"y": 0.0404000994802892
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.7623416832,
+			"scale_variance": 1.0,
+			"x": 0.639692738191675,
+			"y": 0.143236620672818
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.90655423521449,
+			"scale_variance": 1.0,
+			"x": 0.693212841942921,
+			"y": 0.257091302981322
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 3.0,
+			"scale_variance": 1.0,
+			"x": 0.420515187834933,
+			"y": 0.16894575097095
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.973822685184,
+			"scale_variance": 1.0,
+			"x": 0.275246282636466,
+			"y": 0.437055215068247
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.7623416832,
+			"scale_variance": 1.0,
+			"x": 0.31602348715572,
+			"y": 0.583964556113057
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.404928,
+			"scale_variance": 1.0,
+			"x": 0.446000864593719,
+			"y": 0.459091624994388
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.57351936,
+			"scale_variance": 1.0,
+			"x": 0.349155049499938,
+			"y": 0.33789141424771
+		}
+	],
+	"12": [
+		{
+			"angle": 0.0,
+			"direction_variance": 4.5,
+			"scale": 1.0,
+			"scale_variance": 11.0,
+			"x": 0.680469821005733,
+			"y": 0.661091947007453
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.5,
+			"scale": 1.404928,
+			"scale_variance": 3.0,
+			"x": 0.736538674990653,
+			"y": 0.558255425814925
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 5.0,
+			"scale": 1.7623416832,
+			"scale_variance": 3.0,
+			"x": 0.703407112646436,
+			"y": 0.418691525514098
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 0.5,
+			"scale": 1.404928,
+			"scale_variance": 2.0,
+			"x": 0.604012669024178,
+			"y": 0.418691525514098
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.5,
+			"scale": 2.77307875745019,
+			"scale_variance": 2.0,
+			"x": 0.438355222418681,
+			"y": 0.190982073202901
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.0,
+			"scale_variance": 11.0,
+			"x": 0.591269769792186,
+			"y": 0.0918183600765535
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 1.973822685184,
+			"scale_variance": 3.0,
+			"x": 0.665178536655658,
+			"y": 0.154254781788793
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 5.0,
+			"scale": 1.0,
+			"scale_variance": 5.0,
+			"x": 0.675372807359172,
+			"y": 0.297491402461611
+		}
+	],
+	"13": [
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 2.21068140740608,
+			"scale_variance": 1.0,
+			"x": 0.670275550302218,
+			"y": 0.304836843205594
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.0,
+			"scale_variance": 9.0,
+			"x": 0.657532772775424,
+			"y": 0.135891092234644
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.0,
+			"scale": 1.973822685184,
+			"scale_variance": 3.0,
+			"x": 0.415417930777979,
+			"y": 0.268109464097297
+		},
+		{
+			"angle": 1.39626340159546,
+			"direction_variance": 3.0,
+			"scale": 1.404928,
+			"scale_variance": 8.0,
+			"x": 0.517361002928714,
+			"y": 0.0587637013402478
+		}
+	],
+	"14": [
+		{
+			"angle": 3.75245789178781,
+			"direction_variance": 1.5,
+			"scale": 1.57351936,
+			"scale_variance": 2.0,
+			"x": 0.680469821005733,
+			"y": 0.334218693875718
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.5,
+			"scale": 1.0,
+			"scale_variance": 11.0,
+			"x": 0.642241245014955,
+			"y": 0.16894575097095
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.0,
+			"scale": 1.57351936,
+			"scale_variance": 3.0,
+			"x": 0.42816083000997,
+			"y": 0.190982073202901
+		},
+		{
+			"angle": 2.18166156499292,
+			"direction_variance": 0.5,
+			"scale": 1.973822685184,
+			"scale_variance": 3.0,
+			"x": 0.53774966604094,
+			"y": 0.0771273908943965
+		}
+	],
+	"6": [
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 1.7623416832,
+			"scale_variance": 6.0,
+			"x": 0.71614989017323,
+			"y": 0.257091302981322
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 1.973822685184,
+			"scale_variance": 6.0,
+			"x": 0.581075499088672,
+			"y": 0.110181961936512
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 1.57351936,
+			"scale_variance": 8.0,
+			"x": 0.402675153251184,
+			"y": 0.275454992535471
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.5,
+			"scale": 2.21068140740608,
+			"scale_variance": 3.0,
+			"x": 0.448549493122196,
+			"y": 0.117527490374686
+		}
+	],
+	"7": [
+		{
+			"angle": 5.93411945678072,
+			"direction_variance": 2.5,
+			"scale": 2.21068140740608,
+			"scale_variance": 3.0,
+			"x": 0.31602348715572,
+			"y": 0.639055537081313
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.5,
+			"scale": 1.7623416832,
+			"scale_variance": 3.0,
+			"x": 0.280343417988223,
+			"y": 0.470109786110363
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.0,
+			"scale": 1.973822685184,
+			"scale_variance": 5.0,
+			"x": 0.45874376382571,
+			"y": 0.444400655812231
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 7.0,
+			"scale": 1.7623416832,
+			"scale_variance": 4.0,
+			"x": 0.359349320203452,
+			"y": 0.341564134619702
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.5,
+			"scale": 3.0,
+			"scale_variance": 3.0,
+			"x": 0.56833259985668,
+			"y": 0.0367272914141074
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 4.5,
+			"scale": 2.21068140740608,
+			"scale_variance": 3.0,
+			"x": 0.680469821005733,
+			"y": 0.187309352830909
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.12,
+			"scale_variance": 3.0,
+			"x": 0.695761348766201,
+			"y": 0.334218693875718
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 5.5,
+			"scale": 1.57351936,
+			"scale_variance": 5.0,
+			"x": 0.430709458538447,
+			"y": 0.150582061416801
+		}
+	],
+	"8": [
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 1.404928,
+			"scale_variance": 6.0,
+			"x": 0.25485761952424,
+			"y": 0.488473475664511
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 1.5,
+			"scale": 2.21068140740608,
+			"scale_variance": 4.0,
+			"x": 0.31347498033244,
+			"y": 0.635382816709321
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.7623416832,
+			"scale_variance": 4.0,
+			"x": 0.346606420971461,
+			"y": 0.33789141424771
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.57351936,
+			"scale_variance": 5.0,
+			"x": 0.440903729241962,
+			"y": 0.48480075529252
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 2.77307875745019,
+			"scale_variance": 10.0,
+			"x": 0.463840899177468,
+			"y": 0.0954910804485453
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.0,
+			"scale": 2.21068140740608,
+			"scale_variance": 4.0,
+			"x": 0.718698640406904,
+			"y": 0.257091302981322
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 1.57351936,
+			"scale_variance": 5.0,
+			"x": 0.596366905143943,
+			"y": 0.0587637013402478
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 1.2544,
+			"scale_variance": 3.0,
+			"x": 0.683018571239407,
+			"y": 0.701492046487742
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 1.5,
+			"scale": 1.57351936,
+			"scale_variance": 6.0,
+			"x": 0.733989924756979,
+			"y": 0.594982717229032
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.5,
+			"scale": 0.25,
+			"scale_variance": 1.0,
+			"x": 0.6014640404957,
+			"y": 0.23138217268319
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 1.2544,
+			"scale_variance": 2.0,
+			"x": 0.621852703607926,
+			"y": 0.407673364398123
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.0,
+			"scale_variance": 2.0,
+			"x": 0.70850436970339,
+			"y": 0.444400655812231
+		}
+	],
+	"9": [
+		{
+			"angle": 0.0,
+			"direction_variance": 4.0,
+			"scale": 1.57351936,
+			"scale_variance": 3.0,
+			"x": 0.435806593890204,
+			"y": 0.385636954471983
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.57351936,
+			"scale_variance": 3.0,
+			"x": 0.677921314182453,
+			"y": 0.301164122833603
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 3.0,
+			"scale": 3.0,
+			"scale_variance": 2.0,
+			"x": 0.59891553367242,
+			"y": 0.08447283163838
+		},
+		{
+			"angle": 0.0,
+			"direction_variance": 2.5,
+			"scale": 1.2544,
+			"scale_variance": 12.0,
+			"x": 0.42561232318669,
+			"y": 0.172618471342942
+		}
+	]
+}
