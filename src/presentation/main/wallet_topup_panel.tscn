@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/main/wallet_topup_panel.gd" id="1_script"]
+
+[node name="WalletTopupPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.02, 0.01, 0.03, 0.7)
+
+[node name="Window" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.25
+anchor_top = 0.12
+anchor_right = 0.75
+anchor_bottom = 0.88
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="Window"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Window/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "COINS"
+
+[node name="BalanceLabel" type="Label" parent="Window/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Balance: 0 coins"
+
+[node name="CloseButton" type="Button" parent="Window/Content/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "×"
+
+[node name="Intro" type="Label" parent="Window/Content"]
+layout_mode = 2
+text = "Choose a coin pack"
+horizontal_alignment = 1
+
+[node name="Products" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Product100" type="Button" parent="Window/Content/Products"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+text = "100 coins\n59 ₽"
+
+[node name="Product300" type="Button" parent="Window/Content/Products"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+text = "300 coins\n159 ₽"
+
+[node name="Product1000" type="Button" parent="Window/Content/Products"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 150)
+layout_mode = 2
+text = "1000 coins\n259 ₽"
+
+[node name="AdButton" type="Button" parent="Window/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 78)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Watch ad  ·  +10 coins  ·  4/4 left"
+
+[node name="LimitHint" type="Label" parent="Window/Content"]
+layout_mode = 2
+text = "Advertising bonus: up to 4 times per rolling 8 hours"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Window/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+horizontal_alignment = 1
