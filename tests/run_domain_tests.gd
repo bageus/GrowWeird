@@ -173,8 +173,8 @@ func _test_fertilizer_atlas_catalog() -> void:
 	var ids := {}
 	for definition in definitions:
 		ids[String(definition.id)] = true
-	_expect(definitions.size() == 132, "fertilizer atlas: expected 126 offer frames plus six shop boosters")
-	_expect(ids.size() == 132, "fertilizer atlas: frame ids must be unique")
+	_expect(definitions.size() == 126, "fertilizer atlas: expected 126 selectable frames")
+	_expect(ids.size() == 126, "fertilizer atlas: frame ids must be unique")
 	_expect(not ids.has("fertilizer_atlas_2_bag_of_fertilizer"), "fertilizer atlas: first grind result leaked into offers")
 	_expect(not ids.has("fertilizer_atlas_2_pile_of_fertilizers"), "fertilizer atlas: second grind result leaked into offers")
 	_expect(ids.has("fertilizer_atlas_1_eggshell"), "fertilizer atlas: navigation id was not used")
@@ -249,7 +249,7 @@ func _test_fruit_lifecycle_and_harvest() -> void:
 	pot.pot_id = "fruit-pot"
 	pot.soil_moisture = 0.5
 	pot.plant = _plant("fruit-plant")
-	pot.plant.growth_ratio = 1.0; pot.plant.growth_cycle_index = 11
+	pot.plant.growth_ratio = 1.0
 	state.pots = [pot]
 	FruitLifecycleService.advance(state, 120.0, registry)
 	var branch := pot.plant.branch_at(&"center")

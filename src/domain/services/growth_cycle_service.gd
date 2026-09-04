@@ -45,4 +45,7 @@ static func matches_target(cycle: int, target: StringName) -> bool:
 	return false
 
 static func _sync_legacy_growth(plant: PlantState) -> void:
-	plant.growth_ratio = clampf((float(mini(plant.growth_cycle_index, 8)) + progress(plant)) / 9.0, 0.0, 1.0)
+	if plant.growth_cycle_index >= 8:
+		plant.growth_ratio = 1.0
+	else:
+		plant.growth_ratio = clampf((float(plant.growth_cycle_index) + progress(plant)) / 8.0, 0.0, 1.0)
