@@ -281,6 +281,11 @@ func set_gameplay_active(active: bool) -> void:
 func show_fullscreen_ad() -> void:
 	PlatformRuntime.show_fullscreen_ad()
 
+func claim_rewarded_ad(now_unix: int) -> bool:
+	if not RewardedAdService.claim(state, now_unix): return false
+	state_changed.emit()
+	return true
+
 func save_now() -> bool:
 	return state != null and _persistence.save_now(state)
 
