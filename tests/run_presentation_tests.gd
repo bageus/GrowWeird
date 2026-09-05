@@ -138,15 +138,16 @@ func _test_scene_hud_contract() -> void:
 
 func _test_inventory_hud_contract() -> void:
 	var hud_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.tscn")
+	var inventory_script := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
 	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
-	_expect(hud_text.contains("offset_top = 78.0") and hud_text.contains("offset_bottom = -78.0"), "inventory HUD: scrolling cells must remain inset between the frame arrows")
+	_expect(hud_text.contains("offset_top = 73.0") and hud_text.contains("offset_bottom = -73.0"), "inventory HUD: cells must keep equal three-pixel gaps from both arrows")
+	_expect(hud_text.contains("allow_scaling = true") and inventory_script.contains("_add_fitted_icon"), "inventory HUD: frame must scale while item art stays fitted inside each slot")
 	_expect(hud_text.contains("vertical_scroll_mode = 3"), "inventory HUD: native vertical scrollbar must stay hidden")
 	_expect(hud_text.contains("Vector2(164, 520)"), "inventory HUD: frame must use the narrow layout")
 	_expect(hud_text.contains('[node name="FrameContent" type="Control" parent="Layers"]') and hud_text.contains('parent="Layers/FrameContent"'), "inventory HUD: paging arrows must stay inside the visible frame")
 	_expect(hud_text.count('type="TextureButton"') == 2, "inventory HUD: atlas arrows must use reliable texture buttons")
-	var inventory_script := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
 	_expect(inventory_script.contains("SCROLL_STEP") and inventory_script.contains("_scroll_inventory"), "inventory HUD: arrow paging behavior is missing")
 	_expect(hud_text.contains("clip_contents = true") and hud_text.contains("z_index = 5"), "inventory HUD: cells and arrows must be clipped inside the frame")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("configure_inventory_arrow"), "inventory HUD: paging must use the arrow atlas asset")
