@@ -89,6 +89,7 @@ static func _seed_to_dictionary(item: SeedState) -> Dictionary:
 	return {
 		"item_id": item.item_id,
 		"source_plant_id": item.source_plant_id,
+		"visual_frame": item.visual_frame,
 		"genome": genome_to_dictionary(item.genome),
 	}
 
@@ -96,6 +97,8 @@ static func _seed_from_dictionary(data: Dictionary) -> SeedState:
 	var item := SeedState.new()
 	item.item_id = String(data.get("item_id", ""))
 	item.source_plant_id = String(data.get("source_plant_id", ""))
+	item.visual_frame = int(data.get("visual_frame", -1))
+	item.ensure_visual_frame()
 	item.genome = genome_from_dictionary(data.get("genome", {}))
 	return item
 

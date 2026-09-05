@@ -17,6 +17,9 @@ func _init() -> void:
 	_test_regrowth_is_exposed_to_presentation()
 	_test_pruned_branch_skips_current_fruit_cycle()
 	_test_fruit_cycle_restarts_after_last_harvest()
+	_test_cycle_duration_is_independent_of_care()
+	_test_flowering_waits_for_branch_recovery()
+	_test_seed_visual_frame_round_trip()
 	if _failures.is_empty():
 		print("GrowWeird lifecycle tests passed")
 		quit(0)
@@ -217,6 +220,30 @@ func _test_fruit_cycle_restarts_after_last_harvest() -> void:
 	FruitLifecycleService.advance(state, 1.0, registry)
 	_expect(pot.plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "fruit cycle: harvesting the last fruit must start branch recovery")
 	for branch in pot.plant.existing_branches(): _expect(branch.fruit_growth == null, "fruit cycle: recovery must not immediately create new fruit")
+
+func _test_cycle_duration_is_independent_of_care() -> void:
+	var plant := _plant("fixed-duration")
+	GrowthCycleService.advance(plant, 29.0, 0.0)
+	_expect(plant.growth_cycle_index == 0, "growth cycle: seed stage must last its full fixed duration")
+	GrowthCycleService.advance(plant, 1.0, 0.0)
+	_expect(plant.growth_cycle_index == 1, "growth cycle: poor care must not stretch the configured stage duration")
+
+func _test_flowering_waits_for_branch_recovery() -> void:
+	var plant := _plant("strict-recovery")
+	plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
+	plant.cut_branch(&"left")
+	GrowthCycleService.advance(plant, GrowthCycleService.duration(GrowthCycleService.LAST_CYCLE), 1.0)
+	_expect(plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "growth cycle: flowering started before every branch regrew")
+	plant.initialize_native_branches()
+	GrowthCycleService.advance(plant, 1.0, 1.0)
+	_expect(plant.growth_cycle_index == 9, "growth cycle: flowering must start after recovery finishes")
+
+func _test_seed_visual_frame_round_trip() -> void:
+	var state := GameState.new()
+	var seed_state := SeedState.new(); seed_state.item_id = "visual-seed"; seed_state.visual_frame = 7
+	state.inventory.seeds.append(seed_state)
+	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
+	_expect(restored.inventory.seeds[0].visual_frame == 7, "seed art: saved random atlas frame was not restored")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()

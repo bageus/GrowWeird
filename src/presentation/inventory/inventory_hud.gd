@@ -65,7 +65,8 @@ func _rebuild(inventory: InventoryState) -> void:
 	for seed_state in inventory.seeds:
 		if seed_state == null:
 			continue
-		_add_item(&"seed", seed_state.item_id, 1, _genetic_title("Seed", seed_state.genome))
+		seed_state.ensure_visual_frame()
+		_add_item(&"seed", seed_state.item_id, 1, _genetic_title("Seed", seed_state.genome), seed_state.visual_frame)
 		added += 1
 	for fruit in inventory.fruits:
 		if fruit == null:
@@ -107,12 +108,12 @@ func _update_scroll_buttons() -> void:
 	scroll_up.disabled = scroll.scroll_vertical <= 0
 	scroll_down.disabled = scroll.scroll_vertical >= int(maxf(0.0, bar.max_value - bar.page))
 
-func _add_item(kind: StringName, item_id: String, count: int, title: String) -> void:
+func _add_item(kind: StringName, item_id: String, count: int, title: String, visual_frame := -1) -> void:
 	var button := Button.new()
 	_configure_fixed_slot(button)
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	button.text = title + (" ×%d" % count if count > 1 else "")
-	var texture := InventoryItemArt.texture_for(kind, item_id)
+	var texture := InventoryItemArt.texture_for(kind, item_id, visual_frame)
 	if texture != null:
 		button.icon = texture
 		button.expand_icon = true

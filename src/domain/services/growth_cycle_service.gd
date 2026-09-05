@@ -12,13 +12,16 @@ static func progress(plant: PlantState) -> float:
 		return 0.0
 	return clampf(plant.growth_cycle_elapsed / duration(plant.growth_cycle_index), 0.0, 1.0)
 
-static func advance(plant: PlantState, delta_seconds: float, care_factor: float) -> bool:
+static func advance(plant: PlantState, delta_seconds: float, _care_factor: float) -> bool:
 	if plant == null or not plant.alive or delta_seconds <= 0.0:
 		return false
 	var speed := 2.0 if plant.boosted_growth_cycle == plant.growth_cycle_index else 1.0
-	plant.growth_cycle_elapsed += delta_seconds * speed * clampf(care_factor, 0.1, 1.0)
+	plant.growth_cycle_elapsed += delta_seconds * speed
 	var changed := false
 	while plant.growth_cycle_elapsed >= duration(plant.growth_cycle_index):
+		if plant.growth_cycle_index == LAST_CYCLE and not recovery_complete(plant):
+			plant.growth_cycle_elapsed = duration(LAST_CYCLE)
+			break
 		plant.growth_cycle_elapsed -= duration(plant.growth_cycle_index)
 		plant.finish_care_stage(plant.growth_cycle_index + 1)
 		plant.growth_cycle_index = 9 if plant.growth_cycle_index >= LAST_CYCLE else plant.growth_cycle_index + 1
@@ -26,6 +29,14 @@ static func advance(plant: PlantState, delta_seconds: float, care_factor: float)
 		changed = true
 	_sync_legacy_growth(plant)
 	return changed
+
+static func recovery_complete(plant: PlantState) -> bool:
+	if plant == null:
+		return false
+	for slot in BranchState.VALID_SLOTS:
+		if plant.branch_at(slot) == null:
+			return false
+	return true
 
 static func activate_stage_fertilizer(plant: PlantState, target: StringName) -> bool:
 	if plant == null or not matches_target(plant.growth_cycle_index, target):

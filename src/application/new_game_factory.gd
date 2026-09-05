@@ -55,5 +55,6 @@ static func ensure_starter_seed(state: GameState) -> void:
 			return
 	var seed_state := SeedState.new()
 	seed_state.item_id = IdFactory.make("seed")
+	seed_state.ensure_visual_frame()
 	seed_state.genome = GeneticsService.fresh_species_snapshot(STARTER_SEED_SPECIES)
 	InventoryService.add_seed(state.inventory, seed_state)

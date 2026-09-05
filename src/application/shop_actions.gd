@@ -34,6 +34,7 @@ static func buy_species_seed(
 		return ""
 	var seed_state := SeedState.new()
 	seed_state.item_id = IdFactory.make("seed")
+	seed_state.ensure_visual_frame()
 	seed_state.source_plant_id = "shop"
 	seed_state.genome = GeneticsService.fresh_species_snapshot(species_id)
 	if seed_state.genome == null:
@@ -68,7 +69,7 @@ static func buy_catalog_item(state: GameState, item: Dictionary, registry: Conte
 		&"pot": success = _add_pots(state, amount)
 		&"potted_plant": success = _add_potted_plants(state, source_id, registry, amount)
 		&"cutting": success = _add_cuttings(state, source_id, registry, amount)
-		&"seed": success = _add_seeds(state, source_id, registry, amount)
+		&"seed": success = _add_seeds(state, source_id, registry, amount, int(item.get("seed_frame", -1)))
 		&"fertilizer": success = registry.get_fertilizer(source_id) != null
 		&"decoration", &"mutagen": success = not String(source_id).is_empty()
 	if success and action == &"fertilizer": InventoryService.add_fertilizer(state.inventory, source_id, amount)
@@ -106,9 +107,10 @@ static func _add_cuttings(state: GameState, species_id: StringName, registry: Co
 		InventoryService.add_cutting(state.inventory, cutting)
 	return true
 
-static func _add_seeds(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
+static func _add_seeds(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int, visual_frame: int) -> bool:
 	if registry.get_plant(species_id) == null: return false
 	for _index in range(amount):
 		var seed_state := SeedState.new(); seed_state.item_id = IdFactory.make("seed"); seed_state.source_plant_id = "shop"
+		seed_state.visual_frame = visual_frame; seed_state.ensure_visual_frame()
 		seed_state.genome = GeneticsService.fresh_species_snapshot(species_id); InventoryService.add_seed(state.inventory, seed_state)
 	return true
