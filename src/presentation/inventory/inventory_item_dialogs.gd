@@ -43,11 +43,11 @@ func _ready() -> void:
 	$RecyclePopup/Layout/Confirm.pressed.connect(_confirm_recycle)
 	sell_slider.value_changed.connect(_refresh_sell_preview)
 	recycle_slider.value_changed.connect(_refresh_recycle_preview)
-	UiAtlas.configure_button(use_action, 3, 1)
-	UiAtlas.configure_button(sell_action, 1, 3)
-	UiAtlas.configure_button(recycle_action, 3, 2)
-	UiAtlas.configure_button($SellPopup/Layout/Confirm as Button, 1, 3)
-	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 3, 2)
+	UiAtlas.configure_button(use_action, 5, 1)
+	UiAtlas.configure_button(sell_action, 3, 3)
+	UiAtlas.configure_button(recycle_action, 5, 2)
+	UiAtlas.configure_button($SellPopup/Layout/Confirm as Button, 3, 3)
+	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func show_for(
