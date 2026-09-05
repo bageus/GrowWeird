@@ -38,6 +38,7 @@ var _last_signature := ""
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	%BalanceArt.texture = UiAtlas.HUD_BALANCE
 	UiAtlas.configure_balance_plus(%BalancePlus, %BalanceArt)
 	%CloseButton.pressed.connect(_request_close)
 	%CancelButton.pressed.connect(_hide_confirm)
