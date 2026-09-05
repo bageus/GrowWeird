@@ -170,7 +170,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(item_art.contains("FertilizerAssetCatalog.is_offer_id") and item_art.contains("FertilizerOfferArt.texture_for"), "inventory HUD: offered fertilizers must reuse their atlas asset instead of text")
 	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
-	_expect(inventory_script.contains("_configure_fixed_slot(button)") and inventory_script.contains("button.clip_text = true") and inventory_script.contains("button.expand_icon = true"), "inventory HUD: content must shrink or clip without resizing its fixed tile")
+	_expect(inventory_script.contains("_configure_fixed_slot(button)") and inventory_script.contains("button.clip_text = true") and inventory_script.contains("STRETCH_KEEP_ASPECT_CENTERED"), "inventory HUD: content must shrink or clip without resizing its fixed tile")
 	_expect(inventory_script.contains("_set_item_hover"), "inventory HUD: items must react to hover")
 	_expect(inventory_script.contains("_add_stack_badge(button, count)") and inventory_script.contains("PRESET_TOP_RIGHT"), "inventory HUD: stacked items must show their count over the asset's top-right corner")
 	var controls_scene := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
