@@ -23,9 +23,7 @@ func _init() -> void:
 
 func _test_presentation_resources_load() -> void:
 	var paths := [
-		"res://src/presentation/main/main.tscn",
 		"res://src/presentation/main/scene_controls.tscn",
-		"res://src/presentation/main/main_screen.gd",
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/main/scene_action_button.gd",
 		"res://src/presentation/main/scene_draggable_panel.gd",
@@ -143,7 +141,7 @@ func _test_inventory_hud_contract() -> void:
 	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
-	_expect(hud_text.contains("offset_top = 38.0") and hud_text.contains("offset_bottom = -38.0"), "inventory HUD: scrolling cells must remain inset between the frame arrows")
+	_expect(hud_text.contains("offset_top = 78.0") and hud_text.contains("offset_bottom = -78.0"), "inventory HUD: scrolling cells must remain inset between the frame arrows")
 	_expect(hud_text.contains("vertical_scroll_mode = 3"), "inventory HUD: native vertical scrollbar must stay hidden")
 	_expect(hud_text.contains("Vector2(164, 520)"), "inventory HUD: frame must use the narrow layout")
 	_expect(hud_text.contains('[node name="FrameContent" type="Control" parent="Layers"]') and hud_text.contains('parent="Layers/FrameContent"'), "inventory HUD: paging arrows must stay inside the visible frame")
@@ -237,21 +235,21 @@ func _test_growth_stage_geometry() -> void:
 	preview.set_plant(null)
 	_expect(preview.visible and preview.stage == 3, "tree preview: game refresh must not hide an active test preview")
 	var plant_for_pruning := _plant()
-	plant_for_pruning.growth_ratio = 1.0
+	plant_for_pruning.growth_ratio = 1.0; plant_for_pruning.growth_cycle_index = 8
 	preview.set_plant(plant_for_pruning)
 	preview.clear_testing_preview()
 	_expect(preview.stage == 7 and preview.has_prunable_branch(), "tree preview: prune mode must leave test preview and restore domain branches")
 	preview.free()
 	var plant := _plant()
-	plant.growth_ratio = 0.0
+	plant.growth_cycle_index = 0
 	_expect(TreeGrowthPreview.stage_for(plant) == -1, "tree preview: planted seed must stay underground during its first gauge cycle")
-	plant.growth_ratio = 0.125
+	plant.growth_cycle_index = 1
 	_expect(TreeGrowthPreview.stage_for(plant) == 0, "tree preview: first sprout must appear after the first completed gauge cycle")
-	plant.growth_ratio = 1.0
+	plant.growth_cycle_index = 8
 	_expect(TreeGrowthPreview.stage_for(plant) == 7, "tree preview: intact mature plant must use the two-branch asset")
-	plant.growth_ratio = 0.5
+	plant.growth_cycle_index = 4
 	_expect(TreeGrowthPreview.stage_for(plant) == 3, "tree preview: each completed gauge cycle must advance one growth asset")
-	plant.growth_ratio = PropagationService.CUTTING_START_GROWTH_RATIO
+	plant.growth_cycle_index = 5
 	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: a planted branch must immediately use tree_05")
 	plant.cut_branch(&"left")
 	_expect(TreeGrowthPreview.stage_for(plant) == 11, "tree preview: branch removal must select the left-cut asset without a stump")

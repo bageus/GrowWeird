@@ -141,7 +141,7 @@ func _set_interaction_mode(mode: StringName) -> void:
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or shop_container.visible
 	if mode == PlantView.MODE_PRUNE:
 		if _prune_cursor == null:
-			_prune_cursor = load("res://assets/ui/prune_cursor.svg") as Texture2D
+			_prune_cursor = UiAtlas.prune_cursor()
 		if _prune_cursor != null:
 			Input.set_custom_mouse_cursor(_prune_cursor)
 	else:

@@ -180,21 +180,33 @@ layout_mode = 2
 mouse_filter = 1
 
 [node name="PotCircle" type="TextureRect" parent="PotSelector/Layers"]
-layout_mode = 0
-offset_left = 46.0
-offset_top = 4.0
-offset_right = 168.0
-offset_bottom = 120.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 0
+
+[node name="PotHover" type="TextureRect" parent="PotSelector/Layers"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 0
 
 [node name="PreviousPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = -4.0
-offset_top = 23.0
-offset_right = 76.0
-offset_bottom = 103.0
+offset_left = 25.0
+offset_top = 31.0
+offset_right = 63.0
+offset_bottom = 91.0
 text = "‹"
 
 [node name="PotThumbnail" type="TextureRect" parent="PotSelector/Layers"]
@@ -210,10 +222,10 @@ stretch_mode = 5
 
 [node name="NextPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = 138.0
-offset_top = 23.0
-offset_right = 218.0
-offset_bottom = 103.0
+offset_left = 147.0
+offset_top = 31.0
+offset_right = 188.0
+offset_bottom = 91.0
 text = "›"
 
 [node name="Row" type="HBoxContainer" parent="OffersPanel"]

@@ -48,13 +48,17 @@ func all_fertilizers() -> Array[FertilizerDefinition]:
 		var definition := value as FertilizerDefinition
 		if definition != null:
 			result.append(definition)
+	for value in _offer_fertilizers.values():
+		var definition := value as FertilizerDefinition
+		if definition != null and definition.shop_price > 0:
+			result.append(definition)
 	return result
 
 func all_offer_fertilizers() -> Array[FertilizerDefinition]:
 	var result: Array[FertilizerDefinition] = []
 	for value in _offer_fertilizers.values():
 		var definition := value as FertilizerDefinition
-		if definition != null:
+		if definition != null and definition.shop_price <= 0:
 			result.append(definition)
 	return result
 

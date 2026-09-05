@@ -93,6 +93,7 @@ static func _add_potted_plants(state: GameState, species_id: StringName, registr
 		var plant := GeneticsService.plant_from_genome(GeneticsService.fresh_species_snapshot(species_id), IdFactory.make("plant"))
 		if plant == null: return false
 		plant.growth_ratio = 0.0
+		plant.growth_cycle_index = 1
 		var pot := PotState.new(); pot.pot_id = IdFactory.make("pot"); pot.soil_moisture = 0.30; pot.plant = plant
 		state.pots.append(pot)
 	return true

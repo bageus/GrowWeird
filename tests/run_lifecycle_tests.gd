@@ -101,6 +101,7 @@ func _test_inactive_pot_branch_regrows_without_refresh() -> void:
 	var registry := _registry(); var species := registry.get_plant(&"starter_sprout"); var state := GameState.new()
 	var active := _comfortable_pot("active"); var inactive := _comfortable_pot("inactive")
 	active.plant.growth_ratio = 1.0; inactive.plant.growth_ratio = 1.0; inactive.plant.cut_branch(&"right")
+	inactive.plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
 	state.pots = [active, inactive]; state.active_pot_id = active.pot_id
 	var policy := SimulationPolicy.realtime(); policy.advance_environment = false; policy.advance_health = false
 	PlantSimulationService.advance(state, species.native_regrowth_seconds, registry, GameRules.new(), policy)
@@ -193,7 +194,7 @@ func _test_regrowth_is_exposed_to_presentation() -> void:
 
 func _test_pruned_branch_skips_current_fruit_cycle() -> void:
 	var registry := _registry(); var species := registry.get_plant(&"starter_sprout")
-	var state := GameState.new(); var pot := _comfortable_pot("cycle-prune"); pot.plant.growth_ratio = 1.0; state.pots = [pot]
+	var state := GameState.new(); var pot := _comfortable_pot("cycle-prune"); pot.plant.growth_ratio = 1.0; pot.plant.growth_cycle_index = 10; state.pots = [pot]
 	FruitLifecycleService.advance(state, 1.0, registry)
 	var first_progress := pot.plant.branch_at(&"center").fruit_growth.progress
 	_expect(is_equal_approx(first_progress, pot.plant.branch_at(&"right").fruit_growth.progress), "fruit cycle: all branches must flower simultaneously")
@@ -207,15 +208,15 @@ func _test_pruned_branch_skips_current_fruit_cycle() -> void:
 
 func _test_fruit_cycle_restarts_after_last_harvest() -> void:
 	var registry := _registry(); var state := GameState.new(); var pot := _comfortable_pot("cycle-harvest")
-	pot.plant.growth_ratio = 1.0; state.pots = [pot]; FruitLifecycleService.advance(state, 1000.0, registry)
+	pot.plant.growth_ratio = 1.0; pot.plant.growth_cycle_index = 11; state.pots = [pot]; FruitLifecycleService.advance(state, 1.0, registry)
 	_expect(FruitLifecycleService.harvest(pot.plant, &"left", "fruit-left") != null, "fruit cycle: first ready fruit should harvest")
 	_expect(pot.plant.fruit_cycle_index == 0 and pot.plant.branch_at(&"left").fruit_growth == null, "fruit cycle: first harvested branch must wait while other fruit remains")
 	_expect(FruitLifecycleService.harvest(pot.plant, &"center", "fruit-center") != null, "fruit cycle: center fruit should harvest")
 	_expect(FruitLifecycleService.harvest(pot.plant, &"right", "fruit-right") != null, "fruit cycle: last fruit should harvest")
 	_expect(pot.plant.fruit_cycle_index == 1, "fruit cycle: last harvested fruit must restart the shared cycle")
 	FruitLifecycleService.advance(state, 1.0, registry)
-	var progress := pot.plant.branch_at(&"left").fruit_growth.progress
-	for branch in pot.plant.existing_branches(): _expect(is_equal_approx(branch.fruit_growth.progress, progress), "fruit cycle: next flowering must start on every branch simultaneously")
+	_expect(pot.plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "fruit cycle: harvesting the last fruit must start branch recovery")
+	for branch in pot.plant.existing_branches(): _expect(branch.fruit_growth == null, "fruit cycle: recovery must not immediately create new fruit")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()

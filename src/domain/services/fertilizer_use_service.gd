@@ -12,6 +12,9 @@ static func apply(
 	return MutationEngine.apply_fertilizer(plant, fertilizer, mutations)
 
 static func _apply_care_effects(plant: PlantState, fertilizer: FertilizerDefinition) -> void:
+	var target := StringName(fertilizer.care_effects.get("growth_cycle", &""))
+	if not String(target).is_empty() and GrowthCycleService.activate_stage_fertilizer(plant, target):
+		return
 	var nutrition_gain := float(fertilizer.care_effects.get("nutrition", 0.18))
 	plant.nutrition = clampf(plant.nutrition + nutrition_gain, 0.0, 1.0)
 	if fertilizer.care_effects.has("health"):

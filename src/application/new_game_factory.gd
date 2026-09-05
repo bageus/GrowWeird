@@ -13,6 +13,7 @@ static func create(rules: GameRules) -> GameState:
 	first_pot.plant = PlantState.new()
 	first_pot.plant.instance_id = IdFactory.make("plant")
 	first_pot.plant.species_id = STARTER_SPECIES
+	first_pot.plant.growth_cycle_index = 1
 	first_pot.plant.initialize_native_branches()
 	var second_pot := PotState.new()
 	second_pot.pot_id = "pot-2"

@@ -21,10 +21,13 @@ TEXT_EXTENSIONS = {
     ".yml",
 }
 IGNORED_PARTS = {".git", ".godot", "android"}
+GENERATED_DATA = {"tree_flower_layouts.json", "tree_leaf_layouts.json"}
 
 
 def should_check(path: Path) -> bool:
     if any(part in IGNORED_PARTS for part in path.parts):
+        return False
+    if path.name in GENERATED_DATA and "visual" in path.parts:
         return False
     return path.suffix.lower() in TEXT_EXTENSIONS or path.name in {".gitignore", ".editorconfig", ".gitattributes"}
 

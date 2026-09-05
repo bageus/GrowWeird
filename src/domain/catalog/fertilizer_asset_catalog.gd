@@ -8,10 +8,18 @@ const MANIFEST_PATHS := [
 	"res://assets/fertilizers/fertilizers_01.json",
 	"res://assets/fertilizers/fertilizers_02.json",
 ]
+const STAGE_ITEMS := [
+	{"id": "seed_booster", "row": 1, "position": 1, "growth_cycle": &"seed"},
+	{"id": "sprout_booster", "row": 1, "position": 2, "growth_cycle": &"sprout"},
+	{"id": "flower_booster", "row": 1, "position": 3, "growth_cycle": &"flower"},
+	{"id": "fruit_booster", "row": 2, "position": 1, "growth_cycle": &"fruit"},
+	{"id": "restart_booster", "row": 2, "position": 2, "growth_cycle": &"restart"},
+	{"id": "tree_booster", "row": 2, "position": 3, "growth_cycle": &"tree"},
+]
 
 static func definitions() -> Array[FertilizerDefinition]:
 	var result: Array[FertilizerDefinition] = []
-	for atlas_index in range(MANIFEST_PATHS.size()):
+	for atlas_index in range(MANIFEST_PATHS.size() + 1):
 		for item in _items_for_atlas(atlas_index):
 			if _is_reserved_grind_result(atlas_index, item):
 				continue
@@ -20,6 +28,9 @@ static func definitions() -> Array[FertilizerDefinition]:
 			definition.display_name_key = "fertilizer.%s" % String(item.get("id", ""))
 			definition.offer_weight = 1.0
 			definition.care_effects = {"health": FOOD_HEALTH, "nutrition": 0.18}
+			if atlas_index == 2:
+				definition.shop_price = 1
+				definition.care_effects["growth_cycle"] = item["growth_cycle"]
 			result.append(definition)
 	return result
 
@@ -30,7 +41,7 @@ static func id_for(atlas_index: int, row: int, column: int) -> StringName:
 	return &""
 
 static func descriptor_for(id: StringName) -> Dictionary:
-	for atlas_index in range(MANIFEST_PATHS.size()):
+	for atlas_index in range(MANIFEST_PATHS.size() + 1):
 		for item in _items_for_atlas(atlas_index):
 			if _is_reserved_grind_result(atlas_index, item):
 				continue
@@ -47,6 +58,8 @@ static func is_offer_id(id: StringName) -> bool:
 	return not descriptor_for(id).is_empty()
 
 static func _items_for_atlas(atlas_index: int) -> Array:
+	if atlas_index == 2:
+		return STAGE_ITEMS
 	if atlas_index < 0 or atlas_index >= MANIFEST_PATHS.size():
 		return []
 	var file := FileAccess.open(MANIFEST_PATHS[atlas_index], FileAccess.READ)

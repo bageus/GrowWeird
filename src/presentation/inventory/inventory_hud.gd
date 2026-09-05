@@ -19,6 +19,10 @@ func _ready() -> void:
 	$Layers/Background.texture = UiAtlas.HUD_INVENTORY
 	UiAtlas.configure_inventory_arrow(scroll_up, true)
 	UiAtlas.configure_inventory_arrow(scroll_down, false)
+	scroll_up.mouse_entered.connect(_set_arrow_hover.bind(true, true))
+	scroll_up.mouse_exited.connect(_set_arrow_hover.bind(true, false))
+	scroll_down.mouse_entered.connect(_set_arrow_hover.bind(false, true))
+	scroll_down.mouse_exited.connect(_set_arrow_hover.bind(false, false))
 	scroll_up.pressed.connect(_scroll_inventory.bind(-1))
 	scroll_down.pressed.connect(_scroll_inventory.bind(1))
 	scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
@@ -89,6 +93,14 @@ func _scroll_inventory(direction: int) -> void:
 
 func _on_scroll_changed(_value: float) -> void:
 	_update_scroll_buttons()
+
+func _set_arrow_hover(points_up: bool, hovered: bool) -> void:
+	if not hovered:
+		$Layers/Hover.texture = null
+	elif points_up:
+		$Layers/Hover.texture = UiAtlas.HUD_INVENTORY_HOVER_UP
+	else:
+		$Layers/Hover.texture = UiAtlas.HUD_INVENTORY_HOVER_DOWN
 
 func _update_scroll_buttons() -> void:
 	var bar := scroll.get_v_scroll_bar()

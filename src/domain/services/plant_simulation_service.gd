@@ -37,18 +37,9 @@ static func _advance_pot(
 	var overall := float(comfort["overall"])
 	plant.record_care_sample(overall, delta_seconds)
 	if policy.advance_growth:
-		var size_multiplier := lerpf(
-			rules.young_growth_multiplier,
-			rules.mature_growth_multiplier,
-			clampf(plant.growth_ratio, 0.0, 1.0)
-		)
-		plant.growth_ratio = minf(
-			1.0,
-			plant.growth_ratio + species.base_growth_per_second * size_multiplier * overall * delta_seconds
-		)
-		var next_care_stage := CareGaugeService.stage_index(plant.growth_ratio)
-		if next_care_stage != plant.care_stage_index:
-			plant.finish_care_stage(next_care_stage)
+		GrowthCycleService.advance(plant, delta_seconds, overall)
+		if plant.boosted_growth_cycle == plant.growth_cycle_index:
+			plant.nutrition = clampf(plant.nutrition, species.nutrition_min, species.nutrition_max)
 
 	if policy.advance_health:
 		if overall < rules.critical_comfort_threshold:
@@ -62,7 +53,7 @@ static func _advance_pot(
 			else:
 				plant.health = 0.01
 
-	if policy.advance_growth and plant.alive:
+	if policy.advance_growth and plant.alive and plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE:
 		BranchRegrowthService.advance(plant, delta_seconds, species, overall)
 
 static func _consume_growth_needs(
