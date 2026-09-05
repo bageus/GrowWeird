@@ -82,4 +82,5 @@ static func seed_from_fruit(fruit: FruitState, item_id: String) -> SeedState:
 	seed_state.item_id = item_id
 	seed_state.source_plant_id = fruit.source_plant_id
 	seed_state.genome = fruit.genome.duplicate_snapshot()
+	seed_state.ensure_visual_frame()
 	return seed_state

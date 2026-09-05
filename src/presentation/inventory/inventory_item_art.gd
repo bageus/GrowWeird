@@ -9,10 +9,10 @@ const REGIONS := {
 	"misc:dead_mouse": Vector2i(2, 5),
 }
 
-static func texture_for(kind: StringName, item_id: String) -> Texture2D:
+static func texture_for(kind: StringName, item_id: String, visual_frame := -1) -> Texture2D:
 	if kind == &"seed":
 		var seed_texture := AtlasTexture.new()
-		var frame := posmod(item_id.hash(), 8)
+		var frame := visual_frame if visual_frame >= 0 else posmod(item_id.hash(), 8)
 		seed_texture.atlas = SEEDS
 		seed_texture.region = Rect2((frame % 4) * 512, floori(float(frame) / 4.0) * 512, 512, 512)
 		return seed_texture

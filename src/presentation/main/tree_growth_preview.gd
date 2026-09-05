@@ -66,12 +66,6 @@ static func stage_for(plant: PlantState) -> int:
 	return 7
 
 func _set_stage(value: int) -> void:
-	if tree == null:
-		tree = get_node("Tree") as TextureRect
-		leaf_layout = get_node("Tree/LeafLayout") as LeafLayoutEditor
-		flower_layout = get_node("Tree/FlowerLayout") as FlowerLayoutEditor
-		left_hover = get_node("Tree/LeftHover") as TextureRect
-		right_hover = get_node("Tree/RightHover") as TextureRect
 	stage = clampi(value, 0, STAGES.size() - 1)
 	tree.texture = STAGES[stage]
 	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE

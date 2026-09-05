@@ -149,7 +149,7 @@ func _seed_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for index in range(5):
 		var item := _item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4)
-		item["seed_frame"] = index
+		item["seed_frame"] = randi_range(0, 7)
 		result.append(item)
 	return result
 
