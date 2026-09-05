@@ -10,6 +10,7 @@ offset_bottom = 520.0
 script = ExtResource("1_hud")
 layout_id = &"inventory"
 drag_handle_height = 0.0
+allow_scaling = true
 
 [node name="Layers" type="Control" parent="."]
 layout_mode = 2
@@ -55,9 +56,9 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 7.0
-offset_top = 78.0
+offset_top = 73.0
 offset_right = -7.0
-offset_bottom = -78.0
+offset_bottom = -73.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2

@@ -15,6 +15,7 @@ const PRODUCTS := [
 var _ad_pending := false
 
 func _ready() -> void:
+	UiAtlas.configure_close_button(%CloseButton)
 	%CloseButton.pressed.connect(close)
 	%Product100.pressed.connect(_request_purchase.bind(0))
 	%Product300.pressed.connect(_request_purchase.bind(1))

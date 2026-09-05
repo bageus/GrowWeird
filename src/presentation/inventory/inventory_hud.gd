@@ -115,8 +115,7 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String, vis
 	button.text = title + (" ×%d" % count if count > 1 else "")
 	var texture := InventoryItemArt.texture_for(kind, item_id, visual_frame)
 	if texture != null:
-		button.icon = texture
-		button.expand_icon = true
+		_add_fitted_icon(button, texture)
 		button.text = ""
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -133,6 +132,19 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String, vis
 	if count > 1:
 		_add_stack_badge(button, count)
 	items.add_child(button)
+
+func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
+	var icon := TextureRect.new()
+	button.add_child(icon)
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.offset_left = 16.0
+	icon.offset_top = 16.0
+	icon.offset_right = -16.0
+	icon.offset_bottom = -16.0
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = texture
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func _add_stack_badge(button: Button, count: int) -> void:
 	var badge := Label.new()

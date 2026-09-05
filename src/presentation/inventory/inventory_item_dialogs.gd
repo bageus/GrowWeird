@@ -48,6 +48,8 @@ func _ready() -> void:
 	UiAtlas.configure_button(recycle_action, 5, 2)
 	UiAtlas.configure_button($SellPopup/Layout/Confirm as Button, 3, 3)
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
+	UiAtlas.configure_close_button($SellPopup/Layout/Header/Close as Button)
+	UiAtlas.configure_close_button($RecyclePopup/Layout/Header/Close as Button)
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func show_for(
