@@ -62,17 +62,18 @@ static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 	var source := BUTTONS_HOVER if hover else BUTTONS
 	return atlas_region(source, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
-static func configure_balance_plus(button: Button) -> void:
-	if button == null:
+static func configure_balance_plus(button: Button, balance_art: TextureRect) -> void:
+	if button == null or balance_art == null:
 		return
 	button.text = ""
 	button.icon = null
 	button.expand_icon = true
 	button.tooltip_text = "Open balance and shop"
+	balance_art.texture = HUD_BALANCE
 	for state in [&"normal", &"hover", &"pressed", &"focus"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	button.mouse_entered.connect(_set_balance_hover.bind(button, true))
-	button.mouse_exited.connect(_set_balance_hover.bind(button, false))
+	button.mouse_entered.connect(_set_balance_hover.bind(balance_art, true))
+	button.mouse_exited.connect(_set_balance_hover.bind(balance_art, false))
 
 static func configure_hud_slot(button: Button) -> void:
 	if button == null:
@@ -127,10 +128,10 @@ static func _set_icon_button_hover(button: Button, row: int, column: int, hovere
 		button.icon = _button_icon_crop(row, column, hovered)
 		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
 
-static func _set_balance_hover(button: Button, hovered: bool) -> void:
-	if not is_instance_valid(button):
+static func _set_balance_hover(balance_art: TextureRect, hovered: bool) -> void:
+	if not is_instance_valid(balance_art):
 		return
-	button.icon = atlas_region(HUD_BALANCE_PLUS_HOVER, Rect2(768.0, 112.0, 256.0, 288.0)) if hovered else null
+	balance_art.texture = HUD_BALANCE_PLUS_HOVER if hovered else HUD_BALANCE
 
 static func _set_slot_hover(button: Button, hovered: bool) -> void:
 	if is_instance_valid(button):

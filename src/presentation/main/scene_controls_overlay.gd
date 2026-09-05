@@ -36,8 +36,8 @@ func _apply_ui_atlases() -> void:
 		return
 	var wallet := get_node("WalletHud") as PanelContainer
 	wallet.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	(get_node("WalletHud/Layers/BalanceArt") as TextureRect).texture = UiAtlas.HUD_BALANCE
-	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button)
+	var balance_art := get_node("WalletHud/Layers/BalanceArt") as TextureRect
+	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button, balance_art)
 	var offers := get_node("OffersPanel") as PanelContainer
 	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferOne") as Button)
