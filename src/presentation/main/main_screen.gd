@@ -143,8 +143,8 @@ func _set_offer_icon(button: Button, texture: Texture2D) -> void:
 	icon.name = "OfferIcon"
 	button.add_child(icon)
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon.offset_left = 10.0; icon.offset_top = 10.0
-	icon.offset_right = -10.0; icon.offset_bottom = -10.0
+	icon.offset_left = 18.0; icon.offset_top = 18.0
+	icon.offset_right = -18.0; icon.offset_bottom = -18.0
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.texture = texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
