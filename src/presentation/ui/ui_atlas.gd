@@ -129,6 +129,15 @@ static func configure_shop_slot(button: Button) -> void:
 static func coin_texture() -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(112.0, 2672.0, 288.0, 288.0))
 
+static func branch_texture() -> Texture2D:
+	return atlas_region(BUTTONS, Rect2(0.0, 7.0 * CELL, CELL, CELL))
+
+static func shop_title_texture() -> Texture2D:
+	return button_texture(2, 0)
+
+static func shop_awning_texture() -> Texture2D:
+	return button_texture(6, 2)
+
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
 	style.texture = texture

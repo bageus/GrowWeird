@@ -15,8 +15,6 @@ const SEED_NAMES := ["Starter Seed", "Shade Fern Seed", "Sun Creeper Seed", "Har
 const POT_NAMES := ["Clay Pot", "Ceramic Pot", "Stone Pot", "Wooden Pot", "Golden Pot"]
 const DECORATIONS := [&"garden_gnome", &"fairy_lights", &"crystal_cluster", &"wooden_fence", &"water_fountain"]
 const MUTAGENS := [&"stable_mutagen", &"spore_mutagen", &"crystal_mutagen", &"floral_mutagen", &"predatory_mutagen"]
-const CUTTING_LEFT: Texture2D = preload("res://assets/tree/tree_left.png")
-const CUTTING_RIGHT: Texture2D = preload("res://assets/tree/tree_right.png")
 const CATEGORY_FRAMES := {
 	&"fertilizers": Vector2i(0, 0), &"plants": Vector2i(0, 1),
 	&"mutagens": Vector2i(0, 2), &"decorations": Vector2i(0, 3),
@@ -47,6 +45,8 @@ var _layout_editor: ShopLayoutEditor
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_layout_editor = ShopLayoutEditor.new(self)
+	$Window/Content/Header/Title.texture = UiAtlas.shop_title_texture()
+	%Awning.texture = UiAtlas.shop_awning_texture()
 	%BalanceArt.texture = UiAtlas.HUD_BALANCE
 	UiAtlas.configure_balance_plus(%BalancePlus, %BalanceArt)
 	UiAtlas.configure_close_button(%CloseButton)
@@ -70,6 +70,7 @@ func _apply_shop_layout(control: Control, key: String) -> void:
 func _register_static_layout_elements() -> void:
 	_layout_editor.register($Window, "window")
 	_layout_editor.register($Window/Content/Header/Title, "title")
+	_layout_editor.register(%Awning, "awning")
 	_layout_editor.register($Window/Content/Header/Balance, "balance")
 	_layout_editor.register(%CloseButton, "close")
 	_layout_editor.register(%CategoryHud, "category_hud")
@@ -115,8 +116,12 @@ func _add_card(item: Dictionary) -> void:
 	card.custom_minimum_size = Vector2(174.0, 156.0); card.clip_contents = true
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
 	UiAtlas.configure_shop_slot(card)
-	var layout := VBoxContainer.new()
-	layout.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 10); layout.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override(&"margin_left", 10); margin.add_theme_constant_override(&"margin_top", 8)
+	margin.add_theme_constant_override(&"margin_right", 10); margin.add_theme_constant_override(&"margin_bottom", 8)
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(margin)
+	var layout := VBoxContainer.new(); layout.mouse_filter = Control.MOUSE_FILTER_IGNORE; margin.add_child(layout)
 	var name_label := Label.new()
 	name_label.text = String(item.get("name", "Item")); name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; name_label.add_theme_font_size_override(&"font_size", 18); layout.add_child(name_label)
@@ -125,7 +130,6 @@ func _add_card(item: Dictionary) -> void:
 	layout.add_child(preview)
 	var spacer := Control.new(); spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL; layout.add_child(spacer)
 	layout.add_child(_price_row(int(item.get("price", 1)), bool(item.get("unlocked", false))))
-	card.add_child(layout)
 	if int(item.get("stock", 1)) > 1: card.add_child(_quantity_badge(int(item["stock"])))
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
 	_layout_editor.register(card, "lot_%s_%s" % [String(_category), String(item.get("id", ""))])
@@ -229,13 +233,8 @@ func _preview_texture(item: Dictionary) -> Texture2D:
 	if not path.is_empty() and ResourceLoader.exists(path): return load(path) as Texture2D
 	return UiAtlas.background(CATEGORIES.find(_category) % 2)
 
-func _cutting_texture(item_id: String) -> Texture2D:
-	var frame := posmod(item_id.hash(), 12)
-	var local_frame := frame % 6
-	var texture := AtlasTexture.new()
-	texture.atlas = CUTTING_LEFT if frame < 6 else CUTTING_RIGHT
-	texture.region = Rect2((local_frame % 2) * 512, floori(float(local_frame) / 2.0) * 512, 512, 512)
-	return texture
+func _cutting_texture(_item_id: String) -> Texture2D:
+	return UiAtlas.branch_texture()
 
 func _quantity_badge(amount: int) -> Label:
 	var badge := Label.new(); badge.text = "×%d" % amount; badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
