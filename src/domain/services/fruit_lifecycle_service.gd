@@ -35,7 +35,7 @@ static func harvest(
 static func _advance_pot(
 	game_state: GameState,
 	pot: PotState,
-	delta_seconds: float,
+	_delta_seconds: float,
 	registry: ContentRegistry
 ) -> void:
 	var plant := pot.plant
