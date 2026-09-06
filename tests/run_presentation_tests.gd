@@ -112,12 +112,14 @@ func _test_scene_hud_contract() -> void:
 	_expect(shop_scene.contains("QuantityMinus") and shop_scene.contains("QuantityPlus") and shop_scene.contains("QuantityLabel") and shop_script.contains("_change_quantity"), "shop HUD: purchase dialog must expose bounded quantity controls")
 	_expect(shop_scene.contains("ConfirmBackground") and shop_scene.contains("ConfirmBanner") and shop_scene.contains("CountBackground"), "shop HUD: layered buy dialog atlas art is missing")
 	_expect(shop_script.contains('register(%ConfirmBackground') and shop_script.contains('register(%QuantityMinus') and shop_script.contains('register(%ConfirmPrice'), "shop HUD: every buy-dialog block and button must support independent Ctrl layout editing")
+	_expect(shop_script.contains('register(%ConfirmDescription') and shop_scene.contains('theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)'), "shop HUD: purchase description must be independently editable and use dark brown text")
 	_expect(shop_script.contains('_stock[item_id] = maxi(0') and shop_script.contains('if int(item.get("stock", 0)) > 0'), "shop HUD: purchased single-stock items must disappear")
 	_expect(shop_script.contains("UiAtlas.coin_texture()") and shop_script.contains("configure_button(buy_button, 7, 1)") and shop_script.contains("configure_button(%ConfirmClose, 6, 0)"), "shop HUD: atlas Buy and close controls are missing")
 	_expect(shop_script.contains("ShopLayoutEditor") and shop_script.contains("_register_static_layout_elements"), "shop HUD: buttons and blocks must support independent layout editing")
-	_expect(shop_script.contains("configure_shop_slot") and shop_script.contains("coin_texture") and shop_script.contains("_cutting_texture"), "shop HUD: lot cells, coins, and cutting atlas art must be wired")
+	_expect(shop_script.contains("_configure_lot_button") and shop_script.contains("coin_texture") and shop_script.contains("_cutting_texture"), "shop HUD: lot cells, coins, and cutting atlas art must be wired")
 	_expect(shop_script.contains("shop_title_texture") and shop_script.contains("shop_awning_texture"), "shop HUD: Shop title and awning atlas art are missing")
-	_expect(shop_script.contains("MarginContainer.new()") and shop_script.contains("layout.add_child(_price_row"), "shop HUD: lot title and price must stay inside each card")
+	_expect(shop_script.contains("LOT_FRAMES") and shop_script.contains("shop_lot_texture"), "shop HUD: each category must use its colored lot HUD atlas frame")
+	_expect(shop_script.contains('register(name_label') and shop_script.contains('register(preview') and shop_script.contains('register(coin') and shop_script.contains('register(price'), "shop HUD: lot art and every inner element must support independent Ctrl layout editing")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
@@ -142,7 +144,6 @@ func _test_scene_hud_contract() -> void:
 	_expect((overlay.get("_layout") as Dictionary)["water"].distance_to(Vector2(0.4, 0.3)) < 0.001, "scene HUD: action button layout must be captured")
 	overlay.free()
 	host.free()
-
 func _test_inventory_hud_contract() -> void:
 	var hud_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.tscn")
 	var inventory_script := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
@@ -198,7 +199,6 @@ func _test_inventory_hud_contract() -> void:
 	_expect(starter.inventory.cuttings.size() == 1, "inventory HUD: new games need one starter item for interaction testing")
 	_expect(starter.pots[0].plant != null and starter.inventory.seeds.size() == 1, "inventory HUD: first pot sprout and starter seed are missing")
 	_expect(starter.inventory.misc.has("dead_mouse") and InventoryService.fertilizer_count(starter.inventory, RecyclingService.COMPOST_ID) == 0, "inventory HUD: recycled fertilizer must only appear after grinding")
-
 func _test_window_asset_mapping() -> void:
 	var view := WindowView.new()
 	view.set_environment(PotState.LightMode.DIRECT, false)

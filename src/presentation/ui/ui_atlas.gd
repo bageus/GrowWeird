@@ -17,6 +17,7 @@ const HUD_BUYSELL: Texture2D = preload("res://assets/ui/hud4.png")
 const HUD_BUYSELL_BANNER: Texture2D = preload("res://assets/ui/hud_buysell_banner.png")
 const HUD_QUANTITY: Texture2D = preload("res://assets/ui/hud_background_quantity.png")
 const HUD_COUNT: Texture2D = preload("res://assets/ui/hud_background_count.png")
+const HUD_SHOP_LOTS: Texture2D = preload("res://assets/ui/hud_background_shop.png")
 const CELL := 512.0
 
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
@@ -137,7 +138,7 @@ static func branch_texture() -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(0.0, 7.0 * CELL, CELL, CELL))
 
 static func shop_title_texture() -> Texture2D:
-	return button_texture(2, 0)
+	return button_texture(6, 1)
 
 static func shop_awning_texture() -> Texture2D:
 	return button_texture(6, 2)
@@ -147,6 +148,9 @@ static func buy_close_texture(hover := false) -> Texture2D:
 
 static func buy_button_texture(hover := false) -> Texture2D:
 	return button_texture(7, 1, hover)
+
+static func shop_lot_texture(row: int, column: int) -> Texture2D:
+	return atlas_region(HUD_SHOP_LOTS, Rect2(column * CELL, row * CELL, CELL, CELL))
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
