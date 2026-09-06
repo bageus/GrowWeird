@@ -137,10 +137,10 @@ func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
 	var icon := TextureRect.new()
 	button.add_child(icon)
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon.offset_left = 16.0
-	icon.offset_top = 16.0
-	icon.offset_right = -16.0
-	icon.offset_bottom = -16.0
+	icon.offset_left = 20.6
+	icon.offset_top = 20.6
+	icon.offset_right = -20.6
+	icon.offset_bottom = -20.6
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.texture = texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
