@@ -88,14 +88,18 @@ func _move_active(mouse_position: Vector2) -> void:
 	_active.position = _start_position + local_now - local_start
 
 func _target_at(mouse_position: Vector2) -> Control:
-	for index in range(_targets.size() - 1, -1, -1):
-		var target := _targets[index]
+	var best: Control
+	var best_area := INF
+	for target in _targets:
 		if not is_instance_valid(target) or not target.is_visible_in_tree():
 			continue
 		var local := target.get_global_transform_with_canvas().affine_inverse() * mouse_position
 		if Rect2(Vector2.ZERO, target.size).has_point(local):
-			return target
-	return null
+			var area := target.size.x * target.scale.x * target.size.y * target.scale.y
+			if area < best_area:
+				best = target
+				best_area = area
+	return best
 
 func _finish_drag() -> void:
 	if _active != null and is_instance_valid(_active):

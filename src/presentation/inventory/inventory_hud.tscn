@@ -4,9 +4,9 @@
 
 [node name="InventoryHud" type="PanelContainer"]
 clip_contents = true
-custom_minimum_size = Vector2(178, 550)
-offset_right = 178.0
-offset_bottom = 550.0
+custom_minimum_size = Vector2(164, 520)
+offset_right = 164.0
+offset_bottom = 520.0
 script = ExtResource("1_hud")
 layout_id = &"inventory"
 drag_handle_height = 0.0
@@ -55,10 +55,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 7.0
-offset_top = 73.0
-offset_right = -7.0
-offset_bottom = -73.0
+offset_left = 3.0
+offset_top = 63.0
+offset_right = -3.0
+offset_bottom = -63.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -66,11 +66,11 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
 [node name="Items" type="VBoxContainer" parent="Layers/FrameContent/Scroll"]
-custom_minimum_size = Vector2(0, 404)
+custom_minimum_size = Vector2(0, 394)
 layout_mode = 2
 mouse_filter = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 1
+theme_override_constants/separation = 2
 alignment = 1
 
 [node name="ScrollUp" type="TextureButton" parent="Layers/FrameContent"]
@@ -80,9 +80,9 @@ anchors_preset = 10
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -38.0
-offset_top = 28.0
+offset_top = 18.0
 offset_right = 38.0
-offset_bottom = 70.0
+offset_bottom = 60.0
 grow_horizontal = 2
 focus_mode = 0
 ignore_texture_size = true
@@ -97,9 +97,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -38.0
-offset_top = -70.0
+offset_top = -60.0
 offset_right = 38.0
-offset_bottom = -28.0
+offset_bottom = -18.0
 grow_horizontal = 2
 grow_vertical = 0
 focus_mode = 0
