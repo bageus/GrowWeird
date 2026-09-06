@@ -4,9 +4,9 @@
 
 [node name="InventoryHud" type="PanelContainer"]
 clip_contents = true
-custom_minimum_size = Vector2(164, 520)
-offset_right = 164.0
-offset_bottom = 520.0
+custom_minimum_size = Vector2(178, 550)
+offset_right = 178.0
+offset_bottom = 550.0
 script = ExtResource("1_hud")
 layout_id = &"inventory"
 drag_handle_height = 0.0
@@ -66,7 +66,7 @@ horizontal_scroll_mode = 0
 vertical_scroll_mode = 3
 
 [node name="Items" type="VBoxContainer" parent="Layers/FrameContent/Scroll"]
-custom_minimum_size = Vector2(0, 374)
+custom_minimum_size = Vector2(0, 404)
 layout_mode = 2
 mouse_filter = 2
 size_flags_horizontal = 3

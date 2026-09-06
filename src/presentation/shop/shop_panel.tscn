@@ -130,11 +130,10 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
 
-[node name="Tabs" type="VBoxContainer" parent="Window/Content/Body"]
+[node name="Tabs" type="Control" parent="Window/Content/Body"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(200, 408)
 layout_mode = 2
-theme_override_constants/separation = 8
 
 [node name="CategoryHud" type="PanelContainer" parent="Window/Content/Body"]
 unique_name_in_owner = true

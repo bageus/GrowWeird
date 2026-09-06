@@ -23,7 +23,7 @@ const CATEGORY_FRAMES := {
 	&"seeds": Vector2i(1, 0), &"pots": Vector2i(1, 1),
 }
 
-@onready var tabs: VBoxContainer = %Tabs
+@onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
 @onready var category_hud: PanelContainer = %CategoryHud
 @onready var money_label: Label = %MoneyLabel
@@ -93,9 +93,12 @@ func invalidate() -> void: _last_signature = ""
 
 func _build_tabs() -> void:
 	for child in tabs.get_children(): child.queue_free()
-	for category in CATEGORIES:
+	for index in range(CATEGORIES.size()):
+		var category: StringName = CATEGORIES[index]
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(190.0, 60.0)
+		button.position = Vector2(5.0, float(index * 68))
+		button.size = Vector2(190.0, 60.0)
 		var frame: Vector2i = CATEGORY_FRAMES[category]
 		UiAtlas.configure_button(button, frame.x, frame.y)
 		button.pressed.connect(_show_category.bind(category)); tabs.add_child(button)
