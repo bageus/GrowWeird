@@ -25,14 +25,15 @@ const CATEGORY_FRAMES := {
 @onready var grid: GridContainer = %ItemGrid
 @onready var category_hud: PanelContainer = %CategoryHud
 @onready var money_label: Label = %MoneyLabel
-@onready var confirm: PanelContainer = %Confirm
+@onready var confirm: Control = %Confirm
 @onready var confirm_name: Label = %ConfirmName
 @onready var confirm_description: Label = %ConfirmDescription
 @onready var confirm_price: Label = %ConfirmPrice
 @onready var confirm_preview: TextureRect = %ConfirmPreview
-@onready var quantity_slider: HSlider = %QuantitySlider
 @onready var quantity_label: Label = %QuantityLabel
 @onready var buy_button: Button = %BuyButton
+@onready var quantity_minus: Button = %QuantityMinus
+@onready var quantity_plus: Button = %QuantityPlus
 
 var _catalogs: Dictionary = {}
 var _money := 0
@@ -41,6 +42,7 @@ var _selected: Dictionary = {}
 var _stock: Dictionary = {}
 var _last_signature := ""
 var _layout_editor: ShopLayoutEditor
+var _purchase_quantity := 1
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -50,11 +52,12 @@ func _ready() -> void:
 	%BalanceArt.texture = UiAtlas.HUD_BALANCE
 	UiAtlas.configure_balance_plus(%BalancePlus, %BalanceArt)
 	UiAtlas.configure_close_button(%CloseButton)
-	UiAtlas.configure_button(buy_button, 5, 1)
+	_configure_buy_dialog_art()
 	%CloseButton.pressed.connect(_request_close)
-	%CancelButton.pressed.connect(_hide_confirm)
+	%ConfirmClose.pressed.connect(_hide_confirm)
 	buy_button.pressed.connect(_buy_selected)
-	quantity_slider.value_changed.connect(_refresh_purchase_preview)
+	quantity_minus.pressed.connect(_change_quantity.bind(-1))
+	quantity_plus.pressed.connect(_change_quantity.bind(1))
 	_build_tabs()
 	_register_static_layout_elements()
 	confirm.visible = false
@@ -75,9 +78,37 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register(%CloseButton, "close")
 	_layout_editor.register(%CategoryHud, "category_hud")
 	_layout_editor.register(%Confirm, "confirm")
+	_layout_editor.register(%ConfirmBackground, "confirm_background")
+	_layout_editor.register(%ConfirmBanner, "confirm_banner")
+	_layout_editor.register(%ConfirmName, "confirm_name")
+	_layout_editor.register(%ConfirmPreview, "confirm_preview")
+	_layout_editor.register(%ConfirmDescription, "confirm_description")
 	_layout_editor.register(%BuyButton, "confirm_buy")
-	_layout_editor.register(%CancelButton, "confirm_cancel")
-	_layout_editor.register(%QuantitySlider, "confirm_quantity")
+	_layout_editor.register(%ConfirmClose, "confirm_close")
+	_layout_editor.register(%QuantityControl, "confirm_quantity")
+	_layout_editor.register(%QuantityBackground, "confirm_quantity_background")
+	_layout_editor.register(%QuantityMinus, "confirm_quantity_minus")
+	_layout_editor.register(%QuantityLabel, "confirm_quantity_label")
+	_layout_editor.register(%QuantityPlus, "confirm_quantity_plus")
+	_layout_editor.register(%CountControl, "confirm_count")
+	_layout_editor.register(%CountBackground, "confirm_count_background")
+	_layout_editor.register(%ConfirmPrice, "confirm_price")
+
+func _configure_buy_dialog_art() -> void:
+	%ConfirmBackground.texture = UiAtlas.HUD_BUYSELL
+	%ConfirmBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
+	%QuantityBackground.texture = UiAtlas.HUD_QUANTITY
+	%CountBackground.texture = UiAtlas.HUD_COUNT
+	UiAtlas.configure_button(%ConfirmClose, 6, 0)
+	UiAtlas.configure_button(buy_button, 7, 1)
+	_configure_quantity_hit(quantity_minus)
+	_configure_quantity_hit(quantity_plus)
+
+func _configure_quantity_hit(button: Button) -> void:
+	button.text = ""; button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 
 func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
 	var signature := "%s|%d" % [str(fertilizers), money]
@@ -145,25 +176,31 @@ func _price_row(price: int, unlocked: bool) -> Control:
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item; confirm_name.text = String(item.get("name", "Item"))
 	confirm_description.text = String(item.get("description", "")); confirm_preview.texture = _preview_texture(item)
-	quantity_slider.min_value = 1.0; quantity_slider.max_value = float(int(item.get("stock", 1))); quantity_slider.step = 1.0; quantity_slider.value = 1.0
-	quantity_slider.editable = int(item.get("stock", 1)) > 1
-	_refresh_purchase_preview(1.0)
-	_apply_button_color(buy_button, COLORS[_category]); confirm.visible = true
+	_purchase_quantity = 1
+	_refresh_purchase_preview()
+	confirm.visible = true
 
 func _buy_selected() -> void:
 	if _selected.is_empty(): return
-	var quantity := maxi(1, int(round(quantity_slider.value)))
+	var quantity := _purchase_quantity
 	var item_id := String(_selected.get("id", "")); var purchase := _selected.duplicate(true)
 	purchase["amount"] = quantity; purchase["price"] = int(_selected.get("price", 1)) * quantity
 	_stock[item_id] = maxi(0, int(_stock.get(item_id, 0)) - quantity)
 	_hide_confirm(); _rebuild_catalog_stock(); _show_category(_category); item_buy_requested.emit(purchase)
 
-func _refresh_purchase_preview(value: float) -> void:
+func _change_quantity(delta: int) -> void:
 	if _selected.is_empty(): return
-	var quantity := maxi(1, int(round(value))); var unit_price := int(_selected.get("price", 1))
-	quantity_label.text = "Quantity: %d / %d" % [quantity, int(_selected.get("stock", 1))]
-	confirm_price.text = str(unit_price * quantity)
-	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * quantity
+	_purchase_quantity = clampi(_purchase_quantity + delta, 1, int(_selected.get("stock", 1)))
+	_refresh_purchase_preview()
+
+func _refresh_purchase_preview() -> void:
+	if _selected.is_empty(): return
+	var stock := int(_selected.get("stock", 1)); var unit_price := int(_selected.get("price", 1))
+	quantity_label.text = "%d / %d" % [_purchase_quantity, stock]
+	quantity_minus.disabled = stock <= 1 or _purchase_quantity <= 1
+	quantity_plus.disabled = stock <= 1 or _purchase_quantity >= stock
+	confirm_price.text = str(unit_price * _purchase_quantity)
+	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * _purchase_quantity
 
 func _hide_confirm() -> void: _selected = {}; confirm.visible = false
 func _request_close() -> void: _hide_confirm(); close_requested.emit()
@@ -250,13 +287,5 @@ func _apply_category_hud(color: Color) -> void:
 	style.corner_radius_bottom_left = 18; style.corner_radius_bottom_right = 18
 	style.content_margin_left = 16; style.content_margin_top = 16; style.content_margin_right = 16; style.content_margin_bottom = 16
 	category_hud.add_theme_stylebox_override(&"panel", style)
-
-func _apply_button_color(button: Button, color: Color) -> void:
-	for state in [&"normal", &"hover", &"pressed", &"disabled"]:
-		var style := StyleBoxFlat.new(); style.bg_color = color.lightened(0.12) if state == &"hover" else color
-		style.bg_color.a = 0.55 if state == &"disabled" else 0.94
-		style.border_width_left = 3; style.border_width_top = 3; style.border_width_right = 3; style.border_width_bottom = 3
-		style.border_color = color.lightened(0.35); style.corner_radius_top_left = 14; style.corner_radius_top_right = 14
-		style.corner_radius_bottom_left = 14; style.corner_radius_bottom_right = 14; button.add_theme_stylebox_override(state, style)
 
 func _pretty(value: String) -> String: return value.replace("_", " ").capitalize()
