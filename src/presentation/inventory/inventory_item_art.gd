@@ -10,6 +10,8 @@ const REGIONS := {
 }
 
 static func texture_for(kind: StringName, item_id: String, visual_frame := -1) -> Texture2D:
+	if kind == &"cutting":
+		return UiAtlas.branch_texture()
 	if kind == &"seed":
 		var seed_texture := AtlasTexture.new()
 		var frame := visual_frame if visual_frame >= 0 else posmod(item_id.hash(), 8)
