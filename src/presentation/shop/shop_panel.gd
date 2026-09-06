@@ -15,6 +15,8 @@ const SEED_NAMES := ["Starter Seed", "Shade Fern Seed", "Sun Creeper Seed", "Har
 const POT_NAMES := ["Clay Pot", "Ceramic Pot", "Stone Pot", "Wooden Pot", "Golden Pot"]
 const DECORATIONS := [&"garden_gnome", &"fairy_lights", &"crystal_cluster", &"wooden_fence", &"water_fountain"]
 const MUTAGENS := [&"stable_mutagen", &"spore_mutagen", &"crystal_mutagen", &"floral_mutagen", &"predatory_mutagen"]
+const CUTTING_LEFT: Texture2D = preload("res://assets/tree/tree_left.png")
+const CUTTING_RIGHT: Texture2D = preload("res://assets/tree/tree_right.png")
 const CATEGORY_FRAMES := {
 	&"fertilizers": Vector2i(0, 0), &"plants": Vector2i(0, 1),
 	&"mutagens": Vector2i(0, 2), &"decorations": Vector2i(0, 3),
@@ -70,7 +72,6 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register($Window/Content/Header/Title, "title")
 	_layout_editor.register($Window/Content/Header/Balance, "balance")
 	_layout_editor.register(%CloseButton, "close")
-	_layout_editor.register(%Tabs, "tabs")
 	_layout_editor.register(%CategoryHud, "category_hud")
 	_layout_editor.register(%Confirm, "confirm")
 	_layout_editor.register(%BuyButton, "confirm_buy")
@@ -110,7 +111,7 @@ func _add_card(item: Dictionary) -> void:
 	var card := Button.new()
 	card.custom_minimum_size = Vector2(174.0, 156.0); card.clip_contents = true
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
-	_apply_button_color(card, COLORS[_category].darkened(0.15))
+	UiAtlas.configure_shop_slot(card)
 	var layout := VBoxContainer.new()
 	layout.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 10); layout.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var name_label := Label.new()
@@ -129,7 +130,7 @@ func _add_card(item: Dictionary) -> void:
 func _price_row(price: int, unlocked: bool) -> Control:
 	var row := HBoxContainer.new(); row.alignment = BoxContainer.ALIGNMENT_CENTER; row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var coin := TextureRect.new()
-	coin.custom_minimum_size = Vector2(28.0, 28.0); coin.texture = UiAtlas.atlas_region(UiAtlas.BUTTONS, Rect2(72.0, 1625.0, 250.0, 250.0))
+	coin.custom_minimum_size = Vector2(28.0, 28.0); coin.texture = UiAtlas.coin_texture()
 	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; row.add_child(coin)
 	var label := Label.new(); label.text = str(price) if unlocked else "Locked"; label.add_theme_font_size_override(&"font_size", 18); row.add_child(label)
 	return row
@@ -211,6 +212,8 @@ func _item(id: StringName, source_id: StringName, display_name: String, descript
 	return {"id": id, "source_id": source_id, "name": display_name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
 
 func _preview_texture(item: Dictionary) -> Texture2D:
+	if StringName(item.get("action", &"")) == &"cutting":
+		return _cutting_texture(String(item.get("id", "")))
 	if StringName(item.get("action", &"")) == &"fertilizer":
 		return FertilizerOfferArt.texture_for(StringName(item.get("source_id", &"")))
 	if item.has("seed_frame"):
@@ -222,6 +225,14 @@ func _preview_texture(item: Dictionary) -> Texture2D:
 	var path := String(item.get("preview_path", ""))
 	if not path.is_empty() and ResourceLoader.exists(path): return load(path) as Texture2D
 	return UiAtlas.background(CATEGORIES.find(_category) % 2)
+
+func _cutting_texture(item_id: String) -> Texture2D:
+	var frame := posmod(item_id.hash(), 12)
+	var local_frame := frame % 6
+	var texture := AtlasTexture.new()
+	texture.atlas = CUTTING_LEFT if frame < 6 else CUTTING_RIGHT
+	texture.region = Rect2((local_frame % 2) * 512, floori(float(local_frame) / 2.0) * 512, 512, 512)
+	return texture
 
 func _quantity_badge(amount: int) -> Label:
 	var badge := Label.new(); badge.text = "×%d" % amount; badge.mouse_filter = Control.MOUSE_FILTER_IGNORE

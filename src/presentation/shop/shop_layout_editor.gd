@@ -20,12 +20,17 @@ func _init(host: Control) -> void:
 func register(control: Control, key: String) -> void:
 	if control == null or key.is_empty():
 		return
-	_targets = _targets.filter(func(item: Control) -> bool: return is_instance_valid(item))
+	_remove_freed_targets()
 	if not _targets.has(control):
 		_targets.append(control)
 	_keys[control] = key
 	control.pivot_offset = control.size * 0.5
 	_host.call_deferred("_apply_shop_layout", control, key)
+
+func _remove_freed_targets() -> void:
+	for index in range(_targets.size() - 1, -1, -1):
+		if not is_instance_valid(_targets[index]):
+			_targets.remove_at(index)
 
 func apply_saved(control: Control, key: String) -> void:
 	if not is_instance_valid(control):

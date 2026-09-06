@@ -73,7 +73,7 @@ static func configure_close_button(button: Button) -> void:
 
 static func _close_texture(hovered: bool) -> Texture2D:
 	var source := BUTTONS_HOVER if hovered else BUTTONS
-	return atlas_region(source, Rect2(112.0, 3184.0, 288.0, 288.0))
+	return atlas_region(source, Rect2(104.0, 3176.0, 304.0, 304.0))
 
 static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 	var source := BUTTONS_HOVER if hover else BUTTONS
@@ -104,7 +104,7 @@ static func configure_hud_slot(button: Button) -> void:
 	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
 	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
 
-static func configure_inventory_arrow(button: TextureButton, points_up: bool) -> void:
+static func configure_inventory_arrow(button: TextureButton, _points_up: bool) -> void:
 	if button == null:
 		return
 	button.texture_normal = null
@@ -114,6 +114,20 @@ static func configure_inventory_arrow(button: TextureButton, points_up: bool) ->
 	button.ignore_texture_size = true
 	button.stretch_mode = TextureButton.STRETCH_SCALE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+
+static func configure_shop_slot(button: Button) -> void:
+	if button == null:
+		return
+	var style := panel_style(background2(1), Vector4(14.0, 14.0, 14.0, 14.0))
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
+	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
+
+static func coin_texture() -> Texture2D:
+	return atlas_region(BUTTONS, Rect2(112.0, 2672.0, 288.0, 288.0))
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
 	var style := StyleBoxTexture.new()
