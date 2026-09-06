@@ -71,12 +71,21 @@ theme_override_constants/separation = 12
 [node name="Header" type="HBoxContainer" parent="Window/Content"]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Window/Content/Header"]
+[node name="Title" type="TextureRect" parent="Window/Content/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(210, 92)
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Awning" type="TextureRect" parent="Window/Content/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 92)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.96, 0.82, 0.45, 1)
-theme_override_font_sizes/font_size = 38
-text = "SHOP"
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Balance" type="Control" parent="Window/Content/Header"]
 custom_minimum_size = Vector2(240, 120)
