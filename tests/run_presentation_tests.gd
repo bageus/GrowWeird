@@ -40,6 +40,7 @@ func _test_presentation_resources_load() -> void:
 		"res://src/presentation/inventory/inventory_item_dialogs.tscn",
 		"res://src/presentation/progression/progression_panel.gd",
 		"res://src/presentation/shop/shop_panel.gd",
+		"res://src/presentation/shop/shop_layout_editor.gd",
 		"res://src/presentation/main/wallet_topup_panel.gd",
 		"res://src/presentation/main/wallet_topup_panel.tscn",
 	]
@@ -111,6 +112,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(shop_scene.contains("QuantitySlider") and shop_scene.contains("QuantityLabel") and shop_scene.contains('name="ConfirmPreview"') and shop_script.contains("_refresh_purchase_preview"), "shop HUD: purchase dialog must expose its preview and shared quantity flow")
 	_expect(shop_script.contains('_stock[item_id] = maxi(0') and shop_script.contains('if int(item.get("stock", 0)) > 0'), "shop HUD: purchased single-stock items must disappear")
 	_expect(shop_script.contains("UiAtlas.BUTTONS") and shop_scene.contains('text = "BUY"') and shop_scene.contains('text = "CANCEL"'), "shop HUD: asset coin and Buy/Cancel controls are missing")
+	_expect(shop_script.contains("ShopLayoutEditor") and shop_script.contains("_register_static_layout_elements"), "shop HUD: buttons and blocks must support independent layout editing")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
