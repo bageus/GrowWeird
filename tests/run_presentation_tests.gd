@@ -115,6 +115,8 @@ func _test_scene_hud_contract() -> void:
 	_expect(shop_script.contains("UiAtlas.coin_texture()") and shop_scene.contains('text = "BUY"') and shop_scene.contains('text = "CANCEL"'), "shop HUD: asset coin and Buy/Cancel controls are missing")
 	_expect(shop_script.contains("ShopLayoutEditor") and shop_script.contains("_register_static_layout_elements"), "shop HUD: buttons and blocks must support independent layout editing")
 	_expect(shop_script.contains("configure_shop_slot") and shop_script.contains("coin_texture") and shop_script.contains("_cutting_texture"), "shop HUD: lot cells, coins, and cutting atlas art must be wired")
+	_expect(shop_script.contains("shop_title_texture") and shop_script.contains("shop_awning_texture"), "shop HUD: Shop title and awning atlas art are missing")
+	_expect(shop_script.contains("MarginContainer.new()") and shop_script.contains("layout.add_child(_price_row"), "shop HUD: lot title and price must stay inside each card")
 	_expect(not hud_text.contains("OfferLabel"), "scene HUD: fertilizer title label must be removed")
 	_expect(hud_text.contains("WaterOptions") and hud_text.contains("SprayButton") and hud_text.contains("PourButton"), "scene HUD: water must expose spray and pour")
 	_expect(not hud_text.contains("HarvestButton"), "scene HUD: harvest control still present")
@@ -146,10 +148,11 @@ func _test_inventory_hud_contract() -> void:
 	var dialogs_text := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.tscn")
 	var scene_text := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls.tscn")
 	_expect(hud_text.contains("VBoxContainer") and hud_text.contains("Items"), "inventory HUD: inventory must be vertical")
-	_expect(hud_text.contains("offset_top = 63.0") and hud_text.contains("offset_bottom = -63.0"), "inventory HUD: cells must keep equal three-pixel gaps from both arrows")
-	_expect(hud_text.contains("Vector2(0, 394)") and hud_text.contains("separation = 2"), "inventory HUD: viewport must show exactly three non-overlapping 130px cells")
+	_expect(hud_text.contains("offset_top = 43.0") and hud_text.contains("offset_bottom = -43.0"), "inventory HUD: cells must keep equal ten-pixel gaps from both arrows")
+	_expect(hud_text.contains("Vector2(0, 433)") and hud_text.contains("separation = 2"), "inventory HUD: viewport must contain three non-overlapping 143px cells")
+	_expect(hud_text.contains("anchor_left = 0.045") and hud_text.contains("anchor_right = 0.955"), "inventory HUD: enlarged cells must fit horizontally inside the unchanged frame")
 	_expect(hud_text.contains("allow_scaling = true") and inventory_script.contains("_add_fitted_icon"), "inventory HUD: frame must scale while item art stays fitted inside each slot")
-	_expect(inventory_script.contains("offset_left = 21.7") and inventory_script.contains("offset_right = -21.7"), "inventory HUD: item art must remain reduced inside its enlarged slot")
+	_expect(inventory_script.contains("offset_left = 23.9") and inventory_script.contains("offset_right = -23.9"), "inventory HUD: item art must remain reduced inside its enlarged slot")
 	_expect(hud_text.contains("vertical_scroll_mode = 3"), "inventory HUD: native vertical scrollbar must stay hidden")
 	_expect(hud_text.contains("Vector2(164, 520)"), "inventory HUD: outer frame size must remain unchanged")
 	_expect(hud_text.contains('[node name="FrameContent" type="Control" parent="Layers"]') and hud_text.contains('parent="Layers/FrameContent"'), "inventory HUD: paging arrows must stay inside the visible frame")
@@ -173,6 +176,7 @@ func _test_inventory_hud_contract() -> void:
 	_expect(FileAccess.get_file_as_string("res://src/domain/services/care_gauge_service.gd").contains("evaluate_or_preview"), "care HUD: gauge must remain visible for a selected empty pot")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains('_genetic_title("Branch"'), "inventory HUD: pruned plant material must be shown as a branch")
 	var item_art := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_art.gd")
+	_expect(item_art.contains('kind == &"cutting"') and item_art.contains("UiAtlas.branch_texture()"), "inventory HUD: every branch icon must use buttons atlas frame 8-1")
 	_expect(item_art.contains("FertilizerAssetCatalog.is_offer_id") and item_art.contains("FertilizerOfferArt.texture_for"), "inventory HUD: offered fertilizers must reuse their atlas asset instead of text")
 	_expect(item_art.contains('"fertilizer:universal_fertilizer": Vector2i(0, 5)'), "inventory HUD: shop fertilizer must use atlas frame 1-6")
 	_expect(item_art.contains('"fertilizer:compost_mix": Vector2i(3, 0)') and item_art.contains('"misc:dead_mouse": Vector2i(2, 5)'), "inventory HUD: recycled fertilizer and dead mouse atlas frames are missing")
@@ -335,14 +339,12 @@ func _slot_length(layout: Dictionary, slot: StringName) -> float:
 	var start: Vector2 = descriptor["start"]
 	var end: Vector2 = descriptor["end"]
 	return start.distance_to(end)
-
 func _plant() -> PlantState:
 	var plant := PlantState.new()
 	plant.instance_id = "presentation-test"
 	plant.species_id = &"starter_sprout"
 	plant.initialize_native_branches()
 	return plant
-
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)
