@@ -117,12 +117,11 @@ func _refresh_offer() -> void:
 		var button := buttons[index]
 		if index < ids.size():
 			button.text = ""
-			button.icon = FertilizerOfferArt.texture_for(ids[index])
-			button.expand_icon = true
+			_set_offer_icon(button, FertilizerOfferArt.texture_for(ids[index]))
 			button.disabled = false
 		else:
 			button.text = ""
-			button.icon = null
+			_set_offer_icon(button, null)
 			button.disabled = true
 	var price := GameApp.current_offer_skip_price()
 	refresh_offer.text = ""
@@ -132,6 +131,24 @@ func _refresh_offer() -> void:
 	skip_offer.tooltip_text = "Skip · %d" % price if price > 0 else "Skip"
 	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
 	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
+
+func _set_offer_icon(button: Button, texture: Texture2D) -> void:
+	var existing := button.get_node_or_null("OfferIcon")
+	if existing != null:
+		existing.free()
+	button.icon = null
+	if texture == null:
+		return
+	var icon := TextureRect.new()
+	icon.name = "OfferIcon"
+	button.add_child(icon)
+	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	icon.offset_left = 10.0; icon.offset_top = 10.0
+	icon.offset_right = -10.0; icon.offset_bottom = -10.0
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = texture
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)

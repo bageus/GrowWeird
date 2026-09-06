@@ -137,10 +137,10 @@ func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
 	var icon := TextureRect.new()
 	button.add_child(icon)
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon.offset_left = 20.6
-	icon.offset_top = 20.6
-	icon.offset_right = -20.6
-	icon.offset_bottom = -20.6
+	icon.offset_left = 21.1
+	icon.offset_top = 21.1
+	icon.offset_right = -21.1
+	icon.offset_bottom = -21.1
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.texture = texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -180,8 +180,8 @@ func _add_empty_slot(label := "") -> void:
 	items.add_child(slot)
 
 func _configure_fixed_slot(button: Button) -> void:
-	button.custom_minimum_size = Vector2(124.0, 124.0)
-	button.size = Vector2(124.0, 124.0)
+	button.custom_minimum_size = Vector2(134.0, 134.0)
+	button.size = Vector2(134.0, 134.0)
 	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	button.clip_contents = true
