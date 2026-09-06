@@ -40,9 +40,11 @@ var _category: StringName = &"plants"
 var _selected: Dictionary = {}
 var _stock: Dictionary = {}
 var _last_signature := ""
+var _layout_editor: ShopLayoutEditor
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	_layout_editor = ShopLayoutEditor.new(self)
 	%BalanceArt.texture = UiAtlas.HUD_BALANCE
 	UiAtlas.configure_balance_plus(%BalancePlus, %BalanceArt)
 	UiAtlas.configure_close_button(%CloseButton)
@@ -52,7 +54,28 @@ func _ready() -> void:
 	buy_button.pressed.connect(_buy_selected)
 	quantity_slider.value_changed.connect(_refresh_purchase_preview)
 	_build_tabs()
+	_register_static_layout_elements()
 	confirm.visible = false
+
+func _input(event: InputEvent) -> void:
+	if visible and _layout_editor != null and _layout_editor.handle_input(event):
+		get_viewport().set_input_as_handled()
+
+func _apply_shop_layout(control: Control, key: String) -> void:
+	if _layout_editor != null:
+		_layout_editor.apply_saved(control, key)
+
+func _register_static_layout_elements() -> void:
+	_layout_editor.register($Window, "window")
+	_layout_editor.register($Window/Content/Header/Title, "title")
+	_layout_editor.register($Window/Content/Header/Balance, "balance")
+	_layout_editor.register(%CloseButton, "close")
+	_layout_editor.register(%Tabs, "tabs")
+	_layout_editor.register(%CategoryHud, "category_hud")
+	_layout_editor.register(%Confirm, "confirm")
+	_layout_editor.register(%BuyButton, "confirm_buy")
+	_layout_editor.register(%CancelButton, "confirm_cancel")
+	_layout_editor.register(%QuantitySlider, "confirm_quantity")
 
 func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
 	var signature := "%s|%d" % [str(fertilizers), money]
@@ -75,6 +98,7 @@ func _build_tabs() -> void:
 		var frame: Vector2i = CATEGORY_FRAMES[category]
 		UiAtlas.configure_button(button, frame.x, frame.y)
 		button.pressed.connect(_show_category.bind(category)); tabs.add_child(button)
+		_layout_editor.register(button, "tab_%s" % String(category))
 
 func _show_category(category: StringName) -> void:
 	_category = category; _hide_confirm(); _apply_category_hud(COLORS[category])
@@ -100,6 +124,7 @@ func _add_card(item: Dictionary) -> void:
 	card.add_child(layout)
 	if int(item.get("stock", 1)) > 1: card.add_child(_quantity_badge(int(item["stock"])))
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
+	_layout_editor.register(card, "lot_%s_%s" % [String(_category), String(item.get("id", ""))])
 
 func _price_row(price: int, unlocked: bool) -> Control:
 	var row := HBoxContainer.new(); row.alignment = BoxContainer.ALIGNMENT_CENTER; row.mouse_filter = Control.MOUSE_FILTER_IGNORE
