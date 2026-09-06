@@ -20,6 +20,10 @@ const CATEGORY_FRAMES := {
 	&"mutagens": Vector2i(0, 2), &"decorations": Vector2i(0, 3),
 	&"seeds": Vector2i(1, 0), &"pots": Vector2i(1, 1),
 }
+const LOT_FRAMES := {
+	&"plants": Vector2i(0, 0), &"pots": Vector2i(0, 1), &"seeds": Vector2i(0, 2),
+	&"fertilizers": Vector2i(1, 0), &"decorations": Vector2i(1, 1), &"mutagens": Vector2i(1, 2),
+}
 
 @onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
@@ -146,32 +150,41 @@ func _add_card(item: Dictionary) -> void:
 	var card := Button.new()
 	card.custom_minimum_size = Vector2(174.0, 156.0); card.clip_contents = true
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
-	UiAtlas.configure_shop_slot(card)
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	margin.add_theme_constant_override(&"margin_left", 10); margin.add_theme_constant_override(&"margin_top", 8)
-	margin.add_theme_constant_override(&"margin_right", 10); margin.add_theme_constant_override(&"margin_bottom", 8)
-	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(margin)
-	var layout := VBoxContainer.new(); layout.mouse_filter = Control.MOUSE_FILTER_IGNORE; margin.add_child(layout)
+	_configure_lot_button(card)
+	var key := "lot_%s_%s" % [String(_category), String(item.get("id", ""))]
+	var background := TextureRect.new(); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	background.offset_left = 1.0; background.offset_top = 1.0; background.offset_right = -1.0; background.offset_bottom = -1.0
+	var lot_frame: Vector2i = LOT_FRAMES[_category]; background.texture = UiAtlas.shop_lot_texture(lot_frame.x, lot_frame.y)
+	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(background)
 	var name_label := Label.new()
+	name_label.position = Vector2(10.0, 7.0); name_label.size = Vector2(154.0, 28.0)
 	name_label.text = String(item.get("name", "Item")); name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; name_label.add_theme_font_size_override(&"font_size", 18); layout.add_child(name_label)
-	var preview := TextureRect.new(); preview.custom_minimum_size = Vector2(0.0, 76.0); preview.texture = _preview_texture(item)
+	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; name_label.add_theme_font_size_override(&"font_size", 16); card.add_child(name_label)
+	var preview := TextureRect.new(); preview.position = Vector2(25.0, 35.0); preview.size = Vector2(124.0, 78.0); preview.texture = _preview_texture(item)
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layout.add_child(preview)
-	var spacer := Control.new(); spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL; layout.add_child(spacer)
-	layout.add_child(_price_row(int(item.get("price", 1)), bool(item.get("unlocked", false))))
-	if int(item.get("stock", 1)) > 1: card.add_child(_quantity_badge(int(item["stock"])))
+	card.add_child(preview)
+	var coin := TextureRect.new(); coin.position = Vector2(57.0, 119.0); coin.size = Vector2(28.0, 28.0); coin.texture = UiAtlas.coin_texture()
+	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; coin.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(coin)
+	var price := Label.new(); price.position = Vector2(87.0, 118.0); price.size = Vector2(55.0, 30.0)
+	price.text = str(int(item.get("price", 1))) if bool(item.get("unlocked", false)) else "Locked"; price.add_theme_font_size_override(&"font_size", 18); card.add_child(price)
+	var badge: Label = null
+	if int(item.get("stock", 1)) > 1: badge = _quantity_badge(int(item["stock"])); card.add_child(badge)
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
-	_layout_editor.register(card, "lot_%s_%s" % [String(_category), String(item.get("id", ""))])
+	_layout_editor.register(background, "%s_background" % key); _layout_editor.register(card, key)
+	_layout_editor.register(name_label, "%s_name" % key); _layout_editor.register(preview, "%s_preview" % key)
+	_layout_editor.register(coin, "%s_coin" % key); _layout_editor.register(price, "%s_price" % key)
+	if badge != null: _layout_editor.register(badge, "%s_quantity" % key)
 
-func _price_row(price: int, unlocked: bool) -> Control:
-	var row := HBoxContainer.new(); row.alignment = BoxContainer.ALIGNMENT_CENTER; row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var coin := TextureRect.new()
-	coin.custom_minimum_size = Vector2(28.0, 28.0); coin.texture = UiAtlas.coin_texture()
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; row.add_child(coin)
-	var label := Label.new(); label.text = str(price) if unlocked else "Locked"; label.add_theme_font_size_override(&"font_size", 18); row.add_child(label)
-	return row
+func _configure_lot_button(card: Button) -> void:
+	card.focus_mode = Control.FOCUS_NONE; card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		card.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	card.mouse_entered.connect(_set_lot_hover.bind(card, true))
+	card.mouse_exited.connect(_set_lot_hover.bind(card, false))
+
+func _set_lot_hover(card: Button, hovered: bool) -> void:
+	if is_instance_valid(card): card.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
 
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item; confirm_name.text = String(item.get("name", "Item"))
