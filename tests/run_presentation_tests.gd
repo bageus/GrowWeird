@@ -46,7 +46,6 @@ func _test_presentation_resources_load() -> void:
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
-
 func _test_scene_button_contract() -> void:
 	var host := Control.new()
 	host.size = Vector2(1000.0, 600.0)
@@ -110,9 +109,11 @@ func _test_scene_hud_contract() -> void:
 	_expect(shop_scene.contains("BalanceArt") and shop_scene.contains("BalancePlus") and shop_script.contains("UiAtlas.HUD_BALANCE"), "shop HUD: complete main balance block is missing")
 	_expect(shop_script.contains('"price": 1') and shop_script.contains("range(5)"), "shop HUD: categories must expose five one-coin test items")
 	_expect(shop_script.contains("TextureRect.new()") and shop_script.contains("_quantity_badge") and shop_script.contains('&"cutting"') and shop_script.contains('&"potted_plant"'), "shop HUD: lot cards need previews, quantities, branches, and first-stage potted plants")
-	_expect(shop_scene.contains("QuantitySlider") and shop_scene.contains("QuantityLabel") and shop_scene.contains('name="ConfirmPreview"') and shop_script.contains("_refresh_purchase_preview"), "shop HUD: purchase dialog must expose its preview and shared quantity flow")
+	_expect(shop_scene.contains("QuantityMinus") and shop_scene.contains("QuantityPlus") and shop_scene.contains("QuantityLabel") and shop_script.contains("_change_quantity"), "shop HUD: purchase dialog must expose bounded quantity controls")
+	_expect(shop_scene.contains("ConfirmBackground") and shop_scene.contains("ConfirmBanner") and shop_scene.contains("CountBackground"), "shop HUD: layered buy dialog atlas art is missing")
+	_expect(shop_script.contains('register(%ConfirmBackground') and shop_script.contains('register(%QuantityMinus') and shop_script.contains('register(%ConfirmPrice'), "shop HUD: every buy-dialog block and button must support independent Ctrl layout editing")
 	_expect(shop_script.contains('_stock[item_id] = maxi(0') and shop_script.contains('if int(item.get("stock", 0)) > 0'), "shop HUD: purchased single-stock items must disappear")
-	_expect(shop_script.contains("UiAtlas.coin_texture()") and shop_scene.contains('text = "BUY"') and shop_scene.contains('text = "CANCEL"'), "shop HUD: asset coin and Buy/Cancel controls are missing")
+	_expect(shop_script.contains("UiAtlas.coin_texture()") and shop_script.contains("configure_button(buy_button, 7, 1)") and shop_script.contains("configure_button(%ConfirmClose, 6, 0)"), "shop HUD: atlas Buy and close controls are missing")
 	_expect(shop_script.contains("ShopLayoutEditor") and shop_script.contains("_register_static_layout_elements"), "shop HUD: buttons and blocks must support independent layout editing")
 	_expect(shop_script.contains("configure_shop_slot") and shop_script.contains("coin_texture") and shop_script.contains("_cutting_texture"), "shop HUD: lot cells, coins, and cutting atlas art must be wired")
 	_expect(shop_script.contains("shop_title_texture") and shop_script.contains("shop_awning_texture"), "shop HUD: Shop title and awning atlas art are missing")
@@ -332,7 +333,6 @@ func _test_fruit_visual_state() -> void:
 	fruit.hybrid = true
 	_expect(fruit.is_ready() and fruit.hybrid, "fruit presentation: ripe hybrid state unavailable")
 	_expect(PlantView.MODE_HARVEST == &"harvest", "fruit presentation: harvest interaction mode missing")
-
 func _slot_length(layout: Dictionary, slot: StringName) -> float:
 	var slots: Dictionary = layout["slots"]
 	var descriptor: Dictionary = slots[String(slot)]
