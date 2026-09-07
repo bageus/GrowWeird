@@ -1,7 +1,6 @@
 extends SceneTree
 
 var _failures: Array[String] = []
-
 func _init() -> void:
 	_test_presentation_resources_load()
 	_test_scene_button_contract()
@@ -20,7 +19,6 @@ func _init() -> void:
 	for failure in _failures:
 		push_error(failure)
 	quit(1)
-
 func _test_presentation_resources_load() -> void:
 	var paths := [
 		"res://src/presentation/main/scene_controls.tscn",
@@ -63,7 +61,6 @@ func _test_scene_button_contract() -> void:
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("wallet"), "scene buttons: wallet block must be movable")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop") and SceneControlsOverlay.DEFAULT_POSITIONS.has("tasks"), "scene buttons: shop and tasks atlas controls missing")
 	host.free()
-
 func _test_scene_hud_contract() -> void:
 	var host := Control.new()
 	host.size = Vector2(1000.0, 600.0)
