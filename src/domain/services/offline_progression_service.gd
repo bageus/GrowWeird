@@ -12,6 +12,7 @@ static func advance(
 		return _result(requested, 0.0, 0, false, 0, false)
 
 	var applied := minf(requested, rules.offline_max_seconds)
+	EnergyService.advance(state, applied)
 	var steps := mini(
 		rules.offline_max_steps,
 		maxi(1, int(ceil(applied / maxf(rules.simulation_step_seconds, 1.0))))

@@ -7,6 +7,7 @@ extends Control
 @onready var pot_visual: PotVisual = %PotVisual
 @onready var tree_growth_preview: TreeGrowthPreview = %TreeGrowthPreview
 @onready var care_gauge: CareGauge = %CareGauge
+@onready var growth_cycle_hud: GrowthCycleHud = %GrowthCycleHud
 @onready var progression_panel: ProgressionPanel = %ProgressionPanel
 @onready var scene_controls: SceneControlsOverlay = %SceneControls
 @onready var pot_selector: PotSelector = scene_controls.get_node("PotSelector")
@@ -62,6 +63,7 @@ func _ready() -> void:
 	offer_three.button_down.connect(_on_offer_three_pressed)
 	refresh_offer.pressed.connect(_on_refresh_offer_pressed)
 	skip_offer.pressed.connect(_on_skip_offer_pressed)
+	growth_cycle_hud.skip_requested.connect(_on_growth_skip_pressed)
 	for stage in range(14):
 		var button := get_node("Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout/Stage%dButton" % (stage + 1)) as Button
 		button.pressed.connect(_on_tree_stage_selected.bind(stage))
@@ -71,6 +73,7 @@ func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
 	money_label.text = "%d" % GameApp.state.money
+	scene_controls.set_energy(GameApp.state)
 	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
 	inventory_hud.set_inventory(GameApp.state.inventory)
 	pot_selector.set_state(GameApp.state, not String(_pending_plant_kind).is_empty())
@@ -81,6 +84,7 @@ func _refresh() -> void:
 		pot_visual.set_pot_state(pot)
 	tree_growth_preview.set_plant(plant)
 	care_gauge.set_gauge(CareGaugeService.evaluate_or_preview(pot, GameApp.active_species_definition()))
+	growth_cycle_hud.set_cycle(plant, GameApp.state.energy)
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	if pot == null:
@@ -110,6 +114,8 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = ""
 	sell_plant_button.tooltip_text = "Sell plant + pot · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant + pot"
+	spray_button.disabled = pot == null or GameApp.state.energy < EnergyService.WATER_COST
+	pour_button.disabled = spray_button.disabled
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
 	var buttons: Array[Button] = [offer_one, offer_two, offer_three]
@@ -123,13 +129,7 @@ func _refresh_offer() -> void:
 			button.text = ""
 			_set_offer_icon(button, null)
 			button.disabled = true
-	var price := GameApp.current_offer_skip_price()
-	refresh_offer.text = ""
-	refresh_offer.tooltip_text = "Refresh · %d" % price if price > 0 else "Refresh"
-	refresh_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
-	skip_offer.text = ""
-	skip_offer.tooltip_text = "Skip · %d" % price if price > 0 else "Skip"
-	skip_offer.disabled = ids.is_empty() or price <= 0 or GameApp.state.money < price
+	scene_controls.set_offer_energy_actions(not ids.is_empty(), GameApp.state.energy)
 	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
 
 func _set_offer_icon(button: Button, texture: Texture2D) -> void:
@@ -149,6 +149,7 @@ func _set_offer_icon(button: Button, texture: Texture2D) -> void:
 	icon.texture = texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
@@ -328,6 +329,8 @@ func _on_refresh_offer_pressed() -> void:
 	event_label.text = "Fertilizers refreshed." if GameApp.refresh_fertilizer_offer() else "Cannot refresh fertilizers."
 func _on_skip_offer_pressed() -> void:
 	event_label.text = "Fertilizers skipped." if GameApp.skip_fertilizer_offer() else "Cannot skip fertilizers."
+func _on_growth_skip_pressed() -> void:
+	event_label.text = "Growth cycle completed." if GameApp.skip_growth_cycle() else "Not enough energy or branches are still regrowing."
 func _on_mutations_resolved(events: Array[Dictionary]) -> void:
 	if events.is_empty():
 		return

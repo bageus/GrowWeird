@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" path="res://assets/pot/pot_01.png" id="8_pot"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/fertilizer_cooldown_overlay.tscn" id="9_cooldown"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/wallet_topup_panel.tscn" id="10_topup"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/energy_topup_panel.tscn" id="11_energy"]
+[ext_resource type="PackedScene" path="res://src/presentation/main/energy_hud.tscn" id="12_energy_hud"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
@@ -154,6 +156,8 @@ offset_top = 34.0
 offset_right = 234.0
 offset_bottom = 92.0
 text = "Shop"
+
+[node name="EnergyHud" parent="." instance=ExtResource("12_energy_hud")]
 
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
@@ -325,6 +329,8 @@ visible = false
 z_index = 100
 
 [node name="WalletTopupPanel" parent="." instance=ExtResource("10_topup")]
+
+[node name="EnergyTopupPanel" parent="." instance=ExtResource("11_energy")]
 visible = false
 z_index = 110
 

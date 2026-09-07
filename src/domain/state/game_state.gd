@@ -1,10 +1,12 @@
 class_name GameState
 extends RefCounted
 
-const SCHEMA_VERSION: int = 9
+const SCHEMA_VERSION: int = 10
 
 var schema_version: int = SCHEMA_VERSION
 var money: int = 0
+var energy: int = 0
+var energy_regen_elapsed: float = 0.0
 var active_pot_id: String = ""
 var pots: Array[PotState] = []
 var inventory := InventoryState.new()

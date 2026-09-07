@@ -1,0 +1,52 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="1_drag"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBox_energy"]
+bg_color = Color(0.035, 0.13, 0.18, 0.96)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.22, 0.7, 0.95, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="EnergyHud" type="PanelContainer"]
+z_index = 7
+custom_minimum_size = Vector2(180, 88)
+offset_right = 180.0
+offset_bottom = 88.0
+theme_override_styles/panel = SubResource("StyleBox_energy")
+script = ExtResource("1_drag")
+layout_id = &"energy"
+drag_handle_height = 88.0
+allow_scaling = true
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+flat = true
+
+[node name="Layout" type="VBoxContainer" parent="Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Value" type="Label" parent="Button/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.42, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "⚡ 0 / 0"
+horizontal_alignment = 1
+
+[node name="Timer" type="Label" parent="Button/Layout"]
+layout_mode = 2
+text = "+1  02:00"
+horizontal_alignment = 1

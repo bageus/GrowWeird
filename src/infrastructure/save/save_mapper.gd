@@ -8,6 +8,8 @@ static func to_dictionary(state: GameState) -> Dictionary:
 	return {
 		"schema_version": state.schema_version,
 		"money": state.money,
+		"energy": state.energy,
+		"energy_regen_elapsed": state.energy_regen_elapsed,
 		"active_pot_id": state.active_pot_id,
 		"last_saved_unix": state.last_saved_unix,
 		"rewarded_ad_claims": state.rewarded_ad_claims.duplicate(),
@@ -21,6 +23,8 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	var state := GameState.new()
 	state.schema_version = int(data.get("schema_version", GameState.SCHEMA_VERSION))
 	state.money = int(data.get("money", 0))
+	state.energy = maxi(0, int(data.get("energy", 0)))
+	state.energy_regen_elapsed = clampf(float(data.get("energy_regen_elapsed", 0.0)), 0.0, EnergyService.REGEN_SECONDS)
 	state.active_pot_id = String(data.get("active_pot_id", ""))
 	state.last_saved_unix = int(data.get("last_saved_unix", 0))
 	for claim_time in data.get("rewarded_ad_claims", []):
@@ -31,6 +35,7 @@ static func from_dictionary(data: Dictionary) -> GameState:
 	for value in data.get("pots", []):
 		if value is Dictionary:
 			state.pots.append(_pot_from_dictionary(value))
+	EnergyService.clamp_to_capacity(state)
 	return state
 
 static func _pot_to_dictionary(pot: PotState) -> Dictionary:

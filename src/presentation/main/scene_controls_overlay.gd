@@ -14,6 +14,7 @@ const DEFAULT_POSITIONS := {
 	"shop": Vector2(0.84, 0.12),
 	"tasks": Vector2(0.84, 0.22),
 	"wallet": Vector2(0.72, 0.03),
+	"energy": Vector2(0.59, 0.03),
 	"pots": Vector2(0.02, 0.82),
 	"fertilizers": Vector2(0.18, 0.82),
 	"inventory": Vector2(0.77, 0.50),
@@ -27,6 +28,7 @@ func _ready() -> void:
 	_apply_ui_atlases()
 	_collect_controls()
 	(get_node("WalletHud/Layers/ShopButton") as Button).pressed.connect(_toggle_wallet_topup)
+	(get_node("EnergyHud/Button") as Button).pressed.connect(_toggle_energy_topup)
 	_layout = _load_layout()
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
@@ -103,6 +105,19 @@ func set_offer_cooldown(seconds: float) -> void:
 	var minutes := floori(float(total) / 60.0)
 	(get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label).text = "Next fertilizers %02d:%02d" % [minutes, total % 60]
 
+func set_energy(state: GameState) -> void:
+	var capacity := EnergyService.capacity(state)
+	var seconds := EnergyService.seconds_to_next(state)
+	(get_node("EnergyHud/Button/Layout/Value") as Label).text = "⚡ %d / %d" % [state.energy, capacity]
+	(get_node("EnergyHud/Button/Layout/Timer") as Label).text = "FULL" if seconds == 0 else "+1  %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+
+func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
+	for button_name in ["RefreshOffer", "SkipOffer"]:
+		var button := get_node("OffersPanel/Row/" + button_name) as Button
+		button.text = ""
+		button.tooltip_text = "%s · %d energy" % [button_name.trim_suffix("Offer"), EnergyService.OFFER_COST]
+		button.disabled = not has_offer or energy < EnergyService.OFFER_COST
+
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
 	if panel == null:
@@ -110,6 +125,7 @@ func set_shop_visible(enabled: bool) -> void:
 	panel.visible = enabled
 	if enabled:
 		set_wallet_topup_visible(false)
+		set_energy_topup_visible(false)
 
 func set_wallet_topup_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("WalletTopupPanel") as WalletTopupPanel
@@ -125,6 +141,19 @@ func _toggle_wallet_topup() -> void:
 		if opening:
 			set_shop_visible(false)
 		set_wallet_topup_visible(opening)
+
+func set_energy_topup_visible(enabled: bool) -> void:
+	var panel := get_node_or_null("EnergyTopupPanel") as EnergyTopupPanel
+	if panel == null: return
+	if enabled: panel.open()
+	else: panel.close()
+
+func _toggle_energy_topup() -> void:
+	var panel := get_node_or_null("EnergyTopupPanel") as EnergyTopupPanel
+	if panel == null: return
+	var opening := not panel.visible
+	if opening: set_shop_visible(false); set_wallet_topup_visible(false)
+	set_energy_topup_visible(opening)
 
 func save_layout() -> bool:
 	_capture_layout()

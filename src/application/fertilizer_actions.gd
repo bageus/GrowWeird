@@ -25,13 +25,12 @@ static func skip_offer(
 ) -> bool:
 	if state == null or not state.fertilizer_offer.is_active():
 		return false
-	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
-	if price <= 0 or not EconomyService.spend(state, price):
+	if not EnergyService.spend(state, EnergyService.OFFER_COST):
 		return false
 	var resolved := FertilizerOfferService.resolve_skip(state.fertilizer_offer, rules)
 	if resolved:
 		return true
-	EconomyService.credit(state, price)
+	EnergyService.credit(state, EnergyService.OFFER_COST)
 	return false
 
 static func use_inventory(
