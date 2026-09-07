@@ -28,6 +28,8 @@ static func migrate(source: Dictionary) -> Dictionary:
 				data = _migrate_v7_to_v8(data)
 			8:
 				data = _migrate_v8_to_v9(data)
+			9:
+				data = _migrate_v9_to_v10(data)
 			_:
 				push_error("No save migration registered for schema %d" % version)
 				return {}
@@ -139,4 +141,11 @@ static func _migrate_v8_to_v9(source: Dictionary) -> Dictionary:
 		plant["growth_cycle_elapsed"] = 0.0
 		plant["boosted_growth_cycle"] = -1
 	data["schema_version"] = 9
+	return data
+
+static func _migrate_v9_to_v10(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	data["energy"] = int(data.get("pots", []).size()) * EnergyService.PER_POT
+	data["energy_regen_elapsed"] = 0.0
+	data["schema_version"] = 10
 	return data

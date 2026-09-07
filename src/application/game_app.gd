@@ -41,6 +41,7 @@ func _process(delta: float) -> void:
 		PlantSimulationService.advance(state, rules.simulation_step_seconds, registry, rules)
 		FruitLifecycleService.advance(state, rules.simulation_step_seconds, registry)
 		changed = true
+	if EnergyService.advance(state, delta): changed = true
 	if FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_offer_fertilizers(), rules):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
 		changed = true
@@ -89,7 +90,7 @@ func set_window_open(value: bool) -> bool:
 
 func water_active(use_sprayer: bool = false) -> bool:
 	var pot := active_pot()
-	if pot == null:
+	if pot == null or not EnergyService.spend(state, EnergyService.WATER_COST):
 		return false
 	if use_sprayer: pot.spray_soil(rules.sprayer_soil_amount)
 	else: pot.moisten_soil_one_stage()
@@ -121,11 +122,10 @@ func skip_fertilizer_offer() -> bool:
 func refresh_fertilizer_offer() -> bool:
 	if state == null:
 		return false
-	var price := FertilizerOfferService.skip_price(state.fertilizer_offer, rules)
-	if price <= 0 or not EconomyService.spend(state, price):
+	if not EnergyService.spend(state, EnergyService.OFFER_COST):
 		return false
 	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_offer_fertilizers(), rules):
-		EconomyService.credit(state, price)
+		EnergyService.credit(state, EnergyService.OFFER_COST)
 		return false
 	state_changed.emit()
 	return true
@@ -267,19 +267,20 @@ func current_comfort() -> Dictionary:
 
 func current_offer_ids() -> Array[StringName]:
 	return state.fertilizer_offer.offered_ids.duplicate() if state != null else []
-
-func current_offer_skip_price() -> int:
-	return FertilizerOfferService.skip_price(state.fertilizer_offer, rules) if state != null else 0
-
+func current_offer_skip_price() -> int: return EnergyService.OFFER_COST
+func growth_skip_cost() -> int: return EnergyService.cycle_skip_cost(active_plant())
+func skip_growth_cycle() -> bool:
+	if not EnergyActions.skip_growth_cycle(state, active_plant()): return false
+	state_changed.emit()
+	return true
+func buy_energy(amount: int) -> int:
+	var credited := EnergyService.credit(state, amount)
+	if credited > 0: state_changed.emit()
+	return credited
 func platform_id() -> StringName: return _platform_runtime().platform_id()
-
 func cloud_save_available() -> bool: return _platform_runtime().cloud_available()
-
-func set_gameplay_active(active: bool) -> void:
-	_platform_runtime().set_gameplay_active(active)
-
-func show_fullscreen_ad() -> void:
-	_platform_runtime().show_fullscreen_ad()
+func set_gameplay_active(active: bool) -> void: _platform_runtime().set_gameplay_active(active)
+func show_fullscreen_ad() -> void: _platform_runtime().show_fullscreen_ad()
 
 func _platform_runtime() -> Node: return get_node("/root/PlatformRuntime")
 

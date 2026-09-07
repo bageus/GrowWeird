@@ -19,6 +19,7 @@ static func create(rules: GameRules) -> GameState:
 	second_pot.pot_id = "pot-2"
 	second_pot.soil_moisture = 0.30
 	state.pots = [first_pot, second_pot]
+	EnergyService.fill(state)
 	state.active_pot_id = first_pot.pot_id
 	add_starter_inventory_item(state, first_pot.plant)
 	FertilizerOfferService.initialize_rng(state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))

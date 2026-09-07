@@ -25,6 +25,7 @@ static func sell_plant(
 	EconomyService.credit(state, amount)
 	var sold_pot_id := pot.pot_id
 	state.pots.erase(pot)
+	EnergyService.clamp_to_capacity(state)
 	if state.active_pot_id == sold_pot_id:
 		state.active_pot_id = state.pots[0].pot_id if not state.pots.is_empty() else ""
 	return amount
