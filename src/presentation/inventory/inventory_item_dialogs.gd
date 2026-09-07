@@ -10,11 +10,14 @@ signal closed
 @onready var recycle_action: Button = $ActionMenu/Actions/RecycleAction
 @onready var sell_action: Button = $ActionMenu/Actions/SellAction
 @onready var use_action: Button = $ActionMenu/Actions/UseAction
-@onready var sell_popup: PanelContainer = $SellPopup
-@onready var sell_title: Label = $SellPopup/Layout/Header/Title
-@onready var sell_slider: HSlider = $SellPopup/Layout/QuantitySlider
-@onready var sell_quantity: Label = $SellPopup/Layout/QuantityLabel
-@onready var sell_value: Label = $SellPopup/Layout/ValueLabel
+@onready var sell_popup: Control = $SellPopup
+@onready var sell_title: Label = $SellPopup/SellName
+@onready var sell_preview: TextureRect = $SellPopup/SellPreview
+@onready var sell_description: Label = $SellPopup/SellDescription
+@onready var sell_quantity: Label = $SellPopup/QuantityControl/QuantityLabel
+@onready var sell_value: Label = $SellPopup/CountControl/ValueLabel
+@onready var sell_minus: Button = $SellPopup/QuantityControl/QuantityMinus
+@onready var sell_plus: Button = $SellPopup/QuantityControl/QuantityPlus
 @onready var recycle_popup: PanelContainer = $RecyclePopup
 @onready var recycle_title: Label = $RecyclePopup/Layout/Header/Title
 @onready var recycle_slider: HSlider = $RecyclePopup/Layout/QuantitySlider
@@ -27,6 +30,7 @@ var _item_id := ""
 var _title := ""
 var _count := 1
 var _unit_value := 0
+var _sell_amount := 1
 var _recycle_yield := 0
 
 func _ready() -> void:
@@ -37,20 +41,36 @@ func _ready() -> void:
 	recycle_action.pressed.connect(_open_recycle)
 	sell_action.pressed.connect(_open_sell)
 	use_action.pressed.connect(_use)
-	$SellPopup/Layout/Header/Close.pressed.connect(close_all)
-	$SellPopup/Layout/Confirm.pressed.connect(_confirm_sell)
+	$SellPopup/SellClose.pressed.connect(close_all)
+	$SellPopup/SellButton.pressed.connect(_confirm_sell)
+	sell_minus.pressed.connect(_change_sell_quantity.bind(-1))
+	sell_plus.pressed.connect(_change_sell_quantity.bind(1))
 	$RecyclePopup/Layout/Header/Close.pressed.connect(close_all)
 	$RecyclePopup/Layout/Confirm.pressed.connect(_confirm_recycle)
-	sell_slider.value_changed.connect(_refresh_sell_preview)
 	recycle_slider.value_changed.connect(_refresh_recycle_preview)
 	UiAtlas.configure_button(use_action, 5, 1)
 	UiAtlas.configure_button(sell_action, 3, 3)
 	UiAtlas.configure_button(recycle_action, 5, 2)
-	UiAtlas.configure_button($SellPopup/Layout/Confirm as Button, 3, 3)
+	UiAtlas.configure_button($SellPopup/SellClose as Button, 6, 0)
+	UiAtlas.configure_button($SellPopup/SellButton as Button, 3, 3)
+	_configure_sell_art()
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
-	UiAtlas.configure_close_button($SellPopup/Layout/Header/Close as Button)
 	UiAtlas.configure_close_button($RecyclePopup/Layout/Header/Close as Button)
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
+
+func _configure_sell_art() -> void:
+	$SellPopup/SellBackground.texture = UiAtlas.HUD_BUYSELL
+	$SellPopup/SellBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
+	$SellPopup/QuantityControl/QuantityBackground.texture = UiAtlas.HUD_QUANTITY
+	$SellPopup/CountControl/CountBackground.texture = UiAtlas.HUD_COUNT
+	_configure_quantity_hit(sell_minus)
+	_configure_quantity_hit(sell_plus)
+
+func _configure_quantity_hit(button: Button) -> void:
+	button.text = ""; button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 
 func show_for(
 	source: Control,
@@ -86,8 +106,6 @@ func is_open() -> bool:
 func refresh_position() -> void:
 	if actions.visible:
 		_place_left(actions)
-	if sell_popup.visible:
-		_place_left(sell_popup)
 	if recycle_popup.visible:
 		_place_left(recycle_popup)
 
@@ -95,10 +113,11 @@ func _open_sell() -> void:
 	actions.visible = false
 	sell_popup.visible = true
 	recycle_popup.visible = false
-	sell_title.text = "Sell · %s" % _title
-	_setup_slider(sell_slider)
-	_refresh_sell_preview(sell_slider.value)
-	_place_left(sell_popup)
+	sell_title.text = _title
+	sell_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
+	sell_description.text = "Sell %s from inventory." % _title
+	_sell_amount = 1
+	_refresh_sell_preview()
 
 func _open_recycle() -> void:
 	actions.visible = false
@@ -116,10 +135,15 @@ func _setup_slider(slider: HSlider) -> void:
 	slider.value = 1.0
 	slider.editable = _count > 1
 
-func _refresh_sell_preview(value: float) -> void:
-	var quantity := maxi(1, int(round(value)))
-	sell_quantity.text = "Quantity: %d / %d" % [quantity, _count]
-	sell_value.text = "Value: $%d" % (_unit_value * quantity)
+func _change_sell_quantity(delta: int) -> void:
+	_sell_amount = clampi(_sell_amount + delta, 1, _count)
+	_refresh_sell_preview()
+
+func _refresh_sell_preview() -> void:
+	sell_quantity.text = "%d / %d" % [_sell_amount, _count]
+	sell_value.text = str(_unit_value * _sell_amount)
+	sell_minus.disabled = _count <= 1 or _sell_amount <= 1
+	sell_plus.disabled = _count <= 1 or _sell_amount >= _count
 
 func _refresh_recycle_preview(value: float) -> void:
 	var quantity := maxi(1, int(round(value)))
@@ -127,8 +151,7 @@ func _refresh_recycle_preview(value: float) -> void:
 	recycle_output.text = "Output: Recycled Fertilizer ×%d" % (_recycle_yield * quantity)
 
 func _confirm_sell() -> void:
-	var quantity := maxi(1, int(round(sell_slider.value)))
-	sell_requested.emit(_kind, _item_id, quantity)
+	sell_requested.emit(_kind, _item_id, _sell_amount)
 	close_all()
 
 func _confirm_recycle() -> void:

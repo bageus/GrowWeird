@@ -1,7 +1,6 @@
 extends SceneTree
 
 var _failures: Array[String] = []
-
 func _init() -> void:
 	_test_presentation_resources_load()
 	_test_scene_button_contract()
@@ -20,7 +19,6 @@ func _init() -> void:
 	for failure in _failures:
 		push_error(failure)
 	quit(1)
-
 func _test_presentation_resources_load() -> void:
 	var paths := [
 		"res://src/presentation/main/scene_controls.tscn",
@@ -63,7 +61,6 @@ func _test_scene_button_contract() -> void:
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("wallet"), "scene buttons: wallet block must be movable")
 	_expect(SceneControlsOverlay.DEFAULT_POSITIONS.has("shop") and SceneControlsOverlay.DEFAULT_POSITIONS.has("tasks"), "scene buttons: shop and tasks atlas controls missing")
 	host.free()
-
 func _test_scene_hud_contract() -> void:
 	var host := Control.new()
 	host.size = Vector2(1000.0, 600.0)
@@ -169,7 +166,8 @@ func _test_inventory_hud_contract() -> void:
 	_expect(dialogs_text.contains("RecycleAction") and dialogs_text.contains("SellAction") and dialogs_text.contains("UseAction"), "inventory HUD: item action menu incomplete")
 	_expect(not dialogs_text.contains("CancelAction") and FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").contains("inventory_dialogs.is_open()"), "inventory HUD: item menu must use the shared scene cancel button")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_item_dialogs.gd").contains('actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())'), "inventory HUD: item action menu retained its dark panel")
-	_expect(dialogs_text.contains("QuantitySlider") and dialogs_text.contains("ValueLabel"), "inventory HUD: sale quantity/value popup missing")
+	_expect(dialogs_text.contains("SellBackground") and dialogs_text.contains("SellBanner") and dialogs_text.contains("SellPreview") and dialogs_text.contains("SellDescription"), "inventory HUD: sale popup must use the shared buy-sell layout")
+	_expect(dialogs_text.contains("QuantityMinus") and dialogs_text.contains("QuantityPlus") and dialogs_text.contains("ValueLabel") and dialogs_text.contains("SellButton"), "inventory HUD: sale quantity/value controls missing")
 	_expect(dialogs_text.contains("OutputLabel") and dialogs_text.contains("Grind into fertilizer"), "inventory HUD: recycling preview missing")
 	_expect(scene_text.contains("CurtainsButton") and scene_text.contains("OpenWindowButton") and scene_text.contains("BlindsButton") and scene_text.contains("NormalLightButton"), "lighting HUD: four requested modes missing")
 	var main_scene_text := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
@@ -189,6 +187,7 @@ func _test_inventory_hud_contract() -> void:
 	var draggable_script := FileAccess.get_file_as_string("res://src/presentation/main/scene_draggable_panel.gd")
 	var main_screen_script := FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd")
 	_expect(controls_scene.contains("layout_id = &\"wallet\"\ndrag_handle_height = 120.0\nallow_scaling = true"), "wallet HUD: balance block must opt into scaling")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.tscn").contains('[node name="WalletTopupPanel" type="Control"]\nvisible = false'), "wallet HUD: coin purchase menu must start closed")
 	_expect(draggable_script.contains("KEY_CTRL") and draggable_script.contains("MOUSE_BUTTON_WHEEL_UP") and draggable_script.contains("scale_committed.emit"), "wallet HUD: Ctrl-wheel scaling contract is missing")
 	_expect(main_screen_script.count("disabled = ids.is_empty()") >= 2, "fertilizer HUD: Skip and Refresh must stay disabled during the next-batch timer")
 	_expect(main_screen_script.contains("Fertilizer added to inventory."), "fertilizer HUD: selecting an offer must report inventory acquisition instead of immediate use")
