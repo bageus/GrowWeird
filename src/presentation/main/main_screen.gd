@@ -130,6 +130,8 @@ func _refresh_offer() -> void:
 			_set_offer_icon(button, null)
 			button.disabled = true
 	scene_controls.set_offer_energy_actions(not ids.is_empty(), GameApp.state.energy)
+	refresh_offer.disabled = ids.is_empty() or GameApp.state.energy < EnergyService.OFFER_COST
+	skip_offer.disabled = ids.is_empty() or GameApp.state.energy < EnergyService.OFFER_COST
 	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
 
 func _set_offer_icon(button: Button, texture: Texture2D) -> void:
