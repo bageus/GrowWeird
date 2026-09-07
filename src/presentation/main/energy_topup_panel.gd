@@ -11,13 +11,13 @@ func _ready() -> void:
 	%Pack35.pressed.connect(_purchase.bind(0))
 	%Pack105.pressed.connect(_purchase.bind(1))
 	%Pack350.pressed.connect(_purchase.bind(2))
-	GameApp.state_changed.connect(refresh)
+	_app().state_changed.connect(refresh)
 
 func open() -> void: visible = true; refresh()
 func close() -> void: visible = false
 func refresh() -> void:
-	if not is_node_ready() or GameApp.state == null: return
-	%EnergyLabel.text = "Energy %d / %d\nNext +1: %s" % [GameApp.state.energy, EnergyService.capacity(GameApp.state), _timer()]
+	if not is_node_ready() or _app().state == null: return
+	%EnergyLabel.text = "Energy %d / %d\nNext +1: %s" % [_app().state.energy, EnergyService.capacity(_app().state), _timer()]
 
 func _purchase(index: int) -> void:
 	var product: Array = PRODUCTS[index]
@@ -25,5 +25,7 @@ func _purchase(index: int) -> void:
 	%StatusLabel.text = "Waiting for payment provider confirmation."
 
 func _timer() -> String:
-	var seconds := EnergyService.seconds_to_next(GameApp.state)
+	var seconds := EnergyService.seconds_to_next(_app().state)
 	return "full" if seconds == 0 else "%02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+
+func _app() -> Node: return get_node("/root/GameApp")
