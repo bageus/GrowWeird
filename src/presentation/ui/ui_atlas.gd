@@ -130,8 +130,14 @@ static func configure_balance_plus(button: Button, _balance_art: TextureRect) ->
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 
+static func balance_background() -> Texture2D:
+	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
+
 static func balance_icon(energy := false) -> Texture2D:
-	return atlas_region(HUD_BALANCE_ICON, Rect2(CELL if energy else 0.0, 0.0, CELL, CELL))
+	return atlas_region(HUD_BALANCE_ICON, Rect2(572.0, 66.0, 392.0, 362.0) if energy else Rect2(70.0, 86.0, 344.0, 340.0))
+
+static func balance_next_texture() -> Texture2D:
+	return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
 
 static func configure_hud_slot(button: Button) -> void:
 	if button == null:
