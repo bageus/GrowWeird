@@ -23,17 +23,17 @@ grow_vertical = 2
 color = Color(0.02, 0.01, 0.03, 0.7)
 
 [node name="Window" type="Control" parent="."]
-custom_minimum_size = Vector2(760, 610)
+custom_minimum_size = Vector2(820, 440)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -380.0
-offset_top = -305.0
-offset_right = 380.0
-offset_bottom = 305.0
+offset_left = -410.0
+offset_top = -160.0
+offset_right = 410.0
+offset_bottom = 280.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -52,20 +52,20 @@ stretch_mode = 5
 [node name="Banner" type="TextureRect" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 120.0
-offset_top = 18.0
-offset_right = 640.0
-offset_bottom = 118.0
+offset_left = 190.0
+offset_top = 4.0
+offset_right = 630.0
+offset_bottom = 76.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="MenuTitle" type="Label" parent="Window"]
 layout_mode = 0
-offset_left = 190.0
-offset_top = 38.0
-offset_right = 570.0
-offset_bottom = 96.0
+offset_left = 260.0
+offset_top = 14.0
+offset_right = 560.0
+offset_bottom = 66.0
 theme_override_font_sizes/font_size = 30
 text = "ENERGY"
 horizontal_alignment = 1
@@ -74,33 +74,33 @@ vertical_alignment = 1
 [node name="CloseButton" type="Button" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 670.0
-offset_top = 22.0
-offset_right = 740.0
-offset_bottom = 92.0
+offset_left = 740.0
+offset_top = 10.0
+offset_right = 804.0
+offset_bottom = 74.0
 
 [node name="EnergyLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = 115.0
-offset_right = 610.0
-offset_bottom = 150.0
+offset_left = 180.0
+offset_top = 76.0
+offset_right = 640.0
+offset_bottom = 106.0
 theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
 
 [node name="Lots" type="HBoxContainer" parent="Window"]
 layout_mode = 0
-offset_left = 52.0
-offset_top = 158.0
-offset_right = 708.0
-offset_bottom = 520.0
-theme_override_constants/separation = 18
+offset_left = 35.0
+offset_top = 106.0
+offset_right = 785.0
+offset_bottom = 372.0
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(205, 350)
+custom_minimum_size = Vector2(242, 260)
 layout_mode = 2
 [node name="Energy5" type="TextureRect" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -116,13 +116,13 @@ stretch_mode = 5
 [node name="AdButton" type="Button" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+offset_left = 44.0
+offset_top = 194.0
+offset_right = 198.0
+offset_bottom = 250.0
 
 [node name="Lot15" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(205, 350)
+custom_minimum_size = Vector2(242, 260)
 layout_mode = 2
 [node name="Energy15" type="TextureRect" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
@@ -138,13 +138,13 @@ stretch_mode = 5
 [node name="Pack15" type="Button" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+offset_left = 44.0
+offset_top = 194.0
+offset_right = 198.0
+offset_bottom = 250.0
 
 [node name="Lot30" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(205, 350)
+custom_minimum_size = Vector2(242, 260)
 layout_mode = 2
 [node name="Energy30" type="TextureRect" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
@@ -160,17 +160,17 @@ stretch_mode = 5
 [node name="Pack30" type="Button" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+offset_left = 44.0
+offset_top = 194.0
+offset_right = 198.0
+offset_bottom = 250.0
 
 [node name="StatusLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 110.0
-offset_top = 550.0
-offset_right = 650.0
-offset_bottom = 586.0
+offset_left = 130.0
+offset_top = 397.0
+offset_right = 690.0
+offset_bottom = 431.0
 theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 horizontal_alignment = 1
