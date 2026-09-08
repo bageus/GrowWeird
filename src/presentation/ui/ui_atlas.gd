@@ -98,24 +98,39 @@ static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 	return atlas_region(source, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
-	configure_button(button, 7, 2)
+	if button == null:
+		return
+	button.text = ""
+	button.icon = button_texture(7, 2)
+	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	button.clip_contents = true
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	var content := HBoxContainer.new()
 	content.name = "Content"
+	content.z_index = 3
 	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override(&"separation", 2)
+	content.add_theme_constant_override(&"separation", 0)
 	button.add_child(content)
 	if not rewarded_ad:
 		var amount := Label.new()
 		amount.name = "Amount"
+		amount.custom_minimum_size = Vector2(42.0, 0.0)
 		amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		amount.clip_text = true
 		amount.text = str(price)
+		amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		amount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		amount.add_theme_color_override(&"font_color", Color.WHITE)
+		amount.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1))
+		amount.add_theme_constant_override(&"outline_size", 3)
 		amount.add_theme_font_size_override(&"font_size", 22)
 		content.add_child(amount)
 	var currency := TextureRect.new()
