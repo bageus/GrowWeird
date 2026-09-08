@@ -53,10 +53,10 @@ vertical_alignment = 1
 
 [node name="AddButton" type="Button" parent="Layers"]
 layout_mode = 0
-offset_left = 165.0
-offset_top = 20.0
-offset_right = 240.0
-offset_bottom = 100.0
+offset_left = 166.0
+offset_top = 16.0
+offset_right = 249.0
+offset_bottom = 104.0
 
 [node name="Next" type="Control" parent="Layers"]
 layout_mode = 0
