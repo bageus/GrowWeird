@@ -15,12 +15,12 @@ const PRODUCTS := [
 var _ad_pending := false
 
 func _ready() -> void:
-	%Background.texture = UiAtlas.HUD_BUYSELL
-	%Banner.texture = UiAtlas.HUD_COIN_ENERGY_BANNER
-	%Coin10.texture = UiAtlas.COIN_LOTS[10]
-	%Coin100.texture = UiAtlas.COIN_LOTS[100]
-	%Coin300.texture = UiAtlas.COIN_LOTS[300]
-	%Coin1000.texture = UiAtlas.COIN_LOTS[1000]
+	%Background.texture = UiAtlas.topup_background()
+	%Banner.texture = UiAtlas.topup_banner()
+	%Coin10.texture = UiAtlas.coin_lot(10)
+	%Coin100.texture = UiAtlas.coin_lot(100)
+	%Coin300.texture = UiAtlas.coin_lot(300)
+	%Coin1000.texture = UiAtlas.coin_lot(1000)
 	UiAtlas.configure_button(%CloseButton, 6, 0)
 	UiAtlas.configure_topup_button(%AdButton, 0, true)
 	UiAtlas.configure_topup_button(%Product100, 59)
