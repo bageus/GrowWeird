@@ -123,7 +123,7 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
 	if button == null: return
 	button.text = ""
-	button.icon = button_texture(5, 3)
+	button.icon = _button_icon_crop(5, 3, false)
 	button.expand_icon = true
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -138,6 +138,18 @@ static func balance_icon(energy := false) -> Texture2D:
 
 static func balance_next_texture() -> Texture2D:
 	return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
+
+static func topup_background() -> Texture2D:
+	return atlas_region(HUD_BUYSELL, Rect2(100.0, 24.0, 824.0, 976.0))
+
+static func topup_banner() -> Texture2D:
+	return atlas_region(HUD_COIN_ENERGY_BANNER, Rect2(96.0, 112.0, 832.0, 288.0))
+
+static func coin_lot(amount: int) -> Texture2D:
+	return atlas_region(COIN_LOTS[amount], Rect2(296.0, 208.0, 432.0, 608.0))
+
+static func energy_lot(amount: int) -> Texture2D:
+	return atlas_region(ENERGY_LOTS[amount], Rect2(296.0, 208.0, 432.0, 608.0))
 
 static func configure_hud_slot(button: Button) -> void:
 	if button == null:
