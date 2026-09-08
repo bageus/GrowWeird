@@ -114,9 +114,8 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	currency.texture = button_texture(7, 3) if rewarded_ad else button_texture(6, 3)
 	currency.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	currency.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	currency.set_anchors_preset(Control.PRESET_CENTER)
 	var icon_size := 42.0 if rewarded_ad else 25.0
-	currency.position = Vector2(-icon_size * 0.5 if rewarded_ad else 17.0, -icon_size * 0.5)
+	currency.position = Vector2((button.size.x - icon_size) * 0.5 if rewarded_ad else button.size.x - icon_size - 20.0, (button.size.y - icon_size) * 0.5)
 	currency.size = Vector2(icon_size, icon_size)
 	button.add_child(currency)
 
