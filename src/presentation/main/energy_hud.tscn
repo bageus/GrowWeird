@@ -29,9 +29,9 @@ stretch_mode = 5
 
 [node name="BalanceIcon" type="TextureRect" parent="Layers"]
 layout_mode = 0
-offset_left = -8.0
+offset_left = -13.0
 offset_top = 20.0
-offset_right = 72.0
+offset_right = 67.0
 offset_bottom = 100.0
 mouse_filter = 2
 expand_mode = 1
@@ -39,9 +39,9 @@ stretch_mode = 5
 
 [node name="Value" type="Label" parent="Layers"]
 layout_mode = 0
-offset_left = 72.0
+offset_left = 67.0
 offset_top = 28.0
-offset_right = 172.0
+offset_right = 160.0
 offset_bottom = 94.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
@@ -53,10 +53,10 @@ vertical_alignment = 1
 
 [node name="AddButton" type="Button" parent="Layers"]
 layout_mode = 0
-offset_left = 178.0
-offset_top = 24.0
-offset_right = 238.0
-offset_bottom = 96.0
+offset_left = 165.0
+offset_top = 20.0
+offset_right = 240.0
+offset_bottom = 100.0
 
 [node name="Next" type="Control" parent="Layers"]
 layout_mode = 0
