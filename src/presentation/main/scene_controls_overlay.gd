@@ -28,7 +28,7 @@ func _ready() -> void:
 	_apply_ui_atlases()
 	_collect_controls()
 	(get_node("WalletHud/Layers/ShopButton") as Button).pressed.connect(_toggle_wallet_topup)
-	(get_node("EnergyHud/Button") as Button).pressed.connect(_toggle_energy_topup)
+	(get_node("EnergyHud/Layers/AddButton") as Button).pressed.connect(_toggle_energy_topup)
 	_layout = _load_layout()
 	resized.connect(_on_resized)
 	call_deferred("_apply_layout")
@@ -40,7 +40,13 @@ func _apply_ui_atlases() -> void:
 	wallet.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	var balance_art := get_node("WalletHud/Layers/BalanceArt") as TextureRect
 	balance_art.texture = UiAtlas.HUD_BALANCE
+	(get_node("WalletHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon()
 	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button, balance_art)
+	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as TextureRect
+	energy_art.texture = UiAtlas.HUD_BALANCE
+	(get_node("EnergyHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon(true)
+	(get_node("EnergyHud/Layers/Next/NextArt") as TextureRect).texture = UiAtlas.HUD_BALANCE_NEXT
+	UiAtlas.configure_balance_plus(get_node("EnergyHud/Layers/AddButton") as Button, energy_art)
 	var offers := get_node("OffersPanel") as PanelContainer
 	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferOne") as Button)
@@ -108,8 +114,10 @@ func set_offer_cooldown(seconds: float) -> void:
 func set_energy(state: GameState) -> void:
 	var capacity := EnergyService.capacity(state)
 	var seconds := EnergyService.seconds_to_next(state)
-	(get_node("EnergyHud/Button/Layout/Value") as Label).text = "⚡ %d / %d" % [state.energy, capacity]
-	(get_node("EnergyHud/Button/Layout/Timer") as Label).text = "FULL" if seconds == 0 else "+1  %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+	(get_node("EnergyHud/Layers/Value") as Label).text = "%d / %d" % [state.energy, capacity]
+	var next := get_node("EnergyHud/Layers/Next") as Control
+	next.visible = state.energy < capacity
+	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "+1  %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
 
 func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
 	for button_name in ["RefreshOffer", "SkipOffer"]:
