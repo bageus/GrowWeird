@@ -39,13 +39,13 @@ func _apply_ui_atlases() -> void:
 	var wallet := get_node("WalletHud") as PanelContainer
 	wallet.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	var balance_art := get_node("WalletHud/Layers/BalanceArt") as TextureRect
-	balance_art.texture = UiAtlas.HUD_BALANCE
+	balance_art.texture = UiAtlas.balance_background()
 	(get_node("WalletHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon()
 	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button, balance_art)
 	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as TextureRect
-	energy_art.texture = UiAtlas.HUD_BALANCE
+	energy_art.texture = UiAtlas.balance_background()
 	(get_node("EnergyHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon(true)
-	(get_node("EnergyHud/Layers/Next/NextArt") as TextureRect).texture = UiAtlas.HUD_BALANCE_NEXT
+	(get_node("EnergyHud/Layers/Next/NextArt") as TextureRect).texture = UiAtlas.balance_next_texture()
 	UiAtlas.configure_balance_plus(get_node("EnergyHud/Layers/AddButton") as Button, energy_art)
 	var offers := get_node("OffersPanel") as PanelContainer
 	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
