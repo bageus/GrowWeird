@@ -339,9 +339,10 @@ visible = false
 z_index = 100
 
 [node name="WalletTopupPanel" parent="." instance=ExtResource("10_topup")]
+z_index = 180
 
 [node name="EnergyTopupPanel" parent="." instance=ExtResource("11_energy")]
 visible = false
-z_index = 110
+z_index = 180
 
 [node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
