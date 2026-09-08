@@ -149,7 +149,7 @@ columns = 3
 
 [node name="Confirm" type="Control" parent="."]
 unique_name_in_owner = true
-z_index = 10
+z_index = 80
 custom_minimum_size = Vector2(560, 680)
 layout_mode = 1
 anchors_preset = 8
