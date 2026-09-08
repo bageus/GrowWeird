@@ -99,6 +99,8 @@ static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	configure_button(button, 7, 2)
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
 	var amount := Label.new()
 	amount.name = "Amount"
 	amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
