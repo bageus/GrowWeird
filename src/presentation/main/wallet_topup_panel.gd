@@ -15,7 +15,17 @@ const PRODUCTS := [
 var _ad_pending := false
 
 func _ready() -> void:
-	UiAtlas.configure_close_button(%CloseButton)
+	%Background.texture = UiAtlas.HUD_BUYSELL
+	%Banner.texture = UiAtlas.HUD_COIN_ENERGY_BANNER
+	%Coin10.texture = UiAtlas.COIN_LOTS[10]
+	%Coin100.texture = UiAtlas.COIN_LOTS[100]
+	%Coin300.texture = UiAtlas.COIN_LOTS[300]
+	%Coin1000.texture = UiAtlas.COIN_LOTS[1000]
+	UiAtlas.configure_button(%CloseButton, 6, 0)
+	UiAtlas.configure_topup_button(%AdButton, 0, true)
+	UiAtlas.configure_topup_button(%Product100, 59)
+	UiAtlas.configure_topup_button(%Product300, 159)
+	UiAtlas.configure_topup_button(%Product1000, 259)
 	%CloseButton.pressed.connect(close)
 	%Product100.pressed.connect(_request_purchase.bind(0))
 	%Product300.pressed.connect(_request_purchase.bind(1))
@@ -41,10 +51,7 @@ func refresh() -> void:
 	var remaining := RewardedAdService.remaining_claims(app.state, now_unix)
 	balance_label.text = "Balance: %d coins" % app.state.money
 	ad_button.disabled = _ad_pending or remaining <= 0
-	if remaining > 0:
-		ad_button.text = "Watch ad  ·  +10 coins  ·  %d/4 left" % remaining
-	else:
-		ad_button.text = "Next ad in %s" % _format_duration(RewardedAdService.seconds_until_next(app.state, now_unix))
+	ad_button.tooltip_text = "Watch ad · +10 coins · %d/4 left" % remaining if remaining > 0 else "Next ad in %s" % _format_duration(RewardedAdService.seconds_until_next(app.state, now_unix))
 
 func _request_purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]

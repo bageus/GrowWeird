@@ -13,7 +13,8 @@ func _init() -> void:
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
 	_expect(restored.energy == 66 and is_zero_approx(restored.energy_regen_elapsed), "energy save round trip failed")
 	state.pots.pop_back(); EnergyService.clamp_to_capacity(state)
-	_expect(state.energy == 35, "energy must be clamped when a pot is sold")
+	_expect(state.energy == 66, "owned energy must survive a lower pot capacity")
+	EnergyService.credit(state, 20); _expect(state.energy == 86, "purchased energy may exceed capacity")
 	var migrated := SaveMigrator.migrate({"schema_version": 9, "pots": [{}, {}]})
 	_expect(int(migrated.get("energy", -1)) == 70, "existing saves must start with full energy")
 	var plant := PlantState.new(); plant.growth_cycle_index = 9; plant.growth_cycle_elapsed = 0.0

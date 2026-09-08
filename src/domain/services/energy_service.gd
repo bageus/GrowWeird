@@ -14,7 +14,7 @@ static func fill(state: GameState) -> void:
 
 static func clamp_to_capacity(state: GameState) -> void:
 	if state == null: return
-	state.energy = clampi(state.energy, 0, capacity(state))
+	state.energy = maxi(0, state.energy)
 	if state.energy >= capacity(state): state.energy_regen_elapsed = 0.0
 
 static func spend(state: GameState, amount: int) -> bool:
@@ -25,7 +25,7 @@ static func spend(state: GameState, amount: int) -> bool:
 static func credit(state: GameState, amount: int) -> int:
 	if state == null or amount <= 0: return 0
 	var before := state.energy
-	state.energy = mini(capacity(state), state.energy + amount)
+	state.energy += amount
 	return state.energy - before
 
 static func advance(state: GameState, seconds: float) -> bool:
@@ -34,7 +34,7 @@ static func advance(state: GameState, seconds: float) -> bool:
 	var gained := floori(state.energy_regen_elapsed / REGEN_SECONDS)
 	if gained <= 0: return false
 	state.energy_regen_elapsed -= float(gained) * REGEN_SECONDS
-	credit(state, gained)
+	state.energy = mini(capacity(state), state.energy + gained)
 	if state.energy >= capacity(state): state.energy_regen_elapsed = 0.0
 	return true
 
