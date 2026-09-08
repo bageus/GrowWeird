@@ -4,7 +4,6 @@ extends RefCounted
 const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
 const BUTTONS_HOVER: Texture2D = preload("res://assets/ui/buttons_hover.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
-const HUD_BALANCE_PLUS_HOVER: Texture2D = preload("res://assets/ui/hud_balance_plus_hover.png")
 const HUD_BALANCE_ICON: Texture2D = preload("res://assets/ui/hud_balance_icon.png")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
