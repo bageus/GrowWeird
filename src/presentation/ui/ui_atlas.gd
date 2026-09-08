@@ -101,9 +101,11 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	configure_button(button, 7, 2)
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	button.clip_contents = true
 	var amount := Label.new()
 	amount.name = "Amount"
 	amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	amount.clip_text = true
 	amount.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	amount.offset_left = 18.0; amount.offset_right = -52.0
 	amount.text = "" if rewarded_ad else str(price)
@@ -118,8 +120,14 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	currency.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	currency.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	var icon_size := 42.0 if rewarded_ad else 25.0
-	currency.position = Vector2((button.size.x - icon_size) * 0.5 if rewarded_ad else button.size.x - icon_size - 20.0, (button.size.y - icon_size) * 0.5)
-	currency.size = Vector2(icon_size, icon_size)
+	currency.anchor_left = 0.5 if rewarded_ad else 1.0
+	currency.anchor_top = 0.5
+	currency.anchor_right = 0.5 if rewarded_ad else 1.0
+	currency.anchor_bottom = 0.5
+	currency.offset_left = -icon_size * 0.5 if rewarded_ad else -45.0
+	currency.offset_top = -icon_size * 0.5
+	currency.offset_right = icon_size * 0.5 if rewarded_ad else -20.0
+	currency.offset_bottom = icon_size * 0.5
 	button.add_child(currency)
 
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
