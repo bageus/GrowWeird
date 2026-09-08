@@ -113,13 +113,16 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
+pivot_offset = Vector2(102.5, 175)
+scale = Vector2(2, 2)
 [node name="AdButton" type="Button" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+z_index = 2
+offset_left = 25.0
+offset_top = 205.0
+offset_right = 180.0
+offset_bottom = 265.0
 
 [node name="Lot15" type="Control" parent="Window/Lots"]
 custom_minimum_size = Vector2(205, 350)
@@ -135,13 +138,16 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
+pivot_offset = Vector2(102.5, 175)
+scale = Vector2(2, 2)
 [node name="Pack15" type="Button" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+z_index = 2
+offset_left = 25.0
+offset_top = 205.0
+offset_right = 180.0
+offset_bottom = 265.0
 
 [node name="Lot30" type="Control" parent="Window/Lots"]
 custom_minimum_size = Vector2(205, 350)
@@ -157,13 +163,16 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
+pivot_offset = Vector2(102.5, 175)
+scale = Vector2(2, 2)
 [node name="Pack30" type="Button" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 30.0
-offset_top = 274.0
-offset_right = 175.0
-offset_bottom = 334.0
+z_index = 2
+offset_left = 25.0
+offset_top = 205.0
+offset_right = 180.0
+offset_bottom = 265.0
 
 [node name="StatusLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
