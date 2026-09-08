@@ -51,10 +51,7 @@ func refresh() -> void:
 	var remaining := RewardedAdService.remaining_claims(app.state, now_unix)
 	balance_label.text = "Balance: %d coins" % app.state.money
 	ad_button.disabled = _ad_pending or remaining <= 0
-	if remaining > 0:
-		ad_button.text = "Watch ad  ·  +10 coins  ·  %d/4 left" % remaining
-	else:
-		ad_button.text = "Next ad in %s" % _format_duration(RewardedAdService.seconds_until_next(app.state, now_unix))
+	ad_button.tooltip_text = "Watch ad · +10 coins · %d/4 left" % remaining if remaining > 0 else "Next ad in %s" % _format_duration(RewardedAdService.seconds_until_next(app.state, now_unix))
 
 func _request_purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
