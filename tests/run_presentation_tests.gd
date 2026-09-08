@@ -78,7 +78,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(main_text.contains("Save HUD layout"), "scene HUD: explicit save layout button missing")
 	_expect(hud_text.contains("WalletHud") and hud_text.contains("MoneyLabel") and hud_text.contains("ShopButton"), "scene HUD: balance and shop must share a wallet block")
 	_expect(FileAccess.file_exists("res://assets/ui/hud_balance.png") and FileAccess.file_exists("res://assets/ui/buttons.png"), "scene HUD: new UI atlases are missing")
-	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("UiAtlas.HUD_BALANCE_NEXT") and not FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("_set_balance_hover"), "scene HUD: shared balance art, refill badge, or static add button is missing")
+	_expect(FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd").contains("UiAtlas.balance_next_texture()") and not FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("_set_balance_hover"), "scene HUD: shared balance art, refill badge, or static add button is missing")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("UiAtlas.HUD_INVENTORY") and FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd").contains("background2(1)"), "inventory HUD: inventory and three slot atlas art are not wired")
 	_expect(hud_text.contains("OffersPanel") and hud_text.contains("RefreshOffer") and hud_text.contains("SkipOffer"), "scene HUD: fertilizers need refresh left and skip right controls")
 	_expect(hud_text.contains("Vector2(520, 112)"), "scene HUD: fertilizer timer must center on the visible offer block")
