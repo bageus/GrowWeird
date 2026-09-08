@@ -117,7 +117,7 @@ func set_energy(state: GameState) -> void:
 	(get_node("EnergyHud/Layers/Value") as Label).text = "%d / %d" % [state.energy, capacity]
 	var next := get_node("EnergyHud/Layers/Next") as Control
 	next.visible = state.energy < capacity
-	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "+1  %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "%02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
 
 func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
 	for button_name in ["RefreshOffer", "SkipOffer"]:
