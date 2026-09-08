@@ -2,34 +2,71 @@
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="1_drag"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBox_energy"]
-bg_color = Color(0.035, 0.13, 0.18, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.22, 0.7, 0.95, 1)
-corner_radius_top_left = 20
-corner_radius_top_right = 20
-corner_radius_bottom_right = 20
-corner_radius_bottom_left = 20
+[sub_resource type="StyleBoxEmpty" id="StyleBox_empty"]
 
 [node name="EnergyHud" type="PanelContainer"]
-z_index = 7
-custom_minimum_size = Vector2(180, 88)
-offset_right = 180.0
-offset_bottom = 88.0
-theme_override_styles/panel = SubResource("StyleBox_energy")
+z_index = 200
+custom_minimum_size = Vector2(240, 160)
+offset_right = 240.0
+offset_bottom = 160.0
+theme_override_styles/panel = SubResource("StyleBox_empty")
 script = ExtResource("1_drag")
 layout_id = &"energy"
-drag_handle_height = 88.0
+drag_handle_height = 120.0
 allow_scaling = true
 
-[node name="Button" type="Button" parent="."]
+[node name="Layers" type="Control" parent="."]
 layout_mode = 2
-flat = true
+mouse_filter = 1
 
-[node name="Layout" type="VBoxContainer" parent="Button"]
+[node name="BalanceArt" type="TextureRect" parent="Layers"]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 120.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BalanceIcon" type="TextureRect" parent="Layers"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 22.0
+offset_right = 74.0
+offset_bottom = 98.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Layers"]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 30.0
+offset_right = 184.0
+offset_bottom = 92.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 22
+text = "0 / 0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AddButton" type="Button" parent="Layers"]
+layout_mode = 0
+offset_left = 184.0
+offset_top = 31.0
+offset_right = 234.0
+offset_bottom = 91.0
+
+[node name="Next" type="Control" parent="Layers"]
+layout_mode = 0
+offset_left = 42.0
+offset_top = 108.0
+offset_right = 198.0
+offset_bottom = 156.0
+mouse_filter = 2
+
+[node name="NextArt" type="TextureRect" parent="Layers/Next"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,16 +74,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-alignment = 1
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Value" type="Label" parent="Button/Layout"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.42, 0.85, 1, 1)
-theme_override_font_sizes/font_size = 22
-text = "⚡ 0 / 0"
-horizontal_alignment = 1
-
-[node name="Timer" type="Label" parent="Button/Layout"]
-layout_mode = 2
+[node name="Timer" type="Label" parent="Layers/Next"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
 text = "+1  02:00"
 horizontal_alignment = 1
+vertical_alignment = 1
