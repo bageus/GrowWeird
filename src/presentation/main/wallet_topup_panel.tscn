@@ -20,87 +20,190 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.02, 0.01, 0.03, 0.7)
 
-[node name="Window" type="PanelContainer" parent="."]
+[node name="Window" type="Control" parent="."]
+custom_minimum_size = Vector2(900, 610)
 layout_mode = 1
-anchor_left = 0.25
-anchor_top = 0.12
-anchor_right = 0.75
-anchor_bottom = 0.88
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -450.0
+offset_top = -305.0
+offset_right = 450.0
+offset_bottom = 305.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Content" type="VBoxContainer" parent="Window"]
-layout_mode = 2
-theme_override_constants/separation = 12
+[node name="Background" type="TextureRect" parent="Window"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Header" type="HBoxContainer" parent="Window/Content"]
-layout_mode = 2
+[node name="Banner" type="TextureRect" parent="Window"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 190.0
+offset_top = 18.0
+offset_right = 710.0
+offset_bottom = 118.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Title" type="Label" parent="Window/Content/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
+[node name="MenuTitle" type="Label" parent="Window"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 38.0
+offset_right = 640.0
+offset_bottom = 96.0
 theme_override_font_sizes/font_size = 30
 text = "COINS"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BalanceLabel" type="Label" parent="Window/Content/Header"]
+[node name="CloseButton" type="Button" parent="Window"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
+layout_mode = 0
+offset_left = 810.0
+offset_top = 22.0
+offset_right = 880.0
+offset_bottom = 92.0
+
+[node name="BalanceLabel" type="Label" parent="Window"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 250.0
+offset_top = 115.0
+offset_right = 650.0
+offset_bottom = 150.0
+theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
+theme_override_font_sizes/font_size = 20
 text = "Balance: 0 coins"
-
-[node name="CloseButton" type="Button" parent="Window/Content/Header"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(56, 48)
-layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "×"
-
-[node name="Intro" type="Label" parent="Window/Content"]
-layout_mode = 2
-text = "Choose a coin pack"
 horizontal_alignment = 1
 
-[node name="Products" type="HBoxContainer" parent="Window/Content"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 12
+[node name="Lots" type="HBoxContainer" parent="Window"]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 158.0
+offset_right = 852.0
+offset_bottom = 520.0
+theme_override_constants/separation = 14
 alignment = 1
 
-[node name="Product100" type="Button" parent="Window/Content/Products"]
+[node name="AdLot" type="Control" parent="Window/Lots"]
+custom_minimum_size = Vector2(190, 350)
+layout_mode = 2
+[node name="Coin10" type="TextureRect" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-text = "100 coins\n59 ₽"
-
-[node name="Product300" type="Button" parent="Window/Content/Products"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="AdButton" type="Button" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-text = "300 coins\n159 ₽"
+layout_mode = 0
+offset_left = 24.0
+offset_top = 274.0
+offset_right = 166.0
+offset_bottom = 334.0
 
-[node name="Product1000" type="Button" parent="Window/Content/Products"]
+[node name="Lot100" type="Control" parent="Window/Lots"]
+custom_minimum_size = Vector2(190, 350)
+layout_mode = 2
+[node name="Coin100" type="TextureRect" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(150, 150)
-layout_mode = 2
-text = "1000 coins\n259 ₽"
-
-[node name="AdButton" type="Button" parent="Window/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Product100" type="Button" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 78)
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Watch ad  ·  +10 coins  ·  4/4 left"
+layout_mode = 0
+offset_left = 24.0
+offset_top = 274.0
+offset_right = 166.0
+offset_bottom = 334.0
 
-[node name="LimitHint" type="Label" parent="Window/Content"]
+[node name="Lot300" type="Control" parent="Window/Lots"]
+custom_minimum_size = Vector2(190, 350)
 layout_mode = 2
+[node name="Coin300" type="TextureRect" parent="Window/Lots/Lot300"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Product300" type="Button" parent="Window/Lots/Lot300"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 274.0
+offset_right = 166.0
+offset_bottom = 334.0
+
+[node name="Lot1000" type="Control" parent="Window/Lots"]
+custom_minimum_size = Vector2(190, 350)
+layout_mode = 2
+[node name="Coin1000" type="TextureRect" parent="Window/Lots/Lot1000"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+[node name="Product1000" type="Button" parent="Window/Lots/Lot1000"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 274.0
+offset_right = 166.0
+offset_bottom = 334.0
+
+[node name="LimitHint" type="Label" parent="Window"]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 525.0
+offset_right = 730.0
+offset_bottom = 553.0
+theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 text = "Advertising bonus: up to 4 times per rolling 8 hours"
 horizontal_alignment = 1
 
-[node name="StatusLabel" type="Label" parent="Window/Content"]
+[node name="StatusLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
+layout_mode = 0
+offset_left = 160.0
+offset_top = 558.0
+offset_right = 740.0
+offset_bottom = 590.0
+theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 horizontal_alignment = 1
