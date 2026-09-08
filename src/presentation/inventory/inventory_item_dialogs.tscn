@@ -55,6 +55,7 @@ text = "Grind"
 
 [node name="SellPopup" type="Control" parent="."]
 visible = false
+z_index = 160
 custom_minimum_size = Vector2(560, 680)
 layout_mode = 1
 anchors_preset = 8
