@@ -5,6 +5,8 @@ const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
 const BUTTONS_HOVER: Texture2D = preload("res://assets/ui/buttons_hover.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
 const HUD_BALANCE_PLUS_HOVER: Texture2D = preload("res://assets/ui/hud_balance_plus_hover.png")
+const HUD_BALANCE_ICON: Texture2D = preload("res://assets/ui/hud_balance_icon.png")
+const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
 const HUD_INVENTORY: Texture2D = preload("res://assets/ui/hud_background_inventory.png")
@@ -119,18 +121,18 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	currency.size = Vector2(icon_size, icon_size)
 	button.add_child(currency)
 
-static func configure_balance_plus(button: Button, balance_art: TextureRect) -> void:
-	if button == null or balance_art == null:
-		return
+static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
+	if button == null: return
 	button.text = ""
-	button.icon = null
+	button.icon = button_texture(5, 3)
 	button.expand_icon = true
-	button.tooltip_text = "Open balance and shop"
-	balance_art.texture = HUD_BALANCE
-	for state in [&"normal", &"hover", &"pressed", &"focus"]:
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	button.mouse_entered.connect(_set_balance_hover.bind(balance_art, true))
-	button.mouse_exited.connect(_set_balance_hover.bind(balance_art, false))
+
+static func balance_icon(energy := false) -> Texture2D:
+	return atlas_region(HUD_BALANCE_ICON, Rect2(CELL if energy else 0.0, 0.0, CELL, CELL))
 
 static func configure_hud_slot(button: Button) -> void:
 	if button == null:
@@ -220,11 +222,6 @@ static func _set_icon_button_hover(button: Button, row: int, column: int, hovere
 static func _set_close_hover(button: Button, hovered: bool) -> void:
 	if is_instance_valid(button):
 		button.icon = _close_texture(hovered)
-
-static func _set_balance_hover(balance_art: TextureRect, hovered: bool) -> void:
-	if not is_instance_valid(balance_art):
-		return
-	balance_art.texture = HUD_BALANCE_PLUS_HOVER if hovered else HUD_BALANCE
 
 static func _set_slot_hover(button: Button, hovered: bool) -> void:
 	if is_instance_valid(button):
