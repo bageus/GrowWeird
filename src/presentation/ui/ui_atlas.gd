@@ -162,6 +162,27 @@ static func balance_icon(energy := false) -> Texture2D:
 static func balance_next_texture() -> Texture2D:
 	return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
 
+static func warm_hud_style(border_width := 3, radius := 16, margins := Vector4(14.0, 10.0, 14.0, 10.0)) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(1.0, 0.88, 0.62, 0.97)
+	style.border_color = Color(0.76, 0.38, 0.07, 1.0)
+	style.set_border_width_all(border_width)
+	style.set_corner_radius_all(radius)
+	style.content_margin_left = margins.x
+	style.content_margin_top = margins.y
+	style.content_margin_right = margins.z
+	style.content_margin_bottom = margins.w
+	return style
+
+static func configure_warm_timer_hud(panel: PanelContainer, label: Label) -> void:
+	if panel == null or label == null:
+		return
+	panel.add_theme_stylebox_override(&"panel", warm_hud_style(2, 10, Vector4(10.0, 4.0, 10.0, 4.0)))
+	label.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0))
+	label.add_theme_font_size_override(&"font_size", 14)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+
 static func configure_hud_slot(button: Button) -> void:
 	if button == null:
 		return
