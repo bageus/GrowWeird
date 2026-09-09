@@ -99,11 +99,11 @@ offset_left = 48.0
 offset_top = 80.0
 offset_right = 852.0
 offset_bottom = 430.0
-theme_override_constants/separation = -61
+theme_override_constants/separation = -49
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(247, 350)
+custom_minimum_size = Vector2(197.6, 350)
 layout_mode = 2
 [node name="Coin10" type="TextureRect" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -116,8 +116,8 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
-pivot_offset = Vector2(123.5, 175)
-scale = Vector2(2.6, 2.6)
+pivot_offset = Vector2(98.8, 175)
+scale = Vector2(2.08, 2.08)
 [node name="AdButton" type="Button" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
 z_index = 2
@@ -127,15 +127,15 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -151.0
-offset_right = 100.0
-offset_bottom = -73.0
+offset_left = -80.0
+offset_top = -143.2
+offset_right = 80.0
+offset_bottom = -80.8
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot100" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(247, 350)
+custom_minimum_size = Vector2(197.6, 350)
 layout_mode = 2
 [node name="Coin100" type="TextureRect" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
@@ -148,8 +148,8 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
-pivot_offset = Vector2(123.5, 175)
-scale = Vector2(2.6, 2.6)
+pivot_offset = Vector2(98.8, 175)
+scale = Vector2(2.08, 2.08)
 [node name="Product100" type="Button" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
 z_index = 2
@@ -159,15 +159,15 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -151.0
-offset_right = 100.0
-offset_bottom = -73.0
+offset_left = -80.0
+offset_top = -143.2
+offset_right = 80.0
+offset_bottom = -80.8
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot300" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(247, 350)
+custom_minimum_size = Vector2(197.6, 350)
 layout_mode = 2
 [node name="Coin300" type="TextureRect" parent="Window/Lots/Lot300"]
 unique_name_in_owner = true
@@ -180,8 +180,8 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
-pivot_offset = Vector2(123.5, 175)
-scale = Vector2(2.6, 2.6)
+pivot_offset = Vector2(98.8, 175)
+scale = Vector2(2.08, 2.08)
 [node name="Product300" type="Button" parent="Window/Lots/Lot300"]
 unique_name_in_owner = true
 z_index = 2
@@ -191,15 +191,15 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -151.0
-offset_right = 100.0
-offset_bottom = -73.0
+offset_left = -80.0
+offset_top = -143.2
+offset_right = 80.0
+offset_bottom = -80.8
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot1000" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(247, 350)
+custom_minimum_size = Vector2(197.6, 350)
 layout_mode = 2
 [node name="Coin1000" type="TextureRect" parent="Window/Lots/Lot1000"]
 unique_name_in_owner = true
@@ -212,8 +212,8 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
-pivot_offset = Vector2(123.5, 175)
-scale = Vector2(2.6, 2.6)
+pivot_offset = Vector2(98.8, 175)
+scale = Vector2(2.08, 2.08)
 [node name="Product1000" type="Button" parent="Window/Lots/Lot1000"]
 unique_name_in_owner = true
 z_index = 2
@@ -223,10 +223,10 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -100.0
-offset_top = -151.0
-offset_right = 100.0
-offset_bottom = -73.0
+offset_left = -80.0
+offset_top = -143.2
+offset_right = 80.0
+offset_bottom = -80.8
 grow_horizontal = 2
 grow_vertical = 0
 
