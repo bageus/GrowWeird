@@ -168,6 +168,10 @@ static func warm_hud_style(border_width := 3, radius := 16, margins := Vector4(1
 	style.border_color = Color(0.76, 0.38, 0.07, 1.0)
 	style.set_border_width_all(border_width)
 	style.set_corner_radius_all(radius)
+	style.shadow_color = Color(0.34, 0.14, 0.025, 0.48)
+	style.shadow_size = maxi(2, border_width - 1)
+	style.shadow_offset = Vector2(0.0, 3.0)
+	style.anti_aliasing_size = 1.5
 	style.content_margin_left = margins.x
 	style.content_margin_top = margins.y
 	style.content_margin_right = margins.z
