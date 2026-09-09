@@ -45,7 +45,9 @@ func _apply_ui_atlases() -> void:
 	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as TextureRect
 	energy_art.texture = UiAtlas.balance_background()
 	(get_node("EnergyHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon(true)
-	(get_node("EnergyHud/Layers/Next/NextArt") as TextureRect).texture = UiAtlas.balance_next_texture()
+	var energy_next := get_node("EnergyHud/Layers/Next") as PanelContainer
+	UiAtlas.configure_warm_timer_hud(energy_next, get_node("EnergyHud/Layers/Next/Timer") as Label)
+	UiAtlas.configure_warm_timer_hud(get_node("OffersPanel/CooldownCenter/CooldownOverlay") as PanelContainer, get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label)
 	UiAtlas.configure_balance_plus(get_node("EnergyHud/Layers/AddButton") as Button, energy_art)
 	var offers := get_node("OffersPanel") as PanelContainer
 	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
@@ -117,7 +119,7 @@ func set_energy(state: GameState) -> void:
 	(get_node("EnergyHud/Layers/Value") as Label).text = "%d / %d" % [state.energy, capacity]
 	var next := get_node("EnergyHud/Layers/Next") as Control
 	next.visible = state.energy < capacity
-	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "%02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "Next energy in %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
 
 func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
 	for button_name in ["RefreshOffer", "SkipOffer"]:
