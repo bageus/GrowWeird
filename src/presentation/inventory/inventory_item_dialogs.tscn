@@ -56,22 +56,21 @@ text = "Grind"
 [node name="SellPopup" type="Control" parent="."]
 visible = false
 z_index = 160
-custom_minimum_size = Vector2(560, 680)
+custom_minimum_size = Vector2(560, 540)
 layout_mode = 1
-anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 0.2
 anchor_right = 0.5
-anchor_bottom = 0.5
+anchor_bottom = 0.2
 offset_left = -280.0
-offset_top = -340.0
+offset_top = 8.0
 offset_right = 280.0
-offset_bottom = 340.0
+offset_bottom = 548.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
 
-[node name="SellBackground" type="TextureRect" parent="SellPopup"]
+[node name="SellBackground" type="Panel" parent="SellPopup"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -79,15 +78,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
 
 [node name="SellBanner" type="TextureRect" parent="SellPopup"]
 layout_mode = 0
 offset_left = 35.0
-offset_top = 20.0
+offset_top = 10.0
 offset_right = 525.0
-offset_bottom = 120.0
+offset_bottom = 90.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
@@ -95,9 +92,9 @@ stretch_mode = 5
 [node name="SellName" type="Label" parent="SellPopup"]
 layout_mode = 0
 offset_left = 90.0
-offset_top = 42.0
+offset_top = 26.0
 offset_right = 470.0
-offset_bottom = 98.0
+offset_bottom = 78.0
 theme_override_font_sizes/font_size = 28
 text = "Item"
 horizontal_alignment = 1
@@ -106,16 +103,16 @@ vertical_alignment = 1
 [node name="SellClose" type="Button" parent="SellPopup"]
 layout_mode = 0
 offset_left = 474.0
-offset_top = 32.0
+offset_top = 18.0
 offset_right = 540.0
-offset_bottom = 98.0
+offset_bottom = 78.0
 
 [node name="SellPreview" type="TextureRect" parent="SellPopup"]
 layout_mode = 0
 offset_left = 165.0
-offset_top = 125.0
+offset_top = 92.0
 offset_right = 395.0
-offset_bottom = 345.0
+offset_bottom = 252.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
@@ -123,9 +120,9 @@ stretch_mode = 5
 [node name="SellDescription" type="Label" parent="SellPopup"]
 layout_mode = 0
 offset_left = 80.0
-offset_top = 350.0
+offset_top = 255.0
 offset_right = 480.0
-offset_bottom = 420.0
+offset_bottom = 318.0
 theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 theme_override_font_sizes/font_size = 20
 text = "Description"
@@ -136,9 +133,9 @@ autowrap_mode = 2
 [node name="QuantityControl" type="Control" parent="SellPopup"]
 layout_mode = 0
 offset_left = 80.0
-offset_top = 425.0
+offset_top = 320.0
 offset_right = 480.0
-offset_bottom = 505.0
+offset_bottom = 390.0
 
 [node name="QuantityBackground" type="TextureRect" parent="SellPopup/QuantityControl"]
 layout_mode = 1
@@ -183,9 +180,9 @@ text = "+"
 [node name="CountControl" type="Control" parent="SellPopup"]
 layout_mode = 0
 offset_left = 150.0
-offset_top = 515.0
+offset_top = 398.0
 offset_right = 410.0
-offset_bottom = 580.0
+offset_bottom = 458.0
 
 [node name="CountBackground" type="TextureRect" parent="SellPopup/CountControl"]
 layout_mode = 1
@@ -213,9 +210,9 @@ vertical_alignment = 1
 [node name="SellButton" type="Button" parent="SellPopup"]
 layout_mode = 0
 offset_left = 155.0
-offset_top = 590.0
+offset_top = 466.0
 offset_right = 405.0
-offset_bottom = 660.0
+offset_bottom = 526.0
 
 [node name="RecyclePopup" type="PanelContainer" parent="."]
 visible = false

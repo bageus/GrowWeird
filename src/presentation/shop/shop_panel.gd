@@ -97,11 +97,11 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register(%ConfirmPrice, "confirm_price")
 
 func _configure_buy_dialog_art() -> void:
-	%ConfirmBackground.texture = UiAtlas.HUD_BUYSELL
+	(%ConfirmBackground as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	%ConfirmBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
 	%QuantityBackground.texture = UiAtlas.HUD_QUANTITY
 	%CountBackground.texture = UiAtlas.HUD_COUNT
-	UiAtlas.configure_button(%ConfirmClose, 6, 0)
+	UiAtlas.configure_close_button(%ConfirmClose)
 	UiAtlas.configure_button(buy_button, 7, 1)
 	_configure_quantity_hit(quantity_minus)
 	_configure_quantity_hit(quantity_plus)

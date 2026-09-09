@@ -15,13 +15,13 @@ const PRODUCTS := [
 var _ad_pending := false
 
 func _ready() -> void:
-	%Background.texture = UiAtlas.HUD_BUYSELL
+	(%Background as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	%Banner.texture = UiAtlas.HUD_COIN_ENERGY_BANNER
 	%Coin10.texture = UiAtlas.COIN_LOTS[10]
 	%Coin100.texture = UiAtlas.COIN_LOTS[100]
 	%Coin300.texture = UiAtlas.COIN_LOTS[300]
 	%Coin1000.texture = UiAtlas.COIN_LOTS[1000]
-	UiAtlas.configure_button(%CloseButton, 6, 0)
+	UiAtlas.configure_close_button(%CloseButton)
 	UiAtlas.configure_topup_button(%AdButton, 0, true)
 	UiAtlas.configure_topup_button(%Product100, 59)
 	UiAtlas.configure_topup_button(%Product300, 159)
