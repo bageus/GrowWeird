@@ -108,6 +108,7 @@ func _configure_buy_dialog_art() -> void:
 
 func _configure_quantity_hit(button: Button) -> void:
 	button.text = ""; button.focus_mode = Control.FOCUS_NONE
+	button.mouse_filter = Control.MOUSE_FILTER_STOP; button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS; button.z_index = 5
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
