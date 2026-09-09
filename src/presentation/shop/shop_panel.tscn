@@ -1,22 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/shop/shop_panel.gd" id="1_shop"]
-
-[sub_resource type="StyleBoxFlat" id="Style_window"]
-bg_color = Color(0.055, 0.11, 0.09, 0.98)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(0.42, 0.23, 0.08, 1)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-content_margin_left = 22.0
-content_margin_top = 18.0
-content_margin_right = 22.0
-content_margin_bottom = 20.0
 
 [node name="ShopContainer" type="Control"]
 layout_mode = 3
@@ -41,12 +25,11 @@ color = Color(0.015, 0.01, 0.02, 0.78)
 [node name="Window" type="PanelContainer" parent="."]
 layout_mode = 1
 anchor_left = 0.04
-anchor_top = 0.04
+anchor_top = 0.2
 anchor_right = 0.96
-anchor_bottom = 0.96
+anchor_bottom = 0.97
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("Style_window")
 
 [node name="Content" type="VBoxContainer" parent="Window"]
 layout_mode = 2
@@ -75,7 +58,7 @@ stretch_mode = 5
 custom_minimum_size = Vector2(240, 120)
 layout_mode = 2
 
-[node name="BalanceArt" type="TextureRect" parent="Window/Content/Header/Balance"]
+[node name="BalanceFrame" type="Panel" parent="Window/Content/Header/Balance"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -84,16 +67,25 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="ShopBalanceIcon" type="TextureRect" parent="Window/Content/Header/Balance"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 27.0
+offset_right = 68.0
+offset_bottom = 93.0
+mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="MoneyLabel" type="Label" parent="Window/Content/Header/Balance"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 70.0
-offset_top = 34.0
-offset_right = 184.0
-offset_bottom = 88.0
+offset_left = 66.0
+offset_top = 30.0
+offset_right = 180.0
+offset_bottom = 90.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
 theme_override_constants/outline_size = 5

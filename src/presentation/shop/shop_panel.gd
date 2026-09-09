@@ -53,8 +53,11 @@ func _ready() -> void:
 	_layout_editor = ShopLayoutEditor.new(self)
 	$Window/Content/Header/Title.texture = UiAtlas.shop_title_texture()
 	%Awning.texture = UiAtlas.shop_awning_texture()
-	%BalanceArt.texture = UiAtlas.HUD_BALANCE
-	UiAtlas.configure_balance_plus(%BalancePlus, %BalanceArt)
+	($Window as PanelContainer).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(5, 24, Vector4(22.0, 18.0, 22.0, 20.0)))
+	category_hud.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(3, 16))
+	%BalanceFrame.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(3, 16, Vector4(8.0, 6.0, 8.0, 6.0)))
+	%ShopBalanceIcon.texture = UiAtlas.balance_icon()
+	UiAtlas.configure_balance_plus(%BalancePlus, null)
 	UiAtlas.configure_close_button(%CloseButton)
 	_configure_buy_dialog_art()
 	%CloseButton.pressed.connect(_request_close)
