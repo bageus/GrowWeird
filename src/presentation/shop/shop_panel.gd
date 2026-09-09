@@ -28,7 +28,6 @@ const LOT_FRAMES := {
 @onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
 @onready var category_hud: PanelContainer = %CategoryHud
-@onready var money_label: Label = %MoneyLabel
 @onready var confirm: Control = %Confirm
 @onready var confirm_name: Label = %ConfirmName
 @onready var confirm_description: Label = %ConfirmDescription
@@ -53,11 +52,8 @@ func _ready() -> void:
 	_layout_editor = ShopLayoutEditor.new(self)
 	$Window/Content/Header/Title.texture = UiAtlas.shop_title_texture()
 	%Awning.texture = UiAtlas.shop_awning_texture()
-	($Window as PanelContainer).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(5, 24, Vector4(22.0, 18.0, 22.0, 20.0)))
+	($Window as PanelContainer).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	category_hud.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(3, 16))
-	%BalanceFrame.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(3, 16, Vector4(8.0, 6.0, 8.0, 6.0)))
-	%ShopBalanceIcon.texture = UiAtlas.balance_icon()
-	UiAtlas.configure_balance_plus(%BalancePlus, null)
 	UiAtlas.configure_close_button(%CloseButton)
 	_configure_buy_dialog_art()
 	%CloseButton.pressed.connect(_request_close)
@@ -81,7 +77,6 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register($Window, "window")
 	_layout_editor.register($Window/Content/Header/Title, "title")
 	_layout_editor.register(%Awning, "awning")
-	_layout_editor.register($Window/Content/Header/Balance, "balance")
 	_layout_editor.register(%CloseButton, "close")
 	_layout_editor.register(%CategoryHud, "category_hud")
 	_layout_editor.register(%Confirm, "confirm")
@@ -120,7 +115,7 @@ func _configure_quantity_hit(button: Button) -> void:
 func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
 	var signature := "%s|%d" % [str(fertilizers), money]
 	if signature == _last_signature: return
-	_last_signature = signature; _money = money; money_label.text = str(money)
+	_last_signature = signature; _money = money
 	_catalogs = {
 		&"plants": _plant_items(), &"pots": _pot_items(), &"seeds": _seed_items(),
 		&"fertilizers": _fertilizer_items(fertilizers), &"decorations": _misc_items(DECORATIONS, &"decoration"),
@@ -298,9 +293,10 @@ func _quantity_badge(amount: int) -> Label:
 
 func _apply_category_hud(color: Color) -> void:
 	var style := StyleBoxFlat.new(); style.bg_color = color.darkened(0.72); style.bg_color.a = 0.96
-	style.border_width_left = 4; style.border_width_top = 4; style.border_width_right = 4; style.border_width_bottom = 4
-	style.border_color = color.lightened(0.2); style.corner_radius_top_left = 18; style.corner_radius_top_right = 18
-	style.corner_radius_bottom_left = 18; style.corner_radius_bottom_right = 18
+	style.border_width_left = 7; style.border_width_top = 7; style.border_width_right = 7; style.border_width_bottom = 7
+	style.border_color = color.lightened(0.28); style.shadow_color = Color(0.08, 0.04, 0.01, 0.55); style.shadow_size = 5; style.shadow_offset = Vector2(0, 3)
+	style.corner_radius_top_left = 20; style.corner_radius_top_right = 20
+	style.corner_radius_bottom_left = 20; style.corner_radius_bottom_right = 20
 	style.content_margin_left = 16; style.content_margin_top = 16; style.content_margin_right = 16; style.content_margin_bottom = 16
 	category_hud.add_theme_stylebox_override(&"panel", style)
 
