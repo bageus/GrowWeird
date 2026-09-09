@@ -150,6 +150,7 @@ func _toggle_wallet_topup() -> void:
 		var opening := not panel.visible
 		if opening:
 			set_shop_visible(false)
+			set_energy_topup_visible(false)
 		set_wallet_topup_visible(opening)
 
 func set_energy_topup_visible(enabled: bool) -> void:
