@@ -51,7 +51,7 @@ func _ready() -> void:
 	UiAtlas.configure_button(use_action, 5, 1)
 	UiAtlas.configure_button(sell_action, 3, 3)
 	UiAtlas.configure_button(recycle_action, 5, 2)
-	UiAtlas.configure_button($SellPopup/SellClose as Button, 6, 0)
+	UiAtlas.configure_close_button($SellPopup/SellClose as Button)
 	UiAtlas.configure_button($SellPopup/SellButton as Button, 3, 3)
 	_configure_sell_art()
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
@@ -59,7 +59,7 @@ func _ready() -> void:
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func _configure_sell_art() -> void:
-	$SellPopup/SellBackground.texture = UiAtlas.HUD_BUYSELL
+	($SellPopup/SellBackground as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	$SellPopup/SellBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
 	$SellPopup/QuantityControl/QuantityBackground.texture = UiAtlas.HUD_QUANTITY
 	$SellPopup/CountControl/CountBackground.texture = UiAtlas.HUD_COUNT
