@@ -2,7 +2,6 @@ class_name UiAtlas
 extends RefCounted
 
 const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
-const BUTTONS_HOVER: Texture2D = preload("res://assets/ui/buttons_hover.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
 const HUD_BALANCE_ICON: Texture2D = preload("res://assets/ui/hud_balance_icon.png")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
@@ -40,8 +39,7 @@ static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
 	return texture
 
 static func button_texture(row: int, column: int, hover := false, mirror_x := false) -> Texture2D:
-	var source := BUTTONS_HOVER if hover else BUTTONS
-	var texture: Texture2D = atlas_region(source, Rect2(column * CELL, row * CELL + 88.0, CELL, 336.0))
+	var texture: Texture2D = atlas_region(BUTTONS, Rect2(column * CELL, row * CELL + 88.0, CELL, 336.0))
 	if not mirror_x:
 		return texture
 	var image := texture.get_image()
@@ -90,12 +88,10 @@ static func configure_close_button(button: Button) -> void:
 	button.mouse_exited.connect(_set_close_hover.bind(button, false))
 
 static func _close_texture(hovered: bool) -> Texture2D:
-	var source := BUTTONS_HOVER if hovered else BUTTONS
-	return atlas_region(source, Rect2(104.0, 3176.0, 304.0, 304.0))
+	return atlas_region(BUTTONS, Rect2(104.0, 3176.0, 304.0, 304.0))
 
 static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
-	var source := BUTTONS_HOVER if hover else BUTTONS
-	return atlas_region(source, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
+	return atlas_region(BUTTONS, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	if button == null:
@@ -181,7 +177,7 @@ static func warm_hud_style(border_width := 3, radius := 16, margins := Vector4(1
 static func configure_warm_timer_hud(panel: PanelContainer, label: Label) -> void:
 	if panel == null or label == null:
 		return
-	panel.add_theme_stylebox_override(&"panel", warm_hud_style(2, 10, Vector4(10.0, 4.0, 10.0, 4.0)))
+	panel.add_theme_stylebox_override(&"panel", warm_hud_style(2, 10, Vector4(10.0, 2.0, 10.0, 2.0)))
 	label.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0))
 	label.add_theme_font_size_override(&"font_size", 14)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
