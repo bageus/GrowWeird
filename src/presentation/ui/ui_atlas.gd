@@ -15,7 +15,6 @@ const HUD_POT_HOVER_LEFT: Texture2D = preload("res://assets/ui/hud_background_po
 const HUD_POT_HOVER_RIGHT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverright.png")
 const HUD_BUYSELL: Texture2D = preload("res://assets/ui/hud4.png")
 const HUD_BUYSELL_BANNER: Texture2D = preload("res://assets/ui/hud_buysell_banner.png")
-const HUD_QUANTITY: Texture2D = preload("res://assets/ui/hud_background_quantity.png")
 const HUD_COUNT: Texture2D = preload("res://assets/ui/hud_background_count.png")
 const HUD_SHOP_LOTS: Texture2D = preload("res://assets/ui/hud_background_shop.png")
 const HUD_COIN_ENERGY_BANNER: Texture2D = preload("res://assets/ui/hud_coinenergy_banner.png")
