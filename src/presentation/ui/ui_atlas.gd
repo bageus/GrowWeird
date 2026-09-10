@@ -22,6 +22,28 @@ const HUD_COIN_ENERGY_BANNER: Texture2D = preload("res://assets/ui/hud_coinenerg
 const CELL := 512.0
 const ENERGY_COIN_CELL := 256.0
 
+class CoinFace:
+	extends Control
+	func _draw() -> void:
+		var center := size * 0.5
+		var radius := minf(size.x, size.y) * 0.46
+		draw_circle(center + Vector2(0.0, 2.0), radius, Color(0.34, 0.12, 0.015, 0.72))
+		draw_circle(center, radius, Color(1.0, 0.59, 0.02, 1.0))
+		draw_circle(center, radius * 0.82, Color(1.0, 0.84, 0.08, 1.0))
+		draw_arc(center, radius * 0.72, 0.0, TAU, 40, Color(0.92, 0.45, 0.015, 1.0), 2.0, true)
+		var crown := PackedVector2Array([
+			center + Vector2(-radius * 0.48, radius * 0.18),
+			center + Vector2(-radius * 0.42, -radius * 0.28),
+			center + Vector2(-radius * 0.12, -radius * 0.02),
+			center + Vector2(0.0, -radius * 0.42),
+			center + Vector2(radius * 0.16, -radius * 0.02),
+			center + Vector2(radius * 0.46, -radius * 0.28),
+			center + Vector2(radius * 0.42, radius * 0.18)
+		])
+		draw_colored_polygon(crown, Color(1.0, 0.65, 0.015, 1.0))
+		draw_polyline(crown, Color(0.69, 0.26, 0.01, 1.0), 2.0, true)
+
+
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
 	var texture := AtlasTexture.new()
 	texture.atlas = source
@@ -112,11 +134,7 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	label.add_theme_font_override(&"font", bold_font)
 	label.add_theme_color_override(&"font_color", Color(0.33, 0.18, 0.1, 1.0))
 	label.add_theme_color_override(&"font_outline_color", Color(1.0, 0.94, 0.78, 1.0))
-	label.add_theme_color_override(&"font_shadow_color", Color(0.23, 0.08, 0.015, 0.62))
 	label.add_theme_constant_override(&"outline_size", 4)
-	label.add_theme_constant_override(&"shadow_offset_x", 2)
-	label.add_theme_constant_override(&"shadow_offset_y", 3)
-	label.add_theme_constant_override(&"shadow_outline_size", 2)
 	label.add_theme_font_size_override(&"font_size", 22)
 	panel.add_child(label)
 	var icon := TextureRect.new()
@@ -145,17 +163,14 @@ static func configure_transaction_total(container: Control) -> void:
 	value_label.offset_right = 22.0
 	value_label.offset_bottom = 24.0
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var icon := TextureRect.new()
+	var icon := CoinFace.new()
 	icon.name = "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	icon.texture = energy_coin_icon(2, 1)
 	icon.set_anchors_preset(Control.PRESET_CENTER)
 	icon.offset_left = 28.0
 	icon.offset_top = -22.0
 	icon.offset_right = 72.0
 	icon.offset_bottom = 22.0
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	container.add_child(icon)
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
