@@ -55,7 +55,8 @@ text = "Grind"
 
 [node name="SellPopup" type="Control" parent="."]
 visible = false
-z_index = 160
+z_index = 190
+z_as_relative = false
 custom_minimum_size = Vector2(500, 480)
 layout_mode = 1
 anchor_left = 0.5
@@ -220,12 +221,10 @@ vertical_alignment = 1
 
 [node name="SellButton" type="Button" parent="SellPopup"]
 layout_mode = 0
-offset_left = 125.0
-offset_top = 420.0
-offset_right = 375.0
-offset_bottom = 475.0
-pivot_offset = Vector2(125, 27.5)
-scale = Vector2(2, 2)
+offset_left = 50.0
+offset_top = 418.0
+offset_right = 450.0
+offset_bottom = 468.0
 
 [node name="RecyclePopup" type="PanelContainer" parent="."]
 visible = false

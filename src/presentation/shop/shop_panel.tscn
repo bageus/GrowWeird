@@ -92,7 +92,8 @@ columns = 3
 
 [node name="Confirm" type="Control" parent="."]
 unique_name_in_owner = true
-z_index = 80
+z_index = 190
+z_as_relative = false
 custom_minimum_size = Vector2(500, 480)
 layout_mode = 1
 anchor_left = 0.5
@@ -273,9 +274,7 @@ vertical_alignment = 1
 [node name="BuyButton" type="Button" parent="Confirm"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 125.0
-offset_top = 420.0
-offset_right = 375.0
-offset_bottom = 475.0
-pivot_offset = Vector2(125, 27.5)
-scale = Vector2(2, 2)
+offset_left = 50.0
+offset_top = 418.0
+offset_right = 450.0
+offset_bottom = 468.0

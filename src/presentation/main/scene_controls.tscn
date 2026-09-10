@@ -282,7 +282,7 @@ z_index = 7
 
 [node name="WaterOptions" type="PanelContainer" parent="."]
 visible = false
-z_index = 10
+z_index = 30
 custom_minimum_size = Vector2(112, 84)
 offset_right = 112.0
 offset_bottom = 84.0
@@ -304,7 +304,7 @@ text = "Pour"
 
 [node name="LightingOptions" type="PanelContainer" parent="."]
 visible = false
-z_index = 10
+z_index = 30
 custom_minimum_size = Vector2(140, 164)
 offset_right = 140.0
 offset_bottom = 164.0
@@ -336,7 +336,7 @@ text = "Normal light"
 
 [node name="ShopContainer" parent="." instance=ExtResource("4_shop")]
 visible = false
-z_index = 100
+z_index = 180
 
 [node name="WalletTopupPanel" parent="." instance=ExtResource("10_topup")]
 z_index = 180
