@@ -304,7 +304,7 @@ func _on_close_shop_pressed() -> void:
 	scene_controls.set_shop_visible(false)
 	_set_cancel_visibility()
 func _set_cancel_visibility() -> void:
-	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or inventory_dialogs.is_open()
+	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or inventory_dialogs.needs_scene_cancel()
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_save_assets_layout_pressed() -> void:

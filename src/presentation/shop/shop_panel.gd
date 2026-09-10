@@ -63,6 +63,7 @@ func _ready() -> void:
 	quantity_plus.pressed.connect(_change_quantity.bind(1))
 	_build_tabs()
 	_register_static_layout_elements()
+	_configure_buy_dialog_art()
 	confirm.visible = false
 
 func _input(event: InputEvent) -> void:
