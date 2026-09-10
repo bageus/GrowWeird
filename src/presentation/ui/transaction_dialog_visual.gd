@@ -48,13 +48,14 @@ static func configure(nodes: Dictionary, mode: StringName, action_frame: Vector2
 	UiAtlas.configure_transaction_total(nodes["count"] as Control)
 	UiAtlas.configure_close_button(nodes["close"] as Button)
 	UiAtlas.configure_button(nodes["action"] as Button, action_frame.x, action_frame.y)
-	_configure_quantity_button(nodes["minus"] as Button)
-	_configure_quantity_button(nodes["plus"] as Button)
+	_configure_quantity_button(nodes["minus"] as Button, "−")
+	_configure_quantity_button(nodes["plus"] as Button, "+")
 	var quantity_label := nodes["quantity_label"] as Label
 	quantity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_emphasize_label(quantity_label)
 
-static func _configure_quantity_button(button: Button) -> void:
+static func _configure_quantity_button(button: Button, caption: String) -> void:
+	button.text = caption
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_filter = Control.MOUSE_FILTER_STOP
 	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
