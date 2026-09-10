@@ -4,13 +4,13 @@ extends RefCounted
 const SIZE := Vector2(466.0, 480.0)
 const PANEL_RECT := Rect2(20.0, 10.0, 426.0, 460.0)
 const BANNER_RECT := Rect2(5.0, -20.0, 456.0, 80.0)
-const TITLE_RECT := Rect2(28.0, -7.0, 361.0, 54.0)
+const TITLE_RECT := Rect2(53.0, -7.0, 360.0, 54.0)
 const CLOSE_RECT := Rect2(418.0, -10.0, 60.0, 60.0)
-const PREVIEW_RECT := Rect2(118.0, 72.0, 230.0, 148.0)
-const DESCRIPTION_RECT := Rect2(33.0, 222.0, 400.0, 58.0)
+const PREVIEW_RECT := Rect2(118.0, 62.0, 230.0, 140.0)
+const DESCRIPTION_RECT := Rect2(33.0, 205.0, 400.0, 73.0)
 const QUANTITY_RECT := Rect2(33.0, 282.0, 400.0, 70.0)
 const COUNT_RECT := Rect2(103.0, 350.0, 260.0, 55.0)
-const ACTION_RECT := Rect2(93.0, 409.0, 280.0, 54.0)
+const ACTION_RECT := Rect2(93.0, 412.0, 280.0, 54.0)
 
 static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector2i) -> void:
 	var root := nodes["root"] as Control
