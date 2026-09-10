@@ -106,9 +106,17 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	label.text = title
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	var bold_font := SystemFont.new()
+	bold_font.font_names = PackedStringArray(["Arial", "Noto Sans"])
+	bold_font.font_weight = 700
+	label.add_theme_font_override(&"font", bold_font)
 	label.add_theme_color_override(&"font_color", Color(0.33, 0.18, 0.1, 1.0))
 	label.add_theme_color_override(&"font_outline_color", Color(1.0, 0.94, 0.78, 1.0))
-	label.add_theme_constant_override(&"outline_size", 3)
+	label.add_theme_color_override(&"font_shadow_color", Color(0.23, 0.08, 0.015, 0.62))
+	label.add_theme_constant_override(&"outline_size", 4)
+	label.add_theme_constant_override(&"shadow_offset_x", 2)
+	label.add_theme_constant_override(&"shadow_offset_y", 3)
+	label.add_theme_constant_override(&"shadow_outline_size", 2)
 	label.add_theme_font_size_override(&"font_size", 22)
 	panel.add_child(label)
 	var icon := TextureRect.new()
@@ -123,6 +131,28 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	panel.add_child(icon)
+
+static func configure_transaction_total(container: Control, value_label: Label) -> void:
+	if container == null or value_label == null:
+		return
+	value_label.set_anchors_preset(Control.PRESET_CENTER)
+	value_label.offset_left = -78.0
+	value_label.offset_top = -24.0
+	value_label.offset_right = 22.0
+	value_label.offset_bottom = 24.0
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var icon := TextureRect.new()
+	icon.name = "TotalCoinIcon"
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = energy_coin_icon(2, 1)
+	icon.set_anchors_preset(Control.PRESET_CENTER)
+	icon.offset_left = 28.0
+	icon.offset_top = -22.0
+	icon.offset_right = 72.0
+	icon.offset_bottom = 22.0
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	container.add_child(icon)
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	if button == null:
