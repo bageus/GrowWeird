@@ -20,10 +20,6 @@ const CATEGORY_FRAMES := {
 	&"mutagens": Vector2i(0, 2), &"decorations": Vector2i(0, 3),
 	&"seeds": Vector2i(1, 0), &"pots": Vector2i(1, 1),
 }
-const LOT_FRAMES := {
-	&"plants": Vector2i(0, 0), &"pots": Vector2i(0, 1), &"seeds": Vector2i(0, 2),
-	&"fertilizers": Vector2i(1, 0), &"decorations": Vector2i(1, 1), &"mutagens": Vector2i(1, 2),
-}
 
 @onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
