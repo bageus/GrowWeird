@@ -44,16 +44,14 @@ var _category: StringName = &"plants"
 var _selected: Dictionary = {}
 var _stock: Dictionary = {}
 var _last_signature := ""
-var _layout_editor: ShopLayoutEditor
 var _purchase_quantity := 1
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_layout_editor = ShopLayoutEditor.new(self)
 	$Window/Content/Header/Title.texture = UiAtlas.shop_title_texture()
 	%Awning.texture = UiAtlas.shop_awning_texture()
-	($Window as PanelContainer).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
-	category_hud.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(3, 16))
+	($Window as PanelContainer).add_theme_stylebox_override(&"panel", CommerceUiStyle.shop_outer_panel())
+	category_hud.add_theme_stylebox_override(&"panel", CommerceUiStyle.shop_inner_panel())
 	UiAtlas.configure_close_button(%CloseButton)
 	_configure_buy_dialog_art()
 	%CloseButton.pressed.connect(_request_close)
@@ -62,63 +60,7 @@ func _ready() -> void:
 	quantity_minus.pressed.connect(_change_quantity.bind(-1))
 	quantity_plus.pressed.connect(_change_quantity.bind(1))
 	_build_tabs()
-	_register_static_layout_elements()
-	_configure_buy_dialog_art()
 	confirm.visible = false
-
-func _input(event: InputEvent) -> void:
-	if visible and _layout_editor != null and _layout_editor.handle_input(event):
-		get_viewport().set_input_as_handled()
-
-func _apply_shop_layout(control: Control, key: String) -> void:
-	if _layout_editor != null:
-		_layout_editor.apply_saved(control, key)
-
-func _register_static_layout_elements() -> void:
-	_layout_editor.register($Window, "window")
-	_layout_editor.register($Window/Content/Header/Title, "title")
-	_layout_editor.register(%Awning, "awning")
-	_layout_editor.register(%CloseButton, "close")
-	_layout_editor.register(%CategoryHud, "category_hud")
-	_layout_editor.register(%Confirm, "confirm")
-	_layout_editor.register(%ConfirmBackground, "confirm_background")
-	_layout_editor.register(%ConfirmBanner, "confirm_banner")
-	_layout_editor.register(%ConfirmName, "confirm_name")
-	_layout_editor.register(%ConfirmPreview, "confirm_preview")
-	_layout_editor.register(%ConfirmDescription, "confirm_description")
-	_layout_editor.register(%BuyButton, "confirm_buy")
-	_layout_editor.register(%ConfirmClose, "confirm_close")
-	_layout_editor.register(%QuantityControl, "confirm_quantity")
-	_layout_editor.register(%QuantityBackground, "confirm_quantity_background")
-	_layout_editor.register(%QuantityMinus, "confirm_quantity_minus")
-	_layout_editor.register(%QuantityLabel, "confirm_quantity_label")
-	_layout_editor.register(%QuantityPlus, "confirm_quantity_plus")
-	_layout_editor.register(%CountControl, "confirm_count")
-	_layout_editor.register(%CountBackground, "confirm_count_background")
-	_layout_editor.register(%ConfirmPrice, "confirm_price")
-
-func _configure_buy_dialog_art() -> void:
-	TransactionDialogVisual.configure({
-		"root": confirm, "background": %ConfirmBackground, "banner": %ConfirmBanner,
-		"title": confirm_name, "close": %ConfirmClose, "preview": confirm_preview,
-		"description": confirm_description, "quantity": %QuantityControl,
-		"quantity_background": %QuantityBackground, "minus": quantity_minus,
-		"quantity_label": quantity_label, "plus": quantity_plus, "count": %CountControl,
-		"count_background": %CountBackground, "action": buy_button,
-	}, &"buy", Vector2i(7, 1))
-
-func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
-	var signature := "%s|%d" % [str(fertilizers), money]
-	if signature == _last_signature: return
-	_last_signature = signature; _money = money
-	_catalogs = {
-		&"plants": _plant_items(), &"pots": _pot_items(), &"seeds": _seed_items(),
-		&"fertilizers": _fertilizer_items(fertilizers), &"decorations": _misc_items(DECORATIONS, &"decoration"),
-		&"mutagens": _misc_items(MUTAGENS, &"mutagen"),
-	}
-	_show_category(_category)
-
-func invalidate() -> void: _last_signature = ""
 
 func _build_tabs() -> void:
 	for child in tabs.get_children(): child.queue_free()
@@ -131,7 +73,6 @@ func _build_tabs() -> void:
 		var frame: Vector2i = CATEGORY_FRAMES[category]
 		UiAtlas.configure_button(button, frame.x, frame.y)
 		button.pressed.connect(_show_category.bind(category)); tabs.add_child(button)
-		_layout_editor.register(button, "tab_%s" % String(category))
 
 func _show_category(category: StringName) -> void:
 	_category = category; _hide_confirm(); _apply_category_hud(COLORS[category])
@@ -141,15 +82,9 @@ func _show_category(category: StringName) -> void:
 
 func _add_card(item: Dictionary) -> void:
 	var card := Button.new()
-	card.custom_minimum_size = Vector2(174.0, 156.0); card.clip_contents = true
+	card.custom_minimum_size = Vector2(168.0, 156.0); card.clip_contents = true
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
 	_configure_lot_button(card)
-	var key := "lot_%s_%s" % [String(_category), String(item.get("id", ""))]
-	var background := TextureRect.new(); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	background.offset_left = 1.0; background.offset_top = 1.0; background.offset_right = -1.0; background.offset_bottom = -1.0
-	var lot_frame: Vector2i = LOT_FRAMES[_category]; background.texture = UiAtlas.shop_lot_texture(lot_frame.x, lot_frame.y)
-	background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	background.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(background)
 	var name_label := Label.new()
 	name_label.position = Vector2(10.0, 7.0); name_label.size = Vector2(154.0, 28.0)
 	name_label.text = String(item.get("name", "Item")); name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -164,21 +99,9 @@ func _add_card(item: Dictionary) -> void:
 	var badge: Label = null
 	if int(item.get("stock", 1)) > 1: badge = _quantity_badge(int(item["stock"])); card.add_child(badge)
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
-	_layout_editor.register(background, "%s_background" % key); _layout_editor.register(card, key)
-	_layout_editor.register(name_label, "%s_name" % key); _layout_editor.register(preview, "%s_preview" % key)
-	_layout_editor.register(coin, "%s_coin" % key); _layout_editor.register(price, "%s_price" % key)
-	if badge != null: _layout_editor.register(badge, "%s_quantity" % key)
 
 func _configure_lot_button(card: Button) -> void:
-	card.focus_mode = Control.FOCUS_NONE; card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		card.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	card.mouse_entered.connect(_set_lot_hover.bind(card, true))
-	card.mouse_exited.connect(_set_lot_hover.bind(card, false))
-
-func _set_lot_hover(card: Button, hovered: bool) -> void:
-	if is_instance_valid(card): card.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
-
+	CommerceUiStyle.shop_lot(card, COLORS[_category])
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item
 	confirm_description.text = "%s\n%s" % [String(item.get("name", "Item")), String(item.get("description", ""))]
