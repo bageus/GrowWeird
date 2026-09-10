@@ -10,7 +10,7 @@ const PREVIEW_RECT := Rect2(118.0, 62.0, 230.0, 140.0)
 const DESCRIPTION_RECT := Rect2(33.0, 205.0, 400.0, 73.0)
 const QUANTITY_RECT := Rect2(33.0, 282.0, 400.0, 70.0)
 const COUNT_RECT := Rect2(103.0, 350.0, 260.0, 55.0)
-const ACTION_RECT := Rect2(93.0, 412.0, 280.0, 54.0)
+const ACTION_RECT := Rect2(93.0, 408.0, 280.0, 54.0)
 
 static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector2i) -> void:
 	var root := nodes["root"] as Control
@@ -24,6 +24,7 @@ static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector
 	_set_rect(nodes["close"] as Control, CLOSE_RECT)
 	_set_rect(nodes["preview"] as Control, PREVIEW_RECT)
 	_set_rect(nodes["description"] as Control, DESCRIPTION_RECT)
+	_configure_description_hud(root, nodes["description"] as Label)
 	_set_rect(nodes["quantity"] as Control, QUANTITY_RECT)
 	_set_rect(nodes["minus"] as Control, Rect2(14.0, 14.0, 42.0, 42.0))
 	_set_rect(nodes["quantity_label"] as Control, Rect2(70.0, 4.0, 260.0, 62.0))
@@ -54,6 +55,35 @@ static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector
 	var quantity_label := nodes["quantity_label"] as Label
 	quantity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_emphasize_label(quantity_label)
+
+static func fit_description(label: Label) -> void:
+	var length := label.text.length()
+	var font_size := 20
+	if length > 82:
+		font_size = 16
+	elif length > 58:
+		font_size = 18
+	label.add_theme_font_size_override(&"font_size", font_size)
+
+static func _configure_description_hud(root: Control, label: Label) -> void:
+	var hud := root.get_node_or_null("DescriptionHud") as Panel
+	if hud == null:
+		hud = Panel.new()
+		hud.name = "DescriptionHud"
+		hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		root.add_child(hud)
+		root.move_child(hud, label.get_index())
+	_set_rect(hud, Rect2(29.0, 201.0, 408.0, 81.0))
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.54, 0.29, 0.10, 0.24)
+	style.border_color = Color(0.55, 0.25, 0.055, 0.62)
+	style.set_border_width_all(2)
+	style.set_corner_radius_all(14)
+	style.shadow_color = Color(0.28, 0.10, 0.02, 0.16)
+	style.shadow_size = 2
+	hud.add_theme_stylebox_override(&"panel", style)
+	label.clip_text = true
+	fit_description(label)
 
 static func _configure_modal_dim(root: Control) -> void:
 	var parent := root.get_parent()
