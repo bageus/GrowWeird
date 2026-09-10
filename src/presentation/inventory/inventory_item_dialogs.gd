@@ -51,8 +51,6 @@ func _ready() -> void:
 	UiAtlas.configure_button(use_action, 5, 1)
 	UiAtlas.configure_button(sell_action, 3, 3)
 	UiAtlas.configure_button(recycle_action, 5, 2)
-	UiAtlas.configure_close_button($SellPopup/SellClose as Button)
-	UiAtlas.configure_button($SellPopup/SellButton as Button, 3, 3)
 	_configure_sell_art()
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
 	UiAtlas.configure_close_button($RecyclePopup/Layout/Header/Close as Button)
