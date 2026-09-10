@@ -115,6 +115,7 @@ func _open_sell() -> void:
 	recycle_popup.visible = false
 	sell_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
 	sell_description.text = "Sell %s from inventory." % _title
+	TransactionDialogVisual.fit_description(sell_description)
 	_sell_amount = 1
 	_refresh_sell_preview()
 
