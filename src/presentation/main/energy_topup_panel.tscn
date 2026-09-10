@@ -98,11 +98,11 @@ offset_left = 52.0
 offset_top = 80.0
 offset_right = 708.0
 offset_bottom = 430.0
-theme_override_constants/separation = -58
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 350)
+custom_minimum_size = Vector2(213.2, 330)
 layout_mode = 2
 [node name="Energy5" type="Panel" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -131,7 +131,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot15" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 350)
+custom_minimum_size = Vector2(213.2, 330)
 layout_mode = 2
 [node name="Energy15" type="Panel" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
@@ -160,7 +160,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot30" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 350)
+custom_minimum_size = Vector2(213.2, 330)
 layout_mode = 2
 [node name="Energy30" type="Panel" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
