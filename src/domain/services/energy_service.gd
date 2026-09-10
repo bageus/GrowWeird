@@ -7,7 +7,11 @@ const WATER_COST := 1
 const OFFER_COST := 5
 
 static func capacity(state: GameState) -> int:
-	return state.pots.size() * PER_POT if state != null else 0
+	if state == null: return 0
+	var planted := 0
+	for pot in state.pots:
+		if pot != null and not pot.is_empty(): planted += 1
+	return planted * PER_POT
 
 static func fill(state: GameState) -> void:
 	if state != null: state.energy = capacity(state); state.energy_regen_elapsed = 0.0
