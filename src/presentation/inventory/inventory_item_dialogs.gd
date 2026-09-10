@@ -59,19 +59,17 @@ func _ready() -> void:
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func _configure_sell_art() -> void:
-	($SellPopup/SellBackground as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
-	$SellPopup/SellBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
-	$SellPopup/QuantityControl/QuantityBackground.texture = UiAtlas.HUD_QUANTITY
-	$SellPopup/CountControl/CountBackground.texture = UiAtlas.HUD_COUNT
-	_configure_quantity_hit(sell_minus)
-	_configure_quantity_hit(sell_plus)
-
-func _configure_quantity_hit(button: Button) -> void:
-	button.text = ""; button.focus_mode = Control.FOCUS_NONE
-	button.mouse_filter = Control.MOUSE_FILTER_STOP; button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS; button.z_index = 5
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	TransactionDialogVisual.configure({
+		"root": sell_popup, "background": $SellPopup/SellBackground,
+		"banner": $SellPopup/SellBanner, "title": sell_title,
+		"close": $SellPopup/SellClose, "preview": sell_preview,
+		"description": sell_description, "quantity": $SellPopup/QuantityControl,
+		"quantity_background": $SellPopup/QuantityControl/QuantityBackground,
+		"minus": sell_minus, "quantity_label": sell_quantity, "plus": sell_plus,
+		"count": $SellPopup/CountControl,
+		"count_background": $SellPopup/CountControl/CountBackground,
+		"action": $SellPopup/SellButton,
+	}, &"sell", Vector2i(3, 3))
 
 func show_for(
 	source: Control,
@@ -114,7 +112,6 @@ func _open_sell() -> void:
 	actions.visible = false
 	sell_popup.visible = true
 	recycle_popup.visible = false
-	sell_title.text = _title
 	sell_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
 	sell_description.text = "Sell %s from inventory." % _title
 	_sell_amount = 1
