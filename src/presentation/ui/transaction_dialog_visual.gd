@@ -10,7 +10,7 @@ const PREVIEW_RECT := Rect2(118.0, 72.0, 230.0, 148.0)
 const DESCRIPTION_RECT := Rect2(33.0, 222.0, 400.0, 58.0)
 const QUANTITY_RECT := Rect2(33.0, 282.0, 400.0, 70.0)
 const COUNT_RECT := Rect2(103.0, 360.0, 260.0, 55.0)
-const ACTION_RECT := Rect2(83.0, 414.0, 300.0, 58.0)
+const ACTION_RECT := Rect2(93.0, 400.0, 280.0, 54.0)
 
 static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector2i) -> void:
 	var root := nodes["root"] as Control
