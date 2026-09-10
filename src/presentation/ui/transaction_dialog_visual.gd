@@ -1,16 +1,16 @@
 class_name TransactionDialogVisual
 extends RefCounted
 
-const SIZE := Vector2(500.0, 480.0)
-const PANEL_RECT := Rect2(20.0, 10.0, 460.0, 460.0)
-const BANNER_RECT := Rect2(5.0, -20.0, 490.0, 80.0)
-const TITLE_RECT := Rect2(35.0, -7.0, 395.0, 54.0)
-const CLOSE_RECT := Rect2(420.0, 8.0, 60.0, 60.0)
-const PREVIEW_RECT := Rect2(135.0, 72.0, 230.0, 148.0)
-const DESCRIPTION_RECT := Rect2(50.0, 222.0, 400.0, 58.0)
-const QUANTITY_RECT := Rect2(50.0, 282.0, 400.0, 70.0)
-const COUNT_RECT := Rect2(120.0, 360.0, 260.0, 55.0)
-const ACTION_RECT := Rect2(50.0, 418.0, 400.0, 50.0)
+const SIZE := Vector2(486.0, 480.0)
+const PANEL_RECT := Rect2(20.0, 10.0, 446.0, 460.0)
+const BANNER_RECT := Rect2(5.0, -20.0, 476.0, 80.0)
+const TITLE_RECT := Rect2(28.0, -7.0, 381.0, 54.0)
+const CLOSE_RECT := Rect2(406.0, 8.0, 60.0, 60.0)
+const PREVIEW_RECT := Rect2(128.0, 72.0, 230.0, 148.0)
+const DESCRIPTION_RECT := Rect2(43.0, 222.0, 400.0, 58.0)
+const QUANTITY_RECT := Rect2(43.0, 282.0, 400.0, 70.0)
+const COUNT_RECT := Rect2(113.0, 360.0, 260.0, 55.0)
+const ACTION_RECT := Rect2(43.0, 418.0, 400.0, 50.0)
 
 static func configure(nodes: Dictionary, mode: StringName, action_frame: Vector2i) -> void:
 	var root := nodes["root"] as Control
@@ -42,6 +42,7 @@ static func configure(nodes: Dictionary, mode: StringName, action_frame: Vector2
 
 	(nodes["quantity_background"] as TextureRect).texture = UiAtlas.HUD_QUANTITY
 	(nodes["count_background"] as TextureRect).texture = UiAtlas.HUD_COUNT
+	UiAtlas.configure_transaction_total(nodes["count"] as Control)
 	UiAtlas.configure_close_button(nodes["close"] as Button)
 	UiAtlas.configure_button(nodes["action"] as Button, action_frame.x, action_frame.y)
 	_configure_quantity_button(nodes["minus"] as Button)
