@@ -180,32 +180,11 @@ static func configure_transaction_total(container: Control) -> void:
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	if button == null:
 		return
-	button.text = "FREE" if rewarded_ad else "%d ₽" % price
-	button.icon = button_texture(7, 2)
-	button.expand_icon = true
-	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.vertical_icon_alignment = VERTICAL_ALIGNMENT_CENTER
+	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else "%d ₽" % price, rewarded_ad)
 	button.clip_contents = true
-	button.focus_mode = Control.FOCUS_NONE
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.add_theme_color_override(&"font_color", Color.WHITE)
-	button.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1.0))
-	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
-	button.add_theme_constant_override(&"outline_size", 3)
-	button.add_theme_font_size_override(&"font_size", 22)
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
-	if button == null: return
-	button.text = ""
-	button.icon = button_texture(5, 3)
-	button.expand_icon = true
-	button.focus_mode = Control.FOCUS_NONE
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-
+	if button != null:
+		CommerceUiStyle.balance_plus(button)
 static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
 
