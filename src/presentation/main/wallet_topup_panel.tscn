@@ -75,10 +75,10 @@ vertical_alignment = 1
 [node name="CloseButton" type="Button" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 810.0
-offset_top = 22.0
-offset_right = 880.0
-offset_bottom = 92.0
+offset_left = 842.0
+offset_top = -10.0
+offset_right = 912.0
+offset_bottom = 60.0
 
 [node name="BalanceLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
@@ -98,12 +98,12 @@ layout_mode = 0
 offset_left = 48.0
 offset_top = 80.0
 offset_right = 852.0
-offset_bottom = 430.0
+offset_bottom = 422.0
 theme_override_constants/separation = 8
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(195, 330)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Coin10" type="Panel" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -132,7 +132,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot100" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(195, 330)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Coin100" type="Panel" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
@@ -161,7 +161,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot300" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(195, 330)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Coin300" type="Panel" parent="Window/Lots/Lot300"]
 unique_name_in_owner = true
@@ -190,7 +190,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot1000" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(195, 330)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Coin1000" type="Panel" parent="Window/Lots/Lot1000"]
 unique_name_in_owner = true
