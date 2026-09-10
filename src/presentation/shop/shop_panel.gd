@@ -114,7 +114,7 @@ func _add_card(item: Dictionary) -> void:
 	var unlocked := bool(item.get("unlocked", false))
 	var price_hud := Panel.new(); price_hud.position = Vector2(42.0, 116.0); price_hud.size = Vector2(84.0, 34.0)
 	price_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; price_hud.add_theme_stylebox_override(&"panel", _lot_price_style(COLORS[_category])); card.add_child(price_hud)
-	var coin := CoinFace.new(); coin.position = Vector2(6.0, 5.0); coin.size = Vector2(24.0, 24.0); coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var coin := UiAtlas.CoinFace.new(); coin.position = Vector2(6.0, 5.0); coin.size = Vector2(24.0, 24.0); coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	coin.visible = unlocked; price_hud.add_child(coin)
 	var price := Label.new(); price.position = Vector2(31.0 if unlocked else 5.0, 2.0); price.size = Vector2(48.0 if unlocked else 74.0, 30.0)
 	price.text = str(int(item.get("price", 1))) if unlocked else "Locked"; price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
