@@ -111,10 +111,14 @@ func _add_card(item: Dictionary) -> void:
 	var preview := TextureRect.new(); preview.position = Vector2(25.0, 35.0); preview.size = Vector2(124.0, 78.0); preview.texture = _preview_texture(item)
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	card.add_child(preview)
-	var coin := TextureRect.new(); coin.position = Vector2(57.0, 119.0); coin.size = Vector2(28.0, 28.0); coin.texture = UiAtlas.coin_texture()
-	coin.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; coin.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; coin.mouse_filter = Control.MOUSE_FILTER_IGNORE; card.add_child(coin)
-	var price := Label.new(); price.position = Vector2(87.0, 118.0); price.size = Vector2(55.0, 30.0)
-	price.text = str(int(item.get("price", 1))) if bool(item.get("unlocked", false)) else "Locked"; price.add_theme_font_size_override(&"font_size", 18); card.add_child(price)
+	var unlocked := bool(item.get("unlocked", false))
+	var price_hud := Panel.new(); price_hud.position = Vector2(42.0, 116.0); price_hud.size = Vector2(84.0, 34.0)
+	price_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; price_hud.add_theme_stylebox_override(&"panel", _lot_price_style(COLORS[_category])); card.add_child(price_hud)
+	var coin := CoinFace.new(); coin.position = Vector2(6.0, 5.0); coin.size = Vector2(24.0, 24.0); coin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	coin.visible = unlocked; price_hud.add_child(coin)
+	var price := Label.new(); price.position = Vector2(31.0 if unlocked else 5.0, 2.0); price.size = Vector2(48.0 if unlocked else 74.0, 30.0)
+	price.text = str(int(item.get("price", 1))) if unlocked else "Locked"; price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; price.add_theme_font_size_override(&"font_size", 17); price_hud.add_child(price)
 	var badge: Label = null
 	if int(item.get("stock", 1)) > 1: badge = _quantity_badge(int(item["stock"])); card.add_child(badge)
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
@@ -124,6 +128,7 @@ func _configure_lot_button(card: Button) -> void:
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item
 	confirm_description.text = "%s\n%s" % [String(item.get("name", "Item")), String(item.get("description", ""))]
+	TransactionDialogVisual.fit_description(confirm_description)
 	confirm_preview.texture = _preview_texture(item)
 	_purchase_quantity = 1
 	_refresh_purchase_preview()
@@ -240,5 +245,12 @@ func _apply_category_hud(color: Color) -> void:
 	style.corner_radius_bottom_left = 20; style.corner_radius_bottom_right = 20
 	style.content_margin_left = 16; style.content_margin_top = 16; style.content_margin_right = 16; style.content_margin_bottom = 16
 	category_hud.add_theme_stylebox_override(&"panel", style)
+
+func _lot_price_style(accent: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = accent.darkened(0.48); style.bg_color.a = 0.92
+	style.border_color = accent.darkened(0.66); style.set_border_width_all(2)
+	style.set_corner_radius_all(10)
+	return style
 
 func _pretty(value: String) -> String: return value.replace("_", " ").capitalize()
