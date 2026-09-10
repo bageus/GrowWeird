@@ -49,7 +49,7 @@ static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
 	texture.region = region
 	return texture
 
-static func button_texture(row: int, column: int, hover := false, mirror_x := false) -> Texture2D:
+static func button_texture(row: int, column: int, _hover := false, mirror_x := false) -> Texture2D:
 	var texture: Texture2D = atlas_region(BUTTONS, Rect2(column * CELL, row * CELL + 88.0, CELL, 336.0))
 	if not mirror_x:
 		return texture
@@ -98,10 +98,10 @@ static func configure_close_button(button: Button) -> void:
 	button.mouse_entered.connect(_set_close_hover.bind(button, true))
 	button.mouse_exited.connect(_set_close_hover.bind(button, false))
 
-static func _close_texture(hovered: bool) -> Texture2D:
+static func _close_texture(_hovered: bool) -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(104.0, 3176.0, 304.0, 304.0))
 
-static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
+static func _button_icon_crop(row: int, column: int, _hover: bool) -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
 static func energy_coin_icon(row: int, column: int) -> Texture2D:

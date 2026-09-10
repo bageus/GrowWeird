@@ -68,6 +68,19 @@ func _configure_buy_dialog_art() -> void:
 		"count_background": %CountBackground, "action": buy_button,
 	}, &"buy", Vector2i.ZERO)
 
+func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
+	var signature := "%s|%d" % [str(fertilizers), money]
+	if signature == _last_signature: return
+	_last_signature = signature; _money = money
+	_catalogs = {
+		&"plants": _plant_items(), &"pots": _pot_items(), &"seeds": _seed_items(),
+		&"fertilizers": _fertilizer_items(fertilizers), &"decorations": _misc_items(DECORATIONS, &"decoration"),
+		&"mutagens": _misc_items(MUTAGENS, &"mutagen"),
+	}
+	_show_category(_category)
+
+func invalidate() -> void: _last_signature = ""
+
 func _build_tabs() -> void:
 	for child in tabs.get_children(): child.queue_free()
 	for index in range(CATEGORIES.size()):
