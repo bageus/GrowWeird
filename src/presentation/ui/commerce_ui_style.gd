@@ -36,9 +36,9 @@ static func topup_button(button: Button, caption: String, rewarded := false) -> 
 			style.set_corner_radius_all(18)
 
 static func balance_plus(button: Button) -> void:
-	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 28)
-	button.custom_minimum_size = Vector2.ZERO
-	button.add_theme_constant_override(&"outline_size", 3)
+	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 20)
+	button.custom_minimum_size = Vector2(34.0, 34.0)
+	button.add_theme_constant_override(&"outline_size", 1)
 
 static func transaction_action(button: Button, mode: StringName) -> void:
 	var selling := mode == &"sell"
