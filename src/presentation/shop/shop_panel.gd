@@ -97,21 +97,14 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register(%ConfirmPrice, "confirm_price")
 
 func _configure_buy_dialog_art() -> void:
-	(%ConfirmBackground as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
-	%ConfirmBanner.texture = UiAtlas.HUD_BUYSELL_BANNER
-	%QuantityBackground.texture = UiAtlas.HUD_QUANTITY
-	%CountBackground.texture = UiAtlas.HUD_COUNT
-	UiAtlas.configure_close_button(%ConfirmClose)
-	UiAtlas.configure_button(buy_button, 7, 1)
-	_configure_quantity_hit(quantity_minus)
-	_configure_quantity_hit(quantity_plus)
-
-func _configure_quantity_hit(button: Button) -> void:
-	button.text = ""; button.focus_mode = Control.FOCUS_NONE
-	button.mouse_filter = Control.MOUSE_FILTER_STOP; button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS; button.z_index = 5
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	TransactionDialogVisual.configure({
+		"root": confirm, "background": %ConfirmBackground, "banner": %ConfirmBanner,
+		"title": confirm_name, "close": %ConfirmClose, "preview": confirm_preview,
+		"description": confirm_description, "quantity": %QuantityControl,
+		"quantity_background": %QuantityBackground, "minus": quantity_minus,
+		"quantity_label": quantity_label, "plus": quantity_plus, "count": %CountControl,
+		"count_background": %CountBackground, "action": buy_button,
+	}, &"buy", Vector2i(7, 1))
 
 func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
 	var signature := "%s|%d" % [str(fertilizers), money]
@@ -186,8 +179,9 @@ func _set_lot_hover(card: Button, hovered: bool) -> void:
 	if is_instance_valid(card): card.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
 
 func _open_confirm(item: Dictionary) -> void:
-	_selected = item; confirm_name.text = String(item.get("name", "Item"))
-	confirm_description.text = String(item.get("description", "")); confirm_preview.texture = _preview_texture(item)
+	_selected = item
+	confirm_description.text = "%s\n%s" % [String(item.get("name", "Item")), String(item.get("description", ""))]
+	confirm_preview.texture = _preview_texture(item)
 	_purchase_quantity = 1
 	_refresh_purchase_preview()
 	confirm.visible = true
