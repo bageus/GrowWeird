@@ -6,27 +6,38 @@ static func curved_title(label: Label, caption: String, arc_height := 5.0) -> vo
 	for child in label.get_children():
 		child.queue_free()
 	var count := caption.length()
-	var letter_width := label.size.x / maxf(float(count), 1.0)
+	var letter_width := minf(42.0, label.size.x / maxf(float(count), 1.0))
+	var title_width := letter_width * float(count)
+	var start_x := (label.size.x - title_width) * 0.5
+	var center := float(count - 1) * 0.5
 	for index in range(count):
 		var letter := Label.new()
 		letter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		letter.text = caption.substr(index, 1)
-		letter.position = Vector2(index * letter_width, absf(float(index) - float(count - 1) * 0.5) * arc_height / maxf(float(count - 1) * 0.5, 1.0))
-		letter.size = Vector2(letter_width + 2.0, label.size.y)
+		var distance := absf(float(index) - center) / maxf(center, 1.0)
+		letter.position = Vector2(start_x + index * letter_width, distance * arc_height)
+		letter.size = Vector2(letter_width + 1.0, label.size.y - arc_height)
 		letter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		letter.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		letter.add_theme_color_override(&"font_color", Color.WHITE)
 		letter.add_theme_color_override(&"font_outline_color", Color(0.25, 0.08, 0.02, 1.0))
-		letter.add_theme_constant_override(&"outline_size", 6)
-		letter.add_theme_font_size_override(&"font_size", 32)
+		letter.add_theme_constant_override(&"outline_size", 5)
+		letter.add_theme_font_size_override(&"font_size", 30)
 		label.add_child(letter)
 
 static func topup_button(button: Button, caption: String, rewarded := false) -> void:
 	_program_button(button, caption, Color(0.15, 0.69, 0.06, 1.0), Color(0.08, 0.39, 0.025, 1.0), 18)
 	button.add_theme_color_override(&"font_color", Color(1.0, 0.84, 0.22, 1.0) if rewarded else Color.WHITE)
+	for state in [&"normal", &"hover", &"pressed", &"disabled"]:
+		var style := button.get_theme_stylebox(state) as StyleBoxFlat
+		if style != null:
+			style.shadow_size = 0
+			style.shadow_offset = Vector2.ZERO
+			style.set_corner_radius_all(18)
 
 static func balance_plus(button: Button) -> void:
-	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 42)
+	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 28)
+	button.custom_minimum_size = Vector2.ZERO
 	button.add_theme_constant_override(&"outline_size", 3)
 
 static func transaction_action(button: Button, mode: StringName) -> void:
@@ -36,9 +47,9 @@ static func transaction_action(button: Button, mode: StringName) -> void:
 static func shop_lot(card: Button, accent: Color) -> void:
 	card.focus_mode = Control.FOCUS_NONE
 	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	card.add_theme_stylebox_override(&"normal", _panel(Color(1.0, 0.88, 0.62, 0.98), accent.darkened(0.28), 4, 18))
-	card.add_theme_stylebox_override(&"hover", _panel(Color(1.0, 0.93, 0.73, 1.0), accent, 5, 18))
-	card.add_theme_stylebox_override(&"pressed", _panel(Color(0.96, 0.80, 0.51, 1.0), accent.darkened(0.12), 5, 18))
+	card.add_theme_stylebox_override(&"normal", _panel(accent.lightened(0.72), accent.darkened(0.24), 4, 18))
+	card.add_theme_stylebox_override(&"hover", _panel(accent.lightened(0.80), accent, 5, 18))
+	card.add_theme_stylebox_override(&"pressed", _panel(accent.lightened(0.62), accent.darkened(0.12), 5, 18))
 	card.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
 
 static func shop_outer_panel() -> StyleBoxFlat:
