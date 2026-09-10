@@ -104,7 +104,7 @@ alignment = 1
 [node name="AdLot" type="Control" parent="Window/Lots"]
 custom_minimum_size = Vector2(213.2, 350)
 layout_mode = 2
-[node name="Energy5" type="TextureRect" parent="Window/Lots/AdLot"]
+[node name="Energy5" type="Panel" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -113,10 +113,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-pivot_offset = Vector2(106.6, 175)
-scale = Vector2(2.08, 2.08)
+
 [node name="AdButton" type="Button" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
 z_index = 2
@@ -127,16 +124,16 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -80.0
-offset_top = -143.2
+offset_top = -90.0
 offset_right = 80.0
-offset_bottom = -80.8
+offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot15" type="Control" parent="Window/Lots"]
 custom_minimum_size = Vector2(213.2, 350)
 layout_mode = 2
-[node name="Energy15" type="TextureRect" parent="Window/Lots/Lot15"]
+[node name="Energy15" type="Panel" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -145,10 +142,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-pivot_offset = Vector2(106.6, 175)
-scale = Vector2(2.08, 2.08)
+
 [node name="Pack15" type="Button" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
 z_index = 2
@@ -159,16 +153,16 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -80.0
-offset_top = -143.2
+offset_top = -90.0
 offset_right = 80.0
-offset_bottom = -80.8
+offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot30" type="Control" parent="Window/Lots"]
 custom_minimum_size = Vector2(213.2, 350)
 layout_mode = 2
-[node name="Energy30" type="TextureRect" parent="Window/Lots/Lot30"]
+[node name="Energy30" type="Panel" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -177,10 +171,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-pivot_offset = Vector2(106.6, 175)
-scale = Vector2(2.08, 2.08)
+
 [node name="Pack30" type="Button" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
 z_index = 2
@@ -191,9 +182,9 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -80.0
-offset_top = -143.2
+offset_top = -90.0
 offset_right = 80.0
-offset_bottom = -80.8
+offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 0
 
