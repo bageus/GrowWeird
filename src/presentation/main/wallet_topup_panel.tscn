@@ -99,11 +99,11 @@ offset_left = 48.0
 offset_top = 80.0
 offset_right = 852.0
 offset_bottom = 430.0
-theme_override_constants/separation = -49
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(197.6, 350)
+custom_minimum_size = Vector2(195, 330)
 layout_mode = 2
 [node name="Coin10" type="Panel" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -132,7 +132,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot100" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(197.6, 350)
+custom_minimum_size = Vector2(195, 330)
 layout_mode = 2
 [node name="Coin100" type="Panel" parent="Window/Lots/Lot100"]
 unique_name_in_owner = true
@@ -161,7 +161,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot300" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(197.6, 350)
+custom_minimum_size = Vector2(195, 330)
 layout_mode = 2
 [node name="Coin300" type="Panel" parent="Window/Lots/Lot300"]
 unique_name_in_owner = true
@@ -190,7 +190,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot1000" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(197.6, 350)
+custom_minimum_size = Vector2(195, 330)
 layout_mode = 2
 [node name="Coin1000" type="Panel" parent="Window/Lots/Lot1000"]
 unique_name_in_owner = true
@@ -218,15 +218,6 @@ offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 0
 
-[node name="LimitHint" type="Label" parent="Window"]
-layout_mode = 0
-offset_left = 170.0
-offset_top = 420.0
-offset_right = 730.0
-offset_bottom = 445.0
-theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
-text = "Advertising bonus: up to 4 times per rolling 8 hours"
-horizontal_alignment = 1
 
 [node name="StatusLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
