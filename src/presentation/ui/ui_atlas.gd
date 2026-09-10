@@ -162,19 +162,19 @@ static func configure_transaction_total(container: Control) -> void:
 	value_label.add_theme_font_override(&"font", bold_font)
 	value_label.add_theme_color_override(&"font_color", Color(0.24, 0.105, 0.035, 1.0))
 	value_label.set_anchors_preset(Control.PRESET_CENTER)
-	value_label.offset_left = -78.0
+	value_label.offset_left = -50.0
 	value_label.offset_top = -24.0
-	value_label.offset_right = 22.0
+	value_label.offset_right = 2.0
 	value_label.offset_bottom = 24.0
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var icon := CoinFace.new()
 	icon.name = "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.set_anchors_preset(Control.PRESET_CENTER)
-	icon.offset_left = 32.0
-	icon.offset_top = -16.0
-	icon.offset_right = 64.0
-	icon.offset_bottom = 16.0
+	icon.offset_left = 6.0
+	icon.offset_top = -13.0
+	icon.offset_right = 32.0
+	icon.offset_bottom = 13.0
 	container.add_child(icon)
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
@@ -184,6 +184,9 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	button.clip_contents = true
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
 	if button != null:
+		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		button.position = Vector2(198.0, 41.0)
+		button.size = Vector2(38.0, 38.0)
 		CommerceUiStyle.balance_plus(button)
 static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
