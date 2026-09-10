@@ -63,6 +63,7 @@ func _ready() -> void:
 	quantity_plus.pressed.connect(_change_quantity.bind(1))
 	_build_tabs()
 	_register_static_layout_elements()
+	_configure_buy_dialog_art()
 	confirm.visible = false
 
 func _input(event: InputEvent) -> void:
@@ -79,6 +80,22 @@ func _register_static_layout_elements() -> void:
 	_layout_editor.register(%Awning, "awning")
 	_layout_editor.register(%CloseButton, "close")
 	_layout_editor.register(%CategoryHud, "category_hud")
+	_layout_editor.register(%Confirm, "confirm")
+	_layout_editor.register(%ConfirmBackground, "confirm_background")
+	_layout_editor.register(%ConfirmBanner, "confirm_banner")
+	_layout_editor.register(%ConfirmName, "confirm_name")
+	_layout_editor.register(%ConfirmPreview, "confirm_preview")
+	_layout_editor.register(%ConfirmDescription, "confirm_description")
+	_layout_editor.register(%BuyButton, "confirm_buy")
+	_layout_editor.register(%ConfirmClose, "confirm_close")
+	_layout_editor.register(%QuantityControl, "confirm_quantity")
+	_layout_editor.register(%QuantityBackground, "confirm_quantity_background")
+	_layout_editor.register(%QuantityMinus, "confirm_quantity_minus")
+	_layout_editor.register(%QuantityLabel, "confirm_quantity_label")
+	_layout_editor.register(%QuantityPlus, "confirm_quantity_plus")
+	_layout_editor.register(%CountControl, "confirm_count")
+	_layout_editor.register(%CountBackground, "confirm_count_background")
+	_layout_editor.register(%ConfirmPrice, "confirm_price")
 
 func _configure_buy_dialog_art() -> void:
 	TransactionDialogVisual.configure({
