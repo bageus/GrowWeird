@@ -157,6 +157,11 @@ static func configure_transaction_total(container: Control) -> void:
 	if labels.is_empty():
 		return
 	var value_label := labels[0] as Label
+	var bold_font := SystemFont.new()
+	bold_font.font_names = PackedStringArray(["Arial", "Noto Sans"])
+	bold_font.font_weight = 700
+	value_label.add_theme_font_override(&"font", bold_font)
+	value_label.add_theme_color_override(&"font_color", Color(0.24, 0.105, 0.035, 1.0))
 	value_label.set_anchors_preset(Control.PRESET_CENTER)
 	value_label.offset_left = -78.0
 	value_label.offset_top = -24.0
