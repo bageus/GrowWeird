@@ -17,6 +17,7 @@ var _ad_pending := false
 func _ready() -> void:
 	(%Background as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	%Banner.texture = UiAtlas.HUD_COIN_ENERGY_BANNER
+	CommerceUiStyle.curved_title($Window/MenuTitle, "COINS")
 	UiAtlas.configure_topup_card(%Coin10, "10 Coins", UiAtlas.energy_coin_icon(2, 1))
 	UiAtlas.configure_topup_card(%Coin100, "100 Coins", UiAtlas.energy_coin_icon(1, 2))
 	UiAtlas.configure_topup_card(%Coin300, "300 Coins", UiAtlas.energy_coin_icon(1, 1))
