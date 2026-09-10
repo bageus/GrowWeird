@@ -3,7 +3,7 @@ extends RefCounted
 
 const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
-const HUD_BALANCE_ICON: Texture2D = preload("res://assets/ui/hud_balance_icon.png")
+const ENERGY_COIN_ICONS: Texture2D = preload("res://assets/ui/energycoin_icon.png")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
@@ -20,6 +20,7 @@ const HUD_COUNT: Texture2D = preload("res://assets/ui/hud_background_count.png")
 const HUD_SHOP_LOTS: Texture2D = preload("res://assets/ui/hud_background_shop.png")
 const HUD_COIN_ENERGY_BANNER: Texture2D = preload("res://assets/ui/hud_coinenergy_banner.png")
 const CELL := 512.0
+const ENERGY_COIN_CELL := 256.0
 
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
 	var texture := AtlasTexture.new()
@@ -82,7 +83,15 @@ static func _close_texture(hovered: bool) -> Texture2D:
 static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
-static func configure_topup_card(panel: Panel, title: String) -> void:
+static func energy_coin_icon(row: int, column: int) -> Texture2D:
+	return atlas_region(ENERGY_COIN_ICONS, Rect2(
+		(column - 1) * ENERGY_COIN_CELL,
+		(row - 1) * ENERGY_COIN_CELL,
+		ENERGY_COIN_CELL,
+		ENERGY_COIN_CELL
+	))
+
+static func configure_topup_card(panel: Panel, title: String, icon_texture: Texture2D) -> void:
 	if panel == null:
 		return
 	panel.add_theme_stylebox_override(&"panel", warm_hud_style(4, 22, Vector4(12.0, 12.0, 12.0, 12.0)))
@@ -102,6 +111,18 @@ static func configure_topup_card(panel: Panel, title: String) -> void:
 	label.add_theme_constant_override(&"outline_size", 3)
 	label.add_theme_font_size_override(&"font_size", 22)
 	panel.add_child(label)
+	var icon := TextureRect.new()
+	icon.name = "ItemIcon"
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.texture = icon_texture
+	icon.set_anchors_preset(Control.PRESET_CENTER)
+	icon.offset_left = -82.0
+	icon.offset_top = -92.0
+	icon.offset_right = 82.0
+	icon.offset_bottom = 72.0
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	panel.add_child(icon)
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	if button == null:
@@ -136,7 +157,7 @@ static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
 
 static func balance_icon(energy := false) -> Texture2D:
-	return atlas_region(HUD_BALANCE_ICON, Rect2(572.0, 66.0, 392.0, 362.0) if energy else Rect2(70.0, 86.0, 344.0, 340.0))
+	return energy_coin_icon(2, 4) if energy else energy_coin_icon(2, 3)
 
 static func balance_next_texture() -> Texture2D:
 	return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
