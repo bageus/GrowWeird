@@ -141,8 +141,11 @@ func _change_sell_quantity(delta: int) -> void:
 func _refresh_sell_preview() -> void:
 	sell_quantity.text = "%d / %d" % [_sell_amount, _count]
 	sell_value.text = str(_unit_value * _sell_amount)
-	sell_minus.disabled = _count <= 1 or _sell_amount <= 1
-	sell_plus.disabled = _count <= 1 or _sell_amount >= _count
+	var can_change_quantity := _count > 1
+	sell_minus.visible = can_change_quantity
+	sell_plus.visible = can_change_quantity
+	sell_minus.disabled = not can_change_quantity or _sell_amount <= 1
+	sell_plus.disabled = not can_change_quantity or _sell_amount >= _count
 
 func _refresh_recycle_preview(value: float) -> void:
 	var quantity := maxi(1, int(round(value)))
