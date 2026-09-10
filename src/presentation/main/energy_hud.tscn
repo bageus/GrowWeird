@@ -60,9 +60,11 @@ offset_bottom = 79.0
 
 [node name="Next" type="PanelContainer" parent="Layers"]
 layout_mode = 0
-offset_left = 30.0
+z_index = 188
+z_as_relative = false
+offset_left = 35.0
 offset_top = 121.0
-offset_right = 210.0
+offset_right = 205.0
 offset_bottom = 145.0
 mouse_filter = 2
 
