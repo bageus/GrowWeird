@@ -108,7 +108,7 @@ func _test_pour_waters_empty_active_pot() -> void:
 	pot.soil_moisture = 0.30
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
-	EnergyService.fill(state)
+	state.energy = 1
 	app.state = state
 	_expect(app.water_active(false), "pour: an empty active pot must still accept water")
 	_expect(pot.soil_moisture_stage() == 2, "pour: empty pot soil asset stage did not advance")
