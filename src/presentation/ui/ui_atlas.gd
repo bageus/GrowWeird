@@ -171,10 +171,10 @@ static func configure_transaction_total(container: Control) -> void:
 	icon.name = "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.set_anchors_preset(Control.PRESET_CENTER)
-	icon.offset_left = 28.0
-	icon.offset_top = -22.0
-	icon.offset_right = 72.0
-	icon.offset_bottom = 22.0
+	icon.offset_left = 32.0
+	icon.offset_top = -16.0
+	icon.offset_right = 64.0
+	icon.offset_bottom = 16.0
 	container.add_child(icon)
 
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
