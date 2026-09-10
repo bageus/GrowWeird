@@ -62,6 +62,16 @@ func _ready() -> void:
 	_build_tabs()
 	confirm.visible = false
 
+func _configure_buy_dialog_art() -> void:
+	TransactionDialogVisual.configure({
+		"root": confirm, "background": %ConfirmBackground, "banner": %ConfirmBanner,
+		"title": confirm_name, "close": %ConfirmClose, "preview": confirm_preview,
+		"description": confirm_description, "quantity": %QuantityControl,
+		"quantity_background": %QuantityBackground, "minus": quantity_minus,
+		"quantity_label": quantity_label, "plus": quantity_plus, "count": %CountControl,
+		"count_background": %CountBackground, "action": buy_button,
+	}, &"buy", Vector2i.ZERO)
+
 func _build_tabs() -> void:
 	for child in tabs.get_children(): child.queue_free()
 	for index in range(CATEGORIES.size()):
