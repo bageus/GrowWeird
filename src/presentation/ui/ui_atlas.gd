@@ -192,7 +192,7 @@ static func configure_balance_plus(button: Button, _balance_art: TextureRect) ->
 	if button != null:
 		CommerceUiStyle.balance_plus(button)
 		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		button.position = Vector2(202.0, 43.0)
+		button.position = Vector2(202.0, 38.0)
 		button.size = Vector2(34.0, 34.0)
 static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
@@ -262,8 +262,6 @@ static func configure_shop_slot(button: Button) -> void:
 	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
 	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
 
-static func coin_texture() -> Texture2D:
-	return atlas_region(BUTTONS, Rect2(112.0, 2672.0, 288.0, 288.0))
 
 static func branch_texture() -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(0.0, 7.0 * CELL, CELL, CELL))

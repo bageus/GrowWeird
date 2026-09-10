@@ -55,10 +55,20 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="CloseButton" type="Button" parent="Window/Content/Header"]
+[node name="CloseButton" type="Button" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(58, 50)
-layout_mode = 2
+z_index = 5
+layout_mode = 1
+anchor_left = 0.96
+anchor_top = 0.2
+anchor_right = 0.96
+anchor_bottom = 0.2
+offset_left = -48.0
+offset_top = -15.0
+offset_right = 12.0
+offset_bottom = 45.0
+grow_horizontal = 0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 28
 text = "×"
 
