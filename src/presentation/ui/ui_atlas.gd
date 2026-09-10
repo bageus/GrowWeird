@@ -19,17 +19,6 @@ const HUD_QUANTITY: Texture2D = preload("res://assets/ui/hud_background_quantity
 const HUD_COUNT: Texture2D = preload("res://assets/ui/hud_background_count.png")
 const HUD_SHOP_LOTS: Texture2D = preload("res://assets/ui/hud_background_shop.png")
 const HUD_COIN_ENERGY_BANNER: Texture2D = preload("res://assets/ui/hud_coinenergy_banner.png")
-const COIN_LOTS := {
-	10: preload("res://assets/ui/coinlot_card_10.png"),
-	100: preload("res://assets/ui/coinlot_card_100.png"),
-	300: preload("res://assets/ui/coinlot_card_300.png"),
-	1000: preload("res://assets/ui/coinlot_card_1000.png"),
-}
-const ENERGY_LOTS := {
-	5: preload("res://assets/ui/energylot_card_5.png"),
-	15: preload("res://assets/ui/energylot_card_15.png"),
-	30: preload("res://assets/ui/energylot_card_30.png"),
-}
 const CELL := 512.0
 
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
@@ -93,10 +82,31 @@ static func _close_texture(hovered: bool) -> Texture2D:
 static func _button_icon_crop(row: int, column: int, hover: bool) -> Texture2D:
 	return atlas_region(BUTTONS, Rect2(column * CELL + 24.0, row * CELL + 88.0, 240.0, 336.0))
 
+static func configure_topup_card(panel: Panel, title: String) -> void:
+	if panel == null:
+		return
+	panel.add_theme_stylebox_override(&"panel", warm_hud_style(4, 22, Vector4(12.0, 12.0, 12.0, 12.0)))
+	var label := Label.new()
+	label.name = "Title"
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	label.offset_left = 12.0
+	label.offset_top = 18.0
+	label.offset_right = -12.0
+	label.offset_bottom = 58.0
+	label.text = title
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_color_override(&"font_color", Color(0.33, 0.18, 0.1, 1.0))
+	label.add_theme_color_override(&"font_outline_color", Color(1.0, 0.94, 0.78, 1.0))
+	label.add_theme_constant_override(&"outline_size", 3)
+	label.add_theme_font_size_override(&"font_size", 22)
+	panel.add_child(label)
+
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
 	if button == null:
 		return
-	button.text = ""
+	button.text = "FREE" if rewarded_ad else "%d ₽" % price
 	button.icon = button_texture(7, 2)
 	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -104,40 +114,13 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	button.clip_contents = true
 	button.focus_mode = Control.FOCUS_NONE
 	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_color_override(&"font_color", Color.WHITE)
+	button.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1.0))
 	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
+	button.add_theme_constant_override(&"outline_size", 3)
+	button.add_theme_font_size_override(&"font_size", 22)
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	var content := HBoxContainer.new()
-	content.name = "Content"
-	content.z_index = 3
-	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	content.alignment = BoxContainer.ALIGNMENT_CENTER
-	content.add_theme_constant_override(&"separation", 0)
-	button.add_child(content)
-	if not rewarded_ad:
-		var amount := Label.new()
-		amount.name = "Amount"
-		amount.custom_minimum_size = Vector2(42.0, 0.0)
-		amount.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		amount.clip_text = true
-		amount.text = str(price)
-		amount.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		amount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		amount.add_theme_color_override(&"font_color", Color.WHITE)
-		amount.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1))
-		amount.add_theme_constant_override(&"outline_size", 3)
-		amount.add_theme_font_size_override(&"font_size", 22)
-		content.add_child(amount)
-	var currency := TextureRect.new()
-	currency.name = "CurrencyIcon"
-	currency.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	currency.texture = button_texture(7, 3) if rewarded_ad else button_texture(6, 3)
-	currency.custom_minimum_size = Vector2(84.0, 84.0) if rewarded_ad else Vector2(50.0, 50.0)
-	currency.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	currency.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	currency.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	content.add_child(currency)
 
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
 	if button == null: return

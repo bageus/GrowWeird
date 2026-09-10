@@ -12,9 +12,9 @@ var _ad_pending := false
 func _ready() -> void:
 	(%Background as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	%Banner.texture = UiAtlas.HUD_COIN_ENERGY_BANNER
-	%Energy5.texture = UiAtlas.ENERGY_LOTS[5]
-	%Energy15.texture = UiAtlas.ENERGY_LOTS[15]
-	%Energy30.texture = UiAtlas.ENERGY_LOTS[30]
+	UiAtlas.configure_topup_card(%Energy5, "5 Energy")
+	UiAtlas.configure_topup_card(%Energy15, "15 Energy")
+	UiAtlas.configure_topup_card(%Energy30, "30 Energy")
 	UiAtlas.configure_close_button(%CloseButton)
 	UiAtlas.configure_topup_button(%AdButton, 0, true)
 	UiAtlas.configure_topup_button(%Pack15, 59)
