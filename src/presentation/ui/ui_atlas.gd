@@ -132,9 +132,13 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	panel.add_child(icon)
 
-static func configure_transaction_total(container: Control, value_label: Label) -> void:
-	if container == null or value_label == null:
+static func configure_transaction_total(container: Control) -> void:
+	if container == null:
 		return
+	var labels := container.find_children("*", "Label", true, false)
+	if labels.is_empty():
+		return
+	var value_label := labels[0] as Label
 	value_label.set_anchors_preset(Control.PRESET_CENTER)
 	value_label.offset_left = -78.0
 	value_label.offset_top = -24.0
