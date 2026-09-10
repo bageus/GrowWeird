@@ -100,6 +100,9 @@ func close_all() -> void:
 func is_open() -> bool:
 	return actions.visible or sell_popup.visible or recycle_popup.visible
 
+func needs_scene_cancel() -> bool:
+	return actions.visible or recycle_popup.visible
+
 func refresh_position() -> void:
 	if actions.visible:
 		_place_left(actions)
