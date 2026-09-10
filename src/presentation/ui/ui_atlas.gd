@@ -181,13 +181,19 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	if button == null:
 		return
 	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else "%d ₽" % price, rewarded_ad)
+	button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	button.offset_left = -96.0
+	button.offset_top = -92.0
+	button.offset_right = 96.0
+	button.offset_bottom = -28.0
 	button.clip_contents = true
+
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
 	if button != null:
-		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		button.position = Vector2(198.0, 41.0)
-		button.size = Vector2(38.0, 38.0)
 		CommerceUiStyle.balance_plus(button)
+		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		button.position = Vector2(202.0, 43.0)
+		button.size = Vector2(34.0, 34.0)
 static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
 

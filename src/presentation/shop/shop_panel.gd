@@ -146,8 +146,11 @@ func _refresh_purchase_preview() -> void:
 	if _selected.is_empty(): return
 	var stock := int(_selected.get("stock", 1)); var unit_price := int(_selected.get("price", 1))
 	quantity_label.text = "%d / %d" % [_purchase_quantity, stock]
-	quantity_minus.disabled = stock <= 1 or _purchase_quantity <= 1
-	quantity_plus.disabled = stock <= 1 or _purchase_quantity >= stock
+	var can_change_quantity := stock > 1
+	quantity_minus.visible = can_change_quantity
+	quantity_plus.visible = can_change_quantity
+	quantity_minus.disabled = not can_change_quantity or _purchase_quantity <= 1
+	quantity_plus.disabled = not can_change_quantity or _purchase_quantity >= stock
 	confirm_price.text = str(unit_price * _purchase_quantity)
 	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * _purchase_quantity
 
