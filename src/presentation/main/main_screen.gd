@@ -222,6 +222,7 @@ func _on_environment_preset(preset: StringName) -> void:
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset)); care_gauge.reveal()
 func _on_prune_pressed() -> void:
+	if _interaction_mode == PlantView.MODE_PRUNE: _on_cancel_pressed(); return
 	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
 		return
