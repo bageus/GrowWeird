@@ -6,14 +6,14 @@
 
 [node name="EnergyHud" type="PanelContainer"]
 z_index = 200
-custom_minimum_size = Vector2(240, 146)
-offset_right = 240.0
+custom_minimum_size = Vector2(224, 146)
+offset_right = 224.0
 offset_bottom = 146.0
 theme_override_styles/panel = SubResource("StyleBox_empty")
 script = ExtResource("1_drag")
 layout_id = &"energy"
 drag_handle_height = 120.0
-allow_scaling = true
+allow_scaling = false
 
 [node name="Layers" type="Control" parent="."]
 layout_mode = 2
@@ -23,7 +23,7 @@ mouse_filter = 1
 layout_mode = 0
 offset_left = 36.0
 offset_top = 24.0
-offset_right = 240.0
+offset_right = 224.0
 offset_bottom = 96.0
 mouse_filter = 2
 
@@ -39,9 +39,9 @@ stretch_mode = 5
 
 [node name="Value" type="Label" parent="Layers"]
 layout_mode = 0
-offset_left = 67.0
+offset_left = 79.0
 offset_top = 28.0
-offset_right = 158.0
+offset_right = 182.0
 offset_bottom = 94.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
