@@ -15,12 +15,6 @@ const SEED_NAMES := ["Starter Seed", "Shade Fern Seed", "Sun Creeper Seed", "Har
 const POT_NAMES := ["Clay Pot", "Ceramic Pot", "Stone Pot", "Wooden Pot", "Golden Pot"]
 const DECORATIONS := [&"garden_gnome", &"fairy_lights", &"crystal_cluster", &"wooden_fence", &"water_fountain"]
 const MUTAGENS := [&"stable_mutagen", &"spore_mutagen", &"crystal_mutagen", &"floral_mutagen", &"predatory_mutagen"]
-const CATEGORY_FRAMES := {
-	&"fertilizers": Vector2i(0, 0), &"plants": Vector2i(0, 1),
-	&"mutagens": Vector2i(0, 2), &"decorations": Vector2i(0, 3),
-	&"seeds": Vector2i(1, 0), &"pots": Vector2i(1, 1),
-}
-
 @onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
 @onready var category_hud: PanelContainer = %CategoryHud
@@ -89,8 +83,7 @@ func _build_tabs() -> void:
 		button.custom_minimum_size = Vector2(190.0, 60.0)
 		button.position = Vector2(5.0, float(index * 68))
 		button.size = Vector2(190.0, 60.0)
-		var frame: Vector2i = CATEGORY_FRAMES[category]
-		UiAtlas.configure_button(button, frame.x, frame.y)
+		CommerceUiStyle.shop_category_button(button, String(category), COLORS[category])
 		button.pressed.connect(_show_category.bind(category)); tabs.add_child(button)
 
 func _show_category(category: StringName) -> void:
