@@ -106,6 +106,15 @@ func set_lighting_options_visible(enabled: bool) -> void:
 	if enabled:
 		_place_popup(menu, _controls.get("lighting") as Control, 2.0)
 
+func should_cancel_context_click(point: Vector2, dialogs: InventoryItemDialogs) -> bool:
+	var water := get_node("WaterOptions") as Control
+	var lighting := get_node("LightingOptions") as Control
+	if water.visible and not water.get_global_rect().has_point(point):
+		return true
+	if lighting.visible and not lighting.get_global_rect().has_point(point):
+		return true
+	return dialogs.needs_scene_cancel() and not dialogs.cancelable_menu_contains_global_point(point)
+
 func set_offer_cooldown(seconds: float) -> void:
 	var overlay := get_node("OffersPanel/CooldownCenter/CooldownOverlay") as Control
 	overlay.visible = seconds > 0.0

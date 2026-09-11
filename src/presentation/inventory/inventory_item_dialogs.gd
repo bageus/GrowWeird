@@ -103,6 +103,12 @@ func is_open() -> bool:
 func needs_scene_cancel() -> bool:
 	return actions.visible or recycle_popup.visible
 
+func cancelable_menu_contains_global_point(point: Vector2) -> bool:
+	for panel in [actions, recycle_popup]:
+		if panel.visible and panel.get_global_rect().has_point(point):
+			return true
+	return false
+
 func refresh_position() -> void:
 	if actions.visible:
 		_place_left(actions)
