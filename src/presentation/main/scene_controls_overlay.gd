@@ -95,6 +95,7 @@ func set_water_options_visible(enabled: bool) -> void:
 	if menu == null:
 		return
 	menu.visible = enabled
+	_set_context_cancel_state(_controls.get("water") as Button, enabled)
 	if enabled:
 		_place_popup(menu, _controls.get("water") as Control, 2.0)
 
@@ -103,8 +104,32 @@ func set_lighting_options_visible(enabled: bool) -> void:
 	if menu == null:
 		return
 	menu.visible = enabled
+	_set_context_cancel_state(_controls.get("lighting") as Button, enabled)
 	if enabled:
 		_place_popup(menu, _controls.get("lighting") as Control, 2.0)
+
+func _set_context_cancel_state(button: Button, active: bool) -> void:
+	if button == null:
+		return
+	button.self_modulate = Color(1.0, 0.46, 0.40, 1.0) if active else Color.WHITE
+	var caption := button.get_node_or_null("ContextCancelCaption") as Label
+	if not active:
+		if caption != null:
+			caption.free()
+		return
+	if caption == null:
+		caption = Label.new()
+		caption.name = "ContextCancelCaption"
+		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		caption.add_theme_font_size_override(&"font_size", 18)
+		caption.add_theme_color_override(&"font_color", Color.WHITE)
+		caption.add_theme_color_override(&"font_outline_color", Color("5b1008"))
+		caption.add_theme_constant_override(&"outline_size", 4)
+		button.add_child(caption)
+	caption.text = "CANCEL"
 
 func should_cancel_context_click(point: Vector2, dialogs: InventoryItemDialogs) -> bool:
 	var water := get_node("WaterOptions") as Control
