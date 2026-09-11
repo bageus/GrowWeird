@@ -184,39 +184,7 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	button.clip_contents = true
 
 static func configure_balance_hud(panel: Panel) -> void:
-	if panel == null:
-		return
-	var outer := StyleBoxFlat.new()
-	outer.bg_color = Color(0.64, 0.25, 0.035, 0.98)
-	outer.border_color = Color(1.0, 0.60, 0.055, 1.0)
-	outer.border_width_left = 4
-	outer.border_width_top = 5
-	outer.border_width_right = 4
-	outer.border_width_bottom = 5
-	outer.set_corner_radius_all(22)
-	outer.shadow_color = Color(0.22, 0.07, 0.01, 0.58)
-	outer.shadow_size = 4
-	outer.shadow_offset = Vector2(0.0, 3.0)
-	outer.anti_aliasing_size = 1.5
-	panel.add_theme_stylebox_override(&"panel", outer)
-	var inset := panel.get_node_or_null("InnerShadow") as Panel
-	if inset == null:
-		inset = Panel.new()
-		inset.name = "InnerShadow"
-		inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		inset.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		inset.offset_left = 6.0
-		inset.offset_top = 7.0
-		inset.offset_right = -6.0
-		inset.offset_bottom = -7.0
-		panel.add_child(inset)
-	var inner := StyleBoxFlat.new()
-	inner.bg_color = Color(0.08, 0.025, 0.005, 0.10)
-	inner.border_color = Color(0.18, 0.045, 0.005, 0.30)
-	inner.set_border_width_all(4)
-	inner.set_corner_radius_all(16)
-	inset.add_theme_stylebox_override(&"panel", inner)
-
+	CommerceUiStyle.balance_hud(panel)
 static func configure_balance_plus(button: Button, _balance_art: Control) -> void:
 	if button != null:
 		CommerceUiStyle.balance_plus(button)
