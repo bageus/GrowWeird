@@ -49,7 +49,7 @@ func _ready() -> void:
 	inventory_dialogs.use_requested.connect(_on_inventory_use_requested)
 	inventory_dialogs.sell_requested.connect(_on_inventory_sell_requested)
 	inventory_dialogs.recycle_requested.connect(_on_inventory_recycle_requested)
-	inventory_dialogs.closed.connect(_set_cancel_visibility)
+	inventory_dialogs.closed.connect(func() -> void: inventory_hud.set_context_cancel(false); _set_cancel_visibility()); inventory_hud.context_cancel_requested.connect(_on_cancel_pressed)
 	shop_panel.item_buy_requested.connect(_on_shop_item_requested)
 	shop_panel.close_requested.connect(_on_close_shop_pressed)
 	spray_button.pressed.connect(_on_spray_pressed)
@@ -303,7 +303,7 @@ func _on_shop_pressed() -> void:
 	shop_panel.invalidate()
 	_refresh()
 func _on_close_shop_pressed() -> void: scene_controls.set_shop_visible(false); _set_cancel_visibility()
-func _set_cancel_visibility() -> void: cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or inventory_dialogs.needs_scene_cancel()
+func _set_cancel_visibility() -> void: cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty()
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_save_assets_layout_pressed() -> void:
