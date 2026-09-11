@@ -251,8 +251,7 @@ func _on_branch_selected(slot: StringName) -> void:
 	_cancel_action()
 func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE: _cancel_action()
-	var price := GameApp.inventory_item_sale_value(kind, item_id)
-	var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
+	var price := GameApp.inventory_item_sale_value(kind, item_id); var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
 	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield); _set_cancel_visibility()
 func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 	match kind:
