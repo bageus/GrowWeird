@@ -125,16 +125,13 @@ allow_scaling = true
 layout_mode = 2
 mouse_filter = 1
 
-[node name="BalanceArt" type="TextureRect" parent="WalletHud/Layers"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="BalanceArt" type="Panel" parent="WalletHud/Layers"]
+layout_mode = 0
+offset_left = 36.0
+offset_top = 24.0
+offset_right = 240.0
+offset_bottom = 96.0
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
 
 [node name="BalanceIcon" type="TextureRect" parent="WalletHud/Layers"]
 layout_mode = 0
