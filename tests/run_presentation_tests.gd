@@ -100,7 +100,7 @@ func _test_scene_hud_contract() -> void:
 	var shop_scene := FileAccess.get_file_as_string("res://src/presentation/shop/shop_panel.tscn")
 	var shop_script := FileAccess.get_file_as_string("res://src/presentation/shop/shop_panel.gd")
 	_expect(hud_text.contains('instance=ExtResource("4_shop")') and hud_text.contains("z_index = 180"), "shop HUD: modal shop must render above every scene control")
-	_expect(shop_script.contains('CATEGORIES := [&"plants", &"pots", &"seeds", &"fertilizers", &"decorations", &"mutagens"]'), "shop HUD: requested category tabs are incomplete")
+	_expect(shop_script.contains('CATEGORIES := [&"plants", &"pots", &"seeds", &"fertilizers", &"decorations", &"mutagens"]') and shop_script.contains("CommerceUiStyle.shop_category_button") and not shop_script.contains("CATEGORY_FRAMES"), "shop HUD: requested category tabs are incomplete")
 	_expect(shop_scene.contains("ItemGrid") and shop_scene.contains("CategoryHud") and shop_scene.contains("Confirm"), "shop HUD: unified category grid or purchase confirmation is missing")
 	_expect(not shop_scene.contains("CategoryTitle") and not shop_scene.contains("HoverDescription"), "shop HUD: category heading and permanent description must be removed")
 	_expect(not shop_scene.contains('name="Balance"') and not shop_script.contains("BalanceFrame") and shop_scene.contains("anchor_top = 0.2") and shop_script.contains("CommerceUiStyle.shop_outer_panel()") and FileAccess.get_file_as_string("res://src/presentation/main/main_screen.gd").count("shop_container.visible") == 1, "shop HUD: redundant balance, thin frames, unsafe top offset, or background Cancel is present")
