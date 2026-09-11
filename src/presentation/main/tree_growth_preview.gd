@@ -122,8 +122,8 @@ func _load_asset_layout() -> void:
 		tree.scale = saved_scale
 
 func _update_hover_visibility() -> void:
-	left_hover.visible = prune_mode and _hovered_branch == &"left" and stage in [6, 7, 12]
-	right_hover.visible = prune_mode and _hovered_branch == &"right" and stage in [7, 11]
+	left_hover.visible = prune_mode and _hovered_branch == &"left" and _can_prune_side(&"left")
+	right_hover.visible = prune_mode and _hovered_branch == &"right" and _can_prune_side(&"right")
 	left_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	right_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -138,9 +138,9 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 		return
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
-		if side == &"left" and stage in [6, 7, 12]:
+		if side == &"left" and _can_prune_side(side):
 			tree_branch_pruned.emit(side); return
-		if side == &"right" and stage in [7, 11]:
+		if side == &"right" and _can_prune_side(side):
 			tree_branch_pruned.emit(side); return
 	if not Input.is_key_pressed(KEY_CTRL):
 		return
@@ -168,13 +168,17 @@ func _branch_side_at(point: Vector2) -> StringName:
 	var right_image := right_hover.texture.get_image() if right_hover.texture != null else null
 	if left_image != null:
 		var left_px := Vector2i(int(normalized.x * float(left_image.get_width() - 1)), int(normalized.y * float(left_image.get_height() - 1)))
-		if left_image.get_pixelv(left_px).a > 0.08 and stage in [6, 7, 12]:
+		if left_image.get_pixelv(left_px).a > 0.08 and _can_prune_side(&"left"):
 			return &"left"
 	if right_image != null:
 		var right_px := Vector2i(int(normalized.x * float(right_image.get_width() - 1)), int(normalized.y * float(right_image.get_height() - 1)))
-		if right_image.get_pixelv(right_px).a > 0.08 and stage in [7, 11]:
+		if right_image.get_pixelv(right_px).a > 0.08 and _can_prune_side(&"right"):
 			return &"right"
 	return &""
+
+func _can_prune_side(side: StringName) -> bool:
+	if _testing_stage >= 0: return stage in ([6, 7, 12] if side == &"left" else [7, 11])
+	return _plant != null and _plant.branch_at(side) != null
 
 func _scale_tree(factor: float) -> void:
 	var next_scale := tree.scale * factor
