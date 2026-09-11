@@ -38,7 +38,7 @@ signal tree_hover_changed(hovered: bool)
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
 	tree.mouse_entered.connect(tree_hover_changed.emit.bind(true))
-	tree.mouse_exited.connect(tree_hover_changed.emit.bind(false))
+	tree.mouse_exited.connect(tree_hover_changed.emit.bind(false)); tree.mouse_exited.connect(leaf_layout.clear_leaf_hover)
 	_load_asset_layout()
 	_set_stage(stage)
 
@@ -133,6 +133,7 @@ func _set_hovered_branch(side: StringName) -> void:
 		_update_hover_visibility()
 
 func _on_tree_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion: leaf_layout.set_leaf_hover((event as InputEventMouseMotion).position)
 	if prune_mode and event is InputEventMouseMotion:
 		_set_hovered_branch(_branch_side_at(tree.get_local_mouse_position()))
 		return
