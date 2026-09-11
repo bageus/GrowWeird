@@ -40,17 +40,21 @@ func moisten_soil_one_stage() -> void:
 	soil_moisture = SOIL_MOISTURE_STAGE_MAX[next_stage]
 	consecutive_sprays = 0
 
-func spray_soil(amount: float) -> bool:
-	var current_stage := soil_moisture_stage()
+func spray_soil(_amount: float) -> bool:
+	var displayed_stage := soil_moisture_stage()
+	var base_stage := displayed_stage if consecutive_sprays == 0 else maxi(0, displayed_stage - 1)
+	var next_stage := mini(base_stage + 1, SOIL_MOISTURE_STAGE_MAX.size() - 1)
+	if next_stage == base_stage:
+		consecutive_sprays = 0
+		return false
+	var stage_start := 0.0 if base_stage == 0 else SOIL_MOISTURE_STAGE_MAX[base_stage]
+	var stage_end := SOIL_MOISTURE_STAGE_MAX[next_stage]
 	consecutive_sprays = mini(consecutive_sprays + 1, SPRAYS_PER_STAGE)
-	if consecutive_sprays >= SPRAYS_PER_STAGE:
-		moisten_soil_one_stage()
-		return soil_moisture_stage() > current_stage
-	soil_moisture = minf(
-		soil_moisture + maxf(amount, 0.0),
-		SOIL_MOISTURE_STAGE_MAX[current_stage]
-	)
-	return false
+	soil_moisture = lerpf(stage_start, stage_end, float(consecutive_sprays) / float(SPRAYS_PER_STAGE))
+	if consecutive_sprays < SPRAYS_PER_STAGE:
+		return false
+	consecutive_sprays = 0
+	return true
 
 func reset_spray_streak() -> void:
 	consecutive_sprays = 0

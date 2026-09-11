@@ -22,6 +22,14 @@ func _init() -> void:
 	_expect(EnergyService.cycle_skip_cost(plant) == 9, "flower cycle cost must follow remaining minutes")
 	plant.boosted_growth_cycle = 9
 	_expect(EnergyService.cycle_skip_cost(plant) == 5, "matching fertilizer must halve effective skip time")
+	var spray_pot := PotState.new()
+	spray_pot.soil_moisture = 0.30
+	var previous_moisture := spray_pot.soil_moisture
+	for spray_index in range(PotState.SPRAYS_PER_STAGE):
+		spray_pot.spray_soil(0.05)
+		_expect(spray_pot.soil_moisture > previous_moisture, "every spray must visibly advance moisture")
+		previous_moisture = spray_pot.soil_moisture
+	_expect(is_equal_approx(spray_pot.soil_moisture, 0.48), "four sprays must equal one moisture-stage pour")
 	if failures.is_empty(): print("Energy tests passed")
 	else:
 		for failure in failures: push_error(failure)
