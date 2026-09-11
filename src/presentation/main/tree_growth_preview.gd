@@ -33,9 +33,12 @@ var _drag_offset := Vector2.ZERO
 var prune_mode := false
 var _hovered_branch: StringName = &""
 signal tree_branch_pruned(side: StringName)
+signal tree_hover_changed(hovered: bool)
 
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
+	tree.mouse_entered.connect(tree_hover_changed.emit.bind(true))
+	tree.mouse_exited.connect(tree_hover_changed.emit.bind(false))
 	_load_asset_layout()
 	_set_stage(stage)
 
