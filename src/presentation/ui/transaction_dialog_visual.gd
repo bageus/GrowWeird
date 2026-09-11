@@ -73,10 +73,11 @@ static func _configure_description_hud(root: Control, label: Label) -> void:
 		hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		root.add_child(hud)
 		root.move_child(hud, label.get_index())
-	_set_rect(hud, Rect2(29.0, 201.0, 408.0, 81.0))
+	# The description panel sits exactly 8 px inside the main HUD frame.
+	_set_rect(hud, Rect2(28.0, 201.0, 410.0, 81.0))
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.54, 0.29, 0.10, 0.24)
-	style.border_color = Color(0.55, 0.25, 0.055, 0.62)
+	style.bg_color = Color(1.0, 0.82, 0.56, 0.42)
+	style.border_color = Color(0.68, 0.34, 0.075, 0.66)
 	style.set_border_width_all(2)
 	style.set_corner_radius_all(14)
 	style.shadow_color = Color(0.28, 0.10, 0.02, 0.16)

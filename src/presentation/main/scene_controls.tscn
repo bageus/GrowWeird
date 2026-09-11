@@ -112,8 +112,8 @@ action_id = &"tasks"
 
 [node name="WalletHud" type="PanelContainer" parent="."]
 z_index = 200
-custom_minimum_size = Vector2(240, 120)
-offset_right = 240.0
+custom_minimum_size = Vector2(224, 120)
+offset_right = 224.0
 offset_bottom = 120.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("3_drag")
@@ -129,7 +129,7 @@ mouse_filter = 1
 layout_mode = 0
 offset_left = 36.0
 offset_top = 24.0
-offset_right = 240.0
+offset_right = 224.0
 offset_bottom = 96.0
 mouse_filter = 2
 
@@ -147,7 +147,7 @@ stretch_mode = 5
 layout_mode = 0
 offset_left = 79.0
 offset_top = 28.0
-offset_right = 158.0
+offset_right = 182.0
 offset_bottom = 94.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
