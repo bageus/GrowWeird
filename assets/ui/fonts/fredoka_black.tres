@@ -4,6 +4,7 @@
 
 [resource]
 base_font = ExtResource("1_fredoka")
+variation_embolden = 2.0
 variation_opentype = {
 "wght": 900.0
 }
