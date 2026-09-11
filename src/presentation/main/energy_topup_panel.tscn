@@ -23,15 +23,15 @@ grow_vertical = 2
 color = Color(0.02, 0.01, 0.03, 0.7)
 
 [node name="Window" type="Control" parent="."]
-custom_minimum_size = Vector2(760, 480)
+custom_minimum_size = Vector2(900, 480)
 layout_mode = 1
 anchor_left = 0.5
 anchor_top = 0.2
 anchor_right = 0.5
 anchor_bottom = 0.2
-offset_left = -380.0
+offset_left = -450.0
 offset_top = 8.0
-offset_right = 380.0
+offset_right = 450.0
 offset_bottom = 488.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -51,9 +51,9 @@ mouse_filter = 2
 [node name="Banner" type="TextureRect" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 68.0
+offset_left = 138.0
 offset_top = -20.0
-offset_right = 692.0
+offset_right = 762.0
 offset_bottom = 80.0
 mouse_filter = 2
 expand_mode = 1
@@ -61,9 +61,9 @@ stretch_mode = 5
 
 [node name="MenuTitle" type="Label" parent="Window"]
 layout_mode = 0
-offset_left = 98.0
+offset_left = 168.0
 offset_top = 0.0
-offset_right = 662.0
+offset_right = 732.0
 offset_bottom = 58.0
 theme_override_colors/font_outline_color = Color(0.25, 0.08, 0.02, 1)
 theme_override_constants/outline_size = 6
@@ -75,18 +75,18 @@ vertical_alignment = 1
 [node name="CloseButton" type="Button" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 702.0
+offset_left = 842.0
 offset_top = -10.0
-offset_right = 772.0
+offset_right = 912.0
 offset_bottom = 60.0
 
 [node name="EnergyLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
-offset_left = 150.0
+offset_left = 220.0
 offset_top = 115.0
-offset_right = 610.0
+offset_right = 680.0
 offset_bottom = 150.0
 theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 theme_override_font_sizes/font_size = 20
@@ -94,15 +94,15 @@ horizontal_alignment = 1
 
 [node name="Lots" type="HBoxContainer" parent="Window"]
 layout_mode = 0
-offset_left = 52.0
+offset_left = 48.0
 offset_top = 80.0
-offset_right = 708.0
+offset_right = 852.0
 offset_bottom = 422.0
 theme_override_constants/separation = 8
 alignment = 1
 
 [node name="AdLot" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 322)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Energy5" type="Panel" parent="Window/Lots/AdLot"]
 unique_name_in_owner = true
@@ -131,7 +131,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot15" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 322)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Energy15" type="Panel" parent="Window/Lots/Lot15"]
 unique_name_in_owner = true
@@ -160,7 +160,7 @@ grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Lot30" type="Control" parent="Window/Lots"]
-custom_minimum_size = Vector2(213.2, 322)
+custom_minimum_size = Vector2(195, 322)
 layout_mode = 2
 [node name="Energy30" type="Panel" parent="Window/Lots/Lot30"]
 unique_name_in_owner = true
@@ -191,9 +191,9 @@ grow_vertical = 0
 [node name="StatusLabel" type="Label" parent="Window"]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 110.0
+offset_left = 160.0
 offset_top = 448.0
-offset_right = 650.0
+offset_right = 740.0
 offset_bottom = 476.0
 theme_override_colors/font_color = Color(0.33, 0.18, 0.1, 1)
 horizontal_alignment = 1

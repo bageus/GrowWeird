@@ -28,7 +28,13 @@ static func curved_title(label: Label, caption: String, arc_height := 5.0) -> vo
 static func topup_button(button: Button, caption: String, rewarded := false) -> void:
 	_program_button(button, caption, Color(0.15, 0.69, 0.06, 1.0), Color(0.08, 0.39, 0.025, 1.0), 18)
 	button.add_theme_color_override(&"font_color", Color(1.0, 0.84, 0.22, 1.0) if rewarded else Color.WHITE)
-	for state in [&"normal", &"hover", &"pressed", &"disabled"]:
+	var normal_style := _panel(Color(0.15, 0.69, 0.06, 1.0), Color(0.08, 0.39, 0.025, 1.0), 4, 18)
+	normal_style.shadow_size = 0
+	normal_style.shadow_offset = Vector2.ZERO
+	button.add_theme_stylebox_override(&"normal", normal_style)
+	button.add_theme_stylebox_override(&"disabled", normal_style.duplicate())
+	button.add_theme_color_override(&"font_disabled_color", Color(1.0, 0.84, 0.22, 1.0) if rewarded else Color.WHITE)
+	for state in [&"hover", &"pressed"]:
 		var style := button.get_theme_stylebox(state) as StyleBoxFlat
 		if style != null:
 			style.shadow_size = 0
@@ -47,9 +53,9 @@ static func transaction_action(button: Button, mode: StringName) -> void:
 static func shop_lot(card: Button, accent: Color) -> void:
 	card.focus_mode = Control.FOCUS_NONE
 	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	card.add_theme_stylebox_override(&"normal", _panel(accent.lightened(0.72), accent.darkened(0.24), 4, 18))
-	card.add_theme_stylebox_override(&"hover", _panel(accent.lightened(0.80), accent, 5, 18))
-	card.add_theme_stylebox_override(&"pressed", _panel(accent.lightened(0.62), accent.darkened(0.12), 5, 18))
+	card.add_theme_stylebox_override(&"normal", _panel(accent.lightened(0.64), accent.darkened(0.24), 4, 18))
+	card.add_theme_stylebox_override(&"hover", _panel(accent.lightened(0.70), accent, 5, 18))
+	card.add_theme_stylebox_override(&"pressed", _panel(accent.lightened(0.56), accent.darkened(0.12), 5, 18))
 	card.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
 
 static func shop_outer_panel() -> StyleBoxFlat:
