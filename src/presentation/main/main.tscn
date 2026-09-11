@@ -286,14 +286,14 @@ script = ExtResource("3_plant")
 
 [node name="CareGauge" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(90, 300)
+custom_minimum_size = Vector2(90, 210)
 layout_mode = 1
 anchor_left = 0.24
 anchor_top = 0.32
 anchor_right = 0.24
 anchor_bottom = 0.32
 offset_right = 90.0
-offset_bottom = 300.0
+offset_bottom = 210.0
 z_index = 20
 mouse_filter = 2
 script = ExtResource("10_care_gauge")
@@ -304,10 +304,10 @@ layout_mode = 1
 anchors_preset = 10
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -105.0
+offset_left = -150.0
 offset_top = 58.0
-offset_right = 105.0
-offset_bottom = 148.0
+offset_right = 150.0
+offset_bottom = 122.0
 z_index = 21
 
 [node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
