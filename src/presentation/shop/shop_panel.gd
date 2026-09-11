@@ -98,9 +98,10 @@ func _add_card(item: Dictionary) -> void:
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
 	_configure_lot_button(card)
 	var name_label := Label.new()
-	name_label.position = Vector2(10.0, 7.0); name_label.size = Vector2(144.0, 28.0)
+	name_label.position = Vector2(8.0, 7.0); name_label.size = Vector2(116.0, 28.0)
 	name_label.text = String(item.get("name", "Item")); name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; name_label.add_theme_font_size_override(&"font_size", 16)
+	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; name_label.clip_text = true
+	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF; name_label.add_theme_font_size_override(&"font_size", _lot_title_font_size(name_label.text))
 	name_label.add_theme_color_override(&"font_color", Color(0.24, 0.105, 0.035, 1.0)); card.add_child(name_label)
 	var preview := TextureRect.new(); preview.position = Vector2(20.0, 35.0); preview.size = Vector2(118.0, 78.0); preview.texture = _preview_texture(item)
 	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; preview.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -229,7 +230,7 @@ func _quantity_badge(amount: int) -> Control:
 	badge.name = "QuantityBadge"
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	badge.position = Vector2(-36.0, 6.0)
+	badge.position = Vector2(-32.0, 4.0)
 	badge.size = Vector2(30.0, 30.0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = COLORS[_category].darkened(0.38)
@@ -238,16 +239,24 @@ func _quantity_badge(amount: int) -> Control:
 	style.set_corner_radius_all(15)
 	badge.add_theme_stylebox_override(&"panel", style)
 	var label := Label.new()
-	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	badge.add_child(label)
+	label.position = Vector2.ZERO
+	label.size = Vector2(30.0, 30.0)
 	label.text = str(amount)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override(&"font_size", 13 if amount >= 10 else 15)
 	label.add_theme_color_override(&"font_color", Color.WHITE)
 	label.add_theme_color_override(&"font_outline_color", Color(0.20, 0.07, 0.015, 1.0))
-	label.add_theme_constant_override(&"outline_size", 2)
-	badge.add_child(label)
+	label.add_theme_constant_override(&"outline_size", 1)
 	return badge
+
+func _lot_title_font_size(title: String) -> int:
+	if title.length() > 16:
+		return 12
+	if title.length() > 12:
+		return 14
+	return 16
 
 func _apply_category_hud(color: Color) -> void:
 	var style := StyleBoxFlat.new(); style.bg_color = color.darkened(0.72); style.bg_color.a = 0.96
