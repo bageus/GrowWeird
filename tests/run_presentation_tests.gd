@@ -20,6 +20,7 @@ func _init() -> void:
 	quit(1)
 func _test_presentation_resources_load() -> void:
 	var paths := [
+		"res://assets/ui/fonts/fredoka_black.tres",
 		"res://src/presentation/main/scene_controls.tscn",
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/main/scene_action_button.gd",
@@ -43,6 +44,7 @@ func _test_presentation_resources_load() -> void:
 	]
 	for path in paths:
 		_expect(load(path) != null, "presentation load failed: %s" % path)
+	_expect(FileAccess.get_file_as_string("res://project.godot").contains('theme/custom_font="res://assets/ui/fonts/fredoka_black.tres"') and FileAccess.file_exists("res://assets/ui/fonts/Fredoka.ttf") and FileAccess.file_exists("res://assets/ui/fonts/OFL.txt") and FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("GAME_FONT") and not FileAccess.get_file_as_string("res://src/presentation/ui/ui_atlas.gd").contains("SystemFont.new"), "typography: Fredoka Black must be bundled and applied globally")
 func _test_scene_button_contract() -> void:
 	var host := Control.new()
 	host.size = Vector2(1000.0, 600.0)
