@@ -159,7 +159,7 @@ func _set_interaction_mode(mode: StringName) -> void:
 	plant_view.set_interaction_mode(mode)
 	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE or mode == PlantView.MODE_PRUNE else Control.MOUSE_FILTER_STOP
-	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
+	prune_button.button_pressed = mode == PlantView.MODE_PRUNE; scene_controls.set_prune_cancel(mode == PlantView.MODE_PRUNE)
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible
 	if mode == PlantView.MODE_PRUNE:
 		if _prune_cursor == null:
@@ -222,6 +222,7 @@ func _on_environment_preset(preset: StringName) -> void:
 	scene_controls.set_lighting_options_visible(false)
 	event_label.text = "Environment: %s." % _pretty_id(String(preset)); care_gauge.reveal()
 func _on_prune_pressed() -> void:
+	if _interaction_mode == PlantView.MODE_PRUNE: _on_cancel_pressed(); return
 	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
 		return

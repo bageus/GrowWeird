@@ -4,7 +4,7 @@ extends Control
 const COLORS := [Color("2699ff"), Color("52d83d"), Color("ff9a24")]
 const KEYS := ["water", "food", "environment"]
 const ICON_TOP := 30.0
-const AUTO_HIDE_SECONDS := 3.0
+const AUTO_HIDE_SECONDS := 10.0
 const FADE_SECONDS := 0.35
 
 var _data: Dictionary = {}

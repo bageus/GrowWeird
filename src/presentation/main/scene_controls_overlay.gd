@@ -56,8 +56,8 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferThree") as Button)
 	var pots := get_node("PotSelector") as PanelContainer
 	pots.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	var pot_art := get_node("PotSelector/Layers/PotCircle") as TextureRect
-	pot_art.texture = UiAtlas.HUD_POT
+	var pot_art := get_node("PotSelector/Layers/PotCircle") as Panel
+	_configure_pot_circle(pot_art)
 	var pot_hover := get_node("PotSelector/Layers/PotHover") as TextureRect
 	(get_node("WaterOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	(get_node("LightingOptions") as PanelContainer).add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
@@ -78,17 +78,21 @@ func _apply_ui_atlases() -> void:
 	_configure_pot_arrow(get_node("PotSelector/Layers/PreviousPot") as Button, pot_hover, true)
 	_configure_pot_arrow(get_node("PotSelector/Layers/NextPot") as Button, pot_hover, false)
 
+func _configure_pot_circle(circle: Panel) -> void:
+	var outer := StyleBoxFlat.new(); outer.bg_color = Color("ffd489"); outer.border_color = Color("bd641b"); outer.set_border_width_all(3); outer.set_corner_radius_all(58); outer.shadow_color = Color(0.28, 0.09, 0.01, 0.45); outer.shadow_size = 4; outer.shadow_offset = Vector2(0.0, 3.0); circle.add_theme_stylebox_override(&"panel", outer)
+	var inner := Panel.new(); inner.name = "InnerRingShadow"; inner.mouse_filter = Control.MOUSE_FILTER_IGNORE; circle.add_child(inner); inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); inner.offset_left = 4.0; inner.offset_top = 4.0; inner.offset_right = -4.0; inner.offset_bottom = -4.0
+	var inset := StyleBoxFlat.new(); inset.bg_color = Color.TRANSPARENT; inset.border_color = Color(0.30, 0.11, 0.02, 0.26); inset.set_border_width_all(1); inset.set_corner_radius_all(54); inner.add_theme_stylebox_override(&"panel", inset)
+
 func _configure_pot_arrow(button: Button, hover_art: TextureRect, left: bool) -> void:
-	button.text = ""
-	button.icon = null
-	button.focus_mode = Control.FOCUS_NONE
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	button.mouse_entered.connect(func() -> void:
-		hover_art.texture = UiAtlas.HUD_POT_HOVER_LEFT if left else UiAtlas.HUD_POT_HOVER_RIGHT
-	)
-	button.mouse_exited.connect(func() -> void: hover_art.texture = null)
+	hover_art.texture = null; button.text = "‹" if left else "›"; button.icon = null; button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_font_size_override(&"font_size", 34); button.add_theme_color_override(&"font_color", Color.WHITE); button.add_theme_color_override(&"font_outline_color", Color("7b2f09")); button.add_theme_constant_override(&"outline_size", 2)
+	var states := {&"normal": Color("ed8b25"), &"hover": Color("ffa63b"), &"pressed": Color("cf6818"), &"focus": Color("ed8b25"), &"disabled": Color("a98a6c")}
+	for state in states:
+		var style := StyleBoxFlat.new(); style.bg_color = states[state]; style.border_color = Color(0.32, 0.10, 0.015, 0.50); style.set_border_width_all(1); style.set_corner_radius_all(20); style.shadow_color = Color(0.22, 0.06, 0.01, 0.42); style.shadow_size = 2; style.shadow_offset = Vector2(0.0, 2.0); button.add_theme_stylebox_override(state, style)
+	var gloss := Panel.new(); gloss.name = "Gloss"; gloss.mouse_filter = Control.MOUSE_FILTER_IGNORE; button.add_child(gloss); gloss.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE); gloss.offset_left = 5.0; gloss.offset_top = 4.0; gloss.offset_right = -5.0; gloss.offset_bottom = 25.0
+	var shine := StyleBoxFlat.new(); shine.bg_color = Color(1.0, 1.0, 0.9, 0.15); shine.corner_radius_top_left = 15; shine.corner_radius_top_right = 15; shine.corner_radius_bottom_left = 7; shine.corner_radius_bottom_right = 7; gloss.add_theme_stylebox_override(&"panel", shine)
+
+func set_prune_cancel(enabled: bool) -> void: _set_context_cancel_state(_controls.get("prune") as Button, enabled)
 
 func set_water_options_visible(enabled: bool) -> void:
 	var menu := get_node_or_null("WaterOptions") as Control
