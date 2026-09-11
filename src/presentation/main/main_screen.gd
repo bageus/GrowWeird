@@ -24,7 +24,6 @@ extends Control
 @onready var lighting_button: SceneActionButton = scene_controls.get_node("LightingButton")
 @onready var prune_button: SceneActionButton = scene_controls.get_node("PruneButton")
 @onready var sell_plant_button: SceneActionButton = scene_controls.get_node("SellPlantButton")
-@onready var cancel_button: SceneActionButton = scene_controls.get_node("CancelButton")
 @onready var spray_button: Button = scene_controls.get_node("WaterOptions/Options/SprayButton")
 @onready var pour_button: Button = scene_controls.get_node("WaterOptions/Options/PourButton")
 @onready var curtains_button: Button = scene_controls.get_node("LightingOptions/Options/CurtainsButton")
@@ -160,7 +159,6 @@ func _set_interaction_mode(mode: StringName) -> void:
 	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE or mode == PlantView.MODE_PRUNE else Control.MOUSE_FILTER_STOP
 	prune_button.button_pressed = mode == PlantView.MODE_PRUNE; scene_controls.set_prune_cancel(mode == PlantView.MODE_PRUNE)
-	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible
 	if mode == PlantView.MODE_PRUNE:
 		if _prune_cursor == null:
 			_prune_cursor = UiAtlas.prune_cursor()
@@ -304,7 +302,7 @@ func _on_shop_pressed() -> void:
 	shop_panel.invalidate()
 	_refresh()
 func _on_close_shop_pressed() -> void: scene_controls.set_shop_visible(false); _set_cancel_visibility()
-func _set_cancel_visibility() -> void: cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty()
+func _set_cancel_visibility() -> void: pass
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_save_assets_layout_pressed() -> void:
