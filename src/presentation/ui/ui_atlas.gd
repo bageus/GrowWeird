@@ -170,16 +170,41 @@ static func configure_transaction_total(container: Control) -> void:
 static func configure_topup_button(button: Button, price := 0, rewarded_ad := false, currency: StringName = &"rub") -> void:
 	if button == null:
 		return
-	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else str(price), rewarded_ad)
-	button.icon = null if rewarded_ad else (DOLLAR_ICON if currency == &"usd" else RUBLE_ICON)
-	button.expand_icon = true
-	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.add_theme_constant_override(&"icon_max_width", 28)
-	button.add_theme_constant_override(&"h_separation", 5)
+	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else "", rewarded_ad)
+	button.icon = null
+	var old_content := button.get_node_or_null("PriceContent")
+	if old_content != null:
+		old_content.free()
+	if not rewarded_ad:
+		var center := CenterContainer.new()
+		center.name = "PriceContent"
+		center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		button.add_child(center)
+		center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		var row := HBoxContainer.new()
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_theme_constant_override(&"separation", 5)
+		center.add_child(row)
+		var icon := TextureRect.new()
+		icon.custom_minimum_size = Vector2(28.0, 28.0)
+		icon.texture = DOLLAR_ICON if currency == &"usd" else RUBLE_ICON
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(icon)
+		var price_label := Label.new()
+		price_label.text = str(price)
+		price_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		price_label.add_theme_font_size_override(&"font_size", 18)
+		price_label.add_theme_color_override(&"font_color", Color.WHITE)
+		price_label.add_theme_color_override(&"font_outline_color", Color(0.12, 0.28, 0.04, 0.88))
+		price_label.add_theme_constant_override(&"outline_size", 2)
+		price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(price_label)
 	button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	button.offset_left = -96.0
+	button.offset_left = -88.0
 	button.offset_top = -92.0
-	button.offset_right = 96.0
+	button.offset_right = 88.0
 	button.offset_bottom = -28.0
 	button.clip_contents = true
 
