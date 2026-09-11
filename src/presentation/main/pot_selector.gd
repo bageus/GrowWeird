@@ -90,10 +90,4 @@ func _signature(state: GameState, planting_target: bool) -> String:
 	return "|".join(parts)
 
 func _pot_index(pot_id: String) -> int:
-	var digits := ""
-	for character in pot_id:
-		if character >= "0" and character <= "9":
-			digits += character
-	if digits.is_empty():
-		return 0
-	return posmod(int(digits) - 1, POT_TEXTURES.size())
+	return PotVisual.index_for_id(pot_id, POT_TEXTURES.size())

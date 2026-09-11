@@ -124,7 +124,7 @@ func _test_scene_hud_contract() -> void:
 	_expect(main_text.contains("TreeGrowthControls") and main_text.contains("preview only"), "scene HUD: isolated tree asset testing controls missing")
 	_expect(main_text.contains("modulate = Color(1, 1, 1, 0)"), "scene HUD: legacy procedural plant renderer must not compete with asset rendering")
 	var pot_visual_text := FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.gd")
-	_expect(pot_visual_text.contains("GROUND_TEXTURES[state.soil_moisture_stage()]") and pot_visual_text.contains("ground.queue_redraw()") and pot_visual_text.contains("modulo = posmod(modulo * 10 + int(character)") and not pot_visual_text.contains("int(digits)"), "pot visual: moisture stage must directly select and redraw the soil asset")
+	_expect(pot_visual_text.contains("GROUND_TEXTURES[state.soil_moisture_stage()]") and pot_visual_text.contains("ground.queue_redraw()") and pot_visual_text.contains("modulo = posmod(modulo * 10 + int(character)") and not pot_visual_text.contains("int(digits)") and FileAccess.get_file_as_string("res://src/presentation/main/pot_selector.gd").contains("PotVisual.index_for_id"), "pot visual: moisture stage must directly select and redraw the soil asset")
 	_expect(FileAccess.get_file_as_string("res://src/presentation/main/pot_visual.tscn").contains("[node name=\"Ground\" type=\"TextureRect\" parent=\".\"]\nz_index = 2"), "pot visual: tree must render above the soil layer")
 	var overlay := SceneControlsOverlay.new()
 	overlay.size = Vector2(1000.0, 600.0)
