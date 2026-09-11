@@ -172,6 +172,7 @@ func _cancel_action() -> void:
 	_set_interaction_mode(PlantView.MODE_NONE)
 	pot_selector.invalidate()
 func _on_scene_action_requested(action_id: StringName) -> void:
+	if _interaction_mode == PlantView.MODE_PRUNE and action_id != &"prune": _cancel_action()
 	match action_id:
 		&"water": _on_water_pressed()
 		&"lighting": _on_light_pressed()
@@ -224,8 +225,8 @@ func _on_prune_pressed() -> void:
 	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
 		return
-	_pending_item_id = ""
-	_pending_plant_kind = &""
+	_pending_item_id = ""; _pending_plant_kind = &""
+	_water_submenu_visible = false; _lighting_submenu_visible = false; scene_controls.set_water_options_visible(false); scene_controls.set_lighting_options_visible(false)
 	_set_interaction_mode(PlantView.MODE_PRUNE)
 	event_label.text = "Prune mode: click an existing branch."
 func _on_cancel_pressed() -> void:
@@ -249,8 +250,8 @@ func _on_branch_selected(slot: StringName) -> void:
 		event_label.text = "Cutting used on plant." if success else "Graft failed."
 	_cancel_action()
 func _on_inventory_item_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
-	var price := GameApp.inventory_item_sale_value(kind, item_id)
-	var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
+	if _interaction_mode == PlantView.MODE_PRUNE: _cancel_action()
+	var price := GameApp.inventory_item_sale_value(kind, item_id); var recycle_yield := GameApp.inventory_item_recycle_yield(kind)
 	inventory_dialogs.show_for(inventory_hud, kind, item_id, count, title, price, recycle_yield); _set_cancel_visibility()
 func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 	match kind:

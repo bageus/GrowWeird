@@ -120,7 +120,7 @@ func _set_context_cancel_state(button: Button, active: bool) -> void:
 		return
 	if face != null: return
 	face = Panel.new(); face.name = "ContextCancelButton"; face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 12.0; face.offset_top = 10.0; face.offset_right = -12.0; face.offset_bottom = -10.0
+	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 20.0; face.offset_top = 15.0; face.offset_right = -20.0; face.offset_bottom = -15.0
 	var style := StyleBoxFlat.new(); style.bg_color = Color("df4a2f"); style.border_color = Color("8d210f")
 	style.set_border_width_all(3); style.set_corner_radius_all(22); style.shadow_color = Color(0.25, 0.04, 0.01, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 3.0)
 	face.add_theme_stylebox_override(&"panel", style)
