@@ -21,8 +21,8 @@ var _last_signature := ""
 
 func _ready() -> void:
 	super()
-	previous_button.pressed.connect(_select_offset.bind(-1))
-	next_button.pressed.connect(_select_offset.bind(1))
+	previous_button.button_down.connect(_select_offset.bind(-1))
+	next_button.button_down.connect(_select_offset.bind(1))
 
 func set_state(state: GameState, planting_target: bool) -> void:
 	_state = state
