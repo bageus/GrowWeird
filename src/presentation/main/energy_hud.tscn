@@ -6,9 +6,9 @@
 
 [node name="EnergyHud" type="PanelContainer"]
 z_index = 200
-custom_minimum_size = Vector2(224, 146)
+custom_minimum_size = Vector2(224, 138)
 offset_right = 224.0
-offset_bottom = 146.0
+offset_bottom = 138.0
 theme_override_styles/panel = SubResource("StyleBox_empty")
 script = ExtResource("1_drag")
 layout_id = &"energy"
@@ -24,7 +24,7 @@ layout_mode = 0
 offset_left = 36.0
 offset_top = 24.0
 offset_right = 224.0
-offset_bottom = 96.0
+offset_bottom = 88.0
 mouse_filter = 2
 
 [node name="BalanceIcon" type="TextureRect" parent="Layers"]
@@ -40,9 +40,9 @@ stretch_mode = 5
 [node name="Value" type="Label" parent="Layers"]
 layout_mode = 0
 offset_left = 79.0
-offset_top = 28.0
+offset_top = 27.0
 offset_right = 182.0
-offset_bottom = 94.0
+offset_bottom = 85.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
 theme_override_constants/outline_size = 5
@@ -63,9 +63,9 @@ layout_mode = 0
 z_index = 188
 z_as_relative = false
 offset_left = 48.0
-offset_top = 97.0
+offset_top = 89.0
 offset_right = 218.0
-offset_bottom = 121.0
+offset_bottom = 113.0
 mouse_filter = 2
 
 [node name="Timer" type="Label" parent="Layers/Next"]
