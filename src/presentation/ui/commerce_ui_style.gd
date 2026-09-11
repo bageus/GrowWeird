@@ -25,21 +25,26 @@ static func curved_title(label: Label, caption: String, arc_height := 5.0) -> vo
 		letter.add_theme_font_size_override(&"font_size", 30)
 		label.add_child(letter)
 
-static func topup_button(button: Button, caption: String, rewarded := false) -> void:
-	_program_button(button, caption, Color(0.15, 0.69, 0.06, 1.0), Color(0.08, 0.39, 0.025, 1.0), 18)
-	button.add_theme_color_override(&"font_color", Color(1.0, 0.84, 0.22, 1.0) if rewarded else Color.WHITE)
-	var normal_style := _panel(Color(0.15, 0.69, 0.06, 1.0), Color(0.08, 0.39, 0.025, 1.0), 4, 18)
-	normal_style.shadow_size = 0
-	normal_style.shadow_offset = Vector2.ZERO
-	button.add_theme_stylebox_override(&"normal", normal_style)
-	button.add_theme_stylebox_override(&"disabled", normal_style.duplicate())
-	button.add_theme_color_override(&"font_disabled_color", Color(1.0, 0.84, 0.22, 1.0) if rewarded else Color.WHITE)
-	for state in [&"hover", &"pressed"]:
-		var style := button.get_theme_stylebox(state) as StyleBoxFlat
-		if style != null:
-			style.shadow_size = 0
-			style.shadow_offset = Vector2.ZERO
-			style.set_corner_radius_all(18)
+static func topup_button(button: Button, caption: String, _rewarded := false) -> void:
+	_program_button(button, caption, Color("55b83f"), Color("2c7624"), 18)
+	button.add_theme_color_override(&"font_color", Color.WHITE)
+	button.add_theme_color_override(&"font_disabled_color", Color(0.92, 0.96, 0.90, 1.0))
+	button.add_theme_stylebox_override(&"normal", _topup_style(Color("55b83f"), Color("2f7d26"), 5.0))
+	button.add_theme_stylebox_override(&"hover", _topup_style(Color("62c94b"), Color("347f29"), 5.0))
+	button.add_theme_stylebox_override(&"pressed", _topup_style(Color("469f35"), Color("286920"), 2.0))
+	button.add_theme_stylebox_override(&"disabled", _topup_style(Color("83987a"), Color("596b52"), 4.0))
+	button.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
+
+static func _topup_style(color: Color, lower_color: Color, depth: float) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(13)
+	style.shadow_color = lower_color
+	style.shadow_size = 1
+	style.shadow_offset = Vector2(0.0, depth)
+	style.content_margin_bottom = 5.0
+	style.anti_aliasing_size = 1.5
+	return style
 
 static func balance_hud(panel: Panel) -> void:
 	if panel == null: return
