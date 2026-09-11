@@ -44,6 +44,39 @@ static func transaction_action(button: Button, mode: StringName) -> void:
 	var selling := mode == &"sell"
 	_program_button(button, String(mode).to_upper(), Color(0.96, 0.49, 0.045, 1.0) if selling else Color(0.24, 0.72, 0.07, 1.0), Color(0.54, 0.20, 0.02, 1.0), 25)
 
+static func shop_category_button(button: Button, caption: String, accent: Color) -> void:
+	button.text = caption.to_upper()
+	button.icon = null
+	button.expand_icon = false
+	button.focus_mode = Control.FOCUS_NONE
+	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	button.add_theme_font_size_override(&"font_size", 18)
+	button.add_theme_color_override(&"font_color", Color.WHITE)
+	button.add_theme_color_override(&"font_outline_color", accent.darkened(0.62))
+	button.add_theme_constant_override(&"outline_size", 3)
+	button.add_theme_stylebox_override(&"normal", _category_button_style(accent, false))
+	button.add_theme_stylebox_override(&"hover", _category_button_style(accent.lightened(0.10), false))
+	button.add_theme_stylebox_override(&"pressed", _category_button_style(accent.darkened(0.10), true))
+	button.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
+	button.add_theme_stylebox_override(&"disabled", _category_button_style(accent.darkened(0.30), false))
+
+static func _category_button_style(color: Color, pressed: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.border_color = color.darkened(0.34)
+	style.border_width_left = 3
+	style.border_width_top = 2
+	style.border_width_right = 3
+	style.border_width_bottom = 5
+	style.set_corner_radius_all(22)
+	style.shadow_color = color.darkened(0.48)
+	style.shadow_size = 3
+	style.shadow_offset = Vector2(0.0, 2.0 if pressed else 5.0)
+	style.anti_aliasing_size = 1.5
+	style.content_margin_left = 18.0
+	style.content_margin_right = 18.0
+	return style
+
 static func shop_lot(card: Button, accent: Color) -> void:
 	card.focus_mode = Control.FOCUS_NONE
 	card.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
