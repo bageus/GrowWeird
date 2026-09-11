@@ -42,14 +42,14 @@ func _test_pour_moistens_soil_one_stage() -> void:
 
 func _test_four_sprays_moisten_one_stage() -> void:
 	var pot := PotState.new()
-	pot.soil_moisture = 0.18
-	var starting_stage := pot.soil_moisture_stage()
+	pot.soil_moisture = 0.30
+	var previous_moisture := pot.soil_moisture
 	for index in range(3):
-		_expect(not pot.spray_soil(0.035), "spray: first three sprays must not advance the soil stage")
-		_expect(pot.soil_moisture_stage() == starting_stage, "spray: support moisture must remain inside the current stage")
-	_expect(pot.soil_moisture > 0.18, "spray: partial sequence must extend the current stage drying time")
-	_expect(pot.spray_soil(0.035), "spray: fourth consecutive spray must advance one soil stage")
-	_expect(pot.soil_moisture_stage() == starting_stage + 1, "spray: four sprays must advance exactly one stage")
+		_expect(not pot.spray_soil(0.035), "spray: first three quarter steps must not complete the stage")
+		_expect(pot.soil_moisture > previous_moisture, "spray: every quarter step must be visible")
+		previous_moisture = pot.soil_moisture
+	_expect(pot.spray_soil(0.035), "spray: fourth consecutive spray must complete one moisture stage")
+	_expect(is_equal_approx(pot.soil_moisture, 0.48), "spray: four quarter steps must reach the next stage")
 	_expect(pot.consecutive_sprays == 0, "spray: completed sequence must reset")
 
 func _test_care_gauge_ranges_and_stage_history() -> void:
