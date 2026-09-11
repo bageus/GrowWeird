@@ -62,10 +62,10 @@ offset_bottom = 79.0
 layout_mode = 0
 z_index = 188
 z_as_relative = false
-offset_left = 35.0
-offset_top = 100.0
-offset_right = 205.0
-offset_bottom = 124.0
+offset_left = 48.0
+offset_top = 80.0
+offset_right = 218.0
+offset_bottom = 104.0
 mouse_filter = 2
 
 [node name="Timer" type="Label" parent="Layers/Next"]
