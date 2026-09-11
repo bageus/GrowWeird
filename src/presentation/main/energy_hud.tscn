@@ -13,7 +13,7 @@ theme_override_styles/panel = SubResource("StyleBox_empty")
 script = ExtResource("1_drag")
 layout_id = &"energy"
 drag_handle_height = 120.0
-allow_scaling = false
+allow_scaling = true
 
 [node name="Layers" type="Control" parent="."]
 layout_mode = 2
