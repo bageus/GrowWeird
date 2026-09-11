@@ -105,7 +105,7 @@ static func energy_coin_icon(row: int, column: int) -> Texture2D:
 static func configure_topup_card(panel: Panel, title: String, icon_texture: Texture2D) -> void:
 	if panel == null:
 		return
-	panel.add_theme_stylebox_override(&"panel", warm_hud_style(4, 22, Vector4(12.0, 12.0, 12.0, 12.0)))
+	var card_style := warm_hud_style(4, 22, Vector4(12.0, 12.0, 12.0, 12.0)); card_style.bg_color = Color("ffd078"); card_style.border_color = Color("b95a12"); card_style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); panel.add_theme_stylebox_override(&"panel", card_style)
 	var label := Label.new()
 	label.name = "Title"
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -94,11 +94,11 @@ func _show_category(category: StringName) -> void:
 
 func _add_card(item: Dictionary) -> void:
 	var card := Button.new()
-	card.custom_minimum_size = Vector2(158.0, 156.0); card.clip_contents = true
+	card.custom_minimum_size = Vector2(158.0, 156.0); card.clip_contents = false
 	card.disabled = not bool(item.get("unlocked", false)); card.tooltip_text = String(item.get("description", ""))
 	_configure_lot_button(card)
 	var name_label := Label.new()
-	name_label.position = Vector2(8.0, 7.0); name_label.size = Vector2(116.0, 28.0)
+	name_label.position = Vector2(8.0, 7.0); name_label.size = Vector2(120.0, 28.0)
 	name_label.text = String(item.get("name", "Item")); name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; name_label.clip_text = true
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF; name_label.add_theme_font_size_override(&"font_size", _lot_title_font_size(name_label.text))
@@ -163,7 +163,7 @@ func _rebuild_catalog_stock() -> void:
 
 func _plant_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	result.append(_item(&"starter_cuttings", SPECIES[0], "Starter Branches", "Plantable branches delivered to inventory.", &"cutting", true, 2, "res://assets/tree/tree_05.png"))
+	result.append(_item(&"starter_cuttings", SPECIES[0], "Starter Branches", "Plantable branches delivered to inventory.", &"cutting", true, 29, "res://assets/tree/tree_05.png"))
 	result.append(_item(&"fern_cutting", SPECIES[1], "Fern Branch", "A plantable branch delivered without a pot.", &"cutting", true, 1, "res://assets/tree/tree_05.png"))
 	result.append(_item(&"starter_plant", SPECIES[0], PLANT_NAMES[0], "A first-stage shoot supplied in its own pot.", &"potted_plant", true, 1, "res://assets/tree/tree_01.png"))
 	result.append(_item(&"young_ferns", SPECIES[1], PLANT_NAMES[1], "First-stage shoots supplied in their own pots.", &"potted_plant", true, 2, "res://assets/tree/tree_01.png"))
@@ -230,7 +230,7 @@ func _quantity_badge(amount: int) -> Control:
 	badge.name = "QuantityBadge"
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	badge.position = Vector2(-32.0, 4.0)
+	badge.position = Vector2(-28.0, 4.0)
 	badge.size = Vector2(30.0, 30.0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = COLORS[_category].darkened(0.38)
