@@ -69,23 +69,10 @@ func _ready() -> void:
 		button.pressed.connect(_on_tree_stage_selected.bind(stage))
 	_set_interaction_mode(PlantView.MODE_NONE)
 	_refresh()
-
 func _input(event: InputEvent) -> void:
-	if not (event is InputEventMouseButton):
-		return
-	var click := event as InputEventMouseButton
-	if click.button_index != MOUSE_BUTTON_LEFT or not click.pressed:
-		return
-	var water_menu := scene_controls.get_node("WaterOptions") as Control
-	var lighting_menu := scene_controls.get_node("LightingOptions") as Control
-	var outside_water := _water_submenu_visible and not water_menu.get_global_rect().has_point(click.position)
-	var outside_lighting := _lighting_submenu_visible and not lighting_menu.get_global_rect().has_point(click.position)
-	var outside_inventory := inventory_dialogs.needs_scene_cancel() and not inventory_dialogs.cancelable_menu_contains_global_point(click.position)
-	if not (outside_water or outside_lighting or outside_inventory):
-		return
-	_on_cancel_pressed()
-	get_viewport().set_input_as_handled()
-
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and scene_controls.should_cancel_context_click(event.position, inventory_dialogs):
+		_on_cancel_pressed()
+		get_viewport().set_input_as_handled()
 func _refresh() -> void:
 	var pot := GameApp.active_pot()
 	var plant := GameApp.active_plant()
@@ -167,7 +154,6 @@ func _set_offer_icon(button: Button, texture: Texture2D) -> void:
 	icon.texture = texture
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-
 func _set_interaction_mode(mode: StringName) -> void:
 	_interaction_mode = mode
 	plant_view.set_interaction_mode(mode)
