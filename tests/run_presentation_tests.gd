@@ -211,7 +211,6 @@ func _test_window_asset_mapping() -> void:
 	view.set_environment(PotState.LightMode.DIFFUSED, false)
 	_expect(view.texture == WindowView.BLINDS, "window art: blinds mode must use window_04")
 	view.free()
-
 func _test_growth_stage_geometry() -> void:
 	var pot_preview := (load("res://src/presentation/main/pot_visual.tscn") as PackedScene).instantiate() as PotVisual
 	root.add_child(pot_preview)
