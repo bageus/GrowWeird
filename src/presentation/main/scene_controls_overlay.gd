@@ -10,7 +10,6 @@ const DEFAULT_POSITIONS := {
 	"lighting": Vector2(0.06, 0.14),
 	"prune": Vector2(0.05, 0.47),
 	"sell_plant": Vector2(0.05, 0.64),
-	"cancel": Vector2(0.45, 0.05),
 	"shop": Vector2(0.84, 0.12),
 	"tasks": Vector2(0.84, 0.22),
 	"wallet": Vector2(0.72, 0.03),
@@ -84,7 +83,7 @@ func _configure_pot_circle(circle: Panel) -> void:
 	var inset := StyleBoxFlat.new(); inset.bg_color = Color.TRANSPARENT; inset.border_color = Color(0.30, 0.11, 0.02, 0.26); inset.set_border_width_all(1); inset.set_corner_radius_all(54); inner.add_theme_stylebox_override(&"panel", inset)
 
 func _configure_pot_arrow(button: Button, hover_art: TextureRect, left: bool) -> void:
-	hover_art.texture = null; button.text = "‹" if left else "›"; button.icon = null; button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	hover_art.texture = null; button.text = "‹" if left else "›"; button.icon = null; button.focus_mode = Control.FOCUS_NONE; button.mouse_filter = Control.MOUSE_FILTER_STOP; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.move_to_front()
 	button.add_theme_font_size_override(&"font_size", 34); button.add_theme_color_override(&"font_color", Color.WHITE); button.add_theme_color_override(&"font_outline_color", Color("7b2f09")); button.add_theme_constant_override(&"outline_size", 2)
 	var states := {&"normal": Color("ed8b25"), &"hover": Color("ffa63b"), &"pressed": Color("cf6818"), &"focus": Color("ed8b25"), &"disabled": Color("a98a6c")}
 	for state in states:
@@ -121,7 +120,7 @@ func _set_context_cancel_state(button: Button, active: bool) -> void:
 		return
 	if face != null: return
 	face = Panel.new(); face.name = "ContextCancelButton"; face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 12.0; face.offset_top = 10.0; face.offset_right = -12.0; face.offset_bottom = -10.0
 	var style := StyleBoxFlat.new(); style.bg_color = Color("df4a2f"); style.border_color = Color("8d210f")
 	style.set_border_width_all(3); style.set_corner_radius_all(22); style.shadow_color = Color(0.25, 0.04, 0.01, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 3.0)
 	face.add_theme_stylebox_override(&"panel", style)
