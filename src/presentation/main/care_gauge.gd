@@ -4,17 +4,48 @@ extends Control
 const COLORS := [Color("2699ff"), Color("52d83d"), Color("ff9a24")]
 const KEYS := ["water", "food", "environment"]
 const ICON_TOP := 30.0
+const AUTO_HIDE_SECONDS := 3.0
+const FADE_SECONDS := 0.35
 
 var _data: Dictionary = {}
+var _hide_remaining := 0.0
+var _tree_hovered := false
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	visible = false
 	queue_redraw()
 
+func _process(delta: float) -> void:
+	if not visible or _tree_hovered:
+		return
+	_hide_remaining = maxf(0.0, _hide_remaining - delta)
+	modulate.a = clampf(_hide_remaining / FADE_SECONDS, 0.0, 1.0) if _hide_remaining < FADE_SECONDS else 1.0
+	if is_zero_approx(_hide_remaining):
+		visible = false
+
 func set_gauge(data: Dictionary) -> void:
+	var first_data := _data.is_empty() and not data.is_empty()
 	_data = data
-	visible = not data.is_empty()
+	if data.is_empty():
+		visible = false
+	elif first_data:
+		reveal()
 	queue_redraw()
+
+func reveal() -> void:
+	if _data.is_empty():
+		return
+	_hide_remaining = AUTO_HIDE_SECONDS
+	modulate.a = 1.0
+	visible = true
+
+func set_tree_hovered(hovered: bool) -> void:
+	_tree_hovered = hovered
+	if hovered:
+		reveal()
+	elif visible:
+		_hide_remaining = AUTO_HIDE_SECONDS
 
 func _draw() -> void:
 	if _data.is_empty():
@@ -34,10 +65,13 @@ func _draw_vertical_bar(index: int, color: Color, component: Dictionary) -> void
 	var inner := rect.grow(-4.0)
 	draw_style_box(_bar_style(Color(0.10, 0.065, 0.055, 0.94), Color(0.035, 0.02, 0.015, 0.78), 9, 2, 2, 2), inner)
 	var value := clampf(float(component.get("value", 0.5)), 0.0, 1.0)
+	var minimum := clampf(float(component.get("minimum", 0.0)), 0.0, 1.0)
+	var maximum := clampf(float(component.get("maximum", 1.0)), minimum, 1.0)
+	var fill_color := Color("ef3f36") if value < minimum or value > maximum else color
 	if value > 0.0:
 		var fill_height := maxf(6.0, (inner.size.y - 4.0) * value)
 		var fill := Rect2(inner.position + Vector2(2.0, inner.size.y - fill_height - 2.0), Vector2(inner.size.x - 4.0, fill_height))
-		draw_style_box(_bar_style(color, color.darkened(0.42), 7, 2, 2, 3), fill)
+		draw_style_box(_bar_style(fill_color, fill_color.darkened(0.42), 7, 2, 2, 3), fill)
 		var shine := Color(1.0, 1.0, 0.88, 0.72)
 		var shine_start := fill.position + Vector2(4.0, 6.0)
 		draw_circle(shine_start, 2.5, shine)
