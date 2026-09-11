@@ -9,17 +9,34 @@ const FIRST_TREE_STAGE := 4
 const LAST_TREE_STAGE := 13
 const BASE_LEAF_SIZE := Vector2(58.0, 58.0)
 const HIT_RADIUS := 16.0
+const HOVER_RADIUS := 96.0
+const HOVER_SHIFT := 7.0
 
 var enabled := false
 var stage := FIRST_TREE_STAGE
 var layouts: Dictionary = {}
 var selected_index := -1
 var _dragging := false
+var _hover_position := Vector2(-1000.0, -1000.0)
+var _hover_target := 0.0
+var _hover_strength := 0.0
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layouts = _load_layouts()
+	set_process(false)
 	queue_redraw()
+
+func set_leaf_hover(point: Vector2) -> void:
+	_hover_position = point; _hover_target = 1.0; set_process(true)
+
+func clear_leaf_hover() -> void:
+	_hover_target = 0.0; set_process(true)
+
+func _process(delta: float) -> void:
+	_hover_strength = move_toward(_hover_strength, _hover_target, delta * (8.0 if _hover_target > 0.0 else 4.5))
+	queue_redraw()
+	if is_equal_approx(_hover_strength, _hover_target) and is_zero_approx(_hover_target): set_process(false)
 
 func set_stage(value: int) -> void:
 	var next_stage := clampi(value, FIRST_TREE_STAGE, LAST_TREE_STAGE)
@@ -98,6 +115,8 @@ func _draw() -> void:
 		var scale_factor := float(point.get("scale", 1.0)) * _random_scale(index, point)
 		var base_angle := float(point.get("angle", 0.0))
 		var angle := base_angle + _random_angle(index, point)
+		var hover_delta := point_position - _hover_position; var hover_weight := maxf(0.0, 1.0 - hover_delta.length() / HOVER_RADIUS) * _hover_strength
+		if hover_weight > 0.0: point_position += hover_delta.normalized() * HOVER_SHIFT * hover_weight; angle += clampf(hover_delta.x / HOVER_RADIUS, -1.0, 1.0) * 0.12 * hover_weight
 		_draw_leaf(point_position, scale_factor, angle)
 		if enabled:
 			_draw_marker(point_position, float(point.get("scale", 1.0)), base_angle, index == selected_index)
