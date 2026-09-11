@@ -2,6 +2,7 @@ class_name InventoryHud
 extends SceneDraggablePanel
 
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
+signal context_cancel_requested
 
 @onready var items: VBoxContainer = $Layers/FrameContent/Scroll/Items
 @onready var scroll: ScrollContainer = $Layers/FrameContent/Scroll
@@ -11,6 +12,7 @@ signal item_selected(kind: StringName, item_id: String, count: int, title: Strin
 const SCROLL_STEP := 100
 
 var _signature := ""
+var _context_button: Button
 
 func _ready() -> void:
 	super()
@@ -39,6 +41,7 @@ func invalidate() -> void:
 	_signature = ""
 
 func _rebuild(inventory: InventoryState) -> void:
+	set_context_cancel(false)
 	for child in items.get_children():
 		items.remove_child(child)
 		child.queue_free()
@@ -128,7 +131,7 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String, vis
 	button.tooltip_text = "%s%s · click for actions" % [title, count_suffix]
 	button.mouse_entered.connect(_set_item_hover.bind(button, true))
 	button.mouse_exited.connect(_set_item_hover.bind(button, false))
-	button.pressed.connect(_emit_selected.bind(kind, item_id, count, title))
+	button.pressed.connect(_emit_selected.bind(button, kind, item_id, count, title))
 	if count > 1:
 		_add_stack_badge(button, count)
 	items.add_child(button)
@@ -188,7 +191,38 @@ func _configure_fixed_slot(button: Button) -> void:
 	button.clip_text = true
 	button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
-func _emit_selected(kind: StringName, item_id: String, count: int, title: String) -> void:
+func set_context_cancel(active: bool) -> void:
+	if not is_instance_valid(_context_button):
+		_context_button = null
+		return
+	var caption := _context_button.get_node_or_null("ContextCancelCaption") as Label
+	_context_button.self_modulate = Color(1.0, 0.46, 0.40, 1.0) if active else Color.WHITE
+	if not active:
+		if caption != null:
+			caption.free()
+		_context_button = null
+		return
+	if caption == null:
+		caption = Label.new()
+		caption.name = "ContextCancelCaption"
+		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_context_button.add_child(caption)
+		caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		caption.add_theme_font_size_override(&"font_size", 18)
+		caption.add_theme_color_override(&"font_color", Color.WHITE)
+		caption.add_theme_color_override(&"font_outline_color", Color("5b1008"))
+		caption.add_theme_constant_override(&"outline_size", 4)
+	caption.text = "CANCEL"
+
+func _emit_selected(button: Button, kind: StringName, item_id: String, count: int, title: String) -> void:
+	if button == _context_button and button.get_node_or_null("ContextCancelCaption") != null:
+		context_cancel_requested.emit()
+		return
+	set_context_cancel(false)
+	_context_button = button
+	set_context_cancel(true)
 	item_selected.emit(kind, item_id, count, title)
 
 func _genetic_title(prefix: String, genome: GenomeSnapshot) -> String:

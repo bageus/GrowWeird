@@ -196,7 +196,7 @@ static func configure_balance_plus(button: Button, _balance_art: Control) -> voi
 			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		button.custom_minimum_size = Vector2(39.0, 39.0)
-		button.position = Vector2(182.0, 33.0)
+		button.position = Vector2(182.0, 31.0)
 		button.size = Vector2(39.0, 39.0)
 static func balance_background() -> Texture2D:
 	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))

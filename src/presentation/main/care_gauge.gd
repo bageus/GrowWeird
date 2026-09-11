@@ -33,7 +33,6 @@ func _draw_vertical_bar(index: int, color: Color, component: Dictionary) -> void
 	draw_style_box(frame, rect)
 	var inner := rect.grow(-4.0)
 	draw_style_box(_bar_style(Color(0.10, 0.065, 0.055, 0.94), Color(0.035, 0.02, 0.015, 0.78), 9, 2, 2, 2), inner)
-	_draw_cell_guides(index, inner)
 	var value := clampf(float(component.get("value", 0.5)), 0.0, 1.0)
 	if value > 0.0:
 		var fill_height := maxf(6.0, (inner.size.y - 4.0) * value)
@@ -55,24 +54,6 @@ func _draw_target_zone(inner: Rect2, component: Dictionary, color: Color) -> voi
 	draw_rect(zone, Color(color, 0.24), true)
 	draw_line(Vector2(zone.position.x, zone.position.y), Vector2(zone.end.x, zone.position.y), Color(1.0, 1.0, 0.78, 0.90), 2.0, true)
 	draw_line(Vector2(zone.position.x, zone.end.y), Vector2(zone.end.x, zone.end.y), Color(1.0, 1.0, 0.78, 0.90), 2.0, true)
-
-func _draw_cell_guides(index: int, inner: Rect2) -> void:
-	if index != 0:
-		return
-	var previous := 0.0
-	for stage_end in PotState.SOIL_MOISTURE_STAGE_MAX:
-		for quarter in range(1, PotState.SPRAYS_PER_STAGE + 1):
-			var ratio := lerpf(previous, stage_end, float(quarter) / float(PotState.SPRAYS_PER_STAGE))
-			var y := inner.end.y - ratio * inner.size.y
-			var major := quarter == PotState.SPRAYS_PER_STAGE
-			draw_line(
-				Vector2(inner.position.x + 2.0, y),
-				Vector2(inner.end.x - 2.0, y),
-				Color(1.0, 0.91, 0.65, 0.42 if major else 0.18),
-				1.5 if major else 1.0,
-				true
-			)
-		previous = stage_end
 
 func _draw_care_icon(index: int, color: Color) -> void:
 	var center := Vector2(18.0 + index * 29.0, 15.0)

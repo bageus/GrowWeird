@@ -3,6 +3,6 @@
 [ext_resource type="Script" path="res://src/presentation/main/growth_cycle_hud.gd" id="1"]
 
 [node name="GrowthCycleHud" type="Control"]
-custom_minimum_size = Vector2(300, 64)
+custom_minimum_size = Vector2(300, 56)
 mouse_filter = 1
 script = ExtResource("1")
