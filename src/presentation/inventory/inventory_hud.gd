@@ -192,32 +192,22 @@ func _configure_fixed_slot(button: Button) -> void:
 	button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 
 func set_context_cancel(active: bool) -> void:
-	if not is_instance_valid(_context_button):
-		_context_button = null
-		return
-	var caption := _context_button.get_node_or_null("ContextCancelCaption") as Label
-	_context_button.self_modulate = Color(1.0, 0.46, 0.40, 1.0) if active else Color.WHITE
+	if not is_instance_valid(_context_button): _context_button = null; return
+	var face := _context_button.get_node_or_null("ContextCancelCell") as Panel
+	_context_button.self_modulate = Color.WHITE
 	if not active:
-		if caption != null:
-			caption.free()
+		if face != null: face.free()
 		_context_button = null
 		return
-	if caption == null:
-		caption = Label.new()
-		caption.name = "ContextCancelCaption"
-		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		_context_button.add_child(caption)
-		caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		caption.add_theme_font_size_override(&"font_size", 18)
-		caption.add_theme_color_override(&"font_color", Color.WHITE)
-		caption.add_theme_color_override(&"font_outline_color", Color("5b1008"))
-		caption.add_theme_constant_override(&"outline_size", 4)
-	caption.text = "CANCEL"
+	if face != null: return
+	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var style := StyleBoxFlat.new(); style.bg_color = Color("d94732"); style.border_color = Color("8c1d12"); style.set_border_width_all(3); style.set_corner_radius_all(14); style.shadow_color = Color(0.22, 0.03, 0.01, 0.48); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 2.0); face.add_theme_stylebox_override(&"panel", style)
+	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_size_override(&"font_size", 17)
+	caption.add_theme_color_override(&"font_color", Color.WHITE); caption.add_theme_color_override(&"font_outline_color", Color("5b1008")); caption.add_theme_constant_override(&"outline_size", 3)
 
 func _emit_selected(button: Button, kind: StringName, item_id: String, count: int, title: String) -> void:
-	if button == _context_button and button.get_node_or_null("ContextCancelCaption") != null:
+	if button == _context_button and button.get_node_or_null("ContextCancelCell") != null:
 		context_cancel_requested.emit()
 		return
 	set_context_cancel(false)
