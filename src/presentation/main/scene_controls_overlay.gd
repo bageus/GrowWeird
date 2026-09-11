@@ -109,27 +109,22 @@ func set_lighting_options_visible(enabled: bool) -> void:
 		_place_popup(menu, _controls.get("lighting") as Control, 2.0)
 
 func _set_context_cancel_state(button: Button, active: bool) -> void:
-	if button == null:
-		return
-	button.self_modulate = Color(1.0, 0.46, 0.40, 1.0) if active else Color.WHITE
-	var caption := button.get_node_or_null("ContextCancelCaption") as Label
+	if button == null: return
+	button.self_modulate = Color.WHITE
+	var face := button.get_node_or_null("ContextCancelButton") as Panel
 	if not active:
-		if caption != null:
-			caption.free()
+		if face != null: face.free()
 		return
-	if caption == null:
-		caption = Label.new()
-		caption.name = "ContextCancelCaption"
-		caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		caption.add_theme_font_size_override(&"font_size", 18)
-		caption.add_theme_color_override(&"font_color", Color.WHITE)
-		caption.add_theme_color_override(&"font_outline_color", Color("5b1008"))
-		caption.add_theme_constant_override(&"outline_size", 4)
-		button.add_child(caption)
-	caption.text = "CANCEL"
+	if face != null: return
+	face = Panel.new(); face.name = "ContextCancelButton"; face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var style := StyleBoxFlat.new(); style.bg_color = Color("df4a2f"); style.border_color = Color("8d210f")
+	style.set_border_width_all(3); style.set_corner_radius_all(22); style.shadow_color = Color(0.25, 0.04, 0.01, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 3.0)
+	face.add_theme_stylebox_override(&"panel", style)
+	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_size_override(&"font_size", 18)
+	caption.add_theme_color_override(&"font_color", Color.WHITE); caption.add_theme_color_override(&"font_outline_color", Color("5b1008")); caption.add_theme_constant_override(&"outline_size", 3)
 
 func should_cancel_context_click(point: Vector2, dialogs: InventoryItemDialogs) -> bool:
 	var water := get_node("WaterOptions") as Control
