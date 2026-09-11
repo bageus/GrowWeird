@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="rim" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffc400"/><stop offset="1" stop-color="#ff8a00"/></linearGradient><linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe36a"/><stop offset="1" stop-color="#ffc900"/></linearGradient></defs>
+<circle cx="256" cy="256" r="256" fill="url(#rim)"/><circle cx="256" cy="256" r="196" fill="url(#face)"/>
+<path d="M140 220c0-12 12-20 23-16l42 14 35-49c8-12 24-12 32 0l36 49 41-14c13-4 25 7 22 20l-28 94c-3 9-11 15-21 15H190c-10 0-18-6-21-15z" fill="#ff9800"/>
+</svg>
