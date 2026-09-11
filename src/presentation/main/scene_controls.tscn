@@ -183,10 +183,10 @@ mouse_filter = 1
 
 [node name="PotCircle" type="Panel" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = 62.0
-offset_top = 2.0
-offset_right = 178.0
-offset_bottom = 118.0
+offset_left = 68.0
+offset_top = 8.0
+offset_right = 172.0
+offset_bottom = 112.0
 mouse_filter = 2
 
 [node name="PotHover" type="TextureRect" parent="PotSelector/Layers"]
