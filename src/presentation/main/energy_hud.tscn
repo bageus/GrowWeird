@@ -19,13 +19,13 @@ allow_scaling = true
 layout_mode = 2
 mouse_filter = 1
 
-[node name="BalanceArt" type="TextureRect" parent="Layers"]
+[node name="BalanceArt" type="Panel" parent="Layers"]
 layout_mode = 0
+offset_left = 36.0
+offset_top = 24.0
 offset_right = 240.0
-offset_bottom = 120.0
+offset_bottom = 96.0
 mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
 
 [node name="BalanceIcon" type="TextureRect" parent="Layers"]
 layout_mode = 0
@@ -63,9 +63,9 @@ layout_mode = 0
 z_index = 188
 z_as_relative = false
 offset_left = 48.0
-offset_top = 80.0
+offset_top = 97.0
 offset_right = 218.0
-offset_bottom = 104.0
+offset_bottom = 121.0
 mouse_filter = 2
 
 [node name="Timer" type="Label" parent="Layers/Next"]
