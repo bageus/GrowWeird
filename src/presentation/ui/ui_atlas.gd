@@ -4,6 +4,10 @@ extends RefCounted
 const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
 const ENERGY_COIN_ICONS: Texture2D = preload("res://assets/ui/energycoin_icon.png")
+const COIN_ICON: Texture2D = preload("res://assets/ui/coin.svg")
+const BALANCE_PLUS_ICON: Texture2D = preload("res://assets/ui/balance_plus.svg")
+const RUBLE_ICON: Texture2D = preload("res://assets/ui/ruble.svg")
+const DOLLAR_ICON: Texture2D = preload("res://assets/ui/dollar.svg")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
@@ -22,26 +26,12 @@ const CELL := 512.0
 const ENERGY_COIN_CELL := 256.0
 
 class CoinFace:
-	extends Control
-	func _draw() -> void:
-		var center := size * 0.5
-		var radius := minf(size.x, size.y) * 0.46
-		draw_circle(center + Vector2(0.0, 2.0), radius, Color(0.34, 0.12, 0.015, 0.72))
-		draw_circle(center, radius, Color(1.0, 0.59, 0.02, 1.0))
-		draw_circle(center, radius * 0.82, Color(1.0, 0.84, 0.08, 1.0))
-		draw_arc(center, radius * 0.72, 0.0, TAU, 40, Color(0.92, 0.45, 0.015, 1.0), 2.0, true)
-		var crown := PackedVector2Array([
-			center + Vector2(-radius * 0.48, radius * 0.18),
-			center + Vector2(-radius * 0.42, -radius * 0.28),
-			center + Vector2(-radius * 0.12, -radius * 0.02),
-			center + Vector2(0.0, -radius * 0.42),
-			center + Vector2(radius * 0.16, -radius * 0.02),
-			center + Vector2(radius * 0.46, -radius * 0.28),
-			center + Vector2(radius * 0.42, radius * 0.18)
-		])
-		draw_colored_polygon(crown, Color(1.0, 0.65, 0.015, 1.0))
-		draw_polyline(crown, Color(0.69, 0.26, 0.01, 1.0), 2.0, true)
-
+	extends TextureRect
+	func _init() -> void:
+		texture = preload("res://assets/ui/coin.svg")
+		expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 static func atlas_region(source: Texture2D, region: Rect2) -> AtlasTexture:
 	var texture := AtlasTexture.new()
@@ -177,10 +167,15 @@ static func configure_transaction_total(container: Control) -> void:
 	icon.offset_bottom = 13.0
 	container.add_child(icon)
 
-static func configure_topup_button(button: Button, price := 0, rewarded_ad := false) -> void:
+static func configure_topup_button(button: Button, price := 0, rewarded_ad := false, currency: StringName = &"rub") -> void:
 	if button == null:
 		return
-	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else "%d ₽" % price, rewarded_ad)
+	CommerceUiStyle.topup_button(button, "FREE" if rewarded_ad else str(price), rewarded_ad)
+	button.icon = null if rewarded_ad else (DOLLAR_ICON if currency == &"usd" else RUBLE_ICON)
+	button.expand_icon = true
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.add_theme_constant_override(&"icon_max_width", 28)
+	button.add_theme_constant_override(&"h_separation", 5)
 	button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
 	button.offset_left = -96.0
 	button.offset_top = -92.0
@@ -191,6 +186,12 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 static func configure_balance_plus(button: Button, _balance_art: TextureRect) -> void:
 	if button != null:
 		CommerceUiStyle.balance_plus(button)
+		button.text = ""
+		button.icon = BALANCE_PLUS_ICON
+		button.expand_icon = true
+		button.add_theme_constant_override(&"icon_max_width", 34)
+		for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
+			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		button.position = Vector2(202.0, 38.0)
 		button.size = Vector2(34.0, 34.0)
