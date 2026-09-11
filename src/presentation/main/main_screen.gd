@@ -42,7 +42,7 @@ func _ready() -> void:
 	GameApp.mutations_resolved.connect(_on_mutations_resolved)
 	GameApp.fertilizer_offer_ready.connect(_on_offer_ready)
 	plant_view.branch_selected.connect(_on_branch_selected)
-	tree_growth_preview.tree_branch_pruned.connect(_on_tree_branch_pruned)
+	tree_growth_preview.tree_branch_pruned.connect(_on_tree_branch_pruned); tree_growth_preview.tree_hover_changed.connect(care_gauge.set_tree_hovered)
 	pot_selector.pot_selected.connect(_handle_pot_click)
 	scene_controls.action_requested.connect(_on_scene_action_requested)
 	inventory_hud.item_selected.connect(_on_inventory_item_selected)
@@ -192,12 +192,12 @@ func _on_spray_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
-	event_label.text = "Sprayed plant." if GameApp.water_active(true) else "Nothing to water."
+	event_label.text = "Sprayed plant." if GameApp.water_active(true) else "Nothing to water."; care_gauge.reveal()
 func _on_pour_pressed() -> void:
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
-	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."
+	event_label.text = "Water poured." if GameApp.water_active(false) else "Nothing to water."; care_gauge.reveal()
 	_refresh()
 func _on_light_pressed() -> void:
 	_lighting_submenu_visible = not _lighting_submenu_visible
@@ -220,7 +220,7 @@ func _on_environment_preset(preset: StringName) -> void:
 	_lighting_submenu_visible = false
 	_set_cancel_visibility()
 	scene_controls.set_lighting_options_visible(false)
-	event_label.text = "Environment: %s." % _pretty_id(String(preset))
+	event_label.text = "Environment: %s." % _pretty_id(String(preset)); care_gauge.reveal()
 func _on_prune_pressed() -> void:
 	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
 		event_label.text = "There is nothing to prune."
@@ -292,7 +292,7 @@ func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity
 			break
 		total += amount
 	event_label.text = "Ground into Recycled Fertilizer ×%d." % total if total > 0 else "Could not grind item."
-func _handle_pot_click(pot_id: String) -> void: GameApp.switch_pot(pot_id)
+func _handle_pot_click(pot_id: String) -> void: GameApp.switch_pot(pot_id); care_gauge.reveal()
 func _on_sell_plant_pressed() -> void:
 	var amount := GameApp.sell_active_plant()
 	event_label.text = "Plant and pot sold for $%d." % amount if amount > 0 else "Could not sell plant and pot."
