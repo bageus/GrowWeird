@@ -38,12 +38,12 @@ func _apply_ui_atlases() -> void:
 		return
 	var wallet := get_node("WalletHud") as PanelContainer
 	wallet.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	var balance_art := get_node("WalletHud/Layers/BalanceArt") as TextureRect
-	balance_art.texture = UiAtlas.balance_background()
+	var balance_art := get_node("WalletHud/Layers/BalanceArt") as Panel
+	UiAtlas.configure_balance_hud(balance_art)
 	(get_node("WalletHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon()
 	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button, balance_art)
-	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as TextureRect
-	energy_art.texture = UiAtlas.balance_background()
+	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as Panel
+	UiAtlas.configure_balance_hud(energy_art)
 	(get_node("EnergyHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon(true)
 	var energy_next := get_node("EnergyHud/Layers/Next") as PanelContainer
 	UiAtlas.configure_warm_timer_hud(energy_next, get_node("EnergyHud/Layers/Next/Timer") as Label)
