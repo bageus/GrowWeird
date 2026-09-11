@@ -87,15 +87,6 @@ text = "Sell plant"
 script = ExtResource("2_action")
 action_id = &"sell_plant"
 
-[node name="CancelButton" type="Button" parent="."]
-visible = false
-custom_minimum_size = Vector2(112, 38)
-offset_right = 112.0
-offset_bottom = 38.0
-text = "Cancel"
-script = ExtResource("2_action")
-action_id = &"cancel"
-
 [node name="ShopActionButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
