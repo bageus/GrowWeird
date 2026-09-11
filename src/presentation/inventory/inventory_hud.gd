@@ -9,7 +9,7 @@ signal context_cancel_requested
 @onready var scroll_up: TextureButton = $Layers/FrameContent/ScrollUp
 @onready var scroll_down: TextureButton = $Layers/FrameContent/ScrollDown
 
-const SCROLL_STEP := 100
+const SCROLL_STEP := 120
 
 var _signature := ""
 var _context_button: Button
@@ -200,7 +200,7 @@ func set_context_cancel(active: bool) -> void:
 		_context_button = null
 		return
 	if face != null: return
-	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 12.0; face.offset_top = 12.0; face.offset_right = -12.0; face.offset_bottom = -12.0
 	var style := StyleBoxFlat.new(); style.bg_color = Color("d94732"); style.border_color = Color("8c1d12"); style.set_border_width_all(3); style.set_corner_radius_all(14); style.shadow_color = Color(0.22, 0.03, 0.01, 0.48); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 2.0); face.add_theme_stylebox_override(&"panel", style)
 	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_size_override(&"font_size", 17)
