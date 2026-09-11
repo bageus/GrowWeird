@@ -127,7 +127,7 @@ func _open_confirm(item: Dictionary) -> void:
 	confirm_preview.texture = _preview_texture(item)
 	_purchase_quantity = 1
 	_refresh_purchase_preview()
-	confirm.visible = true
+	confirm.visible = true; %CloseButton.disabled = true; %CloseButton.modulate = Color(0.28, 0.28, 0.28, 0.32)
 
 func _buy_selected() -> void:
 	if _selected.is_empty(): return
@@ -154,7 +154,7 @@ func _refresh_purchase_preview() -> void:
 	confirm_price.text = str(unit_price * _purchase_quantity)
 	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * _purchase_quantity
 
-func _hide_confirm() -> void: _selected = {}; confirm.visible = false
+func _hide_confirm() -> void: _selected = {}; confirm.visible = false; %CloseButton.disabled = false; %CloseButton.modulate = Color.WHITE
 func _request_close() -> void: _hide_confirm(); close_requested.emit()
 
 func _rebuild_catalog_stock() -> void:
