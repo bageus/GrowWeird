@@ -160,22 +160,12 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 		tree.global_position = get_global_mouse_position() - _drag_offset
 
 func _branch_side_at(point: Vector2) -> StringName:
-	var normalized := Vector2(
-		clampf(point.x / maxf(tree.size.x, 1.0), 0.0, 1.0),
-		clampf(point.y / maxf(tree.size.y, 1.0), 0.0, 1.0)
-	)
-	var left_image := left_hover.texture.get_image() if left_hover.texture != null else null
-	var right_image := right_hover.texture.get_image() if right_hover.texture != null else null
-	if left_image != null:
-		var left_px := Vector2i(int(normalized.x * float(left_image.get_width() - 1)), int(normalized.y * float(left_image.get_height() - 1)))
-		if left_image.get_pixelv(left_px).a > 0.08 and _can_prune_side(&"left"):
-			return &"left"
-	if right_image != null:
-		var right_px := Vector2i(int(normalized.x * float(right_image.get_width() - 1)), int(normalized.y * float(right_image.get_height() - 1)))
-		if right_image.get_pixelv(right_px).a > 0.08 and _can_prune_side(&"right"):
-			return &"right"
-	return &""
-
+	var normalized := Vector2(clampf(point.x / maxf(tree.size.x, 1.0), 0.0, 1.0), clampf(point.y / maxf(tree.size.y, 1.0), 0.0, 1.0))
+	if normalized.y < 0.08 or normalized.y > 0.78: return &""
+	var preferred: StringName = &"left" if normalized.x < 0.5 else &"right"
+	if _can_prune_side(preferred): return preferred
+	var alternate: StringName = &"right" if preferred == &"left" else &"left"
+	return alternate if _can_prune_side(alternate) else &""
 func _can_prune_side(side: StringName) -> bool:
 	if _testing_stage >= 0: return stage in ([6, 7, 12] if side == &"left" else [7, 11])
 	return _plant != null and _plant.branch_at(side) != null
