@@ -19,8 +19,7 @@ func _init() -> void:
 		push_error(failure)
 	quit(1)
 func _test_presentation_resources_load() -> void:
-	var paths := [
-		"res://assets/ui/fonts/fredoka_black.tres",
+	var paths := ["res://assets/ui/fonts/fredoka_black.tres",
 		"res://src/presentation/main/scene_controls.tscn",
 		"res://src/presentation/main/pot_selector.gd",
 		"res://src/presentation/main/scene_action_button.gd",
@@ -278,7 +277,6 @@ func _test_growth_stage_geometry() -> void:
 		var young_length := _slot_length(young, slot)
 		var mature_length := _slot_length(mature, slot)
 		_expect(mature_length > young_length, "growth view: %s branch should visibly expand with growth" % String(slot))
-
 func _test_phenotype_descriptor() -> void:
 	var branch := BranchState.new()
 	branch.add_trait(&"thorns", 2)
