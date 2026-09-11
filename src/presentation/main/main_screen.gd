@@ -292,8 +292,7 @@ func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity
 			break
 		total += amount
 	event_label.text = "Ground into Recycled Fertilizer ×%d." % total if total > 0 else "Could not grind item."
-func _handle_pot_click(pot_id: String) -> void:
-	GameApp.switch_pot(pot_id)
+func _handle_pot_click(pot_id: String) -> void: GameApp.switch_pot(pot_id)
 func _on_sell_plant_pressed() -> void:
 	var amount := GameApp.sell_active_plant()
 	event_label.text = "Plant and pot sold for $%d." % amount if amount > 0 else "Could not sell plant and pot."
@@ -303,11 +302,8 @@ func _on_shop_pressed() -> void:
 	_set_cancel_visibility()
 	shop_panel.invalidate()
 	_refresh()
-func _on_close_shop_pressed() -> void:
-	scene_controls.set_shop_visible(false)
-	_set_cancel_visibility()
-func _set_cancel_visibility() -> void:
-	cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or inventory_dialogs.needs_scene_cancel()
+func _on_close_shop_pressed() -> void: scene_controls.set_shop_visible(false); _set_cancel_visibility()
+func _set_cancel_visibility() -> void: cancel_button.visible = _interaction_mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible or inventory_dialogs.needs_scene_cancel()
 func _on_save_layout_pressed() -> void:
 	event_label.text = "HUD layout saved." if scene_controls.save_layout() else "Could not save HUD layout."
 func _on_save_assets_layout_pressed() -> void:
