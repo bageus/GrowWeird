@@ -88,12 +88,17 @@ func _scale_asset(target: Control, factor: float) -> void:
 	target.scale = next_scale
 
 func _pot_index(pot_id: String) -> int:
+	return index_for_id(pot_id, POT_TEXTURES.size())
+
+static func index_for_id(pot_id: String, texture_count: int) -> int:
+	if texture_count <= 0:
+		return 0
 	var modulo := 0
 	var found_digit := false
 	for character in pot_id:
 		if character >= "0" and character <= "9":
 			found_digit = true
-			modulo = posmod(modulo * 10 + int(character), POT_TEXTURES.size())
+			modulo = posmod(modulo * 10 + int(character), texture_count)
 	if not found_digit:
 		return 0
-	return posmod(modulo - 1, POT_TEXTURES.size())
+	return posmod(modulo - 1, texture_count)
