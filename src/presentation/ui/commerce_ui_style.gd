@@ -41,6 +41,21 @@ static func topup_button(button: Button, caption: String, rewarded := false) -> 
 			style.shadow_offset = Vector2.ZERO
 			style.set_corner_radius_all(18)
 
+static func balance_hud(panel: Panel) -> void:
+	if panel == null: return
+	var outer := _panel(Color(0.64, 0.25, 0.035, 0.98), Color(1.0, 0.60, 0.055, 1.0), 4, 22)
+	outer.border_width_top = 5; outer.border_width_bottom = 5
+	panel.add_theme_stylebox_override(&"panel", outer)
+	var inset := panel.get_node_or_null("InnerShadow") as Panel
+	if inset == null:
+		inset = Panel.new(); inset.name = "InnerShadow"; inset.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		inset.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		inset.offset_left = 6.0; inset.offset_top = 7.0; inset.offset_right = -6.0; inset.offset_bottom = -7.0
+		panel.add_child(inset)
+	var inner := _panel(Color(0.08, 0.025, 0.005, 0.10), Color(0.18, 0.045, 0.005, 0.30), 4, 16)
+	inner.shadow_size = 0
+	inset.add_theme_stylebox_override(&"panel", inner)
+
 static func balance_plus(button: Button) -> void:
 	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 20)
 	button.custom_minimum_size = Vector2(34.0, 34.0)
