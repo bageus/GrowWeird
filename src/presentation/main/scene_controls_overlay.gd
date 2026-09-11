@@ -78,9 +78,9 @@ func _apply_ui_atlases() -> void:
 	_configure_pot_arrow(get_node("PotSelector/Layers/NextPot") as Button, pot_hover, false)
 
 func _configure_pot_circle(circle: Panel) -> void:
-	var outer := StyleBoxFlat.new(); outer.bg_color = Color("ffd489"); outer.border_color = Color("bd641b"); outer.set_border_width_all(3); outer.set_corner_radius_all(58); outer.shadow_color = Color(0.28, 0.09, 0.01, 0.45); outer.shadow_size = 4; outer.shadow_offset = Vector2(0.0, 3.0); circle.add_theme_stylebox_override(&"panel", outer)
+	var outer := StyleBoxFlat.new(); outer.bg_color = Color("ffd489"); outer.border_color = Color("bd641b"); outer.set_border_width_all(3); outer.set_corner_radius_all(52); outer.shadow_color = Color(0.28, 0.09, 0.01, 0.45); outer.shadow_size = 4; outer.shadow_offset = Vector2(0.0, 3.0); circle.add_theme_stylebox_override(&"panel", outer)
 	var inner := Panel.new(); inner.name = "InnerRingShadow"; inner.mouse_filter = Control.MOUSE_FILTER_IGNORE; circle.add_child(inner); inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); inner.offset_left = 4.0; inner.offset_top = 4.0; inner.offset_right = -4.0; inner.offset_bottom = -4.0
-	var inset := StyleBoxFlat.new(); inset.bg_color = Color.TRANSPARENT; inset.border_color = Color(0.30, 0.11, 0.02, 0.26); inset.set_border_width_all(1); inset.set_corner_radius_all(54); inner.add_theme_stylebox_override(&"panel", inset)
+	var inset := StyleBoxFlat.new(); inset.bg_color = Color.TRANSPARENT; inset.border_color = Color(0.30, 0.11, 0.02, 0.26); inset.set_border_width_all(1); inset.set_corner_radius_all(48); inner.add_theme_stylebox_override(&"panel", inset)
 
 func _configure_pot_arrow(button: Button, hover_art: TextureRect, left: bool) -> void:
 	hover_art.texture = null; button.text = "‹" if left else "›"; button.icon = null; button.focus_mode = Control.FOCUS_NONE; button.mouse_filter = Control.MOUSE_FILTER_STOP; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.move_to_front()
@@ -120,7 +120,7 @@ func _set_context_cancel_state(button: Button, active: bool) -> void:
 		return
 	if face != null: return
 	face = Panel.new(); face.name = "ContextCancelButton"; face.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 12.0; face.offset_top = 14.0; face.offset_right = -28.0; face.offset_bottom = -16.0
+	button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 4.0; face.offset_top = 14.0; face.offset_right = -36.0; face.offset_bottom = -16.0
 	var style := StyleBoxFlat.new(); style.bg_color = Color("df4a2f"); style.border_color = Color("8d210f")
 	style.set_border_width_all(3); style.set_corner_radius_all(22); style.shadow_color = Color(0.25, 0.04, 0.01, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 3.0)
 	face.add_theme_stylebox_override(&"panel", style)
