@@ -8,6 +8,7 @@ const COIN_ICON: Texture2D = preload("res://assets/ui/coin.svg")
 const BALANCE_PLUS_ICON: Texture2D = preload("res://assets/ui/balance_plus.svg")
 const RUBLE_ICON: Texture2D = preload("res://assets/ui/ruble.svg")
 const DOLLAR_ICON: Texture2D = preload("res://assets/ui/dollar.svg")
+const GAME_FONT: Font = preload("res://assets/ui/fonts/fredoka_black.tres")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
@@ -117,10 +118,7 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	label.text = title
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var bold_font := SystemFont.new()
-	bold_font.font_names = PackedStringArray(["Arial", "Noto Sans"])
-	bold_font.font_weight = 700
-	label.add_theme_font_override(&"font", bold_font)
+	label.add_theme_font_override(&"font", GAME_FONT)
 	label.add_theme_color_override(&"font_color", Color(0.33, 0.18, 0.1, 1.0))
 	label.add_theme_color_override(&"font_outline_color", Color(1.0, 0.94, 0.78, 1.0))
 	label.add_theme_constant_override(&"outline_size", 4)
@@ -146,10 +144,7 @@ static func configure_transaction_total(container: Control) -> void:
 	if labels.is_empty():
 		return
 	var value_label := labels[0] as Label
-	var bold_font := SystemFont.new()
-	bold_font.font_names = PackedStringArray(["Arial", "Noto Sans"])
-	bold_font.font_weight = 700
-	value_label.add_theme_font_override(&"font", bold_font)
+	value_label.add_theme_font_override(&"font", GAME_FONT)
 	value_label.add_theme_color_override(&"font_color", Color(0.24, 0.105, 0.035, 1.0))
 	value_label.set_anchors_preset(Control.PRESET_CENTER)
 	value_label.offset_left = -50.0
