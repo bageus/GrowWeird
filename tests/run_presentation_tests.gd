@@ -1,5 +1,4 @@
 extends SceneTree
-
 var _failures: Array[String] = []
 func _init() -> void:
 	_test_presentation_resources_load()
