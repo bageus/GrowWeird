@@ -180,7 +180,7 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 		center.name = "PriceContent"
 		center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		button.add_child(center)
-		center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); center.offset_bottom = -5.0
 		var row := HBoxContainer.new()
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_theme_constant_override(&"separation", 5)
