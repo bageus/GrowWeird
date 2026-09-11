@@ -159,7 +159,7 @@ func _set_interaction_mode(mode: StringName) -> void:
 	plant_view.set_interaction_mode(mode)
 	tree_growth_preview.set_prune_mode(mode == PlantView.MODE_PRUNE)
 	plant_view.mouse_filter = Control.MOUSE_FILTER_IGNORE if mode == PlantView.MODE_NONE or mode == PlantView.MODE_PRUNE else Control.MOUSE_FILTER_STOP
-	prune_button.button_pressed = mode == PlantView.MODE_PRUNE
+	prune_button.button_pressed = mode == PlantView.MODE_PRUNE; scene_controls.set_prune_cancel(mode == PlantView.MODE_PRUNE)
 	cancel_button.visible = mode != PlantView.MODE_NONE or not String(_pending_plant_kind).is_empty() or _water_submenu_visible or _lighting_submenu_visible
 	if mode == PlantView.MODE_PRUNE:
 		if _prune_cursor == null:
