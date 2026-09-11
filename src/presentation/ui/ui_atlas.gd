@@ -197,11 +197,11 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 		price_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_child(price_label)
 	button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	button.offset_left = -88.0
-	button.offset_top = -92.0
-	button.offset_right = 88.0
-	button.offset_bottom = -28.0
-	button.clip_contents = true
+	button.offset_left = -75.0
+	button.offset_top = -88.0
+	button.offset_right = 75.0
+	button.offset_bottom = -34.0
+	button.clip_contents = false
 
 static func configure_balance_hud(panel: Panel) -> void:
 	CommerceUiStyle.balance_hud(panel)
