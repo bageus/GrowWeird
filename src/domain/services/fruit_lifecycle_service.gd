@@ -27,7 +27,6 @@ static func harvest(
 	branch.fruit_growth = null
 	branch.fruit_cycle_eligible = plant.fruit_cycle_index + 1
 	if not plant.has_active_fruits():
-		plant.fruit_cycle_index += 1
 		plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
 		plant.growth_cycle_elapsed = 0.0
 	return fruit
