@@ -24,7 +24,7 @@ func set_cycle(plant: PlantState, _energy: int) -> void:
 	_timer_label.add_theme_color_override(&"font_color", Color("8cff91") if boosted else Color.WHITE)
 	var cost := EnergyService.cycle_skip_cost(plant)
 	_skip_button.text = "FINISH · %d" % cost
-	_skip_button.disabled = cost <= 0 or (plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE and not GrowthCycleService.recovery_complete(plant))
+	_skip_button.disabled = cost <= 0 or (false)
 
 func _build_hud() -> void:
 	_panel = Panel.new()
@@ -59,8 +59,8 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(184.0, 1.0)
-	_skip_button.size = Vector2(110.0, 38.0)
+	_skip_button.position = Vector2(187.0, 1.0)
+	_skip_button.size = Vector2(107.0, 33.0)
 	_skip_button.focus_mode = Control.FOCUS_NONE
 	_skip_button.add_theme_font_size_override(&"font_size", 16)
 	_skip_button.add_theme_color_override(&"font_color", Color.WHITE)
