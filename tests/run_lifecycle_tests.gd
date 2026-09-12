@@ -202,7 +202,7 @@ func _test_pruned_branch_skips_current_fruit_cycle() -> void:
 	var first_progress := pot.plant.branch_at(&"center").fruit_growth.progress
 	_expect(is_equal_approx(first_progress, pot.plant.branch_at(&"right").fruit_growth.progress), "fruit cycle: all branches must flower simultaneously")
 	pot.plant.cut_branch(&"left")
-	_expect(TreeGrowthPreview.stage_for(pot.plant) == 11, "regrowth asset: pruned plant must use the no-stump asset after refresh")
+	_expect(TreeGrowthPreview.stage_for(pot.plant) == 9, "regrowth asset: pruned left branch must keep its stump asset after refresh")
 	BranchRegrowthService.advance(pot.plant, species.native_regrowth_seconds, species, 1.0)
 	var regrown := pot.plant.branch_at(&"left")
 	_expect(regrown != null and regrown.fruit_growth == null, "fruit cycle: branch must regrow without its removed flower or fruit")
