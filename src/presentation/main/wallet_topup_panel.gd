@@ -55,7 +55,7 @@ func refresh() -> void:
 func _request_purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["coins"]), int(product["rub"]))
-	var credited := _app().buy_coins(int(product["coins"]))
+	var credited: int = int(_app().buy_coins(int(product["coins"])))
 	status_label.text = "+%d coins received." % credited
 	refresh()
 
