@@ -10,7 +10,7 @@ var active_slots: Array[StringName] = []
 
 func set_display(kind: DisplayKind, slots: Array[StringName] = []) -> void:
 	display_kind = kind; active_slots = slots.duplicate()
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	mouse_filter = Control.MOUSE_FILTER_PASS
 	queue_redraw()
 
 func _should_draw_index(index: int) -> bool:
