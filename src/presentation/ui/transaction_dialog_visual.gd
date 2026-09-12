@@ -47,7 +47,7 @@ static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector
 
 	(nodes["quantity_background"] as TextureRect).texture = null
 	(nodes["count_background"] as TextureRect).texture = null
-	UiAtlas.configure_transaction_total(nodes["count"] as Control)
+	UiAtlas.configure_transaction_total(nodes["count"] as Control, mode == &"grind")
 	UiAtlas.configure_close_button(nodes["close"] as Button)
 	CommerceUiStyle.transaction_action(nodes["action"] as Button, mode)
 	_configure_quantity_button(nodes["minus"] as Button, "−")
