@@ -13,6 +13,7 @@ const SOIL_MOISTURE_STAGE_MAX: Array[float] = [0.08, 0.30, 0.48, 0.68, 0.86, 1.0
 const SPRAYS_PER_STAGE := 4
 
 var pot_id: String = ""
+var visual_index: int = -1
 var soil_moisture: float = 0.30
 var consecutive_sprays: int = 0
 var light_mode: int = LightMode.DIFFUSED

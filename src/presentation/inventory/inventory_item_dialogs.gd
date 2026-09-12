@@ -136,10 +136,19 @@ func _open_sell() -> void:
 	sell_popup.visible = true
 	recycle_popup.visible = false
 	sell_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
-	sell_description.text = "Sell %s from inventory." % _title
+	CommerceUiStyle.curved_title(sell_title, "SELL · %s" % String(_kind).to_upper())
+	sell_description.text = _item_description(_kind)
 	TransactionDialogVisual.fit_description(sell_description)
 	_sell_amount = 1
 	_refresh_sell_preview()
+
+func _item_description(kind: StringName) -> String:
+	match kind:
+		&"seed": return "A seed stored in the inventory, ready for planting."
+		&"cutting": return "A branch cutting stored in the inventory."
+		&"fruit": return "A harvested fruit stored in the inventory."
+		&"fertilizer": return "Fertilizer stored in the inventory."
+		_: return "An item stored in the inventory."
 
 func _open_recycle() -> void:
 	actions.visible = false; sell_popup.visible = false; recycle_popup.visible = true

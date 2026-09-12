@@ -44,6 +44,7 @@ static func _pot_to_dictionary(pot: PotState) -> Dictionary:
 		plant_data = _plant_to_dictionary(pot.plant)
 	return {
 		"pot_id": pot.pot_id,
+		"visual_index": pot.visual_index,
 		"soil_moisture": pot.soil_moisture,
 		"consecutive_sprays": pot.consecutive_sprays,
 		"light_mode": pot.light_mode,
@@ -54,6 +55,7 @@ static func _pot_to_dictionary(pot: PotState) -> Dictionary:
 static func _pot_from_dictionary(data: Dictionary) -> PotState:
 	var pot := PotState.new()
 	pot.pot_id = String(data.get("pot_id", ""))
+	pot.visual_index = clampi(int(data.get("visual_index", -1)), -1, 4)
 	pot.soil_moisture = clampf(float(data.get("soil_moisture", 0.5)), 0.0, 1.0)
 	pot.consecutive_sprays = clampi(int(data.get("consecutive_sprays", 0)), 0, PotState.SPRAYS_PER_STAGE - 1)
 	pot.light_mode = clampi(int(data.get("light_mode", PotState.LightMode.DIFFUSED)), 0, PotState.LightMode.size() - 1)

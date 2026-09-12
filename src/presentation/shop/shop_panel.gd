@@ -122,12 +122,19 @@ func _configure_lot_button(card: Button) -> void:
 	CommerceUiStyle.shop_lot(card, COLORS[_category])
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item
-	confirm_description.text = "%s\n%s" % [String(item.get("name", "Item")), String(item.get("description", ""))]
+	CommerceUiStyle.curved_title(confirm_name, "BUY · %s" % _purchase_group(item))
+	confirm_description.text = String(item.get("description", ""))
 	TransactionDialogVisual.fit_description(confirm_description)
 	confirm_preview.texture = _preview_texture(item)
 	_purchase_quantity = 1
 	_refresh_purchase_preview()
 	confirm.visible = true; %CloseButton.disabled = true; %CloseButton.modulate = Color(0.28, 0.28, 0.28, 0.32)
+
+func _purchase_group(item: Dictionary) -> String:
+	var action := String(item.get("action", "item")).to_upper()
+	if action == "POTTED_PLANT": return "PLANT"
+	if action == "CUTTING": return "BRANCH"
+	return action
 
 func _buy_selected() -> void:
 	if _selected.is_empty(): return

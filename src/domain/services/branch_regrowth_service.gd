@@ -5,7 +5,7 @@ static func advance(
 	plant: PlantState,
 	delta_seconds: float,
 	species: PlantSpeciesDefinition,
-	overall_comfort: float
+	_overall_comfort: float
 ) -> Array[StringName]:
 	var regrown: Array[StringName] = []
 	if plant == null or species == null or not plant.alive or delta_seconds <= 0.0:
@@ -14,12 +14,8 @@ static func advance(
 		return regrown
 	if not PlantLifecycleService.is_adult(plant, species):
 		return regrown
-	if plant.health < species.native_regrowth_min_health:
-		return regrown
-	if overall_comfort < species.native_regrowth_min_comfort:
-		return regrown
-
-	var rate_factor := minf(clampf(plant.health, 0.0, 1.0), clampf(overall_comfort, 0.0, 1.0))
+	# During cycle testing, branch recovery must not be blocked by care gauges.
+	var rate_factor := 1.0
 	for slot in BranchState.VALID_SLOTS:
 		if plant.branch_at(slot) != null:
 			plant.clear_regrowth_progress(slot)

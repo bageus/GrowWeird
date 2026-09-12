@@ -53,7 +53,7 @@ func _refresh_view() -> void:
 	if not has_pot:
 		tooltip_text = "No available pots"
 		return
-	thumbnail.texture = POT_TEXTURES[_pot_index(active.pot_id)]
+	thumbnail.texture = POT_TEXTURES[active.visual_index if active.visual_index >= 0 else _pot_index(active.pot_id)]
 	var contents := "Empty" if active.is_empty() else String(active.plant.species_id).replace("_", " ").capitalize()
 	tooltip_text = "%s · %s" % [active.pot_id, contents]
 	thumbnail.tooltip_text = tooltip_text

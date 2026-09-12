@@ -37,7 +37,7 @@ func set_pot_state(state: PotState) -> void:
 		pot = get_node("Pot") as TextureRect
 	if ground == null:
 		ground = get_node("Ground") as TextureRect
-	pot.texture = POT_TEXTURES[_pot_index(state.pot_id)]
+	pot.texture = POT_TEXTURES[state.visual_index if state.visual_index >= 0 else _pot_index(state.pot_id)]
 	ground.texture = GROUND_TEXTURES[state.soil_moisture_stage()]
 	ground.queue_redraw()
 
