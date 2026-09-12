@@ -3,6 +3,9 @@ extends RefCounted
 
 const COMPOST_ID: StringName = &"compost_mix"
 
+static func fertilizer_yield(_rules: GameRules) -> int:
+	return 1
+
 static func fruit_yield(rules: GameRules) -> int:
 	return maxi(0, rules.fruit_compost_yield)
 
