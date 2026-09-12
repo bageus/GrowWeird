@@ -56,14 +56,6 @@ static func configure(nodes: Dictionary, mode: StringName, _action_frame: Vector
 	quantity_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_emphasize_label(quantity_label)
 
-static func configure_grind(root: PanelContainer, title: Label, close: Button, description: Label, action: Button) -> void:
-	root.custom_minimum_size = Vector2(390.0, 270.0); root.z_index = 190; root.z_as_relative = false; _configure_modal_dim(root)
-	var outer := UiAtlas.warm_hud_style(8, 24, Vector4(22.0, 18.0, 22.0, 20.0)); root.add_theme_stylebox_override(&"panel", outer)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; title.add_theme_font_size_override(&"font_size", 22); title.add_theme_color_override(&"font_color", Color("55250d"))
-	var field := StyleBoxFlat.new(); field.bg_color = Color(1.0, 0.82, 0.56, 0.42); field.border_color = Color(0.68, 0.34, 0.075, 0.66); field.set_border_width_all(2); field.set_corner_radius_all(14); field.content_margin_left = 12.0; field.content_margin_right = 12.0; description.add_theme_stylebox_override(&"normal", field)
-	description.custom_minimum_size.y = 76.0; description.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; description.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; description.add_theme_color_override(&"font_color", Color("55250d")); description.add_theme_font_size_override(&"font_size", 18)
-	UiAtlas.configure_close_button(close); CommerceUiStyle.transaction_action(action, &"grind")
-
 static func fit_description(label: Label) -> void:
 	var length := label.text.length()
 	var font_size := 20
