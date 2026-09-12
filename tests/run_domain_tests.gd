@@ -58,7 +58,7 @@ func _test_care_gauge_ranges_and_stage_history() -> void:
 	pot.soil_moisture = 0.5
 	pot.plant.nutrition = 0.5
 	var species := PlantSpeciesDefinition.new()
-	var gauge := CareGaugeService.evaluate(pot, species)
+	var gauge := CareGaugeService.evaluate(pot, species); var feed := FertilizerDefinition.new(); feed.care_effects = {"growth_cycle": &"seed", "nutrition": 0.2}; pot.plant.nutrition = 0.2; FertilizerUseService.apply(pot.plant, feed, []); _expect(is_equal_approx(pot.plant.nutrition, 0.65), "fertilizer: stage boost must also feed the plant")
 	_expect(int((gauge["water"] as Dictionary)["direction"]) == 0, "care gauge: optimal water should be in the favorable zone")
 	pot.plant.nutrition = 1.0
 	gauge = CareGaugeService.evaluate(pot, species)
