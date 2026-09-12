@@ -66,7 +66,7 @@ static func buy_catalog_item(state: GameState, item: Dictionary, registry: Conte
 	var amount := maxi(1, int(item.get("amount", 1)))
 	var success := false
 	match action:
-		&"pot": success = _add_pots(state, amount)
+		&"pot": success = _add_pots(state, amount, int(String(item.get("id", "pot_0")).trim_prefix("pot_")))
 		&"potted_plant": success = _add_potted_plants(state, source_id, registry, amount)
 		&"cutting": success = _add_cuttings(state, source_id, registry, amount)
 		&"seed": success = _add_seeds(state, source_id, registry, amount, int(item.get("seed_frame", -1)))
@@ -77,15 +77,16 @@ static func buy_catalog_item(state: GameState, item: Dictionary, registry: Conte
 	if not success: EconomyService.credit(state, price)
 	return success
 
-static func _add_pot(state: GameState) -> String:
+static func _add_pot(state: GameState, visual_index := -1) -> String:
 	var pot := PotState.new()
 	pot.pot_id = IdFactory.make("pot")
+	pot.visual_index = visual_index
 	pot.soil_moisture = 0.30
 	state.pots.append(pot)
 	return pot.pot_id
 
-static func _add_pots(state: GameState, amount: int) -> bool:
-	for _index in range(amount): _add_pot(state)
+static func _add_pots(state: GameState, amount: int, visual_index := -1) -> bool:
+	for _index in range(amount): _add_pot(state, visual_index)
 	return true
 
 static func _add_potted_plants(state: GameState, species_id: StringName, registry: ContentRegistry, amount: int) -> bool:
