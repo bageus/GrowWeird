@@ -55,8 +55,6 @@ static func _advance_pot(
 			else:
 				plant.health = 0.01
 
-	if policy.advance_growth and plant.alive:
-		BranchRegrowthService.advance(plant, delta_seconds, species, overall)
 
 static func _consume_growth_needs(
 	pot: PotState,

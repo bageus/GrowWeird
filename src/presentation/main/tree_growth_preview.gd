@@ -32,6 +32,8 @@ var _dragging := false
 var _drag_offset := Vector2.ZERO
 var prune_mode := false
 var _hovered_branch: StringName = &""
+var _fresh_cut_slots: Array[StringName] = []
+var _shown_plant_id := ""
 signal tree_branch_pruned(side: StringName)
 signal tree_hover_changed(hovered: bool)
 
@@ -44,12 +46,16 @@ func _ready() -> void:
 	_set_stage(stage)
 
 func set_plant(plant: PlantState) -> void:
+	var next_id := plant.instance_id if plant != null else ""
+	if not _shown_plant_id.is_empty() and next_id != _shown_plant_id:
+		_fresh_cut_slots.clear()
+	_shown_plant_id = next_id
 	_plant = plant
 	if _testing_stage >= 0:
 		visible = true
 		_set_stage(_testing_stage)
 		return
-	var next_stage := stage_for(plant)
+	var next_stage := _stage_for_view(plant)
 	visible = plant != null and next_stage >= 0
 	if next_stage >= 0:
 		_set_stage(next_stage)
@@ -59,15 +65,26 @@ static func stage_for(plant: PlantState) -> int:
 		return -1
 	var has_left := plant.branch_at(&"left") != null
 	var has_right := plant.branch_at(&"right") != null
-	if not has_left and not has_right: return 8
-	if not has_left: return 9
-	if not has_right: return 10
+	if not has_left and not has_right: return 13
+	if not has_left: return 11
+	if not has_right: return 12
 	var growth_stage := plant.growth_cycle_index
 	if growth_stage == 0:
 		return -1
 	if growth_stage <= 8:
 		return growth_stage - 1
 	return 7
+
+func _stage_for_view(plant: PlantState) -> int:
+	if plant == null or _fresh_cut_slots.is_empty():
+		return stage_for(plant)
+	var has_left := plant.branch_at(&"left") != null
+	var has_right := plant.branch_at(&"right") != null
+	if not has_left and not has_right: return 8
+	if not has_left: return 9
+	if not has_right: return 10
+	_fresh_cut_slots.clear()
+	return stage_for(plant)
 
 func _set_stage(value: int) -> void:
 	if tree == null:
@@ -149,9 +166,13 @@ func _on_tree_gui_input(event: InputEvent) -> void:
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
 		if side == &"left" and _can_prune_side(side):
-			tree_branch_pruned.emit(side); return
+			_fresh_cut_slots.append(side)
+			tree_branch_pruned.emit(side)
+			return
 		if side == &"right" and _can_prune_side(side):
-			tree_branch_pruned.emit(side); return
+			_fresh_cut_slots.append(side)
+			tree_branch_pruned.emit(side)
+			return
 	if not Input.is_key_pressed(KEY_CTRL):
 		return
 	if event is InputEventMouseButton:

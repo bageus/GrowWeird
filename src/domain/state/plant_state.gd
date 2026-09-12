@@ -39,6 +39,17 @@ func branch_at(slot: StringName) -> BranchState:
 	var value: Variant = branches.get(String(slot))
 	return value as BranchState
 
+func restore_native_branch(slot: StringName) -> bool:
+	if slot not in [&"left", &"right"] or branch_at(slot) != null:
+		return false
+	var branch := BranchState.new()
+	branch.branch_id = "%s:%s:regrown:%d" % [instance_id, String(slot), fruit_cycle_index]
+	branch.slot = slot
+	branch.source_species_id = species_id
+	branch.ancestry = [instance_id]
+	branch.fruit_cycle_eligible = regrowth_fruit_cycle_at(slot)
+	return attach_branch(branch, slot)
+
 func has_free_slot(slot: StringName) -> bool:
 	return BranchState.VALID_SLOTS.has(slot) and branch_at(slot) == null
 

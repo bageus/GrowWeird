@@ -4,7 +4,7 @@ extends RefCounted
 const SIZE := Vector2(466.0, 480.0)
 const PANEL_RECT := Rect2(20.0, 10.0, 426.0, 460.0)
 const BANNER_RECT := Rect2(5.0, -20.0, 456.0, 80.0)
-const TITLE_RECT := Rect2(53.0, -7.0, 360.0, 54.0)
+const TITLE_RECT := Rect2(65.0, -7.0, 320.0, 54.0)
 const CLOSE_RECT := Rect2(418.0, -10.0, 60.0, 60.0)
 const PREVIEW_RECT := Rect2(118.0, 62.0, 230.0, 140.0)
 const DESCRIPTION_RECT := Rect2(33.0, 205.0, 400.0, 73.0)

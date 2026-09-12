@@ -265,9 +265,9 @@ func _test_growth_stage_geometry() -> void:
 	plant.growth_cycle_index = 5
 	_expect(TreeGrowthPreview.stage_for(plant) == 4, "tree preview: a planted branch must immediately use tree_05")
 	plant.cut_branch(&"left")
-	_expect(TreeGrowthPreview.stage_for(plant) == 9, "tree preview: left branch removal must keep the cut stump asset")
+	_expect(TreeGrowthPreview.stage_for(plant) == 11, "tree preview: refreshed left branch removal must use its no-stump asset")
 	plant.cut_branch(&"right")
-	_expect(TreeGrowthPreview.stage_for(plant) == 8, "tree preview: two branch removals must keep both cut stumps")
+	_expect(TreeGrowthPreview.stage_for(plant) == 13, "tree preview: refreshed two-branch removal must use its no-stump asset")
 	plant.initialize_native_branches()
 	plant.growth_ratio = 0.05
 	var young := PlantVisualAssembler.build(Vector2(600.0, 400.0), plant)

@@ -21,11 +21,24 @@ static func advance(plant: PlantState, delta_seconds: float, _care_factor: float
 	while plant.growth_cycle_elapsed >= duration(plant.growth_cycle_index):
 		plant.growth_cycle_elapsed -= duration(plant.growth_cycle_index)
 		plant.finish_care_stage(plant.growth_cycle_index + 1)
-		plant.growth_cycle_index = 9 if plant.growth_cycle_index >= LAST_CYCLE else plant.growth_cycle_index + 1
+		if plant.growth_cycle_index >= LAST_CYCLE:
+			_restore_next_side_branch(plant)
+			plant.growth_cycle_index = LAST_CYCLE if _has_missing_side_branch(plant) else 9
+		else:
+			plant.growth_cycle_index += 1
 		plant.boosted_growth_cycle = -1
 		changed = true
 	_sync_legacy_growth(plant)
 	return changed
+
+static func _restore_next_side_branch(plant: PlantState) -> void:
+	for slot: StringName in [&"left", &"right"]:
+		if plant.branch_at(slot) == null:
+			plant.restore_native_branch(slot)
+			return
+
+static func _has_missing_side_branch(plant: PlantState) -> bool:
+	return plant.branch_at(&"left") == null or plant.branch_at(&"right") == null
 
 static func recovery_complete(plant: PlantState) -> bool:
 	if plant == null:
