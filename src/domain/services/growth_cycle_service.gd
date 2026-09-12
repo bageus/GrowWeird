@@ -19,9 +19,6 @@ static func advance(plant: PlantState, delta_seconds: float, _care_factor: float
 	plant.growth_cycle_elapsed += delta_seconds * speed
 	var changed := false
 	while plant.growth_cycle_elapsed >= duration(plant.growth_cycle_index):
-		if plant.growth_cycle_index == LAST_CYCLE and not recovery_complete(plant):
-			plant.growth_cycle_elapsed = duration(LAST_CYCLE)
-			break
 		plant.growth_cycle_elapsed -= duration(plant.growth_cycle_index)
 		plant.finish_care_stage(plant.growth_cycle_index + 1)
 		plant.growth_cycle_index = 9 if plant.growth_cycle_index >= LAST_CYCLE else plant.growth_cycle_index + 1

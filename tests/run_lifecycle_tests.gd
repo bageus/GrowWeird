@@ -18,7 +18,7 @@ func _init() -> void:
 	_test_pruned_branch_skips_current_fruit_cycle()
 	_test_fruit_cycle_restarts_after_last_harvest()
 	_test_cycle_duration_is_independent_of_care()
-	_test_flowering_waits_for_branch_recovery()
+	_test_growth_continues_during_branch_recovery()
 	_test_seed_visual_frame_round_trip()
 	if _failures.is_empty():
 		print("GrowWeird lifecycle tests passed")
@@ -228,15 +228,13 @@ func _test_cycle_duration_is_independent_of_care() -> void:
 	GrowthCycleService.advance(plant, 1.0, 0.0)
 	_expect(plant.growth_cycle_index == 1, "growth cycle: poor care must not stretch the configured stage duration")
 
-func _test_flowering_waits_for_branch_recovery() -> void:
-	var plant := _plant("strict-recovery")
+func _test_growth_continues_during_branch_recovery() -> void:
+	var plant := _plant("independent-recovery")
 	plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
 	plant.cut_branch(&"left")
 	GrowthCycleService.advance(plant, GrowthCycleService.duration(GrowthCycleService.LAST_CYCLE), 1.0)
-	_expect(plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "growth cycle: flowering started before every branch regrew")
-	plant.initialize_native_branches()
-	GrowthCycleService.advance(plant, 1.0, 1.0)
-	_expect(plant.growth_cycle_index == 9, "growth cycle: flowering must start after recovery finishes")
+	_expect(plant.growth_cycle_index == 9, "growth cycle: pruning must not stop the next growth cycle")
+	_expect(plant.branch_at(&"left") == null, "regrowth: growth cycle changes must preserve the cut stump until native regrowth completes")
 
 func _test_seed_visual_frame_round_trip() -> void:
 	var state := GameState.new()

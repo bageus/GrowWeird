@@ -137,7 +137,7 @@ static func configure_topup_card(panel: Panel, title: String, icon_texture: Text
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	panel.add_child(icon)
 
-static func configure_transaction_total(container: Control) -> void:
+static func configure_transaction_total(container: Control, energy := false) -> void:
 	if container == null:
 		return
 	var labels := container.find_children("*", "Label", true, false)
@@ -152,9 +152,15 @@ static func configure_transaction_total(container: Control) -> void:
 	value_label.offset_right = 2.0
 	value_label.offset_bottom = 24.0
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var icon := CoinFace.new()
-	icon.name = "TotalCoinIcon"
+	var old_icon := container.get_node_or_null("TotalCoinIcon")
+	if old_icon != null: old_icon.free()
+	var icon: TextureRect = TextureRect.new() if energy else CoinFace.new()
+	icon.name = "TotalEnergyIcon" if energy else "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if energy:
+		icon.texture = balance_icon(true)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.set_anchors_preset(Control.PRESET_CENTER)
 	icon.offset_left = 6.0
 	icon.offset_top = -13.0
