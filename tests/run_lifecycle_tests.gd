@@ -107,8 +107,8 @@ func _test_inactive_pot_branch_regrows_without_refresh() -> void:
 	inactive.plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
 	state.pots = [active, inactive]; state.active_pot_id = active.pot_id
 	var policy := SimulationPolicy.realtime(); policy.advance_environment = false; policy.advance_health = false
-	PlantSimulationService.advance(state, species.native_regrowth_seconds, registry, GameRules.new(), policy)
-	_expect(inactive.plant.branch_at(&"right") != null, "regrowth: inactive pot must finish branch growth without switching or manual refresh")
+	PlantSimulationService.advance(state, GrowthCycleService.duration(GrowthCycleService.LAST_CYCLE), registry, GameRules.new(), policy)
+	_expect(inactive.plant.branch_at(&"right") != null and inactive.plant.growth_cycle_index == 9, "regrowth: inactive pot must finish its branch stage and resume flowering")
 
 func _test_graft_cancels_native_regrowth() -> void:
 	var plant := _plant("graft-race")
@@ -202,7 +202,7 @@ func _test_pruned_branch_skips_current_fruit_cycle() -> void:
 	var first_progress := pot.plant.branch_at(&"center").fruit_growth.progress
 	_expect(is_equal_approx(first_progress, pot.plant.branch_at(&"right").fruit_growth.progress), "fruit cycle: all branches must flower simultaneously")
 	pot.plant.cut_branch(&"left")
-	_expect(TreeGrowthPreview.stage_for(pot.plant) == 9, "regrowth asset: pruned left branch must keep its stump asset after refresh")
+	_expect(TreeGrowthPreview.stage_for(pot.plant) == 11, "regrowth asset: a refreshed pruned tree must use the permanent no-stump asset")
 	BranchRegrowthService.advance(pot.plant, species.native_regrowth_seconds, species, 1.0)
 	var regrown := pot.plant.branch_at(&"left")
 	_expect(regrown != null and regrown.fruit_growth == null, "fruit cycle: branch must regrow without its removed flower or fruit")
@@ -229,12 +229,16 @@ func _test_cycle_duration_is_independent_of_care() -> void:
 	_expect(plant.growth_cycle_index == 1, "growth cycle: poor care must not stretch the configured stage duration")
 
 func _test_growth_continues_during_branch_recovery() -> void:
-	var plant := _plant("independent-recovery")
+	var plant := _plant("ordered-recovery")
 	plant.growth_cycle_index = GrowthCycleService.LAST_CYCLE
+	plant.cut_branch(&"right")
 	plant.cut_branch(&"left")
 	GrowthCycleService.advance(plant, GrowthCycleService.duration(GrowthCycleService.LAST_CYCLE), 1.0)
-	_expect(plant.growth_cycle_index == 9, "growth cycle: pruning must not stop the next growth cycle")
-	_expect(plant.branch_at(&"left") == null, "regrowth: growth cycle changes must preserve the cut stump until native regrowth completes")
+	_expect(plant.branch_at(&"left") != null and plant.branch_at(&"right") == null, "regrowth: the first recovery stage must restore only the left branch")
+	_expect(plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "growth cycle: a second recovery stage is required for the right branch")
+	GrowthCycleService.advance(plant, GrowthCycleService.duration(GrowthCycleService.LAST_CYCLE), 1.0)
+	_expect(plant.branch_at(&"right") != null, "regrowth: the second recovery stage must restore the right branch")
+	_expect(plant.growth_cycle_index == 9, "growth cycle: flowering must start immediately after the final side branch regrows")
 
 func _test_seed_visual_frame_round_trip() -> void:
 	var state := GameState.new()
