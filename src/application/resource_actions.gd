@@ -6,6 +6,7 @@ const SEED: StringName = &"seed"
 const FRUIT: StringName = &"fruit"
 const FERTILIZER: StringName = &"fertilizer"
 const MISC: StringName = &"misc"
+const RECYCLE_ENERGY_COST := 2
 
 static func item_value(
 	state: GameState,
