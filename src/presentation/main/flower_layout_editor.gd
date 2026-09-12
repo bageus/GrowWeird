@@ -5,10 +5,10 @@ signal fruit_selected(slot: StringName)
 
 enum DisplayKind { FLOWER, UNRIPE_FRUIT, RIPE_FRUIT }
 const FLOWER_LAYOUT_PATH := "res://content/visual/tree_flower_layouts.json"
-var display_kind := DisplayKind.FLOWER
+var display_kind: DisplayKind = DisplayKind.FLOWER
 var active_slots: Array[StringName] = []
 
-func set_display(kind: int, slots: Array[StringName] = []) -> void:
+func set_display(kind: DisplayKind, slots: Array[StringName] = []) -> void:
 	display_kind = kind; active_slots = slots.duplicate()
 	mouse_filter = Control.MOUSE_FILTER_STOP if display_kind != DisplayKind.FLOWER else Control.MOUSE_FILTER_IGNORE
 	queue_redraw()
@@ -19,7 +19,8 @@ func _should_draw_index(index: int) -> bool:
 func _gui_input(event: InputEvent) -> void:
 	if display_kind == DisplayKind.FLOWER:
 		super._gui_input(event); return
-	var index := _point_at(event.position)
+	if not event is InputEventMouse: return
+	var index := _point_at((event as InputEventMouse).position)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if index >= 0 and _should_draw_index(index) else Control.CURSOR_ARROW
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and index >= 0 and _should_draw_index(index):
 		fruit_selected.emit(BranchState.VALID_SLOTS[index]); accept_event()

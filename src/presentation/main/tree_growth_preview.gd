@@ -89,7 +89,7 @@ func _set_stage(value: int) -> void:
 		if _plant != null:
 			for branch in _plant.existing_branches():
 				if branch.fruit_growth != null: slots.append(branch.slot)
-		var kind := FlowerLayoutEditor.DisplayKind.FLOWER if cycle == 9 else (FlowerLayoutEditor.DisplayKind.UNRIPE_FRUIT if cycle == 10 else FlowerLayoutEditor.DisplayKind.RIPE_FRUIT)
+		var kind: FlowerLayoutEditor.DisplayKind = FlowerLayoutEditor.DisplayKind.FLOWER if cycle == 9 else (FlowerLayoutEditor.DisplayKind.UNRIPE_FRUIT if cycle == 10 else FlowerLayoutEditor.DisplayKind.RIPE_FRUIT)
 		flower_layout.set_display(kind, slots)
 	_update_hover_visibility()
 
