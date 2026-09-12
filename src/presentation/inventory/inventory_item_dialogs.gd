@@ -18,11 +18,13 @@ signal closed
 @onready var sell_value: Label = $SellPopup/CountControl/ValueLabel
 @onready var sell_minus: Button = $SellPopup/QuantityControl/QuantityMinus
 @onready var sell_plus: Button = $SellPopup/QuantityControl/QuantityPlus
-@onready var recycle_popup: PanelContainer = $RecyclePopup
-@onready var recycle_title: Label = $RecyclePopup/Layout/Header/Title
-@onready var recycle_slider: HSlider = $RecyclePopup/Layout/QuantitySlider
-@onready var recycle_quantity: Label = $RecyclePopup/Layout/QuantityLabel
-@onready var recycle_output: Label = $RecyclePopup/Layout/OutputLabel
+@onready var recycle_popup: Control = $RecyclePopup
+@onready var recycle_preview: TextureRect = $RecyclePopup/RecyclePreview
+@onready var recycle_description: Label = $RecyclePopup/RecycleDescription
+@onready var recycle_quantity: Label = $RecyclePopup/QuantityControl/QuantityLabel
+@onready var recycle_cost: Label = $RecyclePopup/CountControl/ValueLabel
+@onready var recycle_minus: Button = $RecyclePopup/QuantityControl/QuantityMinus
+@onready var recycle_plus: Button = $RecyclePopup/QuantityControl/QuantityPlus
 
 var _source: Control
 var _kind: StringName = &""
@@ -32,6 +34,7 @@ var _count := 1
 var _unit_value := 0
 var _sell_amount := 1
 var _recycle_yield := 0
+var _recycle_amount := 1
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -45,16 +48,15 @@ func _ready() -> void:
 	$SellPopup/SellButton.pressed.connect(_confirm_sell)
 	sell_minus.pressed.connect(_change_sell_quantity.bind(-1))
 	sell_plus.pressed.connect(_change_sell_quantity.bind(1))
-	$RecyclePopup/Layout/Header/Close.pressed.connect(close_all)
-	$RecyclePopup/Layout/Confirm.pressed.connect(_confirm_recycle)
-	recycle_slider.value_changed.connect(_refresh_recycle_preview)
+	$RecyclePopup/RecycleClose.pressed.connect(close_all)
+	$RecyclePopup/RecycleButton.pressed.connect(_confirm_recycle)
+	recycle_minus.pressed.connect(_change_recycle_quantity.bind(-1))
+	recycle_plus.pressed.connect(_change_recycle_quantity.bind(1))
 	UiAtlas.configure_button(use_action, 5, 1)
 	UiAtlas.configure_button(sell_action, 3, 3)
 	UiAtlas.configure_button(recycle_action, 5, 2)
 	_configure_sell_art()
-	TransactionDialogVisual.configure_grind(recycle_popup, recycle_title, $RecyclePopup/Layout/Header/Close as Button, recycle_output, $RecyclePopup/Layout/Confirm as Button)
-	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
-	UiAtlas.configure_close_button($RecyclePopup/Layout/Header/Close as Button)
+	_configure_recycle_art()
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 
 func _configure_sell_art() -> void:
@@ -69,6 +71,19 @@ func _configure_sell_art() -> void:
 		"count_background": $SellPopup/CountControl/CountBackground,
 		"action": $SellPopup/SellButton,
 	}, &"sell", Vector2i(3, 3))
+
+func _configure_recycle_art() -> void:
+	TransactionDialogVisual.configure({
+		"root": recycle_popup, "background": $RecyclePopup/RecycleBackground,
+		"banner": $RecyclePopup/RecycleBanner, "title": $RecyclePopup/RecycleName,
+		"close": $RecyclePopup/RecycleClose, "preview": recycle_preview,
+		"description": recycle_description, "quantity": $RecyclePopup/QuantityControl,
+		"quantity_background": $RecyclePopup/QuantityControl/QuantityBackground,
+		"minus": recycle_minus, "quantity_label": recycle_quantity, "plus": recycle_plus,
+		"count": $RecyclePopup/CountControl,
+		"count_background": $RecyclePopup/CountControl/CountBackground,
+		"action": $RecyclePopup/RecycleButton,
+	}, &"grind", Vector2i(5, 2))
 
 func show_for(
 	source: Control,
@@ -127,20 +142,11 @@ func _open_sell() -> void:
 	_refresh_sell_preview()
 
 func _open_recycle() -> void:
-	actions.visible = false
-	sell_popup.visible = false
-	recycle_popup.visible = true
-	recycle_title.text = "GRIND · %s" % _title
-	_setup_slider(recycle_slider)
-	_refresh_recycle_preview(recycle_slider.value)
-	recycle_popup.position = (size - recycle_popup.size) * 0.5
+	actions.visible = false; sell_popup.visible = false; recycle_popup.visible = true
+	recycle_preview.texture = InventoryItemArt.texture_for(_kind, _item_id); _recycle_amount = 1; _refresh_recycle_preview()
 
-func _setup_slider(slider: HSlider) -> void:
-	slider.min_value = 1.0
-	slider.max_value = float(_count)
-	slider.step = 1.0
-	slider.value = 1.0
-	slider.editable = _count > 1
+func _change_recycle_quantity(delta: int) -> void:
+	_recycle_amount = clampi(_recycle_amount + delta, 1, _count); _refresh_recycle_preview()
 
 func _change_sell_quantity(delta: int) -> void:
 	_sell_amount = clampi(_sell_amount + delta, 1, _count)
@@ -155,18 +161,18 @@ func _refresh_sell_preview() -> void:
 	sell_minus.disabled = not can_change_quantity or _sell_amount <= 1
 	sell_plus.disabled = not can_change_quantity or _sell_amount >= _count
 
-func _refresh_recycle_preview(value: float) -> void:
-	var quantity := maxi(1, int(round(value)))
-	recycle_quantity.text = "Quantity: %d / %d" % [quantity, _count]
-	recycle_output.text = "Output: Recycled Fertilizer ×%d\nCost: %d energy" % [_recycle_yield * quantity, ResourceActions.RECYCLE_ENERGY_COST * quantity]
+func _refresh_recycle_preview() -> void:
+	recycle_quantity.text = "%d / %d" % [_recycle_amount, _count]
+	recycle_description.text = "Grind %s.\nOutput: Recycled Fertilizer ×%d" % [_title, _recycle_yield * _recycle_amount]; TransactionDialogVisual.fit_description(recycle_description)
+	recycle_cost.text = "%d ENERGY" % (ResourceActions.RECYCLE_ENERGY_COST * _recycle_amount)
+	var can_change := _count > 1; recycle_minus.visible = can_change; recycle_plus.visible = can_change; recycle_minus.disabled = not can_change or _recycle_amount <= 1; recycle_plus.disabled = not can_change or _recycle_amount >= _count
 
 func _confirm_sell() -> void:
 	sell_requested.emit(_kind, _item_id, _sell_amount)
 	close_all()
 
 func _confirm_recycle() -> void:
-	var quantity := maxi(1, int(round(recycle_slider.value)))
-	recycle_requested.emit(_kind, _item_id, quantity)
+	recycle_requested.emit(_kind, _item_id, _recycle_amount)
 	close_all()
 
 func _use() -> void:
