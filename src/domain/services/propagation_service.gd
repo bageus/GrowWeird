@@ -8,7 +8,7 @@ static func prune(
 	slot: StringName,
 	item_id: String
 ) -> CuttingState:
-	if plant == null or not plant.alive or not BranchState.VALID_SLOTS.has(slot):
+	if plant == null or not BranchState.VALID_SLOTS.has(slot):
 		return null
 	var branch := plant.cut_branch(slot)
 	if branch == null:
