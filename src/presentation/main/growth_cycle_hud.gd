@@ -12,7 +12,7 @@ func _ready() -> void:
 	_build_hud()
 	_skip_button.pressed.connect(func() -> void: skip_requested.emit())
 
-func set_cycle(plant: PlantState, energy: int) -> void:
+func set_cycle(plant: PlantState, _energy: int) -> void:
 	visible = plant != null and plant.alive
 	if not visible:
 		return
