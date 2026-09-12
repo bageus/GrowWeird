@@ -95,6 +95,8 @@ static func recycle_item(
 
 static func recycle_yield(kind: StringName, rules: GameRules) -> int:
 	match kind:
+		FERTILIZER:
+			return RecyclingService.fertilizer_yield(rules)
 		CUTTING:
 			return RecyclingService.cutting_yield(rules)
 		SEED:
@@ -107,6 +109,8 @@ static func recycle_yield(kind: StringName, rules: GameRules) -> int:
 
 static func _take_item(state: GameState, kind: StringName, item_id: String) -> bool:
 	match kind:
+		FERTILIZER:
+			return InventoryService.take_fertilizer_amount(state.inventory, StringName(item_id), 1) == 1
 		CUTTING:
 			return InventoryService.take_cutting(state.inventory, item_id) != null
 		SEED:

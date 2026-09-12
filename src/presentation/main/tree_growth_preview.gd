@@ -37,6 +37,7 @@ signal tree_hover_changed(hovered: bool)
 
 func _ready() -> void:
 	tree.gui_input.connect(_on_tree_gui_input)
+	flower_layout.fruit_selected.connect(_on_fruit_selected)
 	tree.mouse_entered.connect(tree_hover_changed.emit.bind(true))
 	tree.mouse_exited.connect(tree_hover_changed.emit.bind(false)); tree.mouse_exited.connect(leaf_layout.clear_leaf_hover)
 	_load_asset_layout()
@@ -64,7 +65,7 @@ static func stage_for(plant: PlantState) -> int:
 	var growth_stage := plant.growth_cycle_index
 	if growth_stage == 0:
 		return -1
-	if growth_stage <= 11:
+	if growth_stage <= 8:
 		return growth_stage - 1
 	return 7
 
@@ -80,9 +81,16 @@ func _set_stage(value: int) -> void:
 	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
 	if leaf_layout.visible:
 		leaf_layout.set_stage(stage)
-	flower_layout.visible = _testing_stage >= 0 or (_plant != null and _plant.growth_cycle_index == 9)
+	var cycle := _plant.growth_cycle_index if _plant != null else 9
+	flower_layout.visible = _testing_stage >= 0 or cycle in [9, 10, 11]
 	if flower_layout.visible:
-		flower_layout.set_stage(stage)
+		flower_layout.set_stage(8)
+		var slots: Array[StringName] = []
+		if _plant != null:
+			for branch in _plant.existing_branches():
+				if branch.fruit_growth != null: slots.append(branch.slot)
+		var kind := FlowerLayoutEditor.DisplayKind.FLOWER if cycle == 9 else (FlowerLayoutEditor.DisplayKind.UNRIPE_FRUIT if cycle == 10 else FlowerLayoutEditor.DisplayKind.RIPE_FRUIT)
+		flower_layout.set_display(kind, slots)
 	_update_hover_visibility()
 
 func preview_stage_for_testing(value: int) -> void:
@@ -170,6 +178,9 @@ func _branch_side_at(point: Vector2) -> StringName:
 func _can_prune_side(side: StringName) -> bool:
 	if _testing_stage >= 0: return stage in ([6, 7, 12] if side == &"left" else [7, 11])
 	return _plant != null and _plant.branch_at(side) != null
+
+func _on_fruit_selected(slot: StringName) -> void:
+	GameApp.harvest_active_fruit(slot)
 
 func _scale_tree(factor: float) -> void:
 	var next_scale := tree.scale * factor

@@ -230,7 +230,7 @@ func _quantity_badge(amount: int) -> Control:
 	badge.name = "QuantityBadge"
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	badge.position = Vector2(-28.0, 4.0)
+	badge.position = Vector2(-30.0, 4.0)
 	badge.size = Vector2(30.0, 30.0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = COLORS[_category].darkened(0.38)

@@ -1,6 +1,8 @@
 class_name PlantSimulationService
 extends RefCounted
 
+const QUARTER_CELL_DECAY_PER_SECOND := 0.05 / 60.0
+
 static func advance(
 	game_state: GameState,
 	delta_seconds: float,
@@ -64,14 +66,14 @@ static func _consume_growth_needs(
 ) -> void:
 	var moisture_stage_before := pot.soil_moisture_stage()
 	pot.soil_moisture = clampf(
-		pot.soil_moisture - species.moisture_decay_per_second * delta_seconds,
+		pot.soil_moisture - QUARTER_CELL_DECAY_PER_SECOND * delta_seconds,
 		0.0,
 		1.0
 	)
 	if pot.soil_moisture_stage() != moisture_stage_before:
 		pot.reset_spray_streak()
 	plant.nutrition = clampf(
-		plant.nutrition - species.nutrition_decay_per_second * delta_seconds,
+		plant.nutrition - QUARTER_CELL_DECAY_PER_SECOND * delta_seconds,
 		0.0,
 		1.0
 	)

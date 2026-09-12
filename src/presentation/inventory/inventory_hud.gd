@@ -151,6 +151,7 @@ func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
 
 func _add_stack_badge(button: Button, count: int) -> void:
 	var badge := Label.new()
+	badge.name = "StackBadge"
 	button.add_child(badge)
 	badge.z_index = 10
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -195,6 +196,8 @@ func set_context_cancel(active: bool) -> void:
 	if not is_instance_valid(_context_button): _context_button = null; return
 	var face := _context_button.get_node_or_null("ContextCancelCell") as Panel
 	_context_button.self_modulate = Color.WHITE
+	var badge := _context_button.get_node_or_null("StackBadge") as Label
+	if badge != null: badge.visible = not active
 	if not active:
 		if face != null: face.free()
 		_context_button = null

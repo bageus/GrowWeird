@@ -110,6 +110,7 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 func _draw() -> void:
 	var points := _stage_points()
 	for index in range(points.size()):
+		if not _should_draw_index(index): continue
 		var point: Dictionary = points[index]
 		var point_position := _position_for(point)
 		var scale_factor := float(point.get("scale", 1.0)) * _random_scale(index, point)
@@ -120,6 +121,8 @@ func _draw() -> void:
 		_draw_leaf(point_position, scale_factor, angle)
 		if enabled:
 			_draw_marker(point_position, float(point.get("scale", 1.0)), base_angle, index == selected_index)
+
+func _should_draw_index(_index: int) -> bool: return true
 
 func _draw_leaf(point_position: Vector2, scale_factor: float, angle: float) -> void:
 	var source := Rect2(Vector2.ZERO, Vector2(512.0, 512.0))

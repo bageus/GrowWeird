@@ -1,7 +1,28 @@
 class_name FlowerLayoutEditor
 extends LeafLayoutEditor
 
+signal fruit_selected(slot: StringName)
+
+enum DisplayKind { FLOWER, UNRIPE_FRUIT, RIPE_FRUIT }
 const FLOWER_LAYOUT_PATH := "res://content/visual/tree_flower_layouts.json"
+var display_kind := DisplayKind.FLOWER
+var active_slots: Array[StringName] = []
+
+func set_display(kind: int, slots: Array[StringName] = []) -> void:
+	display_kind = kind; active_slots = slots.duplicate()
+	mouse_filter = Control.MOUSE_FILTER_STOP if display_kind != DisplayKind.FLOWER else Control.MOUSE_FILTER_IGNORE
+	queue_redraw()
+
+func _should_draw_index(index: int) -> bool:
+	return display_kind == DisplayKind.FLOWER or (index < BranchState.VALID_SLOTS.size() and active_slots.has(BranchState.VALID_SLOTS[index]))
+
+func _gui_input(event: InputEvent) -> void:
+	if display_kind == DisplayKind.FLOWER:
+		super._gui_input(event); return
+	var index := _point_at(event.position)
+	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if index >= 0 and _should_draw_index(index) else Control.CURSOR_ARROW
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and index >= 0 and _should_draw_index(index):
+		fruit_selected.emit(BranchState.VALID_SLOTS[index]); accept_event()
 
 func save_layout() -> bool:
 	var directory := DirAccess.open("res://")
@@ -21,6 +42,11 @@ func _load_layouts() -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 func _draw_leaf(point_position: Vector2, scale_factor: float, angle: float) -> void:
+	if display_kind != DisplayKind.FLOWER:
+		var fruit_color := Color("e53935") if display_kind == DisplayKind.RIPE_FRUIT else Color("66c92f")
+		var radius := 14.0 * scale_factor
+		draw_circle(point_position, radius, fruit_color); draw_arc(point_position, radius, 0.0, TAU, 20, fruit_color.darkened(0.45), 2.0, true)
+		draw_circle(point_position + Vector2(-4.0, -5.0) * scale_factor, 3.5 * scale_factor, Color(1.0, 1.0, 1.0, 0.55)); return
 	var petal_color := Color("ff75bd")
 	var petal_radius := 10.0 * scale_factor
 	var petal_distance := 12.0 * scale_factor
