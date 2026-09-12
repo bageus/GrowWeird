@@ -233,13 +233,13 @@ func _test_cutting_plant_and_graft_flow() -> void:
 	_expect(not PropagationService.graft_cutting(cutting, host, &"right", "blocked"), "cutting flow: graft must fail when slot is occupied")
 	host.cut_branch(&"right")
 	_expect(PropagationService.graft_cutting(cutting, host, &"right", "graft-flow"), "cutting flow: graft should succeed after slot is freed")
-	var state := GameState.new()
-	state.inventory = InventoryState.new()
+	var state := GameState.new(); state.inventory = InventoryState.new(); state.energy = 20
 	var source := _plant("prune-source")
 	var source_branch_id := source.branch_at(&"left").branch_id
 	var cutting_id := PropagationActions.prune(state, source, &"left")
 	_expect(not cutting_id.is_empty() and state.inventory.cuttings.size() == 1, "prune flow: cut plant branch was not added to inventory")
-	_expect(state.inventory.cuttings[0].source_branch_id == source_branch_id, "prune flow: inventory branch lost its source identity")
+	_expect(state.inventory.cuttings[0].source_branch_id == source_branch_id and state.energy == 10, "prune flow: inventory branch identity or ten-energy cost is incorrect")
+	source.alive = false; _expect(not PropagationActions.prune(state, source, &"right").is_empty() and state.inventory.cuttings.size() == 2 and state.energy == 0, "prune flow: an existing final-state branch must still become an inventory cutting"); _expect(PropagationActions.prune(state, source, &"center").is_empty() and source.branch_at(&"center") != null, "prune flow: insufficient energy must leave the branch intact")
 
 func _test_fruit_lifecycle_and_harvest() -> void:
 	var registry := ContentRegistry.new()

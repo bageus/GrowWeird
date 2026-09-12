@@ -2,11 +2,12 @@ class_name PropagationActions
 extends RefCounted
 
 static func prune(state: GameState, plant: PlantState, slot: StringName) -> String:
-	if state == null:
+	if state == null or state.energy < EnergyService.PRUNE_COST:
 		return ""
 	var cutting := PropagationService.prune(plant, slot, IdFactory.make("cutting"))
 	if cutting == null:
 		return ""
+	EnergyService.spend(state, EnergyService.PRUNE_COST)
 	InventoryService.add_cutting(state.inventory, cutting)
 	return cutting.item_id
 

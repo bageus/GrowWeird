@@ -113,7 +113,7 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	lighting_button.disabled = pot == null
 	lighting_button.text = ""
 	lighting_button.tooltip_text = "Lighting"
-	prune_button.disabled = pot == null
+	prune_button.disabled = plant == null or plant.existing_branches().is_empty() or GameApp.state.energy < EnergyService.PRUNE_COST
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = ""
 	sell_plant_button.tooltip_text = "Sell plant + pot · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant + pot"
@@ -222,9 +222,9 @@ func _on_environment_preset(preset: StringName) -> void:
 	event_label.text = "Environment: %s." % _pretty_id(String(preset)); care_gauge.reveal()
 func _on_prune_pressed() -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE: _on_cancel_pressed(); return
-	if GameApp.active_plant() == null and not tree_growth_preview.has_prunable_branch():
-		event_label.text = "There is nothing to prune."
-		return
+	tree_growth_preview.clear_testing_preview(); var plant := GameApp.active_plant()
+	if plant == null or plant.existing_branches().is_empty(): event_label.text = "There is nothing to prune."; return
+	if GameApp.state.energy < EnergyService.PRUNE_COST: event_label.text = "Pruning requires 10 energy."; return
 	_pending_item_id = ""; _pending_plant_kind = &""
 	_water_submenu_visible = false; _lighting_submenu_visible = false; scene_controls.set_water_options_visible(false); scene_controls.set_lighting_options_visible(false)
 	_set_interaction_mode(PlantView.MODE_PRUNE)
@@ -241,6 +241,7 @@ func _on_cancel_pressed() -> void:
 func _on_tree_branch_pruned(side: StringName) -> void:
 	var cutting_id := GameApp.prune_active_branch(side)
 	event_label.text = "Plant branch added to inventory." if not cutting_id.is_empty() else "That branch cannot be cut."
+	if not cutting_id.is_empty(): _cancel_action()
 func _on_branch_selected(slot: StringName) -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE:
 		var cutting_id := GameApp.prune_active_branch(slot)

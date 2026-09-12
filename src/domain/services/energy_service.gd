@@ -5,6 +5,7 @@ const PER_POT := 35
 const REGEN_SECONDS := 120.0
 const WATER_COST := 1
 const OFFER_COST := 5
+const PRUNE_COST := 10
 
 static func capacity(state: GameState) -> int:
 	if state == null: return 0
