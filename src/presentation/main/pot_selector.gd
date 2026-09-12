@@ -99,7 +99,7 @@ func _pot_index(pot_id: String) -> int:
 	return PotVisual.index_for_id(pot_id, POT_TEXTURES.size())
 
 func _build_index_hud() -> void:
-	_index_hud = PanelContainer.new(); _index_hud.name = "PotIndexHud"; _index_hud.position = Vector2(35.0, 118.0); _index_hud.size = Vector2(170.0, 24.0); _index_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _index_hud.modulate.a = 0.0; _index_hud.visible = false; $Layers.add_child(_index_hud)
+	_index_hud = PanelContainer.new(); _index_hud.name = "PotIndexHud"; _index_hud.position = Vector2(55.0, 96.0); _index_hud.size = Vector2(130.0, 24.0); _index_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _index_hud.modulate.a = 0.0; _index_hud.visible = false; $Layers.add_child(_index_hud)
 	_index_label = Label.new(); _index_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; _index_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; _index_label.add_theme_font_size_override(&"font_size", 14); _index_hud.add_child(_index_label); UiAtlas.configure_warm_timer_hud(_index_hud, _index_label)
 
 func _on_pot_hover(hovered: bool) -> void:
