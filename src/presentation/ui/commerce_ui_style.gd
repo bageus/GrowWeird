@@ -5,11 +5,14 @@ static func curved_title(label: Label, caption: String, arc_height := 5.0) -> vo
 	label.text = ""
 	for child in label.get_children():
 		child.queue_free()
+	label.clip_contents = true
 	var count := caption.length()
-	var letter_width := minf(42.0, label.size.x / maxf(float(count), 1.0))
+	var usable_width := maxf(80.0, label.size.x - 48.0)
+	var letter_width := minf(38.0, usable_width / maxf(float(count), 1.0))
 	var title_width := letter_width * float(count)
 	var start_x := (label.size.x - title_width) * 0.5
 	var center := float(count - 1) * 0.5
+	var font_size := clampi(int(letter_width * 1.15), 17, 30)
 	for index in range(count):
 		var letter := Label.new()
 		letter.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -22,7 +25,7 @@ static func curved_title(label: Label, caption: String, arc_height := 5.0) -> vo
 		letter.add_theme_color_override(&"font_color", Color.WHITE)
 		letter.add_theme_color_override(&"font_outline_color", Color(0.25, 0.08, 0.02, 1.0))
 		letter.add_theme_constant_override(&"outline_size", 5)
-		letter.add_theme_font_size_override(&"font_size", 30)
+		letter.add_theme_font_size_override(&"font_size", font_size)
 		label.add_child(letter)
 
 static func topup_button(button: Button, caption: String, _rewarded := false) -> void:
@@ -67,6 +70,9 @@ static func balance_plus(button: Button) -> void:
 	button.add_theme_constant_override(&"outline_size", 1)
 
 static func transaction_action(button: Button, mode: StringName) -> void:
+	if mode == &"grind":
+		_program_button(button, "GRIND", Color(0.055, 0.43, 0.86, 1.0), Color(0.018, 0.16, 0.43, 1.0), 25)
+		return
 	var selling := mode == &"sell"
 	_program_button(button, String(mode).to_upper(), Color(0.96, 0.49, 0.045, 1.0) if selling else Color(0.24, 0.72, 0.07, 1.0), Color(0.54, 0.20, 0.02, 1.0), 25)
 
