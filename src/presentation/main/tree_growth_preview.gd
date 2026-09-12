@@ -181,8 +181,10 @@ func _can_prune_side(side: StringName) -> bool:
 	return _plant != null and _plant.branch_at(side) != null
 
 func _on_fruit_selected(slot: StringName) -> void:
-	if _plant != null and _plant.growth_cycle_index == 9: GameApp.pick_active_flower(slot)
-	else: GameApp.harvest_active_fruit(slot)
+	var app := get_node_or_null("/root/GameApp")
+	if app == null: return
+	if _plant != null and _plant.growth_cycle_index == 9: app.call("pick_active_flower", slot)
+	else: app.call("harvest_active_fruit", slot)
 
 func _scale_tree(factor: float) -> void:
 	var next_scale := tree.scale * factor
