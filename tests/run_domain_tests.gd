@@ -249,11 +249,11 @@ func _test_fruit_lifecycle_and_harvest() -> void:
 	pot.pot_id = "fruit-pot"
 	pot.soil_moisture = 0.5
 	pot.plant = _plant("fruit-plant")
-	pot.plant.growth_ratio = 1.0; pot.plant.growth_cycle_index = 11
-	state.pots = [pot]
-	FruitLifecycleService.advance(state, 120.0, registry)
-	var branch := pot.plant.branch_at(&"center")
-	_expect(branch.fruit_growth != null and branch.fruit_growth.is_ready(), "fruit lifecycle: mature comfortable branch should ripen fruit")
+	pot.plant.growth_ratio = 1.0; pot.plant.growth_cycle_index = 9
+	state.pots = [pot]; _expect(FruitActions.pick_flower(state, pot.plant, &"left") and int(state.inventory.misc.get("picked_flower", 0)) == 1, "flower lifecycle: a clicked flower must enter inventory")
+	pot.plant.growth_cycle_index = 10; FruitLifecycleService.advance(state, 120.0, registry); var branch := pot.plant.branch_at(&"center")
+	_expect(branch.fruit_growth != null and not branch.fruit_growth.is_ready(), "fruit lifecycle: green fruit must appear immediately after flowers")
+	pot.plant.growth_cycle_index = 11; FruitLifecycleService.advance(state, 120.0, registry); _expect(branch.fruit_growth.is_ready(), "fruit lifecycle: green fruit must ripen on the next stage")
 	var harvested := FruitLifecycleService.harvest(pot.plant, &"center", "fruit-harvest")
 	_expect(harvested != null, "fruit lifecycle: ripe fruit should harvest")
 	_expect(branch.fruit_growth == null, "fruit lifecycle: harvesting must reset branch fruit cycle")

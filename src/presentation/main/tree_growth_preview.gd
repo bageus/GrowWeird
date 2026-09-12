@@ -88,7 +88,8 @@ func _set_stage(value: int) -> void:
 		var slots: Array[StringName] = []
 		if _plant != null:
 			for branch in _plant.existing_branches():
-				if branch.fruit_growth != null: slots.append(branch.slot)
+				if cycle == 9 and branch.fruit_cycle_eligible <= _plant.fruit_cycle_index: slots.append(branch.slot)
+				elif cycle in [10, 11] and branch.fruit_growth != null: slots.append(branch.slot)
 		var kind: FlowerLayoutEditor.DisplayKind = FlowerLayoutEditor.DisplayKind.FLOWER if cycle == 9 else (FlowerLayoutEditor.DisplayKind.UNRIPE_FRUIT if cycle == 10 else FlowerLayoutEditor.DisplayKind.RIPE_FRUIT)
 		flower_layout.set_display(kind, slots)
 	_update_hover_visibility()
@@ -180,7 +181,8 @@ func _can_prune_side(side: StringName) -> bool:
 	return _plant != null and _plant.branch_at(side) != null
 
 func _on_fruit_selected(slot: StringName) -> void:
-	GameApp.harvest_active_fruit(slot)
+	if _plant != null and _plant.growth_cycle_index == 9: GameApp.pick_active_flower(slot)
+	else: GameApp.harvest_active_fruit(slot)
 
 func _scale_tree(factor: float) -> void:
 	var next_scale := tree.scale * factor

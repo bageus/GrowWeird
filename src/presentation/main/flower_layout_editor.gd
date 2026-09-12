@@ -10,14 +10,14 @@ var active_slots: Array[StringName] = []
 
 func set_display(kind: DisplayKind, slots: Array[StringName] = []) -> void:
 	display_kind = kind; active_slots = slots.duplicate()
-	mouse_filter = Control.MOUSE_FILTER_STOP if display_kind != DisplayKind.FLOWER else Control.MOUSE_FILTER_IGNORE
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	queue_redraw()
 
 func _should_draw_index(index: int) -> bool:
-	return display_kind == DisplayKind.FLOWER or (index < BranchState.VALID_SLOTS.size() and active_slots.has(BranchState.VALID_SLOTS[index]))
+	return index < BranchState.VALID_SLOTS.size() and active_slots.has(BranchState.VALID_SLOTS[index])
 
 func _gui_input(event: InputEvent) -> void:
-	if display_kind == DisplayKind.FLOWER:
+	if enabled:
 		super._gui_input(event); return
 	if not event is InputEventMouse: return
 	var index := _point_at((event as InputEventMouse).position)

@@ -4,7 +4,6 @@ signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
-
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
 
 var state: GameState
@@ -168,6 +167,7 @@ func graft_cutting(cutting_id: String, slot: StringName) -> bool:
 	state_changed.emit()
 	return true
 
+func pick_active_flower(slot: StringName) -> bool: var picked := FruitActions.pick_flower(state, active_plant(), slot); if picked: state_changed.emit(); return picked
 func harvest_active_fruit(slot: StringName) -> String:
 	var item_id := FruitActions.harvest(state, active_plant(), slot)
 	if not item_id.is_empty():
