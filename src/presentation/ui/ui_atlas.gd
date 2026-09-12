@@ -153,8 +153,7 @@ static func configure_transaction_total(container: Control, energy := false) -> 
 	value_label.offset_bottom = 24.0
 	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var old_icon := container.get_node_or_null("TotalCoinIcon")
-	if old_icon != null:
-		old_icon.free()
+	if old_icon != null: old_icon.free()
 	var icon: TextureRect = TextureRect.new() if energy else CoinFace.new()
 	icon.name = "TotalEnergyIcon" if energy else "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
