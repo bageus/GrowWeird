@@ -5,12 +5,7 @@ const BUTTONS: Texture2D = preload("res://assets/ui/buttons.png")
 const HUD_BALANCE: Texture2D = preload("res://assets/ui/hud_balance.png")
 const ENERGY_COIN_ICONS: Texture2D = preload("res://assets/ui/energycoin_icon.png")
 const COIN_ICON: Texture2D = preload("res://assets/ui/coin.svg")
-<<<<<<< Updated upstream
 const BALANCE_PLUS_TEXTURE: Texture2D = preload("res://assets/ui/fonts/balance_plus.svg")
-=======
-const BALANCE_PLUS_ICON: Texture2D = preload("res://assets/ui/fonts/balance_plus.svg")
-const BALANCE_PLUS_ICON: Texture2D = null
->>>>>>> Stashed changes
 const RUBLE_ICON: Texture2D = preload("res://assets/ui/ruble.svg")
 const DOLLAR_ICON: Texture2D = preload("res://assets/ui/dollar.svg")
 const GAME_FONT: Font = preload("res://assets/ui/fonts/fredoka_black.tres")
@@ -213,14 +208,8 @@ static func configure_balance_hud(panel: Panel) -> void:
 static func configure_balance_plus(button: Button, _balance_art: Control) -> void:
 	if button != null:
 		CommerceUiStyle.balance_plus(button)
-<<<<<<< Updated upstream
 		button.text = ""
 		button.icon = BALANCE_PLUS_TEXTURE
-=======
-		button.text = "+"
-		button.icon = BALANCE_PLUS_ICON
-		button.add_theme_font_size_override(&"font_size", 30)
->>>>>>> Stashed changes
 		button.expand_icon = true
 		button.add_theme_constant_override(&"icon_max_width", 39)
 		for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
