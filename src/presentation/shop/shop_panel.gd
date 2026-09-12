@@ -122,7 +122,7 @@ func _configure_lot_button(card: Button) -> void:
 	CommerceUiStyle.shop_lot(card, COLORS[_category])
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item
-	CommerceUiStyle.curved_title(confirm_name, "BUY · %s" % _purchase_group(item))
+	CommerceUiStyle.curved_title(confirm_name, "BUY·%s" % _purchase_group(item))
 	confirm_description.text = String(item.get("description", ""))
 	TransactionDialogVisual.fit_description(confirm_description)
 	confirm_preview.texture = _preview_texture(item)
