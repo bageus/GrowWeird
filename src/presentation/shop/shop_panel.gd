@@ -152,7 +152,7 @@ func _refresh_purchase_preview() -> void:
 	quantity_minus.disabled = not can_change_quantity or _purchase_quantity <= 1
 	quantity_plus.disabled = not can_change_quantity or _purchase_quantity >= stock
 	confirm_price.text = str(unit_price * _purchase_quantity)
-	buy_button.disabled = not bool(_selected.get("unlocked", false)) or _money < unit_price * _purchase_quantity
+	buy_button.disabled = not bool(_selected.get("unlocked", false))
 
 func _hide_confirm() -> void: _selected = {}; confirm.visible = false; %CloseButton.disabled = false; %CloseButton.modulate = Color.WHITE
 func _request_close() -> void: _hide_confirm(); close_requested.emit()
