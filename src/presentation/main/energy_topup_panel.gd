@@ -37,7 +37,7 @@ func refresh() -> void:
 func _purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["energy"]), int(product["rub"]))
-	var credited := _app().buy_energy(int(product["energy"]))
+	var credited: int = int(_app().buy_energy(int(product["energy"])))
 	%StatusLabel.text = "+%d energy received." % credited
 	refresh()
 
