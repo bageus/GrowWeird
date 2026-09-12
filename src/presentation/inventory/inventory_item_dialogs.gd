@@ -52,6 +52,7 @@ func _ready() -> void:
 	UiAtlas.configure_button(sell_action, 3, 3)
 	UiAtlas.configure_button(recycle_action, 5, 2)
 	_configure_sell_art()
+	TransactionDialogVisual.configure_grind(recycle_popup, recycle_title, $RecyclePopup/Layout/Header/Close as Button, recycle_output, $RecyclePopup/Layout/Confirm as Button)
 	UiAtlas.configure_button($RecyclePopup/Layout/Confirm as Button, 5, 2)
 	UiAtlas.configure_close_button($RecyclePopup/Layout/Header/Close as Button)
 	actions.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
@@ -113,7 +114,7 @@ func refresh_position() -> void:
 	if actions.visible:
 		_place_left(actions)
 	if recycle_popup.visible:
-		_place_left(recycle_popup)
+		recycle_popup.position = (size - recycle_popup.size) * 0.5
 
 func _open_sell() -> void:
 	actions.visible = false
@@ -129,10 +130,10 @@ func _open_recycle() -> void:
 	actions.visible = false
 	sell_popup.visible = false
 	recycle_popup.visible = true
-	recycle_title.text = "Grind · %s" % _title
+	recycle_title.text = "GRIND · %s" % _title
 	_setup_slider(recycle_slider)
 	_refresh_recycle_preview(recycle_slider.value)
-	_place_left(recycle_popup)
+	recycle_popup.position = (size - recycle_popup.size) * 0.5
 
 func _setup_slider(slider: HSlider) -> void:
 	slider.min_value = 1.0
@@ -157,7 +158,7 @@ func _refresh_sell_preview() -> void:
 func _refresh_recycle_preview(value: float) -> void:
 	var quantity := maxi(1, int(round(value)))
 	recycle_quantity.text = "Quantity: %d / %d" % [quantity, _count]
-	recycle_output.text = "Output: Recycled Fertilizer ×%d" % (_recycle_yield * quantity)
+	recycle_output.text = "Output: Recycled Fertilizer ×%d\nCost: %d energy" % [_recycle_yield * quantity, ResourceActions.RECYCLE_ENERGY_COST * quantity]
 
 func _confirm_sell() -> void:
 	sell_requested.emit(_kind, _item_id, _sell_amount)
