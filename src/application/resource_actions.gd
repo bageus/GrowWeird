@@ -17,6 +17,8 @@ static func item_value(
 	if state == null:
 		return 0
 	match kind:
+		FERTILIZER:
+			return RecyclingService.fertilizer_yield(rules)
 		CUTTING:
 			var cutting := InventoryService.find_cutting(state.inventory, item_id)
 			if cutting == null or cutting.genome == null:
@@ -107,6 +109,8 @@ static func recycle_yield(kind: StringName, rules: GameRules) -> int:
 
 static func _take_item(state: GameState, kind: StringName, item_id: String) -> bool:
 	match kind:
+		FERTILIZER:
+			return InventoryService.take_fertilizer_amount(state.inventory, StringName(item_id), 1) == 1
 		CUTTING:
 			return InventoryService.take_cutting(state.inventory, item_id) != null
 		SEED:
