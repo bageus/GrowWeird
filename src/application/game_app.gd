@@ -273,6 +273,7 @@ func skip_growth_cycle() -> bool:
 	if not EnergyActions.skip_growth_cycle(state, active_plant()): return false
 	state_changed.emit()
 	return true
+func buy_coins(amount: int) -> int: EconomyService.credit(state, amount); state_changed.emit(); return maxi(0, amount)
 func buy_energy(amount: int) -> int:
 	var credited := EnergyService.credit(state, amount)
 	if credited > 0: state_changed.emit()
@@ -281,7 +282,6 @@ func platform_id() -> StringName: return _platform_runtime().platform_id()
 func cloud_save_available() -> bool: return _platform_runtime().cloud_available()
 func set_gameplay_active(active: bool) -> void: _platform_runtime().set_gameplay_active(active)
 func show_fullscreen_ad() -> void: _platform_runtime().show_fullscreen_ad()
-
 func _platform_runtime() -> Node: return get_node("/root/PlatformRuntime")
 
 func claim_rewarded_ad(now_unix: int) -> bool:
