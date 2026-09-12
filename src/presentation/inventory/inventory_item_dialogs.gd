@@ -137,7 +137,7 @@ func _open_sell() -> void:
 	sell_popup.visible = true
 	recycle_popup.visible = false
 	sell_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
-	CommerceUiStyle.curved_title(sell_title, "SELL · %s" % String(_kind).to_upper())
+	CommerceUiStyle.curved_title(sell_title, "SELL·%s" % String(_kind).to_upper())
 	sell_description.text = _item_description(_kind)
 	TransactionDialogVisual.fit_description(sell_description)
 	_sell_amount = 1
@@ -156,7 +156,7 @@ func _open_recycle() -> void:
 	sell_popup.visible = false
 	recycle_popup.visible = true
 	recycle_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
-	CommerceUiStyle.curved_title(recycle_title, "GRIND · %s" % String(_kind).to_upper())
+	CommerceUiStyle.curved_title(recycle_title, "GRIND·%s" % String(_kind).to_upper())
 	_recycle_amount = 1
 	_refresh_recycle_preview()
 
