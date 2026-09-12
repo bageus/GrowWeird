@@ -1,6 +1,5 @@
 class_name SceneControlsOverlay
 extends Control
-
 signal action_requested(action_id: StringName)
 
 const FILE_PATH := "user://growweird_scene_buttons.json"
@@ -21,6 +20,8 @@ const DEFAULT_POSITIONS := {
 
 var _controls: Dictionary = {}
 var _layout: Dictionary = {}
+var _balance_hint: Label
+var _hint_tween: Tween
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -158,7 +159,7 @@ func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
 		var button := get_node("OffersPanel/Row/" + button_name) as Button
 		button.text = ""
 		button.tooltip_text = "%s · %d energy" % [button_name.trim_suffix("Offer"), EnergyService.OFFER_COST]
-		button.disabled = not has_offer or energy < EnergyService.OFFER_COST
+		button.disabled = not has_offer
 
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
@@ -334,3 +335,15 @@ func _save_layout() -> bool:
 		return false
 	file.store_string(JSON.stringify(payload))
 	return true
+
+func show_insufficient_balance(energy: bool) -> void:
+	_hide_balance_hint(); var value := get_node("EnergyHud/Layers/Value" if energy else "WalletHud/Layers/MoneyLabel") as Label; var plus := get_node("EnergyHud/Layers/AddButton" if energy else "WalletHud/Layers/ShopButton") as Control
+	value.add_theme_color_override(&"font_color", Color("ff493d")); _balance_hint = Label.new(); _balance_hint.text = "NO ENERGY  ➜" if energy else "NO COINS  ➜"; _balance_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE; _balance_hint.z_as_relative = false; _balance_hint.z_index = 1000
+	_balance_hint.size = Vector2(150.0, 38.0); _balance_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; _balance_hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; _balance_hint.add_theme_font_size_override(&"font_size", 18); _balance_hint.add_theme_color_override(&"font_color", Color("ff493d")); _balance_hint.add_theme_color_override(&"font_outline_color", Color.WHITE); _balance_hint.add_theme_constant_override(&"outline_size", 4)
+	add_child(_balance_hint); _balance_hint.global_position = plus.global_position - Vector2(150.0, 5.0); _hint_tween = create_tween(); _hint_tween.tween_interval(3.0); _hint_tween.tween_callback(_hide_balance_hint)
+func _input(event: InputEvent) -> void:
+	if _balance_hint != null and event is InputEventMouseButton and event.pressed: call_deferred("_hide_balance_hint")
+func _hide_balance_hint() -> void:
+	if _hint_tween != null: _hint_tween.kill(); _hint_tween = null
+	if is_instance_valid(_balance_hint): _balance_hint.queue_free()
+	_balance_hint = null; (get_node("EnergyHud/Layers/Value") as Label).add_theme_color_override(&"font_color", Color.WHITE); (get_node("WalletHud/Layers/MoneyLabel") as Label).add_theme_color_override(&"font_color", Color.WHITE)
