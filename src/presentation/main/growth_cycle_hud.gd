@@ -36,8 +36,8 @@ func _build_hud() -> void:
 
 	_stage_label = Label.new()
 	_stage_label.name = "StageLabel"
-	_stage_label.position = Vector2(22.0, 4.0)
-	_stage_label.size = Vector2(88.0, 44.0)
+	_stage_label.position = Vector2(22.0, 0.0)
+	_stage_label.size = Vector2(88.0, 42.0)
 	_stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_stage_label.add_theme_font_size_override(&"font_size", 15)
@@ -48,8 +48,8 @@ func _build_hud() -> void:
 
 	_timer_label = Label.new()
 	_timer_label.name = "TimerLabel"
-	_timer_label.position = Vector2(110.0, 4.0)
-	_timer_label.size = Vector2(74.0, 44.0)
+	_timer_label.position = Vector2(110.0, 0.0)
+	_timer_label.size = Vector2(74.0, 42.0)
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.add_theme_font_size_override(&"font_size", 18)
@@ -59,8 +59,8 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(184.0, 5.0)
-	_skip_button.size = Vector2(110.0, 46.0)
+	_skip_button.position = Vector2(184.0, 1.0)
+	_skip_button.size = Vector2(110.0, 38.0)
 	_skip_button.focus_mode = Control.FOCUS_NONE
 	_skip_button.add_theme_font_size_override(&"font_size", 16)
 	_skip_button.add_theme_color_override(&"font_color", Color.WHITE)
@@ -78,7 +78,7 @@ func _hud_style() -> StyleBoxFlat:
 	style.bg_color = Color("74320f")
 	style.border_color = Color("ffad25")
 	style.set_border_width_all(4)
-	style.set_corner_radius_all(26)
+	style.set_corner_radius_all(21)
 	style.shadow_color = Color(0.20, 0.06, 0.01, 0.55)
 	style.shadow_size = 5
 	style.shadow_offset = Vector2(0.0, 3.0)
@@ -90,7 +90,7 @@ func _button_style(color: Color) -> StyleBoxFlat:
 	style.bg_color = color
 	style.border_color = Color("451086")
 	style.set_border_width_all(3)
-	style.set_corner_radius_all(22)
+	style.set_corner_radius_all(18)
 	style.shadow_color = Color(0.10, 0.02, 0.18, 0.55)
 	style.shadow_size = 3
 	style.shadow_offset = Vector2(0.0, 2.0)
