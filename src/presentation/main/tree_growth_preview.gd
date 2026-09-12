@@ -59,9 +59,9 @@ static func stage_for(plant: PlantState) -> int:
 		return -1
 	var has_left := plant.branch_at(&"left") != null
 	var has_right := plant.branch_at(&"right") != null
-	if not has_left and not has_right: return 13
-	if not has_left: return 11
-	if not has_right: return 12
+	if not has_left and not has_right: return 8
+	if not has_left: return 9
+	if not has_right: return 10
 	var growth_stage := plant.growth_cycle_index
 	if growth_stage == 0:
 		return -1
