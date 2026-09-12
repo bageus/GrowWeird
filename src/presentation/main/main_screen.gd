@@ -257,7 +257,7 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 			if GameApp.active_plant() == null or not GameApp.active_plant().alive: event_label.text = "Select a living plant first."; return
 			if GameApp.registry.get_fertilizer(StringName(item_id)) == null: event_label.text = "This item cannot feed the plant."; return
 			var nutrition_before := GameApp.active_plant().nutrition
-			GameApp.use_inventory_fertilizer(StringName(item_id), kind); var gain := GameApp.active_plant().nutrition - nutrition_before; event_label.text = "Plant fed."; care_gauge.reveal(); FeedGainFeedback.show(self, plant_view, gain)
+			GameApp.use_inventory_fertilizer(StringName(item_id), kind); inventory_hud.invalidate(); _refresh(); var gain := GameApp.active_plant().nutrition - nutrition_before; event_label.text = "Plant fed."; care_gauge.reveal(); FeedGainFeedback.show(self, plant_view, gain)
 		&"cutting":
 			_on_cutting_graft_requested(item_id)
 		&"seed":
