@@ -48,24 +48,19 @@ func refresh() -> void:
 	var app := _app()
 	if not is_node_ready() or app.state == null:
 		return
-	var now_unix: int = int(_platform().now_unix())
-	var remaining := RewardedAdService.remaining_claims(app.state, now_unix)
 	balance_label.text = "Balance: %d coins" % app.state.money
-	ad_button.disabled = _ad_pending or remaining <= 0
-	ad_button.tooltip_text = "Watch ad · +10 coins · %d/4 left" % remaining if remaining > 0 else "Next ad in %s" % _format_duration(RewardedAdService.seconds_until_next(app.state, now_unix))
+	ad_button.disabled = false
+	ad_button.tooltip_text = "Temporary local reward · +10 coins"
 
 func _request_purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["coins"]), int(product["rub"]))
-	status_label.text = "Waiting for payment provider confirmation."
+	var credited := _app().buy_coins(int(product["coins"]))
+	status_label.text = "+%d coins received." % credited
+	refresh()
 
 func _request_rewarded_ad() -> void:
-	if _ad_pending or RewardedAdService.remaining_claims(_app().state, _platform().now_unix()) <= 0:
-		return
-	_ad_pending = true
-	status_label.text = "Opening advertisement..."
-	_platform().ad_closed.connect(_on_ad_closed, CONNECT_ONE_SHOT)
-	_app().show_fullscreen_ad()
+	status_label.text = "+%d coins received." % _app().buy_coins(10)
 	refresh()
 
 func _on_ad_closed(was_shown: bool) -> void:
