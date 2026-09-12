@@ -73,8 +73,7 @@ func _input(event: InputEvent) -> void:
 		_on_cancel_pressed()
 		get_viewport().set_input_as_handled()
 func _refresh() -> void:
-	var pot := GameApp.active_pot()
-	var plant := GameApp.active_plant()
+	var pot := GameApp.active_pot(); var plant := GameApp.active_plant()
 	money_label.text = "%d" % GameApp.state.money
 	scene_controls.set_energy(GameApp.state)
 	progression_panel.set_goal(ProgressionQuery.current_goal(GameApp.state, GameApp.registry))
@@ -83,8 +82,7 @@ func _refresh() -> void:
 	shop_panel.set_shop(GameApp.shop_catalog(), GameApp.species_shop_catalog(), GameApp.next_pot_price(), GameApp.state.money)
 	_refresh_offer()
 	_refresh_actions(pot, plant)
-	if pot != null:
-		pot_visual.set_pot_state(pot)
+	if pot != null: pot_visual.set_pot_state(pot)
 	tree_growth_preview.set_plant(plant)
 	care_gauge.set_gauge(CareGaugeService.evaluate_or_preview(pot, GameApp.active_species_definition()))
 	growth_cycle_hud.set_cycle(plant, GameApp.state.energy)
@@ -113,11 +111,11 @@ func _refresh_actions(pot: PotState, plant: PlantState) -> void:
 	lighting_button.disabled = pot == null
 	lighting_button.text = ""
 	lighting_button.tooltip_text = "Lighting"
-	prune_button.disabled = plant == null or plant.existing_branches().is_empty() or GameApp.state.energy < EnergyService.PRUNE_COST
+	prune_button.disabled = plant == null or plant.existing_branches().is_empty()
 	sell_plant_button.disabled = plant == null
 	sell_plant_button.text = ""
 	sell_plant_button.tooltip_text = "Sell plant + pot · %d" % GameApp.active_plant_sale_value() if plant != null else "Sell plant + pot"
-	spray_button.disabled = pot == null or GameApp.state.energy < EnergyService.WATER_COST
+	spray_button.disabled = pot == null
 	pour_button.disabled = spray_button.disabled
 func _refresh_offer() -> void:
 	var ids := GameApp.current_offer_ids()
@@ -133,16 +131,14 @@ func _refresh_offer() -> void:
 			_set_offer_icon(button, null)
 			button.disabled = true
 	scene_controls.set_offer_energy_actions(not ids.is_empty(), GameApp.state.energy)
-	refresh_offer.disabled = ids.is_empty() or GameApp.state.energy < EnergyService.OFFER_COST
-	skip_offer.disabled = ids.is_empty() or GameApp.state.energy < EnergyService.OFFER_COST
+	refresh_offer.disabled = ids.is_empty()
+	skip_offer.disabled = ids.is_empty()
 	scene_controls.set_offer_cooldown(GameApp.state.fertilizer_offer.seconds_until_offer if ids.is_empty() else 0.0)
 func _set_offer_icon(button: Button, texture: Texture2D) -> void:
 	var existing := button.get_node_or_null("OfferIcon")
-	if existing != null:
-		existing.free()
+	if existing != null: existing.free()
 	button.icon = null
-	if texture == null:
-		return
+	if texture == null: return
 	var icon := TextureRect.new()
 	icon.name = "OfferIcon"
 	button.add_child(icon)
@@ -188,11 +184,13 @@ func _on_water_pressed() -> void:
 	scene_controls.set_water_options_visible(_water_submenu_visible)
 	scene_controls.set_lighting_options_visible(false)
 func _on_spray_pressed() -> void:
+	if GameApp.state.energy < EnergyService.WATER_COST: event_label.text = "No energy."; scene_controls.show_insufficient_balance(true); return
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
 	event_label.text = "Sprayed plant." if GameApp.water_active(true) else "Nothing to water."; care_gauge.reveal()
 func _on_pour_pressed() -> void:
+	if GameApp.state.energy < EnergyService.WATER_COST: event_label.text = "No energy."; scene_controls.show_insufficient_balance(true); return
 	_water_submenu_visible = false
 	scene_controls.set_water_options_visible(false)
 	_set_cancel_visibility()
@@ -205,8 +203,7 @@ func _on_light_pressed() -> void:
 	scene_controls.set_lighting_options_visible(_lighting_submenu_visible)
 	scene_controls.set_water_options_visible(false)
 func _on_environment_preset(preset: StringName) -> void:
-	if GameApp.active_pot() == null:
-		return
+	if GameApp.active_pot() == null: return
 	var light_mode := PotState.LightMode.DIRECT
 	var window_open := false
 	match preset:
@@ -224,7 +221,7 @@ func _on_prune_pressed() -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE: _on_cancel_pressed(); return
 	tree_growth_preview.clear_testing_preview(); var plant := GameApp.active_plant()
 	if plant == null or plant.existing_branches().is_empty(): event_label.text = "There is nothing to prune."; return
-	if GameApp.state.energy < EnergyService.PRUNE_COST: event_label.text = "Pruning requires 10 energy."; return
+	if GameApp.state.energy < EnergyService.PRUNE_COST: event_label.text = "No energy for pruning."; scene_controls.show_insufficient_balance(true); return
 	_pending_item_id = ""; _pending_plant_kind = &""
 	_water_submenu_visible = false; _lighting_submenu_visible = false; scene_controls.set_water_options_visible(false); scene_controls.set_lighting_options_visible(false)
 	_set_interaction_mode(PlantView.MODE_PRUNE)
@@ -260,7 +257,7 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 			if GameApp.active_plant() == null or not GameApp.active_plant().alive:
 				event_label.text = "Select a living plant first."
 				return
-			GameApp.use_inventory_fertilizer(StringName(item_id), kind); event_label.text = "Item used on current plant."
+			GameApp.use_inventory_fertilizer(StringName(item_id), kind); event_label.text = "Item used on current plant."; care_gauge.reveal()
 		&"cutting":
 			_on_cutting_graft_requested(item_id)
 		&"seed":
@@ -315,6 +312,7 @@ func _on_reset_layout_pressed() -> void:
 	scene_controls.reset_layout()
 	event_label.text = "HUD layout reset. Press Save HUD layout to keep it."
 func _on_shop_item_requested(item: Dictionary) -> void:
+	if GameApp.state.money < int(item.get("price", 0)): event_label.text = "Not enough coins."; scene_controls.show_insufficient_balance(false); return
 	var success := GameApp.buy_shop_item(item)
 	event_label.text = "%s purchased." % String(item.get("name", "Item")) if success else "Item is unavailable or unaffordable."
 	pot_selector.invalidate(); shop_panel.invalidate()
@@ -323,18 +321,19 @@ func _on_offer_two_pressed() -> void: _choose_offer(1)
 func _on_offer_three_pressed() -> void: _choose_offer(2)
 func _choose_offer(index: int) -> void:
 	var ids := GameApp.current_offer_ids()
-	if index >= ids.size():
-		return
+	if index >= ids.size(): return
 	event_label.text = "Fertilizer added to inventory." if GameApp.choose_fertilizer_offer(ids[index]) else "Could not take fertilizer."
 func _on_refresh_offer_pressed() -> void:
+	if GameApp.state.energy < EnergyService.OFFER_COST: event_label.text = "No energy."; scene_controls.show_insufficient_balance(true); return
 	event_label.text = "Fertilizers refreshed." if GameApp.refresh_fertilizer_offer() else "Cannot refresh fertilizers."
 func _on_skip_offer_pressed() -> void:
+	if GameApp.state.energy < EnergyService.OFFER_COST: event_label.text = "No energy."; scene_controls.show_insufficient_balance(true); return
 	event_label.text = "Fertilizers skipped." if GameApp.skip_fertilizer_offer() else "Cannot skip fertilizers."
 func _on_growth_skip_pressed() -> void:
+	if GameApp.state.energy < EnergyService.cycle_skip_cost(GameApp.active_plant()): event_label.text = "No energy."; scene_controls.show_insufficient_balance(true); return
 	event_label.text = "Growth cycle completed." if GameApp.skip_growth_cycle() else "Not enough energy or branches are still regrowing."
 func _on_mutations_resolved(events: Array[Dictionary]) -> void:
-	if events.is_empty():
-		return
+	if events.is_empty(): return
 	var texts: Array[String] = []
 	for event in events:
 		texts.append("%s changed: %s" % [event["branch_id"], _pretty_id(String(event["trait_id"]))])
