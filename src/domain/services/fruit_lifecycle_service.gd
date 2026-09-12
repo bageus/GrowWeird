@@ -19,7 +19,7 @@ static func harvest(
 	if plant == null or not plant.alive:
 		return null
 	var branch := plant.branch_at(slot)
-	if branch == null or branch.fruit_growth == null or not branch.fruit_growth.is_ready():
+	if branch == null or branch.fruit_growth == null:
 		return null
 	var fruit := PropagationService.create_fruit(plant, slot, item_id)
 	if fruit == null:
