@@ -47,10 +47,6 @@ static func _advance_pot(
 	if plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE:
 		_convert_unharvested_to_seeds(game_state, plant)
 		return
-	var comfort := ComfortEvaluator.evaluate(pot, species)
-	var growth_factor := clampf(float(comfort.get("overall", 0.0)), 0.0, 1.0)
-	if growth_factor <= 0.0:
-		return
 	for branch in plant.existing_branches():
 		if branch.fruit_cycle_eligible > plant.fruit_cycle_index:
 			continue
