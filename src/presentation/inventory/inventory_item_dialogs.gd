@@ -19,6 +19,7 @@ signal closed
 @onready var sell_minus: Button = $SellPopup/QuantityControl/QuantityMinus
 @onready var sell_plus: Button = $SellPopup/QuantityControl/QuantityPlus
 @onready var recycle_popup: Control = $RecyclePopup
+@onready var recycle_title: Label = $RecyclePopup/RecycleName
 @onready var recycle_preview: TextureRect = $RecyclePopup/RecyclePreview
 @onready var recycle_description: Label = $RecyclePopup/RecycleDescription
 @onready var recycle_quantity: Label = $RecyclePopup/QuantityControl/QuantityLabel
@@ -151,8 +152,13 @@ func _item_description(kind: StringName) -> String:
 		_: return "An item stored in the inventory."
 
 func _open_recycle() -> void:
-	actions.visible = false; sell_popup.visible = false; recycle_popup.visible = true
-	recycle_preview.texture = InventoryItemArt.texture_for(_kind, _item_id); _recycle_amount = 1; _refresh_recycle_preview()
+	actions.visible = false
+	sell_popup.visible = false
+	recycle_popup.visible = true
+	recycle_preview.texture = InventoryItemArt.texture_for(_kind, _item_id)
+	CommerceUiStyle.curved_title(recycle_title, "GRIND · %s" % String(_kind).to_upper())
+	_recycle_amount = 1
+	_refresh_recycle_preview()
 
 func _change_recycle_quantity(delta: int) -> void:
 	_recycle_amount = clampi(_recycle_amount + delta, 1, _count); _refresh_recycle_preview()
@@ -172,8 +178,9 @@ func _refresh_sell_preview() -> void:
 
 func _refresh_recycle_preview() -> void:
 	recycle_quantity.text = "%d / %d" % [_recycle_amount, _count]
-	recycle_description.text = "Grind %s.\nOutput: Recycled Fertilizer ×%d" % [_title, _recycle_yield * _recycle_amount]; TransactionDialogVisual.fit_description(recycle_description)
-	recycle_cost.text = "%d ENERGY" % (ResourceActions.RECYCLE_ENERGY_COST * _recycle_amount)
+	recycle_description.text = "%s\nOutput: Recycled Fertilizer ×%d" % [_item_description(_kind), _recycle_yield * _recycle_amount]
+	TransactionDialogVisual.fit_description(recycle_description)
+	recycle_cost.text = str(ResourceActions.RECYCLE_ENERGY_COST * _recycle_amount)
 	var can_change := _count > 1; recycle_minus.visible = can_change; recycle_plus.visible = can_change; recycle_minus.disabled = not can_change or _recycle_amount <= 1; recycle_plus.disabled = not can_change or _recycle_amount >= _count
 
 func _confirm_sell() -> void:
