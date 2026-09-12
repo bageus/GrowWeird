@@ -61,7 +61,7 @@ static func _advance_pot(
 static func _consume_growth_needs(
 	pot: PotState,
 	plant: PlantState,
-	species: PlantSpeciesDefinition,
+	_species: PlantSpeciesDefinition,
 	delta_seconds: float
 ) -> void:
 	var moisture_stage_before := pot.soil_moisture_stage()
