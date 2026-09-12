@@ -25,6 +25,10 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed and index >= 0 and _should_draw_index(index):
 		fruit_selected.emit(BranchState.VALID_SLOTS[index]); accept_event()
 
+func _store_stage_points(points: Array) -> void:
+	super(points)
+	save_layout()
+
 func save_layout() -> bool:
 	var directory := DirAccess.open("res://")
 	if directory != null:

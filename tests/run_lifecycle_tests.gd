@@ -216,7 +216,7 @@ func _test_fruit_cycle_restarts_after_last_harvest() -> void:
 	_expect(pot.plant.fruit_cycle_index == 0 and pot.plant.branch_at(&"left").fruit_growth == null, "fruit cycle: first harvested branch must wait while other fruit remains")
 	_expect(FruitLifecycleService.harvest(pot.plant, &"center", "fruit-center") != null, "fruit cycle: center fruit should harvest")
 	_expect(FruitLifecycleService.harvest(pot.plant, &"right", "fruit-right") != null, "fruit cycle: last fruit should harvest")
-	_expect(pot.plant.fruit_cycle_index == 1, "fruit cycle: last harvested fruit must restart the shared cycle")
+	_expect(pot.plant.fruit_cycle_index == 0, "fruit cycle: harvesting waits for Restart before opening the next flower generation")
 	FruitLifecycleService.advance(state, 1.0, registry)
 	_expect(pot.plant.growth_cycle_index == GrowthCycleService.LAST_CYCLE, "fruit cycle: harvesting the last fruit must start branch recovery")
 	for branch in pot.plant.existing_branches(): _expect(branch.fruit_growth == null, "fruit cycle: recovery must not immediately create new fruit")

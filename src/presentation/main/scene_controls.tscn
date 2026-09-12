@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://src/presentation/main/wallet_topup_panel.tscn" id="10_topup"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/energy_topup_panel.tscn" id="11_energy"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/energy_hud.tscn" id="12_energy_hud"]
+[ext_resource type="Script" path="res://src/presentation/main/fertilizer_offer_panel.gd" id="13_offer_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
@@ -163,7 +164,7 @@ custom_minimum_size = Vector2(520, 112)
 offset_right = 520.0
 offset_bottom = 112.0
 theme_override_styles/panel = SubResource("StyleBox_hud")
-script = ExtResource("3_drag")
+script = ExtResource("13_offer_panel")
 layout_id = &"fertilizers"
 drag_handle_height = 112.0
 
@@ -183,10 +184,10 @@ mouse_filter = 1
 
 [node name="PotCircle" type="Panel" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = 68.0
-offset_top = 8.0
-offset_right = 172.0
-offset_bottom = 112.0
+offset_left = 76.0
+offset_top = 16.0
+offset_right = 164.0
+offset_bottom = 104.0
 mouse_filter = 2
 
 [node name="PotHover" type="TextureRect" parent="PotSelector/Layers"]
@@ -210,10 +211,10 @@ text = "‹"
 
 [node name="PotThumbnail" type="TextureRect" parent="PotSelector/Layers"]
 layout_mode = 0
-offset_left = 85.0
-offset_top = 29.0
-offset_right = 155.0
-offset_bottom = 95.0
+offset_left = 90.0
+offset_top = 34.0
+offset_right = 150.0
+offset_bottom = 90.0
 mouse_filter = 2
 texture = ExtResource("8_pot")
 expand_mode = 1

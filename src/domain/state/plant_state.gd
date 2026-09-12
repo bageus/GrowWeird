@@ -60,8 +60,6 @@ func cut_branch(slot: StringName) -> BranchState:
 	branches[String(slot)] = null
 	set_regrowth_progress(slot, 0.0)
 	regrowth_fruit_cycles[String(slot)] = fruit_cycle_index + 1
-	if removed_last_active_fruit(branch):
-		fruit_cycle_index += 1
 	return branch
 
 func removed_last_active_fruit(removed: BranchState) -> bool:

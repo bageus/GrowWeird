@@ -13,7 +13,7 @@ const DEFAULT_POSITIONS := {
 	"tasks": Vector2(0.84, 0.22),
 	"wallet": Vector2(0.72, 0.03),
 	"energy": Vector2(0.59, 0.03),
-	"pots": Vector2(0.02, 0.82),
+	"pots": Vector2(0.38, 0.80),
 	"fertilizers": Vector2(0.18, 0.82),
 	"inventory": Vector2(0.77, 0.50),
 }

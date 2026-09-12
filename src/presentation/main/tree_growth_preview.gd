@@ -199,7 +199,7 @@ func _branch_side_at(point: Vector2) -> StringName:
 	return alternate if _can_prune_side(alternate) else &""
 func _can_prune_side(side: StringName) -> bool:
 	if _testing_stage >= 0: return stage in ([6, 7, 12] if side == &"left" else [7, 11])
-	return _plant != null and _plant.branch_at(side) != null
+	return _plant != null and _plant.growth_cycle_index >= 8 and _plant.branch_at(side) != null
 
 func _on_fruit_selected(slot: StringName) -> void:
 	var app := get_node_or_null("/root/GameApp")
