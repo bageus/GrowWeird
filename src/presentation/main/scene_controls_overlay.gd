@@ -154,7 +154,7 @@ func set_energy(state: GameState) -> void:
 	next.visible = state.energy < capacity
 	(get_node("EnergyHud/Layers/Next/Timer") as Label).text = "Next energy in %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
 
-func set_offer_energy_actions(has_offer: bool, energy: int) -> void:
+func set_offer_energy_actions(has_offer: bool, _energy: int) -> void:
 	for button_name in ["RefreshOffer", "SkipOffer"]:
 		var button := get_node("OffersPanel/Row/" + button_name) as Button
 		button.text = ""
