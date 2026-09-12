@@ -1,25 +1,27 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene format=3 uid="uid://drlnn3ir1nrsr"]
 
-[ext_resource type="Script" path="res://src/presentation/main/main_screen.gd" id="1_main"]
-[ext_resource type="Script" path="res://src/presentation/environment/window_view.gd" id="2_window"]
-[ext_resource type="Script" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
-[ext_resource type="Script" path="res://src/presentation/progression/progression_panel.gd" id="5_progress"]
-[ext_resource type="Texture2D" path="res://assets/window/window_01.png" id="6_window_art"]
+[ext_resource type="Script" uid="uid://sx87tn3odso7" path="res://src/presentation/main/main_screen.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://btyphr5sxpngr" path="res://src/presentation/environment/window_view.gd" id="2_window"]
+[ext_resource type="Script" uid="uid://c8ym78cmpdwl1" path="res://src/presentation/plant/plant_view.gd" id="3_plant"]
+[ext_resource type="Script" uid="uid://hj65r26efeja" path="res://src/presentation/progression/progression_panel.gd" id="5_progress"]
+[ext_resource type="Texture2D" uid="uid://dd4tsscwgtsgc" path="res://assets/window/window_01.png" id="6_window_art"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/scene_controls.tscn" id="7_scene_controls"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/pot_visual.tscn" id="8_pot_visual"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/tree_growth_preview.tscn" id="9_tree_preview"]
-[ext_resource type="Script" path="res://src/presentation/main/care_gauge.gd" id="10_care_gauge"]
-[ext_resource type="Script" path="res://src/presentation/main/leaf_layout_controls.gd" id="11_leaf_controls"]
+[ext_resource type="Script" uid="uid://48flg0b7xpax" path="res://src/presentation/main/care_gauge.gd" id="10_care_gauge"]
+[ext_resource type="Script" uid="uid://c41k3tm7xuigs" path="res://src/presentation/main/leaf_layout_controls.gd" id="11_leaf_controls"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/growth_cycle_hud.tscn" id="12_growth_hud"]
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" unique_id=1739373092]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Shell" type="MarginContainer" parent="."]
+[node name="Shell" type="MarginContainer" parent="." unique_id=298774367]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,250 +30,262 @@ offset_left = 12.0
 offset_top = 12.0
 offset_right = -12.0
 offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Layout" type="HBoxContainer" parent="Shell"]
+[node name="Layout" type="HBoxContainer" parent="Shell" unique_id=1648825858]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="LeftSidebar" type="PanelContainer" parent="Shell/Layout"]
+[node name="LeftSidebar" type="PanelContainer" parent="Shell/Layout" unique_id=1552939274]
 custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 
-[node name="LeftScroll" type="ScrollContainer" parent="Shell/Layout/LeftSidebar"]
+[node name="LeftScroll" type="ScrollContainer" parent="Shell/Layout/LeftSidebar" unique_id=142921815]
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="LeftLayout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll"]
+[node name="LeftLayout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll" unique_id=1200939411]
 custom_minimum_size = Vector2(202, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=810126373]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "GROW WEIRD"
 
-[node name="PlantNameLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="PlantNameLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1916408573]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Plant"
 autowrap_mode = 2
 
-[node name="StatusLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="StatusLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1606488774]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Loading..."
 autowrap_mode = 2
 
-[node name="EventLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="EventLabel" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1823423749]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Grow. Graft. Mutate."
 autowrap_mode = 2
 
-[node name="ProgressionPanel" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="ProgressionPanel" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1554643016]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("5_progress")
 
-[node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="TreeGrowthControls" type="PanelContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1423071347]
 custom_minimum_size = Vector2(0, 460)
 layout_mode = 2
 
-[node name="Layout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls"]
+[node name="Layout" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls" unique_id=882386098]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+[node name="Title" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1297080300]
 layout_mode = 2
 text = "Tree test · preview only"
 
-[node name="Stage1Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+[node name="Stage1Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=581833240]
 layout_mode = 2
 text = "Growth 1"
-[node name="Stage2Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage2Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1416177030]
 layout_mode = 2
 text = "Growth 2"
-[node name="Stage3Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage3Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=248576719]
 layout_mode = 2
 text = "Growth 3"
-[node name="Stage4Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage4Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1210914404]
 layout_mode = 2
 text = "Growth 4"
-[node name="Stage5Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage5Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=2143735640]
 layout_mode = 2
 text = "5 · Young tree / cutting start"
-[node name="Stage6Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage6Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1293223848]
 layout_mode = 2
 text = "6 · Full tree"
-[node name="Stage7Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage7Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=434107716]
 layout_mode = 2
 text = "7 · Full + left branch"
-[node name="Stage8Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage8Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1472104007]
 layout_mode = 2
 text = "8 · Full + both branches"
-[node name="Stage9Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage9Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=188658859]
 layout_mode = 2
 text = "9 · Both branches cut"
-[node name="Stage10Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage10Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1032776489]
 layout_mode = 2
 text = "10 · Left cut / right available"
-[node name="Stage11Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage11Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=510605327]
 layout_mode = 2
 text = "11 · Right cut / left available"
-[node name="Stage12Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage12Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=511110290]
 layout_mode = 2
 text = "12 · Right branch only"
-[node name="Stage13Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage13Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=284343745]
 layout_mode = 2
 text = "13 · Left cut / right not grown"
-[node name="Stage14Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout"]
+
+[node name="Stage14Button" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/TreeGrowthControls/Layout" unique_id=1042459069]
 layout_mode = 2
 text = "14 · Right cut / left not grown"
 
-[node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="SaveLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=320195455]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Save HUD layout"
 
-[node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="ResetLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=755959162]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Reset HUD layout"
 
-[node name="SaveAssetsLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="SaveAssetsLayoutButton" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1109127747]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Save assets layout"
 
-[node name="LeafLayoutControls" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="LeafLayoutControls" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1935358863]
 layout_mode = 2
 theme_override_constants/separation = 3
 script = ExtResource("11_leaf_controls")
 
-[node name="Toggle" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="Toggle" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=1644010565]
 layout_mode = 2
+tooltip_text = "Tree 05–14: click to add/select, drag to move, wheel to scale, Shift+wheel to rotate, right click to delete"
 toggle_mode = true
 text = "Leaf points: OFF"
-tooltip_text = "Tree 05–14: click to add/select, drag to move, wheel to scale, Shift+wheel to rotate, right click to delete"
 
-[node name="ScaleValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="ScaleValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=1420185520]
 layout_mode = 2
 text = "Random scale: 1%"
 
-[node name="ScaleVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="ScaleVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=329679832]
 layout_mode = 2
 min_value = 1.0
 max_value = 15.0
-step = 1.0
 value = 1.0
 
-[node name="DirectionValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="DirectionValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=1491501111]
 layout_mode = 2
 text = "Direction error: 0.5%"
 
-[node name="DirectionVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="DirectionVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=647678340]
 layout_mode = 2
 min_value = 0.5
 max_value = 7.0
 step = 0.5
 value = 0.5
 
-[node name="Save" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls"]
+[node name="Save" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/LeafLayoutControls" unique_id=156993864]
 layout_mode = 2
 text = "Save leaf layout"
 
-[node name="FlowerLayoutControls" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout"]
+[node name="FlowerLayoutControls" type="VBoxContainer" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout" unique_id=1417011763]
 layout_mode = 2
 theme_override_constants/separation = 3
 script = ExtResource("11_leaf_controls")
 editor_node_name = &"FlowerLayout"
 item_label = "Flower"
 
-[node name="Toggle" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="Toggle" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=1893574554]
 layout_mode = 2
+tooltip_text = "Tree 05–14: click to add/select, drag to move, wheel to scale, Shift+wheel to rotate, right click to delete"
 toggle_mode = true
 text = "Flower points: OFF"
-tooltip_text = "Tree 05–14: click to add/select, drag to move, wheel to scale, Shift+wheel to rotate, right click to delete"
 
-[node name="ScaleValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="ScaleValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=330594521]
 layout_mode = 2
 text = "Random scale: 1%"
 
-[node name="ScaleVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="ScaleVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=630051681]
 layout_mode = 2
 min_value = 1.0
 max_value = 15.0
-step = 1.0
 value = 1.0
 
-[node name="DirectionValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="DirectionValue" type="Label" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=228854926]
 layout_mode = 2
 text = "Direction error: 0.5%"
 
-[node name="DirectionVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="DirectionVariance" type="HSlider" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=848629602]
 layout_mode = 2
 min_value = 0.5
 max_value = 7.0
 step = 0.5
 value = 0.5
 
-[node name="Save" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls"]
+[node name="Save" type="Button" parent="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/FlowerLayoutControls" unique_id=387743261]
 layout_mode = 2
 text = "Save flower layout"
 
-[node name="ScenePanel" type="PanelContainer" parent="Shell/Layout"]
+[node name="ScenePanel" type="PanelContainer" parent="Shell/Layout" unique_id=233161721]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="SceneRoot" type="Control" parent="Shell/Layout/ScenePanel"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+[node name="SceneRoot" type="Control" parent="Shell/Layout/ScenePanel" unique_id=1363621923]
 clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="WindowView" type="TextureRect" parent="Shell/Layout/ScenePanel/SceneRoot"]
+[node name="WindowView" type="TextureRect" parent="Shell/Layout/ScenePanel/SceneRoot" unique_id=91264410]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("6_window_art")
 expand_mode = 1
 stretch_mode = 5
 script = ExtResource("2_window")
 
-[node name="World" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
+[node name="World" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot" unique_id=933900993]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
-[node name="PotVisual" parent="Shell/Layout/ScenePanel/SceneRoot/World" instance=ExtResource("8_pot_visual")]
+[node name="PotVisual" parent="Shell/Layout/ScenePanel/SceneRoot/World" unique_id=1087375461 instance=ExtResource("8_pot_visual")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-anchor_bottom = 1.0
 offset_left = 120.0
 offset_top = 170.0
 offset_right = -120.0
 offset_bottom = -20.0
+grow_horizontal = 2
 
-[node name="TreeGrowthPreview" parent="Shell/Layout/ScenePanel/SceneRoot/World" instance=ExtResource("9_tree_preview")]
+[node name="TreeGrowthPreview" parent="Shell/Layout/ScenePanel/SceneRoot/World" unique_id=1891517271 instance=ExtResource("9_tree_preview")]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
 z_index = 3
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World"]
+[node name="PlantView" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot/World" unique_id=1985201075]
 unique_name_in_owner = true
 modulate = Color(1, 1, 1, 0)
 layout_mode = 1
@@ -282,10 +296,13 @@ offset_left = 30.0
 offset_top = 20.0
 offset_right = -30.0
 offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("3_plant")
 
-[node name="CareGauge" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot"]
+[node name="CareGauge" type="Control" parent="Shell/Layout/ScenePanel/SceneRoot" unique_id=1757652671]
 unique_name_in_owner = true
+z_index = 20
 custom_minimum_size = Vector2(90, 210)
 layout_mode = 1
 anchor_left = 0.24
@@ -294,25 +311,27 @@ anchor_right = 0.24
 anchor_bottom = 0.32
 offset_right = 90.0
 offset_bottom = 210.0
-z_index = 20
 mouse_filter = 2
 script = ExtResource("10_care_gauge")
 
-[node name="GrowthCycleHud" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("12_growth_hud")]
+[node name="GrowthCycleHud" parent="Shell/Layout/ScenePanel/SceneRoot" unique_id=1242161870 instance=ExtResource("12_growth_hud")]
 unique_name_in_owner = true
+z_index = 21
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -150.0
 offset_top = 68.0
 offset_right = 150.0
 offset_bottom = 110.0
-z_index = 21
+grow_horizontal = 2
 
-[node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" instance=ExtResource("7_scene_controls")]
+[node name="SceneControls" parent="Shell/Layout/ScenePanel/SceneRoot" unique_id=216445670 instance=ExtResource("7_scene_controls")]
 unique_name_in_owner = true
+grow_horizontal = 2
+grow_vertical = 2
 
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveLayoutButton" to="." method="_on_save_layout_pressed"]
-[connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveAssetsLayoutButton" to="." method="_on_save_assets_layout_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/ResetLayoutButton" to="." method="_on_reset_layout_pressed"]
+[connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveAssetsLayoutButton" to="." method="_on_save_assets_layout_pressed"]

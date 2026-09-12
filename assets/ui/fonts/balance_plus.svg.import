@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://pb3bb375qiqp"
-path="res://.godot/imported/balance_plus.svg-26f2872169c4e2b0bc767c7b88afb524.ctex"
+uid="uid://rakfq0wuwvib"
+path="res://.godot/imported/balance_plus.svg-dfdda1c1dc7faa788f85a829154d1381.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/balance_plus.svg"
-dest_files=["res://.godot/imported/balance_plus.svg-26f2872169c4e2b0bc767c7b88afb524.ctex"]
+source_file="res://assets/ui/fonts/balance_plus.svg"
+dest_files=["res://.godot/imported/balance_plus.svg-dfdda1c1dc7faa788f85a829154d1381.ctex"]
 
 [params]
 

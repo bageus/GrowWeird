@@ -30,8 +30,8 @@ window/stretch/mode="canvas_items"
 
 [gui]
 
-theme/custom_font="res://assets/ui/fonts/fredoka_black.tres"
 theme/default_font_multichannel_signed_distance_field=true
+theme/custom_font="res://assets/ui/fonts/fredoka_black.tres"
 
 [physics]
 
