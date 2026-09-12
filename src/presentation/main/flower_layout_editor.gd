@@ -14,7 +14,7 @@ func set_display(kind: DisplayKind, slots: Array[StringName] = []) -> void:
 	queue_redraw()
 
 func _should_draw_index(index: int) -> bool:
-	return index < BranchState.VALID_SLOTS.size() and active_slots.has(BranchState.VALID_SLOTS[index])
+	return enabled or (index < BranchState.VALID_SLOTS.size() and active_slots.has(BranchState.VALID_SLOTS[index]))
 
 func _gui_input(event: InputEvent) -> void:
 	if enabled:
