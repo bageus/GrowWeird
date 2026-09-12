@@ -283,11 +283,11 @@ func _on_inventory_sell_requested(kind: StringName, item_id: String, quantity: i
 	var amount := GameApp.sell_inventory_items(kind, item_id, quantity)
 	event_label.text = "Sold for $%d." % amount if amount > 0 else "Could not sell item."
 func _on_inventory_recycle_requested(kind: StringName, item_id: String, quantity: int) -> void:
+	if GameApp.state.energy < ResourceActions.RECYCLE_ENERGY_COST * maxi(1, quantity): event_label.text = "Not enough energy to grind."; scene_controls.show_insufficient_balance(true); return
 	var total := 0
 	for _index in range(maxi(1, quantity)):
 		var amount := GameApp.recycle_inventory_item(kind, item_id)
-		if amount <= 0:
-			break
+		if amount <= 0: break
 		total += amount
 	event_label.text = "Ground into Recycled Fertilizer ×%d." % total if total > 0 else "Could not grind item."
 func _handle_pot_click(pot_id: String) -> void: GameApp.switch_pot(pot_id); care_gauge.reveal()

@@ -18,11 +18,16 @@ const POT_TEXTURES := [
 var _state: GameState
 var _planting_target := false
 var _last_signature := ""
+var _index_hud: PanelContainer
+var _index_label: Label
+var _index_tween: Tween
+var _pot_hovered := false
 
 func _ready() -> void:
 	super()
 	previous_button.button_down.connect(_select_offset.bind(-1))
 	next_button.button_down.connect(_select_offset.bind(1))
+	_build_index_hud(); mouse_entered.connect(_on_pot_hover.bind(true)); mouse_exited.connect(_on_pot_hover.bind(false))
 
 func set_state(state: GameState, planting_target: bool) -> void:
 	_state = state
@@ -64,6 +69,7 @@ func _select_offset(offset: int) -> void:
 			break
 	var next: PotState = pots[posmod(current_index + offset, pots.size())]
 	pot_selected.emit(next.pot_id)
+	call_deferred("_show_index_hud")
 
 func _selectable_pots() -> Array[PotState]:
 	var result: Array[PotState] = []
@@ -91,3 +97,22 @@ func _signature(state: GameState, planting_target: bool) -> String:
 
 func _pot_index(pot_id: String) -> int:
 	return PotVisual.index_for_id(pot_id, POT_TEXTURES.size())
+
+func _build_index_hud() -> void:
+	_index_hud = PanelContainer.new(); _index_hud.name = "PotIndexHud"; _index_hud.position = Vector2(70.0, 112.0); _index_hud.size = Vector2(100.0, 28.0); _index_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE; _index_hud.modulate.a = 0.0; _index_hud.visible = false; add_child(_index_hud)
+	_index_label = Label.new(); _index_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; _index_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; _index_label.add_theme_font_size_override(&"font_size", 15); _index_hud.add_child(_index_label); UiAtlas.configure_warm_timer_hud(_index_hud, _index_label)
+
+func _on_pot_hover(hovered: bool) -> void:
+	_pot_hovered = hovered
+	if hovered: _show_index_hud()
+	else: _schedule_index_fade()
+
+func _show_index_hud() -> void:
+	var pots := _selectable_pots(); var active := _active_pot(); var index := pots.find(active)
+	_index_label.text = "%d / %d" % [maxi(0, index) + 1, pots.size()]; _index_hud.visible = not pots.is_empty(); _index_hud.modulate.a = 1.0
+	if _index_tween != null: _index_tween.kill()
+	if not _pot_hovered: _schedule_index_fade()
+
+func _schedule_index_fade() -> void:
+	if _index_tween != null: _index_tween.kill()
+	_index_tween = create_tween(); _index_tween.tween_interval(0.7); _index_tween.tween_property(_index_hud, "modulate:a", 0.0, 0.45); _index_tween.tween_callback(func() -> void: _index_hud.visible = false)

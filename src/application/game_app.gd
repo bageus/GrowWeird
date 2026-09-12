@@ -220,10 +220,10 @@ func inventory_item_recycle_yield(kind: StringName) -> int:
 	return ResourceActions.recycle_yield(kind, rules)
 
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
+	if state.energy < ResourceActions.RECYCLE_ENERGY_COST: return 0
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
 	if amount > 0:
-		_progress(&"resource_processed")
-		state_changed.emit()
+		EnergyService.spend(state, ResourceActions.RECYCLE_ENERGY_COST); _progress(&"resource_processed"); state_changed.emit()
 	return amount
 
 func shop_catalog() -> Array[Dictionary]:
