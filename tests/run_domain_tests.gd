@@ -80,10 +80,10 @@ func _test_growth_cycle_consumes_water_and_food() -> void:
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
 	var growth_before := pot.plant.growth_ratio
-	PlantSimulationService.advance(state, 10.0, registry, GameRules.new())
+	PlantSimulationService.advance(state, 60.0, registry, GameRules.new())
 	_expect(pot.plant.growth_ratio > growth_before, "growth needs: planted seed must start its growth cycle")
-	_expect(pot.soil_moisture < 0.8, "growth needs: soil must dry while the growth pointer moves")
-	_expect(pot.plant.nutrition < 0.8, "growth needs: nutrition must decrease while the growth pointer moves")
+	_expect(is_equal_approx(pot.soil_moisture, 0.75), "growth needs: soil must lose one quarter-cell per minute")
+	_expect(is_equal_approx(pot.plant.nutrition, 0.75), "growth needs: nutrition must lose one quarter-cell per minute")
 
 func _test_independent_pots_and_starter_seed() -> void:
 	var state := NewGameFactory.create(GameRules.new())
