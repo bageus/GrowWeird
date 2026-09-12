@@ -31,20 +31,18 @@ func close() -> void: visible = false
 func refresh() -> void:
 	if not is_node_ready() or _app().state == null: return
 	%EnergyLabel.text = "Energy %d / %d · next +1: %s" % [_app().state.energy, EnergyService.capacity(_app().state), _timer()]
-	%AdButton.disabled = _ad_pending or _app().state.energy >= EnergyService.capacity(_app().state)
-	%AdButton.tooltip_text = "Watch ad · +5 energy"
+	%AdButton.disabled = false
+	%AdButton.tooltip_text = "Temporary local reward · +5 energy"
 
 func _purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["energy"]), int(product["rub"]))
-	%StatusLabel.text = "Waiting for payment provider confirmation."
+	var credited := _app().buy_energy(int(product["energy"]))
+	%StatusLabel.text = "+%d energy received." % credited
+	refresh()
 
 func _request_rewarded_ad() -> void:
-	if _ad_pending or %AdButton.disabled: return
-	_ad_pending = true
-	%StatusLabel.text = "Opening advertisement..."
-	_platform().ad_closed.connect(_on_ad_closed, CONNECT_ONE_SHOT)
-	_app().show_fullscreen_ad()
+	%StatusLabel.text = "+%d energy received." % _app().buy_energy(5)
 	refresh()
 
 func _on_ad_closed(was_shown: bool) -> void:
