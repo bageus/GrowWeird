@@ -155,7 +155,7 @@ static func configure_transaction_total(container: Control, energy := false) -> 
 	var old_icon := container.get_node_or_null("TotalCoinIcon")
 	if old_icon != null:
 		old_icon.free()
-	var icon := TextureRect.new() if energy else CoinFace.new()
+	var icon: TextureRect = TextureRect.new() if energy else CoinFace.new()
 	icon.name = "TotalEnergyIcon" if energy else "TotalCoinIcon"
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if energy:
