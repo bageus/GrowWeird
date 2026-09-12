@@ -222,14 +222,9 @@ func _on_environment_preset(preset: StringName) -> void:
 	event_label.text = "Environment: %s." % _pretty_id(String(preset)); care_gauge.reveal()
 func _on_prune_pressed() -> void:
 	if _interaction_mode == PlantView.MODE_PRUNE: _on_cancel_pressed(); return
-	tree_growth_preview.clear_testing_preview()
-	var plant := GameApp.active_plant()
-	if plant == null or plant.existing_branches().is_empty():
-		event_label.text = "There is nothing to prune."
-		return
-	if GameApp.state.energy < EnergyService.PRUNE_COST:
-		event_label.text = "Pruning requires 10 energy."
-		return
+	tree_growth_preview.clear_testing_preview(); var plant := GameApp.active_plant()
+	if plant == null or plant.existing_branches().is_empty(): event_label.text = "There is nothing to prune."; return
+	if GameApp.state.energy < EnergyService.PRUNE_COST: event_label.text = "Pruning requires 10 energy."; return
 	_pending_item_id = ""; _pending_plant_kind = &""
 	_water_submenu_visible = false; _lighting_submenu_visible = false; scene_controls.set_water_options_visible(false); scene_controls.set_lighting_options_visible(false)
 	_set_interaction_mode(PlantView.MODE_PRUNE)
