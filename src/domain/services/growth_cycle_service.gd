@@ -24,6 +24,8 @@ static func advance(plant: PlantState, delta_seconds: float, _care_factor: float
 		if plant.growth_cycle_index >= LAST_CYCLE:
 			_restore_next_side_branch(plant)
 			plant.growth_cycle_index = LAST_CYCLE if _has_missing_side_branch(plant) else 9
+			if plant.growth_cycle_index == 9:
+				plant.fruit_cycle_index += 1
 		else:
 			plant.growth_cycle_index += 1
 		plant.boosted_growth_cycle = -1
