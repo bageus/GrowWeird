@@ -65,7 +65,7 @@ func _apply_ui_atlases() -> void:
 	UiAtlas.configure_button(get_node("TasksButton") as Button, 2, 1)
 	UiAtlas.configure_button(get_node("OffersPanel/Row/RefreshOffer") as Button, 2, 3)
 	UiAtlas.configure_button(get_node("OffersPanel/Row/SkipOffer") as Button, 2, 2)
-	UiAtlas.configure_button(get_node("OffersPanel/Row/AdOffer") as Button, 2, 0)
+	CommerceUiStyle.transaction_action(get_node("OffersPanel/Row/AdOffer") as Button, &"ad")
 	UiAtlas.configure_button(get_node("WaterOptions/Options/SprayButton") as Button, 3, 0)
 	UiAtlas.configure_button(get_node("WaterOptions/Options/PourButton") as Button, 3, 1)
 	UiAtlas.configure_button(get_node("LightingOptions/Options/CurtainsButton") as Button, 4, 0)
@@ -147,7 +147,7 @@ func set_offer_energy_actions(has_offer: bool, _energy: int) -> void:
 		button.text = ""
 		button.tooltip_text = "%s · %d energy" % [button_name.trim_suffix("Offer"), EnergyService.OFFER_COST]
 		button.disabled = not has_offer
-	var ad := get_node("OffersPanel/Row/AdOffer") as Button; ad.text = ""; ad.tooltip_text = "Refresh by watching an advertisement"; ad.disabled = not has_offer
+	var ad := get_node("OffersPanel/Row/AdOffer") as Button; ad.text = "AD"; ad.tooltip_text = "Refresh by watching an advertisement"; ad.disabled = not has_offer
 func set_shop_visible(enabled: bool) -> void:
 	var panel := get_node_or_null("ShopContainer") as Control
 	if panel == null:
