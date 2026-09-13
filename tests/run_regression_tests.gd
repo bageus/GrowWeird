@@ -10,6 +10,7 @@ func _run() -> void:
 	_app = root.get_node("GameApp")
 	await _test_offer_scene_nodes()
 	_test_inventory_feeding()
+	await _test_inventory_menu_feeding()
 	_test_existing_growth_repair_and_parallel_cycles()
 	_test_restart_booster_completes_restart()
 	_test_pruning_requires_mature_branch()
@@ -36,10 +37,14 @@ func _test_offer_scene_nodes() -> void:
 	var journal_button := auxiliary.get_node("JournalButton") as Button
 	_expect(not panel.visible and not dim.visible and timer.visible, "offer UI: timer state must be visible without modal dim")
 	_expect(journal_button.visible, "offer UI: journal button must always exist on the left")
+	var dialogs := controls.get_node("InventoryItemDialogs") as InventoryItemDialogs
+	dialogs.show_for(controls.get_node("InventoryHud"), &"fertilizer", "compost_mix", 1, "Compost", 0, 1)
 	game_state.fertilizer_offer.offered_ids = [&"humus", &"banana_peel", &"dead_mouse"]
 	_app.emit_signal("state_changed")
 	await process_frame
-	_expect(panel.visible and dim.visible and not timer.visible, "offer UI: completed timer must show modal and dim")
+	_expect(not panel.visible and not dim.visible and not timer.visible, "offer UI: completed timer must wait for an open menu")
+	dialogs.close_all(); await process_frame; await process_frame
+	_expect(panel.visible and dim.visible, "offer UI: deferred offer must appear after the current menu closes")
 	controls.queue_free()
 
 func _test_inventory_feeding() -> void:
@@ -53,13 +58,25 @@ func _test_inventory_feeding() -> void:
 	_expect(InventoryService.fertilizer_count(state.inventory, fertilizer_id) == 0, "inventory feed: used item was not removed")
 	_expect(state.pots[0].plant.nutrition > before, "inventory feed: nutrition did not increase")
 
+func _test_inventory_menu_feeding() -> void:
+	var state := _state_with_plants(1); _app.set("state", state)
+	InventoryService.add_fertilizer(state.inventory, RecyclingService.COMPOST_ID)
+	var dialogs := (load("res://src/presentation/inventory/inventory_item_dialogs.tscn") as PackedScene).instantiate() as InventoryItemDialogs
+	var source := Control.new(); source.size = Vector2(118.0, 118.0); root.add_child(source); root.add_child(dialogs); await process_frame
+	dialogs.use_requested.connect(func(kind: StringName, item_id: String) -> void: _app.call("use_inventory_fertilizer", StringName(item_id), kind))
+	dialogs.show_for(source, &"fertilizer", String(RecyclingService.COMPOST_ID), 1, "Recycled Fertilizer", 0, 1)
+	dialogs.call("_use"); await process_frame
+	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == 0 and state.pots[0].plant.nutrition > 0.4, "inventory feed: Use button did not consume and apply fertilizer")
+	dialogs.queue_free(); source.queue_free()
+
 func _test_existing_growth_repair_and_parallel_cycles() -> void:
 	var state := _state_with_plants(2)
 	for pot in state.pots:
 		pot.plant.growth_ratio = 1.0
 		pot.plant.growth_cycle_index = 0
+		pot.plant.alive = false; pot.plant.health = 0.0
 	GrowthCycleService.repair_state(state)
-	_expect(state.pots[0].plant.growth_cycle_index == 8 and state.pots[1].plant.growth_cycle_index == 8, "growth repair: existing adult cycles were not restored")
+	_expect(state.pots[0].plant.alive and state.pots[0].plant.health > 0.0 and state.pots[0].plant.growth_cycle_index == 8 and state.pots[1].plant.growth_cycle_index == 8, "growth repair: existing adult cycles were not restored")
 	PlantSimulationService.advance(state, GrowthCycleService.duration(8), _registry(), _app.get("rules") as GameRules)
 	_expect(state.pots[0].plant.growth_cycle_index == 9 and state.pots[1].plant.growth_cycle_index == 9, "growth cycle: inactive plants did not advance with the selected plant")
 
