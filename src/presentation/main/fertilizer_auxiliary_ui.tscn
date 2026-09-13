@@ -1,0 +1,102 @@
+[gd_scene format=3]
+
+[node name="FertilizerAuxiliaryUi" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Dim" type="ColorRect" parent="."]
+visible = false
+z_index = 208
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.02, 0.015, 0.025, 0.68)
+
+[node name="TimerHud" type="PanelContainer" parent="."]
+z_index = 20
+layout_mode = 0
+offset_left = 16.0
+offset_top = 68.0
+offset_right = 240.0
+offset_bottom = 105.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="TimerHud"]
+layout_mode = 2
+text = "FERTILIZERS 00:30"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="JournalButton" type="Button" parent="."]
+z_index = 20
+layout_mode = 0
+offset_left = 53.0
+offset_top = 113.0
+offset_right = 203.0
+offset_bottom = 150.0
+text = "JOURNAL"
+
+[node name="Journal" type="PanelContainer" parent="."]
+visible = false
+z_index = 211
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -215.0
+offset_top = -165.0
+offset_right = 215.0
+offset_bottom = 165.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Journal"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 18
+
+[node name="Layout" type="VBoxContainer" parent="Journal/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Journal/Margin/Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Journal/Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "MUTATION JOURNAL"
+vertical_alignment = 1
+
+[node name="Close" type="Button" parent="Journal/Margin/Layout/Header"]
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 2
+text = "×"
+
+[node name="Separator" type="HSeparator" parent="Journal/Margin/Layout"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Journal/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="KnowledgeText" type="Label" parent="Journal/Margin/Layout/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Use fertilizers to reveal their care and mutation properties."
+vertical_alignment = 0
+autowrap_mode = 2

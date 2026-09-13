@@ -17,6 +17,7 @@ func _ready() -> void:
 		state = _create_new_game()
 	else:
 		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
+	GrowthCycleService.repair_state(state)
 	FertilizerOfferService.schedule_initial(state.fertilizer_offer, rules)
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	var platform := _platform_runtime()
@@ -258,6 +259,7 @@ func save_now() -> bool:
 	return state != null and _persistence.save_now(state)
 func _on_persistence_reconciled(next_state: GameState, offline_result: Dictionary) -> void:
 	state = next_state
+	GrowthCycleService.repair_state(state)
 	_clock.reset()
 	_emit_offline_result(offline_result)
 	state_changed.emit()

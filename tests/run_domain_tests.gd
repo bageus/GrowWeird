@@ -234,7 +234,7 @@ func _test_cutting_plant_and_graft_flow() -> void:
 	host.cut_branch(&"right")
 	_expect(PropagationService.graft_cutting(cutting, host, &"right", "graft-flow"), "cutting flow: graft should succeed after slot is freed")
 	var state := GameState.new(); state.inventory = InventoryState.new(); state.energy = 20
-	var source := _plant("prune-source")
+	var source := _plant("prune-source"); source.growth_cycle_index = 8
 	var source_branch_id := source.branch_at(&"left").branch_id
 	var cutting_id := PropagationActions.prune(state, source, &"left")
 	_expect(not cutting_id.is_empty() and state.inventory.cuttings.size() == 1, "prune flow: cut plant branch was not added to inventory")

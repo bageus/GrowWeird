@@ -51,3 +51,5 @@ jobs:
         run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_offline_platform_tests.gd"
       - name: Run energy tests
         run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_energy_tests.gd"
+      - name: Run regression tests
+        run: ".godot/${GODOT_BINARY} --headless --path . --script res://tests/run_regression_tests.gd"

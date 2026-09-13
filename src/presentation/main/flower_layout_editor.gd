@@ -5,6 +5,7 @@ signal fruit_selected(slot: StringName)
 
 enum DisplayKind { FLOWER, UNRIPE_FRUIT, RIPE_FRUIT }
 const FLOWER_LAYOUT_PATH := "res://content/visual/tree_flower_layouts.json"
+const USER_LAYOUT_PATH := "user://tree_flower_layouts.json"
 var display_kind: DisplayKind = DisplayKind.FLOWER
 var active_slots: Array[StringName] = []
 
@@ -30,19 +31,19 @@ func _store_stage_points(points: Array) -> void:
 	save_layout()
 
 func save_layout() -> bool:
-	var directory := DirAccess.open("res://")
-	if directory != null:
-		directory.make_dir_recursive("content/visual")
-	var file := FileAccess.open(FLOWER_LAYOUT_PATH, FileAccess.WRITE)
-	if file == null:
-		return false
-	file.store_string(JSON.stringify(layouts, "\t"))
-	return true
+	var payload := JSON.stringify(layouts, "\t")
+	var user_file := FileAccess.open(USER_LAYOUT_PATH, FileAccess.WRITE)
+	if user_file != null: user_file.store_string(payload)
+	var source_file := FileAccess.open(FLOWER_LAYOUT_PATH, FileAccess.WRITE) if OS.has_feature("editor") else null
+	if source_file != null: source_file.store_string(payload)
+	return user_file != null or source_file != null
 
 func _load_layouts() -> Dictionary:
-	if not FileAccess.file_exists(FLOWER_LAYOUT_PATH):
+	var path := FLOWER_LAYOUT_PATH if OS.has_feature("editor") else USER_LAYOUT_PATH
+	if not FileAccess.file_exists(path): path = FLOWER_LAYOUT_PATH
+	if not FileAccess.file_exists(path):
 		return {}
-	var file := FileAccess.open(FLOWER_LAYOUT_PATH, FileAccess.READ)
+	var file := FileAccess.open(path, FileAccess.READ)
 	var parsed: Variant = JSON.parse_string(file.get_as_text()) if file != null else null
 	return parsed if parsed is Dictionary else {}
 

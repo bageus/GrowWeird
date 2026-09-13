@@ -12,6 +12,21 @@ static func progress(plant: PlantState) -> float:
 		return 0.0
 	return clampf(plant.growth_cycle_elapsed / duration(plant.growth_cycle_index), 0.0, 1.0)
 
+static func repair_state(state: GameState) -> void:
+	if state == null: return
+	for pot in state.pots:
+		var plant := pot.plant as PlantState
+		if plant == null: continue
+		plant.growth_cycle_index = clampi(plant.growth_cycle_index, 0, LAST_CYCLE)
+		if not is_finite(plant.growth_cycle_elapsed) or plant.growth_cycle_elapsed < 0.0:
+			plant.growth_cycle_elapsed = 0.0
+		if plant.branches.is_empty(): plant.initialize_native_branches()
+		if plant.growth_ratio >= 0.999 and plant.growth_cycle_index < 8:
+			plant.growth_cycle_index = 8
+		elif plant.growth_ratio > 0.0 and plant.growth_cycle_index == 0:
+			plant.growth_cycle_index = clampi(floori(plant.growth_ratio * 8.0), 1, 7)
+		_sync_legacy_growth(plant)
+
 static func advance(plant: PlantState, delta_seconds: float, _care_factor: float) -> bool:
 	if plant == null or not plant.alive or delta_seconds <= 0.0:
 		return false
@@ -49,6 +64,14 @@ static func recovery_complete(plant: PlantState) -> bool:
 		if plant.branch_at(slot) == null:
 			return false
 	return true
+
+static func branch_has_grown(plant: PlantState, slot: StringName) -> bool:
+	if plant == null or plant.branch_at(slot) == null:
+		return false
+	match slot:
+		&"left": return plant.growth_cycle_index >= 7
+		&"right": return plant.growth_cycle_index >= 8
+	return false
 
 static func activate_stage_fertilizer(plant: PlantState, target: StringName) -> bool:
 	if plant == null or not matches_target(plant.growth_cycle_index, target):
