@@ -30,6 +30,9 @@ func _bind_auxiliary_hud() -> void:
 	_journal_button.pressed.connect(_toggle_journal)
 	_journal = auxiliary.get_node("Journal") as PanelContainer
 	_journal.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(6, 24, Vector4(24.0, 22.0, 24.0, 22.0)))
+	var close_button := auxiliary.get_node("Journal/Margin/Layout/Header/Close") as Button
+	CommerceUiStyle.transaction_action(close_button, &"cancel")
+	close_button.pressed.connect(_close_journal)
 
 func _sync() -> void:
 	var host := get_parent() as Control
@@ -48,7 +51,7 @@ func _sync() -> void:
 	_refresh_journal(app)
 
 func _refresh_journal(app: Node) -> void:
-	var label := _journal.get_node_or_null("KnowledgeText") as Label
+	var label := _journal.get_node_or_null("Margin/Layout/Scroll/KnowledgeText") as Label
 	if label == null:
 		return
 	var knowledge := app.call("fertilizer_knowledge") as Dictionary
@@ -73,6 +76,10 @@ func _toggle_journal() -> void:
 	_journal.visible = not _journal.visible
 	_dim.visible = visible or _journal.visible
 
+func _close_journal() -> void:
+	_journal.visible = false
+	_dim.visible = visible
+
 func _request_rewarded_refresh() -> void:
 	_ad_pending = true
 	get_node("Row/AdOffer").disabled = true
@@ -84,4 +91,7 @@ func _on_ad_closed(was_shown: bool) -> void:
 	get_node("Row/AdOffer").disabled = false
 	var app := get_node_or_null("/root/GameApp")
 	if app != null and app.state.fertilizer_offer.is_active():
-		app.call("refresh_fertilizer_offer_rewarded") if was_shown else _sync()
+		if was_shown:
+			app.call("refresh_fertilizer_offer_rewarded")
+		else:
+			_sync()
