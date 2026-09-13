@@ -1,7 +1,7 @@
 class_name GameState
 extends RefCounted
 
-const SCHEMA_VERSION: int = 10
+const SCHEMA_VERSION: int = 11
 
 var schema_version: int = SCHEMA_VERSION
 var money: int = 0
@@ -11,6 +11,7 @@ var active_pot_id: String = ""
 var pots: Array[PotState] = []
 var inventory := InventoryState.new()
 var fertilizer_offer := FertilizerOfferState.new()
+var fertilizer_knowledge: Dictionary = {}
 var progression := ProgressionState.new()
 var last_saved_unix: int = 0
 var rewarded_ad_claims: Array[int] = []
