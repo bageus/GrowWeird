@@ -51,8 +51,7 @@ static func _topup_style(color: Color, lower_color: Color, depth: float) -> Styl
 
 static func balance_hud(panel: Panel) -> void:
 	if panel == null: return
-	var outer := _panel(Color(0.64, 0.25, 0.035, 0.98), Color(1.0, 0.60, 0.055, 1.0), 4, 22)
-	outer.border_width_top = 5; outer.border_width_bottom = 5
+	var outer := top_hud_style(22)
 	panel.add_theme_stylebox_override(&"panel", outer)
 	var inset := panel.get_node_or_null("InnerShadow") as Panel
 	if inset == null:
@@ -63,6 +62,13 @@ static func balance_hud(panel: Panel) -> void:
 	var inner := _panel(Color(0.08, 0.025, 0.005, 0.10), Color(0.18, 0.045, 0.005, 0.30), 4, 16)
 	inner.shadow_size = 0
 	inset.add_theme_stylebox_override(&"panel", inner)
+
+static func top_hud_style(radius := 21) -> StyleBoxFlat:
+	var style := _panel(Color("74320f"), Color("ffad25"), 4, radius)
+	style.shadow_color = Color(0.20, 0.06, 0.01, 0.55)
+	style.shadow_size = 5
+	style.shadow_offset = Vector2(0.0, 3.0)
+	return style
 
 static func balance_plus(button: Button) -> void:
 	_program_button(button, "+", Color(0.12, 0.72, 0.055, 1.0), Color(0.055, 0.31, 0.015, 1.0), 20)
