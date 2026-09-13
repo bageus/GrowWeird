@@ -1,18 +1,15 @@
 extends Node
-
 signal state_changed
 signal mutations_resolved(events: Array[Dictionary])
 signal fertilizer_offer_ready(ids: Array[StringName])
 signal offline_progress_applied(result: Dictionary)
 const DEFAULT_RULES: GameRules = preload("res://content/config/default_game_rules.tres")
-
 var state: GameState
 var registry := ContentRegistry.new()
 var rules: GameRules = DEFAULT_RULES
 var _clock := GameClock.new()
 var _persistence := PersistenceCoordinator.new()
 var _platform_paused: bool = false
-
 func _ready() -> void:
 	registry.load_all()
 	state = SaveRepository.load_state()
@@ -20,7 +17,7 @@ func _ready() -> void:
 		state = _create_new_game()
 	else:
 		NewGameFactory.ensure_inventory_bootstrap(state, active_plant())
-	FertilizerOfferService.ensure_active(state.fertilizer_offer, registry.all_offer_fertilizers(), rules)
+	FertilizerOfferService.schedule_initial(state.fertilizer_offer, rules)
 	_persistence.reconciled.connect(_on_persistence_reconciled)
 	var platform := _platform_runtime()
 	if platform != null:
@@ -46,29 +43,23 @@ func _process(delta: float) -> void:
 		changed = true
 	if changed:
 		state_changed.emit()
-
 func _exit_tree() -> void:
 	if state != null and _persistence.is_ready():
 		_persistence.save_now(state, false)
-
 func active_pot() -> PotState:
 	return state.active_pot() if state != null else null
-
 func active_plant() -> PlantState:
 	var pot := active_pot()
 	return pot.plant if pot != null else null
-
 func active_species_definition() -> PlantSpeciesDefinition:
 	var plant := active_plant()
 	return registry.get_plant(plant.species_id) if plant != null else null
-
 func switch_pot(pot_id: String) -> bool:
 	if state == null or state.find_pot(pot_id) == null:
 		return false
 	state.active_pot_id = pot_id
 	state_changed.emit()
 	return true
-
 func set_light_mode(mode: int) -> bool:
 	var pot := active_pot()
 	if pot == null or mode < 0 or mode >= PotState.LightMode.size():
@@ -77,7 +68,6 @@ func set_light_mode(mode: int) -> bool:
 	_progress(&"environment_changed")
 	state_changed.emit()
 	return true
-
 func set_window_open(value: bool) -> bool:
 	var pot := active_pot()
 	if pot == null:
@@ -86,7 +76,6 @@ func set_window_open(value: bool) -> bool:
 	_progress(&"environment_changed")
 	state_changed.emit()
 	return true
-
 func water_active(use_sprayer: bool = false) -> bool:
 	var pot := active_pot()
 	if pot == null or not EnergyService.spend(state, EnergyService.WATER_COST):
@@ -96,7 +85,6 @@ func water_active(use_sprayer: bool = false) -> bool:
 	_progress(&"watered")
 	state_changed.emit()
 	return true
-
 func rename_active_plant(new_name: String) -> bool:
 	var plant := active_plant()
 	if plant == null:
@@ -104,20 +92,17 @@ func rename_active_plant(new_name: String) -> bool:
 	plant.custom_name = new_name.strip_edges().left(48)
 	state_changed.emit()
 	return true
-
 func choose_fertilizer_offer(fertilizer_id: StringName) -> bool:
 	var result := FertilizerActions.choose_offer(state, active_plant(), fertilizer_id, registry, rules)
 	if not bool(result.get("success", false)):
 		return false
 	state_changed.emit()
 	return true
-
 func skip_fertilizer_offer() -> bool:
 	if not FertilizerActions.skip_offer(state, rules, registry.all_offer_fertilizers()):
 		return false
 	state_changed.emit()
 	return true
-
 func refresh_fertilizer_offer() -> bool:
 	if state == null:
 		return false
@@ -128,45 +113,46 @@ func refresh_fertilizer_offer() -> bool:
 		return false
 	state_changed.emit()
 	return true
-
-func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = ResourceActions.FERTILIZER) -> Array[Dictionary]:
+func refresh_fertilizer_offer_rewarded() -> bool:
+	if state == null or not state.fertilizer_offer.is_active(): return false
+	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_offer_fertilizers(), rules): return false
+	state_changed.emit(); return true
+func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = ResourceActions.FERTILIZER) -> Dictionary:
 	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry, kind)
 	if not bool(result.get("success", false)):
-		return []
+		return result
 	var events := _events_from_result(result)
+	_record_fertilizer_knowledge(fertilizer_id, events)
 	_progress(&"fertilizer_used")
 	if not events.is_empty():
 		_progress(&"mutation_resolved")
 	_emit_mutation_events(events)
 	state_changed.emit()
-	return events
-
+	return result
+func fertilizer_knowledge() -> Dictionary:
+	return state.fertilizer_knowledge.duplicate(true) if state != null else {}
 func prune_active_branch(slot: StringName) -> String:
 	var item_id := PropagationActions.prune(state, active_plant(), slot)
 	if not item_id.is_empty():
 		_progress(&"branch_pruned")
 		state_changed.emit()
 	return item_id
-
 func plant_cutting(cutting_id: String, pot_id: String) -> bool:
 	if not PropagationActions.plant_cutting(state, cutting_id, pot_id):
 		return false
 	state_changed.emit()
 	return true
-
 func plant_seed(seed_id: String, pot_id: String) -> bool:
 	if not PropagationActions.plant_seed(state, seed_id, pot_id):
 		return false
 	state_changed.emit()
 	return true
-
 func graft_cutting(cutting_id: String, slot: StringName) -> bool:
 	if not PropagationActions.graft_cutting(state, active_plant(), cutting_id, slot):
 		return false
 	_progress(&"branch_grafted")
 	state_changed.emit()
 	return true
-
 func pick_active_flower(slot: StringName) -> bool: var picked := FruitActions.pick_flower(state, active_plant(), slot); state_changed.emit(); return picked
 func harvest_active_fruit(slot: StringName) -> String:
 	var item_id := FruitActions.harvest(state, active_plant(), slot)
@@ -174,97 +160,78 @@ func harvest_active_fruit(slot: StringName) -> String:
 		_progress(&"fruit_harvested")
 		state_changed.emit()
 	return item_id
-
 func create_seed_from_fruit(fruit_id: String) -> String:
 	var item_id := PropagationActions.create_seed_from_fruit(state, fruit_id)
 	if not item_id.is_empty():
 		_progress(&"seed_created")
 		state_changed.emit()
 	return item_id
-
 func active_plant_sale_value() -> int:
 	var value := EconomyActions.plant_value(active_plant(), registry, rules)
 	return value + rules.pot_base_price if value > 0 else 0
-
 func sell_active_plant() -> int:
 	var amount := EconomyActions.sell_plant(state, active_pot(), registry, rules)
 	if amount > 0:
 		state_changed.emit()
 	return amount
-
 func fruit_sale_value(fruit_id: String) -> int:
 	var fruit := InventoryService.find_fruit(state.inventory, fruit_id) if state != null else null
 	return EconomyActions.fruit_value(fruit, registry, rules)
-
 func sell_fruit(fruit_id: String) -> int:
 	var amount := EconomyActions.sell_fruit(state, fruit_id, registry, rules)
 	if amount > 0:
 		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
-
 func inventory_item_sale_value(kind: StringName, item_id: String) -> int:
 	return ResourceActions.item_value(state, kind, item_id, registry, rules)
-
 func sell_inventory_item(kind: StringName, item_id: String) -> int:
 	return sell_inventory_items(kind, item_id, 1)
-
 func sell_inventory_items(kind: StringName, item_id: String, quantity: int) -> int:
 	var amount := ResourceActions.sell_items(state, kind, item_id, quantity, registry, rules)
 	if amount > 0:
 		_progress(&"resource_processed")
 		state_changed.emit()
 	return amount
-
 func inventory_item_recycle_yield(kind: StringName) -> int:
 	return ResourceActions.recycle_yield(kind, rules)
-
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	if state.energy < ResourceActions.RECYCLE_ENERGY_COST: return 0
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
 	if amount > 0:
 		EnergyService.spend(state, ResourceActions.RECYCLE_ENERGY_COST); _progress(&"resource_processed"); state_changed.emit()
 	return amount
-
 func shop_catalog() -> Array[Dictionary]:
 	return ShopService.fertilizer_catalog(state, registry.all_fertilizers())
-
 func species_shop_catalog() -> Array[Dictionary]:
 	return ShopService.species_catalog(state, registry.all_plants())
-
 func next_pot_price() -> int:
 	return ShopService.next_pot_price(state, rules)
-
 func buy_shop_fertilizer(fertilizer_id: StringName) -> bool:
 	if not ShopActions.buy_fertilizer(state, fertilizer_id, registry):
 		return false
 	state_changed.emit()
 	return true
-
 func buy_shop_seed(species_id: StringName) -> String:
 	var seed_id := ShopActions.buy_species_seed(state, species_id, registry)
 	if not seed_id.is_empty():
 		state_changed.emit()
 	return seed_id
-
 func buy_new_pot() -> String:
 	var pot_id := ShopActions.buy_pot(state, rules)
 	if not pot_id.is_empty():
 		state_changed.emit()
 	return pot_id
-
 func buy_shop_item(item: Dictionary) -> bool:
 	if not ShopActions.buy_catalog_item(state, item, registry): return false
 	state_changed.emit()
 	return true
-
 func current_comfort() -> Dictionary:
 	var pot := active_pot()
 	if pot == null or pot.plant == null:
 		return {}
 	var species := registry.get_plant(pot.plant.species_id)
 	return ComfortEvaluator.evaluate(pot, species) if species != null else {}
-
 func current_offer_ids() -> Array[StringName]:
 	return state.fertilizer_offer.offered_ids.duplicate() if state != null else []
 func current_offer_skip_price() -> int: return EnergyService.OFFER_COST
@@ -283,21 +250,17 @@ func cloud_save_available() -> bool: return _platform_runtime().cloud_available(
 func set_gameplay_active(active: bool) -> void: _platform_runtime().set_gameplay_active(active)
 func show_fullscreen_ad() -> void: _platform_runtime().show_fullscreen_ad()
 func _platform_runtime() -> Node: return get_node("/root/PlatformRuntime")
-
 func claim_rewarded_ad(now_unix: int) -> bool:
 	if not RewardedAdService.claim(state, now_unix): return false
 	state_changed.emit()
 	return true
-
 func save_now() -> bool:
 	return state != null and _persistence.save_now(state)
-
 func _on_persistence_reconciled(next_state: GameState, offline_result: Dictionary) -> void:
 	state = next_state
 	_clock.reset()
 	_emit_offline_result(offline_result)
 	state_changed.emit()
-
 func _on_platform_pause_requested() -> void:
 	if _platform_paused:
 		return
@@ -305,7 +268,6 @@ func _on_platform_pause_requested() -> void:
 	_clock.reset()
 	if _persistence.is_ready():
 		_persistence.save_now(state)
-
 func _on_platform_resume_requested() -> void:
 	if not _platform_paused:
 		return
@@ -314,14 +276,12 @@ func _on_platform_resume_requested() -> void:
 	var result := _persistence.catch_up(state)
 	_emit_offline_result(result)
 	state_changed.emit()
-
 func _emit_offline_result(result: Dictionary) -> void:
 	if result.is_empty() or float(result.get("applied_seconds", 0.0)) <= 0.0:
 		return
 	offline_progress_applied.emit(result)
 	if bool(result.get("offer_created", false)):
 		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
-
 func _events_from_result(result: Dictionary) -> Array[Dictionary]:
 	var events: Array[Dictionary] = []
 	var raw: Variant = result.get("events", [])
@@ -330,14 +290,24 @@ func _events_from_result(result: Dictionary) -> Array[Dictionary]:
 			if value is Dictionary:
 				events.append(value)
 	return events
-
 func _emit_mutation_events(events: Array[Dictionary]) -> void:
 	if not events.is_empty():
 		mutations_resolved.emit(events)
-
+func _record_fertilizer_knowledge(fertilizer_id: StringName, events: Array[Dictionary]) -> void:
+	var definition := registry.get_fertilizer(fertilizer_id)
+	if definition == null: return
+	var previous: Dictionary = state.fertilizer_knowledge.get(String(fertilizer_id), {})
+	var discovered: Array[String] = []
+	for value in previous.get("discovered_traits", []):
+		var known_trait := String(value)
+		if not known_trait.is_empty() and not discovered.has(known_trait): discovered.append(known_trait)
+	for event in events:
+		var trait_id := String(event.get("trait_id", ""))
+		if not trait_id.is_empty() and not discovered.has(trait_id): discovered.append(trait_id)
+	var care: Dictionary = definition.care_effects.duplicate(true)
+	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "care_effects": care, "discovered_traits": discovered}
 func _progress(event_id: StringName) -> void:
 	ProgressionActions.record_event(state, event_id, registry)
-
 func _has_living_plant() -> bool:
 	if state == null:
 		return false
@@ -345,6 +315,5 @@ func _has_living_plant() -> bool:
 		if pot.plant != null and pot.plant.alive:
 			return true
 	return false
-
 func _create_new_game() -> GameState:
 	return NewGameFactory.create(rules)

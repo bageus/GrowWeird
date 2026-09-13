@@ -96,6 +96,9 @@ func _test_compost_uses_normal_fertilizer_path() -> void:
 	result = FertilizerActions.use_inventory(state, plant, &"dead_mouse", registry, &"misc")
 	_expect(bool(result.get("success", false)) and not state.inventory.misc.has("dead_mouse"), "resource: used misc fertilizer should leave inventory")
 	_expect(plant.nutrition > nutrition_before, "resource: used misc fertilizer should feed the plant")
+	state.fertilizer_knowledge["dead_mouse"] = {"uses": 1, "care_effects": {"nutrition": 0.18}}
+	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
+	_expect(restored.fertilizer_knowledge.has("dead_mouse"), "resource: discovered fertilizer knowledge must survive save and load")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()

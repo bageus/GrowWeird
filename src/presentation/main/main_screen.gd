@@ -33,8 +33,7 @@ extends Control
 var _interaction_mode: StringName = PlantView.MODE_NONE
 var _pending_item_id := ""
 var _pending_plant_kind: StringName = &""
-var _water_submenu_visible := false
-var _lighting_submenu_visible := false
+var _water_submenu_visible := false; var _lighting_submenu_visible := false
 var _prune_cursor: Texture2D = null
 func _ready() -> void:
 	GameApp.state_changed.connect(_refresh)
@@ -257,7 +256,9 @@ func _on_inventory_use_requested(kind: StringName, item_id: String) -> void:
 			if GameApp.active_plant() == null or not GameApp.active_plant().alive: event_label.text = "Select a living plant first."; return
 			if GameApp.registry.get_fertilizer(StringName(item_id)) == null: event_label.text = "This item cannot feed the plant."; return
 			var nutrition_before := GameApp.active_plant().nutrition
-			GameApp.use_inventory_fertilizer(StringName(item_id), kind); inventory_hud.invalidate(); _refresh(); var gain := GameApp.active_plant().nutrition - nutrition_before; event_label.text = "Plant fed."; care_gauge.reveal(); FeedGainFeedback.show(self, plant_view, gain)
+			var result: Dictionary = GameApp.use_inventory_fertilizer(StringName(item_id), kind)
+			if not bool(result.get("success", false)): event_label.text = "Fertilizer was not applied."; return
+			inventory_hud.invalidate(); _refresh(); var gain := GameApp.active_plant().nutrition - nutrition_before; event_label.text = "Plant fed."; care_gauge.reveal(); FeedGainFeedback.show(self, plant_view, gain)
 		&"cutting":
 			_on_cutting_graft_requested(item_id)
 		&"seed":
