@@ -2,7 +2,7 @@ class_name SceneControlsOverlay
 extends Control
 signal action_requested(action_id: StringName)
 const FILE_PATH := "user://growweird_scene_buttons.json"
-const LAYOUT_VERSION := 8
+const LAYOUT_VERSION := 9
 const DEFAULT_POSITIONS := {
 	"water": Vector2(0.05, 0.56),
 	"lighting": Vector2(0.06, 0.14),
@@ -12,7 +12,7 @@ const DEFAULT_POSITIONS := {
 	"tasks": Vector2(0.84, 0.22),
 	"wallet": Vector2(0.72, 0.03),
 	"energy": Vector2(0.59, 0.03),
-	"pots": Vector2(0.38, 0.80),
+	"pots": Vector2(0.50, 0.80),
 	"fertilizers": Vector2(0.18, 0.82),
 	"inventory": Vector2(0.77, 0.50),
 }
