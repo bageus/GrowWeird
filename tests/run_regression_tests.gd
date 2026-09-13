@@ -11,6 +11,7 @@ func _run() -> void:
 	await _test_offer_scene_nodes()
 	_test_inventory_feeding()
 	await _test_inventory_menu_feeding()
+	_test_fertilizer_timer_finish()
 	_test_existing_growth_repair_and_parallel_cycles()
 	_test_restart_booster_completes_restart()
 	_test_pruning_requires_mature_branch()
@@ -27,7 +28,7 @@ func _test_offer_scene_nodes() -> void:
 	var game_state := _app.get("state") as GameState
 	game_state.fertilizer_offer.clear()
 	game_state.fertilizer_offer.seconds_until_offer = 10.0
-	var controls := (load("res://src/presentation/main/scene_controls.tscn") as PackedScene).instantiate()
+	var controls := (load("res://src/presentation/main/scene_controls.tscn") as PackedScene).instantiate(); controls.size = Vector2(1152.0, 648.0)
 	root.add_child(controls)
 	await process_frame
 	var auxiliary := controls.get_node("FertilizerAuxiliaryUi")
@@ -37,6 +38,8 @@ func _test_offer_scene_nodes() -> void:
 	var journal_button := auxiliary.get_node("JournalButton") as Button
 	_expect(not panel.visible and not dim.visible and timer.visible, "offer UI: timer state must be visible without modal dim")
 	_expect(journal_button.visible, "offer UI: journal button must always exist on the left")
+	_expect(journal_button.position.y > 500.0 and journal_button.position.y + journal_button.size.y <= controls.size.y, "offer UI: journal button must remain visible in the lower-left corner")
+	for tab in ["Unknown", "Fertilizers", "Decorations", "Mutagens"]: _expect(auxiliary.has_node("Journal/ContentHud/Tabs/" + tab), "almanac: missing %s tab" % tab)
 	var dialogs := controls.get_node("InventoryItemDialogs") as InventoryItemDialogs
 	dialogs.show_for(controls.get_node("InventoryHud"), &"fertilizer", "compost_mix", 1, "Compost", 0, 1)
 	game_state.fertilizer_offer.offered_ids = [&"humus", &"banana_peel", &"dead_mouse"]
@@ -68,6 +71,12 @@ func _test_inventory_menu_feeding() -> void:
 	dialogs.call("_use"); await process_frame
 	_expect(InventoryService.fertilizer_count(state.inventory, RecyclingService.COMPOST_ID) == 0 and state.pots[0].plant.nutrition > 0.4, "inventory feed: Use button did not consume and apply fertilizer")
 	dialogs.queue_free(); source.queue_free()
+
+func _test_fertilizer_timer_finish() -> void:
+	var state := _state_with_plants(1); _app.set("state", state); state.energy = 10
+	state.fertilizer_offer.clear(); state.fertilizer_offer.seconds_until_offer = 300.0
+	_expect(EnergyService.fertilizer_timer_skip_cost(state.fertilizer_offer) == 5, "offer timer: five minutes must cost five energy")
+	_expect(bool(_app.call("finish_fertilizer_timer")) and state.energy == 5 and state.fertilizer_offer.is_active(), "offer timer: Finish did not spend energy and open the selection")
 
 func _test_existing_growth_repair_and_parallel_cycles() -> void:
 	var state := _state_with_plants(2)
