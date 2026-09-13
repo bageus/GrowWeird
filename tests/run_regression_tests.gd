@@ -66,8 +66,14 @@ func _test_existing_growth_repair_and_parallel_cycles() -> void:
 func _test_pruning_requires_mature_branch() -> void:
 	var state := _state_with_plants(1)
 	state.energy = 20
-	state.pots[0].plant.growth_cycle_index = 5
-	_expect(PropagationActions.prune(state, state.pots[0].plant, &"left").is_empty(), "pruning: an immature branch was cut")
+	var plant := state.pots[0].plant as PlantState
+	plant.growth_cycle_index = 6
+	_expect(PropagationActions.prune(state, plant, &"left").is_empty(), "pruning: an immature left branch was cut")
+	plant.growth_cycle_index = 7
+	_expect(not PropagationActions.prune(state, plant, &"left").is_empty(), "pruning: a grown left branch could not be cut")
+	_expect(PropagationActions.prune(state, plant, &"right").is_empty(), "pruning: an immature right branch was cut")
+	plant.growth_cycle_index = 8
+	_expect(not PropagationActions.prune(state, plant, &"right").is_empty(), "pruning: a grown right branch could not be cut")
 
 func _test_restart_booster_completes_restart() -> void:
 	var plant := _state_with_plants(1).pots[0].plant
