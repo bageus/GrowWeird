@@ -65,6 +65,14 @@ static func recovery_complete(plant: PlantState) -> bool:
 			return false
 	return true
 
+static func branch_has_grown(plant: PlantState, slot: StringName) -> bool:
+	if plant == null or plant.branch_at(slot) == null:
+		return false
+	match slot:
+		&"left": return plant.growth_cycle_index >= 7
+		&"right": return plant.growth_cycle_index >= 8
+	return false
+
 static func activate_stage_fertilizer(plant: PlantState, target: StringName) -> bool:
 	if plant == null or not matches_target(plant.growth_cycle_index, target):
 		return false
