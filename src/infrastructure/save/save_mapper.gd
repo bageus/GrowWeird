@@ -16,6 +16,7 @@ static func to_dictionary(state: GameState) -> Dictionary:
 		"pots": pots,
 		"inventory": SaveItemMapper.inventory_to_dictionary(state.inventory),
 		"fertilizer_offer": _offer_to_dictionary(state.fertilizer_offer),
+		"fertilizer_knowledge": _plain_dictionary(state.fertilizer_knowledge),
 		"progression": _progression_to_dictionary(state.progression),
 	}
 
@@ -31,6 +32,7 @@ static func from_dictionary(data: Dictionary) -> GameState:
 		state.rewarded_ad_claims.append(maxi(0, int(claim_time)))
 	state.inventory = SaveItemMapper.inventory_from_dictionary(data.get("inventory", {}))
 	state.fertilizer_offer = _offer_from_dictionary(data.get("fertilizer_offer", {}))
+	state.fertilizer_knowledge = _plain_dictionary(data.get("fertilizer_knowledge", {}))
 	state.progression = _progression_from_dictionary(data.get("progression", {}))
 	for value in data.get("pots", []):
 		if value is Dictionary:
