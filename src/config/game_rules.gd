@@ -20,8 +20,8 @@ extends Resource
 @export_range(0.001, 0.5, 0.001) var sprayer_soil_amount: float = 0.035
 
 @export_group("Fertilizer Offers")
-@export_range(1.0, 3600.0, 1.0) var initial_offer_delay_seconds: float = 30.0
-@export_range(1.0, 3600.0, 1.0) var fertilizer_offer_interval_seconds: float = 120.0
+@export_range(1.0, 3600.0, 1.0) var initial_offer_delay_seconds: float = 300.0
+@export_range(1.0, 3600.0, 1.0) var fertilizer_offer_interval_seconds: float = 300.0
 @export_range(1, 6, 1) var fertilizer_offer_count: int = 3
 
 @export_group("Offline Progression")

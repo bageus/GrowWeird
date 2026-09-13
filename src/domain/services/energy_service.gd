@@ -52,3 +52,7 @@ static func cycle_skip_cost(plant: PlantState) -> int:
 	var remaining := maxf(0.0, GrowthCycleService.duration(plant.growth_cycle_index) - plant.growth_cycle_elapsed)
 	if plant.boosted_growth_cycle == plant.growth_cycle_index: remaining *= 0.5
 	return maxi(1, int(ceil(remaining / 60.0)))
+
+static func fertilizer_timer_skip_cost(offer: FertilizerOfferState) -> int:
+	if offer == null or offer.is_active() or offer.seconds_until_offer <= 0.0: return 0
+	return maxi(1, int(ceil(offer.seconds_until_offer / 60.0)))

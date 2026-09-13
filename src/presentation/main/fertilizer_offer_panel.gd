@@ -2,12 +2,14 @@ class_name FertilizerOfferPanel
 extends SceneDraggablePanel
 
 var _dim: ColorRect
-var _timer: PanelContainer
+var _timer: Control
 var _timer_label: Label
+var _timer_finish: Button
 var _journal_button: Button
 var _journal: Control
 var _ad_pending := false
 var _last_blocked := false
+var _journal_tab: StringName = &"unknown"
 
 func _ready() -> void:
 	super()
@@ -23,9 +25,11 @@ func _ready() -> void:
 func _bind_auxiliary_hud() -> void:
 	var auxiliary := get_parent().get_node("FertilizerAuxiliaryUi")
 	_dim = auxiliary.get_node("Dim") as ColorRect
-	_timer = auxiliary.get_node("TimerHud") as PanelContainer
+	_timer = auxiliary.get_node("TimerHud") as Control
 	_timer_label = auxiliary.get_node("TimerHud/Label") as Label
+	_timer_finish = auxiliary.get_node("TimerHud/FinishButton") as Button
 	_configure_timer_hud()
+	_timer_finish.pressed.connect(_finish_timer)
 	_journal_button = auxiliary.get_node("JournalButton") as Button
 	CommerceUiStyle.transaction_action(_journal_button, &"journal")
 	_journal_button.pressed.connect(_toggle_journal)
@@ -38,6 +42,10 @@ func _bind_auxiliary_hud() -> void:
 	var close_button := _journal.get_node("Close") as Button
 	UiAtlas.configure_close_button(close_button)
 	close_button.pressed.connect(_close_journal)
+	for tab: StringName in [&"unknown", &"fertilizers", &"decorations", &"mutagens"]:
+		var button := _journal.get_node("ContentHud/Tabs/%s" % String(tab).capitalize()) as Button
+		CommerceUiStyle.shop_category_button(button, button.text, Color("b86a22"))
+		button.pressed.connect(_select_journal_tab.bind(tab))
 
 func _process(_delta: float) -> void:
 	var blocked := _other_menu_open()
@@ -60,6 +68,9 @@ func _sync() -> void:
 		position = (host.size - size) * 0.5
 	var seconds := maxi(0, int(ceil(app.state.fertilizer_offer.seconds_until_offer)))
 	_timer_label.text = "FERTILIZERS %02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
+	var finish_cost := EnergyService.fertilizer_timer_skip_cost(app.state.fertilizer_offer)
+	_timer_finish.text = "FINISH · %d" % finish_cost
+	_timer_finish.disabled = finish_cost <= 0
 	_refresh_journal(app)
 
 func _refresh_journal(app: Node) -> void:
@@ -67,22 +78,35 @@ func _refresh_journal(app: Node) -> void:
 	if label == null:
 		return
 	var knowledge := app.call("fertilizer_knowledge") as Dictionary
-	var lines: Array[String] = ["MUTATION JOURNAL", ""]
-	if knowledge.is_empty():
-		lines.append("Use fertilizers to reveal their care and mutation properties.")
+	var lines: Array[String] = []
+	if _journal_tab == &"unknown":
+		var definitions: Array = app.registry.all_fertilizers() + app.registry.all_offer_fertilizers()
+		for definition in definitions:
+			if definition != null and not knowledge.has(String(definition.id)): lines.append("UNKNOWN ITEM — properties hidden")
 	else:
 		var ids := knowledge.keys(); ids.sort()
 		for raw_id in ids:
 			var entry: Dictionary = knowledge[raw_id]
-			var details: Array[String] = ["used ×%d" % int(entry.get("uses", 0))]
 			var care: Dictionary = entry.get("care_effects", {})
-			for key in care:
-				var amount := float(care[key])
-				details.append("%s %s%.2f" % [String(key).replace("_", " "), "+" if amount >= 0.0 else "", amount])
+			var mutation_effects: Dictionary = entry.get("mutation_effects", {})
 			var traits: Array = entry.get("discovered_traits", [])
+			if _journal_tab == &"fertilizers" and care.is_empty(): continue
+			if _journal_tab == &"mutagens" and mutation_effects.is_empty() and traits.is_empty(): continue
+			if _journal_tab == &"decorations" and String(entry.get("category", "")) != "decoration": continue
+			var details: Array[String] = ["used ×%d" % int(entry.get("uses", 0))]
+			for key in care:
+				var amount := float(care[key]); details.append("%s %s%.2f" % [String(key).replace("_", " "), "+" if amount >= 0.0 else "", amount])
+			for axis in mutation_effects:
+				var effect := float(mutation_effects[axis]); details.append("%s mutation %s%.2f" % [String(axis), "+" if effect >= 0.0 else "", effect])
 			if not traits.is_empty(): details.append("mutations: %s" % ", ".join(traits))
 			lines.append("%s — %s" % [String(raw_id).replace("_", " ").capitalize(), "; ".join(details)])
+	if lines.is_empty(): lines.append("No discovered items in this section yet.")
 	label.text = "\n".join(lines)
+
+func _select_journal_tab(tab: StringName) -> void:
+	_journal_tab = tab
+	var app := get_node_or_null("/root/GameApp")
+	if app != null: _refresh_journal(app)
 
 func _toggle_journal() -> void:
 	_journal.visible = not _journal.visible
@@ -102,11 +126,21 @@ func _other_menu_open() -> bool:
 	return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("74320f"); style.border_color = Color("ffad25"); style.set_border_width_all(4); style.set_corner_radius_all(19)
-	style.shadow_color = Color(0.20, 0.06, 0.01, 0.55); style.shadow_size = 5; style.shadow_offset = Vector2(0.0, 3.0)
-	_timer.add_theme_stylebox_override(&"panel", style)
+	(_timer.get_node("Hud") as Panel).add_theme_stylebox_override(&"panel", CommerceUiStyle.top_hud_style())
 	_timer_label.add_theme_font_size_override(&"font_size", 15); _timer_label.add_theme_color_override(&"font_color", Color("ffe7a1")); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2)
+	_timer_finish.alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_finish.add_theme_font_size_override(&"font_size", 16); _timer_finish.add_theme_color_override(&"font_color", Color.WHITE); _timer_finish.add_theme_color_override(&"font_outline_color", Color("31105c")); _timer_finish.add_theme_constant_override(&"outline_size", 2)
+	for state in [&"normal", &"hover", &"pressed", &"disabled"]: _timer_finish.add_theme_stylebox_override(state, _finish_button_style(state))
+	_timer_finish.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
+
+func _finish_button_style(state: StringName) -> StyleBoxFlat:
+	var colors := {&"normal": Color("7d25e8"), &"hover": Color("963cf2"), &"pressed": Color("6418c2"), &"disabled": Color("766b7e")}
+	var style := StyleBoxFlat.new(); style.bg_color = colors[state]; style.border_color = Color("451086"); style.set_border_width_all(3); style.set_corner_radius_all(18); style.shadow_color = Color(0.10, 0.02, 0.18, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 2.0)
+	return style
+
+func _finish_timer() -> void:
+	var app := get_node_or_null("/root/GameApp")
+	if app != null and not bool(app.call("finish_fertilizer_timer")):
+		get_parent().call("show_insufficient_balance", true)
 
 func _request_rewarded_refresh() -> void:
 	_ad_pending = true

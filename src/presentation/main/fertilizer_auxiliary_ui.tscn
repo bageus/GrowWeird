@@ -21,23 +21,43 @@ grow_vertical = 2
 mouse_filter = 0
 color = Color(0.02, 0.015, 0.025, 0.68)
 
-[node name="TimerHud" type="PanelContainer" parent="."]
+[node name="TimerHud" type="Control" parent="."]
 z_index = 20
 layout_mode = 0
 offset_left = 16.0
 offset_top = 68.0
-offset_right = 240.0
-offset_bottom = 105.0
+offset_right = 321.0
+offset_bottom = 108.0
+mouse_filter = 2
+
+[node name="Hud" type="Panel" parent="TimerHud"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="TimerHud"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 14.0
+offset_right = 187.0
+offset_bottom = 40.0
 text = "FERTILIZERS 00:30"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="FinishButton" type="Button" parent="TimerHud"]
+layout_mode = 0
+offset_left = 192.0
+offset_top = 3.0
+offset_right = 303.0
+offset_bottom = 40.0
+text = "FINISH · 5"
+
 [node name="JournalButton" type="Button" parent="."]
-z_index = 20
+z_index = 205
 layout_mode = 1
 anchors_preset = 3
 anchor_top = 1.0
@@ -109,13 +129,41 @@ offset_right = 402.0
 offset_bottom = 398.0
 mouse_filter = 2
 
+[node name="Tabs" type="HBoxContainer" parent="Journal/ContentHud"]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 362.0
+offset_bottom = 56.0
+theme_override_constants/separation = 4
+
+[node name="Unknown" type="Button" parent="Journal/ContentHud/Tabs"]
+custom_minimum_size = Vector2(83, 42)
+layout_mode = 2
+text = "?"
+
+[node name="Fertilizers" type="Button" parent="Journal/ContentHud/Tabs"]
+custom_minimum_size = Vector2(83, 42)
+layout_mode = 2
+text = "FEED"
+
+[node name="Decorations" type="Button" parent="Journal/ContentHud/Tabs"]
+custom_minimum_size = Vector2(83, 42)
+layout_mode = 2
+text = "DECOR"
+
+[node name="Mutagens" type="Button" parent="Journal/ContentHud/Tabs"]
+custom_minimum_size = Vector2(83, 42)
+layout_mode = 2
+text = "MUTATE"
+
 [node name="Scroll" type="ScrollContainer" parent="Journal/ContentHud"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 18.0
-offset_top = 16.0
+offset_top = 68.0
 offset_right = -18.0
 offset_bottom = -16.0
 grow_horizontal = 2
