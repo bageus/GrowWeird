@@ -118,6 +118,12 @@ func refresh_fertilizer_offer_rewarded() -> bool:
 	if state == null or not state.fertilizer_offer.is_active(): return false
 	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_offer_fertilizers(), rules): return false
 	state_changed.emit(); return true
+func finish_fertilizer_timer() -> bool:
+	var cost := EnergyService.fertilizer_timer_skip_cost(state.fertilizer_offer)
+	if cost <= 0 or not EnergyService.spend(state, cost): return false
+	if not FertilizerOfferService.ensure_active(state.fertilizer_offer, registry.all_offer_fertilizers(), rules):
+		EnergyService.credit(state, cost); return false
+	fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate()); state_changed.emit(); return true
 func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = ResourceActions.FERTILIZER) -> Dictionary:
 	var result := FertilizerActions.use_inventory(state, active_plant(), fertilizer_id, registry, kind)
 	if not bool(result.get("success", false)):
@@ -307,7 +313,9 @@ func _record_fertilizer_knowledge(fertilizer_id: StringName, events: Array[Dicti
 		var trait_id := String(event.get("trait_id", ""))
 		if not trait_id.is_empty() and not discovered.has(trait_id): discovered.append(trait_id)
 	var care: Dictionary = definition.care_effects.duplicate(true)
-	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "care_effects": care, "discovered_traits": discovered}
+	var mutation_effects: Dictionary = definition.mutation_contributions.duplicate(true)
+	var category := "mutagen" if not mutation_effects.is_empty() else "fertilizer"
+	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "category": category, "care_effects": care, "mutation_effects": mutation_effects, "discovered_traits": discovered}
 func _progress(event_id: StringName) -> void:
 	ProgressionActions.record_event(state, event_id, registry)
 func _has_living_plant() -> bool:
