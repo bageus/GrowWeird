@@ -59,8 +59,9 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(187.0, 1.0)
-	_skip_button.size = Vector2(107.0, 33.0)
+	_skip_button.position = Vector2(192.0, 3.0)
+	_skip_button.size = Vector2(111.0, 37.0)
+	_skip_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_skip_button.focus_mode = Control.FOCUS_NONE
 	_skip_button.add_theme_font_size_override(&"font_size", 16)
 	_skip_button.add_theme_color_override(&"font_color", Color.WHITE)
@@ -74,16 +75,7 @@ func _build_hud() -> void:
 	add_child(_skip_button)
 
 func _hud_style() -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color("74320f")
-	style.border_color = Color("ffad25")
-	style.set_border_width_all(4)
-	style.set_corner_radius_all(21)
-	style.shadow_color = Color(0.20, 0.06, 0.01, 0.55)
-	style.shadow_size = 5
-	style.shadow_offset = Vector2(0.0, 3.0)
-	style.anti_aliasing_size = 1.5
-	return style
+	return CommerceUiStyle.top_hud_style()
 
 func _button_style(color: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
