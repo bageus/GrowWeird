@@ -17,6 +17,9 @@ static func repair_state(state: GameState) -> void:
 	for pot in state.pots:
 		var plant := pot.plant as PlantState
 		if plant == null: continue
+		if not plant.alive:
+			plant.alive = true
+			plant.health = 1.0
 		plant.growth_cycle_index = clampi(plant.growth_cycle_index, 0, LAST_CYCLE)
 		if not is_finite(plant.growth_cycle_elapsed) or plant.growth_cycle_elapsed < 0.0:
 			plant.growth_cycle_elapsed = 0.0
