@@ -6,6 +6,7 @@ var _timer: PanelContainer
 var _timer_label: Label
 var _journal_button: Button
 var _journal: PanelContainer
+var _ad_pending := false
 
 func _ready() -> void:
 	super()
@@ -13,6 +14,8 @@ func _ready() -> void:
 	var app := get_node_or_null("/root/GameApp")
 	if app != null:
 		app.state_changed.connect(_sync)
+		get_node("Row/AdOffer").pressed.connect(_request_rewarded_refresh)
+		app.call("_platform_runtime").ad_closed.connect(_on_ad_closed)
 	get_parent().resized.connect(_sync)
 	call_deferred("_sync")
 
@@ -58,7 +61,8 @@ func _build_journal(host: Control) -> void:
 	var text := Label.new()
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.vertical_alignment = VERTICAL_ALIGNMENT_TOP
-	text.text = "MUTATION JOURNAL\n\nApply fertilizers and observe the plant to build knowledge about mutation effects. Known characteristics and discovered combinations will be recorded here."
+	text.name = "KnowledgeText"
+	text.text = "MUTATION JOURNAL\n\nUse fertilizers to reveal their properties."
 	_journal.add_child(text)
 
 func _sync() -> void:
@@ -78,7 +82,42 @@ func _sync() -> void:
 	_timer.position = Vector2(16.0, maxf(16.0, (host.size.y - 52.0) * 0.5))
 	_journal_button.position = _timer.position + Vector2(37.0, 62.0)
 	_journal.position = (host.size - _journal.size) * 0.5
+	_refresh_journal(app)
+
+func _refresh_journal(app: Node) -> void:
+	var label := _journal.get_node_or_null("KnowledgeText") as Label
+	if label == null:
+		return
+	var knowledge := app.call("fertilizer_knowledge") as Dictionary
+	var lines: Array[String] = ["MUTATION JOURNAL", ""]
+	if knowledge.is_empty():
+		lines.append("Use fertilizers to reveal their care and mutation properties.")
+	else:
+		var ids := knowledge.keys(); ids.sort()
+		for raw_id in ids:
+			var entry: Dictionary = knowledge[raw_id]
+			var details: Array[String] = ["used ×%d" % int(entry.get("uses", 0))]
+			var care: Dictionary = entry.get("care_effects", {})
+			for key in care:
+				details.append("%s %+g" % [String(key).replace("_", " "), float(care[key])])
+			var traits: Array = entry.get("discovered_traits", [])
+			if not traits.is_empty(): details.append("mutations: %s" % ", ".join(traits))
+			lines.append("%s — %s" % [String(raw_id).replace("_", " ").capitalize(), "; ".join(details)])
+	label.text = "\n".join(lines)
 
 func _toggle_journal() -> void:
 	_journal.visible = not _journal.visible
 	_dim.visible = visible or _journal.visible
+
+func _request_rewarded_refresh() -> void:
+	_ad_pending = true
+	get_node("Row/AdOffer").disabled = true
+	get_node("/root/GameApp").call("show_fullscreen_ad")
+
+func _on_ad_closed(was_shown: bool) -> void:
+	if not _ad_pending: return
+	_ad_pending = false
+	get_node("Row/AdOffer").disabled = false
+	var app := get_node_or_null("/root/GameApp")
+	if app != null and app.state.fertilizer_offer.is_active():
+		app.call("refresh_fertilizer_offer_rewarded") if was_shown else _sync()
