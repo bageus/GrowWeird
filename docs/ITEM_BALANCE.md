@@ -75,6 +75,8 @@ Processed fertilizer base gains:
 
 Decoration upgrades may add extra processed-fertilizer nutrition, for example +1. The same bonus applies to a wrong-stage store fertilizer because it is treated as processed fertilizer.
 
+Legacy ordinary misc items that predate the v5 balance table and do not define an explicit Food value retain their old +2 nutrition fallback. Atlas v5 items always use their explicit balance value, including zero.
+
 ### Initial store fertilizer prices
 
 | Stage fertilizer | Price |
@@ -88,14 +90,37 @@ Decoration upgrades may add extra processed-fertilizer nutrition, for example +1
 
 ## Planting shop prices
 
-| Product | Price |
+Base genetic-item prices are not stored as 24 separate values. Runtime uses one formula:
+
+`price = base_price_by_type × rarity_multiplier`
+
+Base prices:
+
+| Product | Base price |
 | --- | ---: |
 | Seed | 20 |
 | Sprout | 60 |
 | Plantable cutting | 110 |
 | Empty normal pot | 130 |
 
-A sprout supplied together with its own normal pot therefore costs 190. A cutting is planted in an empty pot and after one growth cycle becomes a tree with one branch.
+Rarity multipliers:
+
+| Rarity | UI color | Multiplier | Seed | Sprout | Cutting |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Common | green | ×1.0 | 20 | 60 | 110 |
+| Uncommon | turquoise | ×1.5 | 30 | 90 | 165 |
+| Rare | blue | ×2.0 | 40 | 120 | 220 |
+| Epic | purple | ×3.0 | 60 | 180 | 330 |
+| Legendary | orange | ×4.5 | 90 | 270 | 495 |
+| Golden | gold | ×6.0 | 120 | 360 | 660 |
+| Lunar | pink | ×7.5 | 150 | 450 | 825 |
+| Unique | red | ×9.0 | 180 | 540 | 990 |
+
+Rarity order is `common < uncommon < rare < epic < legendary < golden < lunar < unique`. When genetic material is combined, the highest inherited rarity wins. Rarity is stored on genome snapshots and plants so fruit -> seed, seed -> plant and plant -> cutting keep the same rarity tier.
+
+A sprout supplied together with its own normal pot therefore costs its rarity-adjusted sprout price plus 130 for the pot. Pot price itself is not multiplied by plant rarity.
+
+Sale values for seeds and cuttings derive from the same rarity-adjusted full price and then apply the existing sale multiplier from `GameRules`; the 24 rarity/type prices are never duplicated in code.
 
 ## Per-item canonical data
 
