@@ -36,16 +36,24 @@ static func credit(state: GameState, amount: int) -> int:
 static func advance(state: GameState, seconds: float) -> bool:
 	if state == null or seconds <= 0.0 or state.energy >= capacity(state): return false
 	state.energy_regen_elapsed += seconds
-	var gained := floori(state.energy_regen_elapsed / REGEN_SECONDS)
+	var interval := REGEN_SECONDS / _production_multiplier(state)
+	var gained := floori(state.energy_regen_elapsed / interval)
 	if gained <= 0: return false
-	state.energy_regen_elapsed -= float(gained) * REGEN_SECONDS
+	state.energy_regen_elapsed -= float(gained) * interval
 	state.energy = mini(capacity(state), state.energy + gained)
 	if state.energy >= capacity(state): state.energy_regen_elapsed = 0.0
 	return true
 
 static func seconds_to_next(state: GameState) -> int:
 	if state == null or state.energy >= capacity(state): return 0
-	return maxi(1, int(ceil(REGEN_SECONDS - state.energy_regen_elapsed)))
+	return maxi(1, int(ceil(REGEN_SECONDS / _production_multiplier(state) - state.energy_regen_elapsed)))
+
+static func _production_multiplier(state: GameState) -> float:
+	var bonus := 0.0
+	for pot in state.pots:
+		if pot == null or pot.plant == null: continue
+		for item_id in pot.plant.decorations: bonus += float(AlmanacItemCatalog.decoration_effect(StringName(item_id)).get("energy_bonus", 0.0))
+	return 1.0 + bonus
 
 static func cycle_skip_cost(plant: PlantState) -> int:
 	if plant == null or not plant.alive: return 0
