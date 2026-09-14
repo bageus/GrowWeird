@@ -22,6 +22,7 @@ var regrowth_progress: Dictionary = {}
 var regrowth_fruit_cycles: Dictionary = {}
 var fruit_cycle_index: int = 0
 var rng_state: int = 0
+var decorations: Array[String] = []
 
 func initialize_native_branches() -> void:
 	branches.clear()
