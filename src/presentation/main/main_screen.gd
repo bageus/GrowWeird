@@ -175,7 +175,7 @@ func _on_scene_action_requested(action_id: StringName) -> void:
 		&"sell_plant": _on_sell_plant_pressed()
 		&"cancel": _on_cancel_pressed()
 		&"shop": _on_shop_pressed()
-		&"tasks": progression_panel.visible = not progression_panel.visible
+		&"tasks": progression_panel.toggle_menu()
 func _on_water_pressed() -> void:
 	_water_submenu_visible = not _water_submenu_visible
 	_lighting_submenu_visible = false
