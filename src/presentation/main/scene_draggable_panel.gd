@@ -6,6 +6,10 @@ signal drag_moved(layout_id: StringName)
 signal scale_committed(layout_id: StringName, scale_factor: float)
 
 const DRAG_THRESHOLD := 5.0
+const FIXED_LAYOUT_POSITIONS := {
+	&"wallet": Vector2(0.72, 0.03),
+	&"energy": Vector2(0.59, 0.03),
+}
 
 @export var layout_id: StringName = &""
 @export var drag_handle_height := 30.0
@@ -31,7 +35,7 @@ func apply_normalized_position(value: Vector2) -> void:
 	if parent_control == null:
 		return
 	var available := _available_space(parent_control)
-	var target := locked_normalized_position if lock_layout else value
+	var target := _fixed_position() if _is_layout_locked() else value
 	position = Vector2(
 		clampf(target.x, 0.0, 1.0) * available.x,
 		clampf(target.y, 0.0, 1.0) * available.y
@@ -48,7 +52,7 @@ func normalized_position() -> Vector2:
 	)
 
 func apply_scale_factor(value: float) -> void:
-	if lock_layout:
+	if _is_layout_locked():
 		scale_factor = 1.0
 		scale = Vector2.ONE
 		return
@@ -59,7 +63,7 @@ func apply_scale_factor(value: float) -> void:
 		position = _clamp_position(parent_control, position)
 
 func _input(event: InputEvent) -> void:
-	if lock_layout:
+	if _is_layout_locked():
 		return
 	if _handle_scale_input(event):
 		return
@@ -88,7 +92,7 @@ func _input(event: InputEvent) -> void:
 		_handle_mouse_motion()
 
 func _handle_scale_input(event: InputEvent) -> bool:
-	if lock_layout or not allow_scaling or not Input.is_key_pressed(KEY_CTRL):
+	if _is_layout_locked() or not allow_scaling or not Input.is_key_pressed(KEY_CTRL):
 		return false
 	if not (event is InputEventMouseButton) or not event.pressed:
 		return false
@@ -140,6 +144,12 @@ func _handle_mouse_motion() -> void:
 	position = _clamp_position(parent_control, target)
 	drag_moved.emit(layout_id)
 	accept_event()
+
+func _is_layout_locked() -> bool:
+	return lock_layout or FIXED_LAYOUT_POSITIONS.has(layout_id)
+
+func _fixed_position() -> Vector2:
+	return FIXED_LAYOUT_POSITIONS.get(layout_id, locked_normalized_position)
 
 func _clamp_position(parent_control: Control, value: Vector2) -> Vector2:
 	var available := _available_space(parent_control)
