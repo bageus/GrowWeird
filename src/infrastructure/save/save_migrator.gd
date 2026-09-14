@@ -32,6 +32,8 @@ static func migrate(source: Dictionary) -> Dictionary:
 				data = _migrate_v9_to_v10(data)
 			10:
 				data = _migrate_v10_to_v11(data)
+			11:
+				data = _migrate_v11_to_v12(data)
 			_:
 				push_error("No save migration registered for schema %d" % version)
 				return {}
@@ -156,4 +158,11 @@ static func _migrate_v10_to_v11(source: Dictionary) -> Dictionary:
 	var data := source.duplicate(true)
 	data["fertilizer_knowledge"] = {}
 	data["schema_version"] = 11
+	return data
+
+static func _migrate_v11_to_v12(source: Dictionary) -> Dictionary:
+	var data := source.duplicate(true)
+	for pot in data.get("pots", []):
+		if pot is Dictionary and pot.get("plant") is Dictionary: pot["plant"]["decorations"] = []
+	data["schema_version"] = 12
 	return data
