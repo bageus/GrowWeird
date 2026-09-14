@@ -25,6 +25,8 @@ static func value(
 		+ maxi(0, ancestry.size() - 1) * rules.ancestry_sale_value
 	)
 	var health_factor := lerpf(0.4, 1.0, clampf(plant.health, 0.0, 1.0))
+	var decoration_multiplier := 1.0
+	for item_id in plant.decorations: decoration_multiplier += float(AlmanacItemCatalog.decoration_effect(StringName(item_id)).get("sale_bonus", 0.0))
 	if not plant.alive:
 		health_factor *= rules.nonliving_plant_value_multiplier
-	return maxi(1, int(round((base + float(extras)) * health_factor)))
+	return maxi(1, int(round((base + float(extras)) * health_factor * decoration_multiplier)))
