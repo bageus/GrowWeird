@@ -13,7 +13,6 @@ var _daily_tab: Button
 var _tab: StringName = &"main"
 var _suppress_visibility := false
 var _refresh_queued := false
-var _toggle_guard := false
 
 func _app() -> Node:
 	return get_node_or_null("/root/GameApp")
@@ -24,9 +23,6 @@ func _ready() -> void:
 	if app != null:
 		TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
 	visibility_changed.connect(_on_host_visibility_changed)
-	var tasks_button := get_tree().current_scene.find_child("TasksButton", true, false) as Button
-	if tasks_button != null and not tasks_button.pressed.is_connected(toggle_menu):
-		tasks_button.pressed.connect(toggle_menu)
 	_suppress_visibility = true
 	hide()
 	_suppress_visibility = false
@@ -36,17 +32,12 @@ func set_goal(_goal: Dictionary) -> void:
 func invalidate() -> void: _queue_refresh()
 
 func toggle_menu() -> void:
-	if _overlay == null or _toggle_guard:
+	if _overlay == null:
 		return
-	_toggle_guard = true
-	call_deferred("_release_toggle_guard")
 	if _overlay.visible:
 		_close()
 	else:
 		_open()
-
-func _release_toggle_guard() -> void:
-	_toggle_guard = false
 
 func _on_host_visibility_changed() -> void:
 	if _suppress_visibility or not visible or _overlay == null: return
