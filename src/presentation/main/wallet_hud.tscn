@@ -2,17 +2,17 @@
 
 [ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="1_balance"]
 
-[node name="EnergyHud" type="PanelContainer"]
+[node name="WalletHud" type="PanelContainer"]
 layout_mode = 1
 z_index = 200
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -418.0
-offset_right = -194.0
-offset_bottom = 126.0
+offset_left = -224.0
+offset_right = 0.0
+offset_bottom = 100.0
 grow_horizontal = 0
-custom_minimum_size = Vector2(224, 126)
+custom_minimum_size = Vector2(224, 100)
 mouse_filter = 2
 script = ExtResource("1_balance")
-energy = true
+energy = false
