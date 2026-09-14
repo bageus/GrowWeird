@@ -81,7 +81,9 @@ static func ground_fertilizer_gain(plant: PlantState, extra: float = 0.0) -> flo
 static func item_gain(plant: PlantState, fertilizer: FertilizerDefinition) -> float:
 	if plant == null or fertilizer == null:
 		return 0.0
-	var points := float(fertilizer.care_effects.get("nutrition_points", 0.0))
+	# Legacy/generic items without an explicit nutrition value keep the old +2 default.
+	# Balanced atlas items always receive an explicit nutrition_points value, including zero.
+	var points := float(fertilizer.care_effects.get("nutrition_points", 2.0))
 	if points >= 100.0:
 		return capacity(plant)
 	return clampf(points, 0.0, 5.0)
@@ -93,9 +95,7 @@ static func fertilizer_gain(plant: PlantState, fertilizer: FertilizerDefinition,
 	if not String(target).is_empty():
 		if GrowthCycleService.matches_target(plant.growth_cycle_index, target):
 			return correct_stage_fertilizer_gain(plant)
-		# A store fertilizer on the wrong stage behaves as processed fertilizer.
 		return ground_fertilizer_gain(plant)
-	# Found atlas items use their explicit Food value from item_balance_v5.json.
 	if fertilizer.care_effects.has("nutrition_points"):
 		return item_gain(plant, fertilizer)
 	return ground_fertilizer_gain(plant)
