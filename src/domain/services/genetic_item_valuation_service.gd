@@ -22,6 +22,17 @@ const RARITY_MULTIPLIERS := {
 	&"unique": 9.0,
 }
 
+const RARITY_ORDER := [
+	&"common",
+	&"uncommon",
+	&"rare",
+	&"epic",
+	&"legendary",
+	&"golden",
+	&"lunar",
+	&"unique",
+]
+
 static func price(item_type: StringName, rarity: StringName = &"common") -> int:
 	var base := int(BASE_PRICES.get(item_type, 0))
 	if base <= 0:
@@ -37,6 +48,15 @@ static func sprout_price(rarity: StringName = &"common") -> int:
 
 static func cutting_price(rarity: StringName = &"common") -> int:
 	return price(CUTTING, rarity)
+
+static func higher_rarity(first: StringName, second: StringName) -> StringName:
+	var first_index := RARITY_ORDER.find(first)
+	var second_index := RARITY_ORDER.find(second)
+	if first_index < 0:
+		first_index = 0
+	if second_index < 0:
+		second_index = 0
+	return RARITY_ORDER[maxi(first_index, second_index)]
 
 static func seed_value(
 	seed_state: SeedState,
