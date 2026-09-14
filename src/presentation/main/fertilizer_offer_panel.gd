@@ -34,17 +34,9 @@ func _bind_auxiliary_hud() -> void:
 	var legacy_journal_button := auxiliary.get_node_or_null("JournalButton") as Button
 	if legacy_journal_button != null:
 		legacy_journal_button.hide()
-	_journal_button = Button.new()
-	_journal_button.name = "JournalButton"
-	_journal_button.text = "JOURNAL"
-	host.add_child(_journal_button)
+	_journal_button = host.get_node("JournalButton") as Button
 	_journal_button.z_as_relative = true
 	_journal_button.z_index = 0
-	_journal_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_journal_button.offset_left = 28.0
-	_journal_button.offset_top = -62.0
-	_journal_button.offset_right = 178.0
-	_journal_button.offset_bottom = -25.0
 	_journal_button.show()
 	CommerceUiStyle.transaction_action(_journal_button, &"journal")
 	_journal_button.pressed.connect(_toggle_journal)
