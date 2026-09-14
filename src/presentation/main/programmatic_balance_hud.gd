@@ -35,5 +35,5 @@ func _move_wallet_coin_icon() -> void:
 	var icon := layers.get_node_or_null("BalanceIcon") as TextureRect
 	if icon == null:
 		return
-	icon.position = Vector2(-4.0, 18.0)
+	icon.position = Vector2(-8.0, 14.0)
 	icon.size = Vector2(80.0, 80.0)

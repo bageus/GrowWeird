@@ -133,11 +133,6 @@ func _other_menu_open() -> bool:
 	return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	_timer.size = Vector2(306.0, 60.0)
-	_timer_label.position = Vector2(14.0, 0.0)
-	_timer_label.size = Vector2(173.0, 60.0)
-	_timer_finish.position = Vector2(192.0, 11.0)
-	_timer_finish.size = Vector2(112.0, 39.0)
 	var hud_style := CommerceUiStyle.top_hud_style(24)
 	hud_style.shadow_size = 0
 	hud_style.shadow_offset = Vector2.ZERO
