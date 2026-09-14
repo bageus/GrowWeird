@@ -31,12 +31,8 @@ func _build_hud() -> void:
 	_panel.name = "Hud"
 	_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_panel.add_theme_stylebox_override(&"panel", _hud_style())
 	add_child(_panel)
-	CommerceUiStyle.balance_hud(_panel)
-	var outer := _panel.get_theme_stylebox(&"panel") as StyleBoxFlat
-	if outer != null:
-		outer.shadow_size = 0
-		outer.shadow_offset = Vector2.ZERO
 
 	_stage_label = Label.new()
 	_stage_label.name = "StageLabel"
@@ -78,6 +74,12 @@ func _build_hud() -> void:
 	_skip_button.add_theme_stylebox_override(&"disabled", _button_style(Color("766b7e")))
 	_skip_button.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
 	add_child(_skip_button)
+
+func _hud_style() -> StyleBoxFlat:
+	var style := CommerceUiStyle.top_hud_style(24)
+	style.shadow_size = 0
+	style.shadow_offset = Vector2.ZERO
+	return style
 
 func _button_style(color: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
