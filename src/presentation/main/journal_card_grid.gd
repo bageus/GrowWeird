@@ -45,7 +45,6 @@ static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array
 	ids.sort()
 	for raw_id in ids:
 		var entry: Dictionary = knowledge[raw_id]
-		# Item becomes studied only after at least one successful application/use.
 		if int(entry.get("uses", 0)) <= 0:
 			continue
 		var care: Dictionary = entry.get("care_effects", {})
@@ -53,7 +52,7 @@ static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array
 		var traits: Array = entry.get("discovered_traits", [])
 		if tab == &"fertilizers" and care.is_empty():
 			continue
-		if tab == &"mutagens" and mutations.is_empty() and traits.is_empty() and ItemBalanceCatalog.get(StringName(raw_id)).is_empty():
+		if tab == &"mutagens" and mutations.is_empty() and traits.is_empty() and ItemBalanceCatalog.entry(StringName(raw_id)).is_empty():
 			continue
 		if tab == &"decorations" and String(entry.get("category", "")) != "decoration":
 			continue
@@ -131,7 +130,7 @@ static func _show_claim_feedback(scroll: ScrollContainer, reward_kind: StringNam
 
 static func _details(id: StringName, data: Dictionary) -> String:
 	var lines: Array[String] = []
-	var balance := ItemBalanceCatalog.get(id)
+	var balance := ItemBalanceCatalog.entry(id)
 	if not balance.is_empty():
 		lines.append("Редкость: %s" % String(balance.get("rarity", "—")))
 		var food: Variant = balance.get("food", 0)
@@ -155,7 +154,7 @@ static func _details(id: StringName, data: Dictionary) -> String:
 	return "\n".join(lines)
 
 static func _display_name(id: StringName) -> String:
-	var balance := ItemBalanceCatalog.get(id)
+	var balance := ItemBalanceCatalog.entry(id)
 	if not balance.is_empty(): return String(balance.get("display_name", id))
 	var descriptor := FertilizerAssetCatalog.descriptor_for(id)
 	if not descriptor.is_empty():
