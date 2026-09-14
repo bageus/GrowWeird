@@ -10,7 +10,7 @@ func _apply_programmatic_style() -> void:
 	var inset := get_node_or_null("InnerShadow")
 	if inset != null:
 		inset.queue_free()
-	var hud_style := CommerceUiStyle.top_hud_style(24)
+	var hud_style := CommerceUiStyle.top_hud_style(21)
 	hud_style.shadow_size = 0
 	hud_style.shadow_offset = Vector2.ZERO
 	add_theme_stylebox_override(&"panel", hud_style)
