@@ -23,7 +23,9 @@ static func evaluate(pot: PotState, species: PlantSpeciesDefinition) -> Dictiona
 		return {}
 	var plant := pot.plant
 	var water := component(pot.soil_moisture, species.moisture_min, species.moisture_max)
-	var food := component(plant.nutrition, species.nutrition_min, species.nutrition_max)
+	var food := component(NutritionService.ratio(plant), species.nutrition_min, species.nutrition_max)
+	food["units"] = plant.nutrition
+	food["capacity"] = NutritionService.capacity(plant)
 	var environment := component(pot.light_level(), species.light_min, species.light_max)
 	var air := air_component(pot.window_open, species.open_window_preference)
 	environment["score"] = minf(float(environment["score"]), float(air["score"]))
