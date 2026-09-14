@@ -1,45 +1,350 @@
 class_name ProgressionPanel
 extends PanelContainer
 
-var _signature: String = ""
+const WINDOW_SIZE := Vector2(900.0, 510.0)
+const CARD_SIZE := Vector2(210.0, 286.0)
+const CONNECTOR_WIDTH := 62.0
 
-func set_goal(goal: Dictionary) -> void:
-	var signature := str(goal)
-	if signature == _signature:
-		return
-	_signature = signature
-	for child in get_children():
-		remove_child(child)
-		child.queue_free()
-	var layout := VBoxContainer.new()
-	layout.add_theme_constant_override("separation", 3)
-	add_child(layout)
-	var title := Label.new()
-	if goal.is_empty():
-		title.text = "Experiment freely"
-		title.add_theme_font_size_override("font_size", 17)
-		layout.add_child(title)
-		var done := Label.new()
-		done.text = "Core onboarding complete. Grow, mutate, breed and build stranger lineages."
-		done.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		done.modulate = Color(1.0, 1.0, 1.0, 0.68)
-		layout.add_child(done)
-		return
-	title.text = "Next: %s" % String(goal.get("title", "Experiment"))
-	title.add_theme_font_size_override("font_size", 17)
-	layout.add_child(title)
-	var hint := Label.new()
-	hint.text = String(goal.get("hint", ""))
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.modulate = Color(1.0, 1.0, 1.0, 0.72)
-	layout.add_child(hint)
-	var progress := int(goal.get("progress", 0))
-	var target := maxi(1, int(goal.get("target", 1)))
-	var reward := int(goal.get("reward_money", 0))
-	var footer := Label.new()
-	footer.text = "%d/%d%s" % [progress, target, " · reward $%d" % reward if reward > 0 else ""]
-	footer.modulate = Color(1.0, 1.0, 1.0, 0.56)
-	layout.add_child(footer)
+var _overlay: Control
+var _window: Control
+var _content: Control
+var _main_tab: Button
+var _daily_tab: Button
+var _tab: StringName = &"main"
+var _suppress_visibility := false
+var _refresh_queued := false
+
+func _ready() -> void:
+	_build_modal()
+	TaskService.ensure_daily(GameApp.state, int(Time.get_unix_time_from_system()))
+	visibility_changed.connect(_on_host_visibility_changed)
+	_suppress_visibility = true
+	hide()
+	_suppress_visibility = false
+
+func set_goal(_goal: Dictionary) -> void:
+	if _overlay != null and _overlay.visible:
+		_queue_refresh()
 
 func invalidate() -> void:
-	_signature = ""
+	_queue_refresh()
+
+func _on_host_visibility_changed() -> void:
+	if _suppress_visibility or not visible or _overlay == null:
+		return
+	if _overlay.visible:
+		_close()
+	else:
+		_open()
+	_suppress_visibility = true
+	hide()
+	_suppress_visibility = false
+
+func _build_modal() -> void:
+	_overlay = Control.new()
+	_overlay.name = "TasksMenuOverlay"
+	_overlay.z_as_relative = false
+	_overlay.z_index = 190
+	_overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	get_tree().current_scene.add_child(_overlay)
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.hide()
+	var dim := ColorRect.new()
+	dim.color = Color(0.05, 0.025, 0.015, 0.58)
+	dim.mouse_filter = Control.MOUSE_FILTER_STOP
+	_overlay.add_child(dim)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_window = Control.new()
+	_window.name = "TasksWindow"
+	_window.set_anchors_preset(Control.PRESET_CENTER)
+	_window.position = -WINDOW_SIZE * 0.5
+	_window.size = WINDOW_SIZE
+	_overlay.add_child(_window)
+	var background := Panel.new()
+	background.mouse_filter = Control.MOUSE_FILTER_STOP
+	background.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
+	_window.add_child(background)
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var banner := TextureRect.new()
+	banner.texture = UiAtlas.HUD_BUYSELL_BANNER
+	banner.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	banner.stretch_mode = TextureRect.STRETCH_SCALE
+	banner.position = Vector2(290.0, -27.0)
+	banner.size = Vector2(320.0, 82.0)
+	_window.add_child(banner)
+	var title := Label.new()
+	title.position = Vector2(320.0, -11.0)
+	title.size = Vector2(260.0, 52.0)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_window.add_child(title)
+	CommerceUiStyle.curved_title(title, "TASKS", 3.0)
+	var close := Button.new()
+	close.position = Vector2(856.0, -18.0)
+	close.size = Vector2(64.0, 64.0)
+	_window.add_child(close)
+	UiAtlas.configure_close_button(close)
+	close.pressed.connect(_close)
+	_build_tabs()
+	_content = Control.new()
+	_content.position = Vector2(28.0, 106.0)
+	_content.size = Vector2(844.0, 370.0)
+	_window.add_child(_content)
+
+func _build_tabs() -> void:
+	_main_tab = Button.new()
+	_main_tab.text = "MAIN"
+	_main_tab.position = Vector2(255.0, 57.0)
+	_main_tab.size = Vector2(190.0, 48.0)
+	_window.add_child(_main_tab)
+	_daily_tab = Button.new()
+	_daily_tab.text = "DAILY"
+	_daily_tab.position = Vector2(455.0, 57.0)
+	_daily_tab.size = Vector2(190.0, 48.0)
+	_window.add_child(_daily_tab)
+	_main_tab.pressed.connect(_select_tab.bind(&"main"))
+	_daily_tab.pressed.connect(_select_tab.bind(&"daily"))
+	_style_tabs()
+
+func _open() -> void:
+	TaskService.ensure_daily(GameApp.state, int(Time.get_unix_time_from_system()))
+	_overlay.show()
+	_refresh()
+	call_deferred("_center_current_main")
+
+func _close() -> void:
+	if _overlay != null:
+		_overlay.hide()
+
+func _select_tab(tab: StringName) -> void:
+	_tab = tab
+	_style_tabs()
+	_refresh()
+	if tab == &"main":
+		call_deferred("_center_current_main")
+
+func _style_tabs() -> void:
+	if _main_tab == null:
+		return
+	CommerceUiStyle.shop_category_button(_main_tab, "MAIN", Color("d99727") if _tab == &"main" else Color("a85e20"))
+	CommerceUiStyle.shop_category_button(_daily_tab, "DAILY", Color("d99727") if _tab == &"daily" else Color("a85e20"))
+
+func _queue_refresh() -> void:
+	if _refresh_queued:
+		return
+	_refresh_queued = true
+	call_deferred("_deferred_refresh")
+
+func _deferred_refresh() -> void:
+	_refresh_queued = false
+	if _overlay != null and _overlay.visible:
+		_refresh()
+
+func _refresh() -> void:
+	if _content == null or GameApp.state == null:
+		return
+	for child in _content.get_children():
+		child.queue_free()
+	if _tab == &"daily":
+		_build_daily()
+	else:
+		_build_main()
+
+func _build_main() -> void:
+	var scroll := HScrollBar.new()
+	scroll.name = "MainTaskScroll"
+	scroll.position = Vector2(0.0, 336.0)
+	scroll.size = Vector2(_content.size.x, 24.0)
+	_content.add_child(scroll)
+	var viewport := Control.new()
+	viewport.name = "MainViewport"
+	viewport.clip_contents = true
+	viewport.position = Vector2.ZERO
+	viewport.size = Vector2(_content.size.x, 330.0)
+	_content.add_child(viewport)
+	var ribbon := HBoxContainer.new()
+	ribbon.name = "MainRibbon"
+	ribbon.position = Vector2(18.0, 15.0)
+	ribbon.add_theme_constant_override(&"separation", 0)
+	viewport.add_child(ribbon)
+	var tasks := TaskService.main_tasks(GameApp.state, GameApp.registry)
+	for index in range(tasks.size()):
+		var task: Dictionary = tasks[index]
+		ribbon.add_child(_task_card(task, false))
+		if index < tasks.size() - 1:
+			ribbon.add_child(_connector(task))
+	await get_tree().process_frame
+	var max_scroll := maxf(0.0, ribbon.size.x + 36.0 - viewport.size.x)
+	scroll.max_value = max_scroll
+	scroll.page = viewport.size.x
+	scroll.value_changed.connect(func(value: float) -> void: ribbon.position.x = 18.0 - value)
+	viewport.set_meta("ribbon", ribbon)
+	scroll.set_meta("viewport", viewport)
+
+func _build_daily() -> void:
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_content.add_child(scroll)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_theme_constant_override(&"h_separation", 10)
+	grid.add_theme_constant_override(&"v_separation", 10)
+	scroll.add_child(grid)
+	for task in TaskService.daily_tasks(GameApp.state):
+		grid.add_child(_task_card(task, true))
+
+func _task_card(task: Dictionary, daily: bool) -> PanelContainer:
+	var card := PanelContainer.new()
+	card.name = "Task_%s" % String(task.id)
+	card.custom_minimum_size = CARD_SIZE
+	var active := bool(task.unlocked) and not bool(task.claimed)
+	card.add_theme_stylebox_override(&"panel", _card_style(active, bool(task.claimed)))
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override(&"separation", 8)
+	card.add_child(box)
+	var title := Label.new()
+	title.text = String(task.title).to_upper()
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.add_theme_font_size_override(&"font_size", 17)
+	title.add_theme_color_override(&"font_color", Color("5b2b12"))
+	box.add_child(title)
+	var requirement := Label.new()
+	requirement.text = String(task.get("hint", task.title))
+	requirement.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	requirement.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	requirement.add_theme_font_size_override(&"font_size", 14)
+	requirement.add_theme_color_override(&"font_color", Color("693718"))
+	box.add_child(requirement)
+	var progress := Label.new()
+	progress.text = "%d / %d" % [int(task.progress), int(task.target)]
+	progress.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	progress.add_theme_font_size_override(&"font_size", 15)
+	box.add_child(progress)
+	var reward := Label.new()
+	reward.text = "REWARD  +%d %s" % [int(task.reward), String(task.reward_kind).to_upper()]
+	reward.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	reward.add_theme_font_size_override(&"font_size", 15)
+	reward.add_theme_color_override(&"font_color", Color("7b4513"))
+	box.add_child(reward)
+	var claim := Button.new()
+	claim.custom_minimum_size = Vector2(0.0, 42.0)
+	box.add_child(claim)
+	_configure_claim(claim, task, daily)
+	if not bool(task.unlocked):
+		var lock := ColorRect.new()
+		lock.color = Color(0.11, 0.07, 0.045, 0.55)
+		lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(lock)
+		lock.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	return card
+
+func _configure_claim(button: Button, task: Dictionary, daily: bool) -> void:
+	if bool(task.claimed):
+		button.text = "CLAIMED"
+		button.disabled = true
+		_style_disabled_claim(button)
+	elif not bool(task.unlocked):
+		button.text = "LOCKED"
+		button.disabled = true
+		_style_disabled_claim(button)
+	elif not bool(task.completed):
+		button.text = "IN PROGRESS"
+		button.disabled = true
+		_style_disabled_claim(button)
+	else:
+		button.text = "CLAIM"
+		CommerceUiStyle.transaction_action(button, &"claim")
+		button.pressed.connect(_claim_task.bind(StringName(task.id), daily), CONNECT_DEFERRED)
+
+func _claim_task(task_id: StringName, daily: bool) -> void:
+	var result := TaskService.claim_daily(GameApp.state, task_id) if daily else TaskService.claim_main(GameApp.state, GameApp.registry, task_id)
+	if result.is_empty():
+		return
+	if daily:
+		GameApp.state_changed.emit()
+		_refresh()
+	else:
+		_animate_connector(task_id)
+
+func _animate_connector(task_id: StringName) -> void:
+	var connector := _content.get_node_or_null("MainViewport/MainRibbon/Connector_%s" % String(task_id)) as Control
+	var fill := connector.get_node_or_null("Fill") as Panel if connector != null else null
+	if fill == null:
+		_finish_main_claim()
+		return
+	fill.size = Vector2(0.0, 5.0)
+	var tween := fill.create_tween()
+	tween.tween_property(fill, "size", Vector2(CONNECTOR_WIDTH, 5.0), 0.48).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(_finish_main_claim)
+
+func _finish_main_claim() -> void:
+	GameApp.state_changed.emit()
+	_refresh()
+	call_deferred("_center_current_main")
+
+func _connector(task: Dictionary) -> Control:
+	var connector := Control.new()
+	connector.name = "Connector_%s" % String(task.id)
+	connector.custom_minimum_size = Vector2(CONNECTOR_WIDTH, CARD_SIZE.y)
+	var track := Panel.new()
+	track.position = Vector2(0.0, 139.0)
+	track.size = Vector2(CONNECTOR_WIDTH, 5.0)
+	track.add_theme_stylebox_override(&"panel", _line_style(Color("7d5b36")))
+	connector.add_child(track)
+	var fill := Panel.new()
+	fill.name = "Fill"
+	fill.position = Vector2(0.0, 139.0)
+	fill.size = Vector2(CONNECTOR_WIDTH if bool(task.claimed) else 0.0, 5.0)
+	fill.add_theme_stylebox_override(&"panel", _line_style(Color("ffc52c")))
+	connector.add_child(fill)
+	return connector
+
+func _center_current_main() -> void:
+	if _tab != &"main" or _content == null:
+		return
+	var scroll := _content.get_node_or_null("MainTaskScroll") as HScrollBar
+	if scroll == null:
+		return
+	var tasks := TaskService.main_tasks(GameApp.state, GameApp.registry)
+	var active_index := 0
+	for index in range(tasks.size()):
+		if bool(tasks[index].unlocked) and not bool(tasks[index].claimed):
+			active_index = index
+			break
+	var stride := CARD_SIZE.x + CONNECTOR_WIDTH
+	var center_x := float(active_index) * stride + CARD_SIZE.x * 0.5
+	scroll.value = clampf(center_x - _content.size.x * 0.5 + 18.0, 0.0, scroll.max_value)
+
+func _card_style(active: bool, claimed: bool) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("d9a968") if claimed else Color("f0c982")
+	style.border_color = Color("8d5b2b") if claimed else (Color("f6b817") if active else Color("a76525"))
+	style.set_border_width_all(4 if active else 3)
+	style.set_corner_radius_all(18)
+	style.content_margin_left = 13.0
+	style.content_margin_top = 14.0
+	style.content_margin_right = 13.0
+	style.content_margin_bottom = 12.0
+	if active:
+		style.shadow_color = Color(1.0, 0.72, 0.12, 0.35)
+		style.shadow_size = 8
+	return style
+
+func _style_disabled_claim(button: Button) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color("8c8276")
+	style.border_color = Color("62594f")
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(18)
+	for state in [&"normal", &"hover", &"pressed", &"disabled"]:
+		button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override(&"font_disabled_color", Color("ded8cf"))
+
+func _line_style(color: Color) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(3)
+	return style
