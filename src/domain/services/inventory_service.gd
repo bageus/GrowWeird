@@ -28,6 +28,9 @@ static func take_fertilizer_amount(inventory: InventoryState, fertilizer_id: Str
 		inventory.fertilizers[key] = remaining
 	return taken
 
+static func misc_count(inventory: InventoryState, item_id: String) -> int:
+	return int(inventory.misc.get(item_id, 0)) if inventory != null else 0
+
 static func take_misc(inventory: InventoryState, item_id: String, amount: int = 1) -> int:
 	if inventory == null or amount <= 0:
 		return 0
