@@ -106,9 +106,9 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Journal"]
 layout_mode = 0
-offset_left = 150.0
+offset_left = 180.0
 offset_top = 10.0
-offset_right = 470.0
+offset_right = 440.0
 offset_bottom = 62.0
 text = "JOURNAL"
 horizontal_alignment = 1
@@ -116,10 +116,10 @@ vertical_alignment = 1
 
 [node name="Close" type="Button" parent="Journal"]
 layout_mode = 0
-offset_left = 552.0
-offset_top = 6.0
-offset_right = 612.0
-offset_bottom = 66.0
+offset_left = 588.0
+offset_top = 0.0
+offset_right = 648.0
+offset_bottom = 60.0
 
 [node name="ContentHud" type="Panel" parent="Journal"]
 layout_mode = 0
