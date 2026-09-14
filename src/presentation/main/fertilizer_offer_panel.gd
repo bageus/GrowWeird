@@ -23,7 +23,8 @@ func _ready() -> void:
 	call_deferred("_sync")
 
 func _bind_auxiliary_hud() -> void:
-	var auxiliary := get_parent().get_node("FertilizerAuxiliaryUi")
+	var host := get_parent() as Control
+	var auxiliary := host.get_node("FertilizerAuxiliaryUi")
 	_dim = auxiliary.get_node("Dim") as ColorRect
 	_timer = auxiliary.get_node("TimerHud") as Control
 	_timer_label = auxiliary.get_node("TimerHud/Label") as Label
@@ -31,6 +32,15 @@ func _bind_auxiliary_hud() -> void:
 	_configure_timer_hud()
 	_timer_finish.pressed.connect(_finish_timer)
 	_journal_button = auxiliary.get_node("JournalButton") as Button
+	_journal_button.reparent(host)
+	_journal_button.z_as_relative = false
+	_journal_button.z_index = 10
+	_journal_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_journal_button.offset_left = 28.0
+	_journal_button.offset_top = -62.0
+	_journal_button.offset_right = 178.0
+	_journal_button.offset_bottom = -25.0
+	_journal_button.show()
 	CommerceUiStyle.transaction_action(_journal_button, &"journal")
 	_journal_button.pressed.connect(_toggle_journal)
 	_journal = auxiliary.get_node("Journal") as Control
