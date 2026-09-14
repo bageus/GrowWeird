@@ -15,6 +15,11 @@ const SEED_NAMES := ["Starter Seed", "Shade Fern Seed", "Sun Creeper Seed", "Har
 const POT_NAMES := ["Clay Pot", "Ceramic Pot", "Stone Pot", "Wooden Pot", "Golden Pot"]
 const DECORATIONS := [&"garden_gnome", &"fairy_lights", &"crystal_cluster", &"wooden_fence", &"water_fountain"]
 const MUTAGENS := [&"stable_mutagen", &"spore_mutagen", &"crystal_mutagen", &"floral_mutagen", &"predatory_mutagen"]
+const SEED_PRICE := 20
+const SPROUT_WITH_POT_PRICE := 190
+const CUTTING_PRICE := 110
+const DEFAULT_POT_PRICE := 130
+
 @onready var tabs: Control = %Tabs
 @onready var grid: GridContainer = %ItemGrid
 @onready var category_hud: PanelContainer = %CategoryHud
@@ -35,6 +40,7 @@ var _selected: Dictionary = {}
 var _stock: Dictionary = {}
 var _last_signature := ""
 var _purchase_quantity := 1
+var _pot_price := DEFAULT_POT_PRICE
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -62,10 +68,12 @@ func _configure_buy_dialog_art() -> void:
 		"count_background": %CountBackground, "action": buy_button,
 	}, &"buy", Vector2i.ZERO)
 
-func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], _pot_price: int, money: int) -> void:
-	var signature := "%s|%d" % [str(fertilizers), money]
+func set_shop(fertilizers: Array[Dictionary], _species: Array[Dictionary], pot_price: int, money: int) -> void:
+	var signature := "%s|%d|%d" % [str(fertilizers), pot_price, money]
 	if signature == _last_signature: return
-	_last_signature = signature; _money = money
+	_last_signature = signature
+	_money = money
+	_pot_price = maxi(1, pot_price)
 	_catalogs = {
 		&"plants": _plant_items(), &"pots": _pot_items(), &"seeds": _seed_items(),
 		&"fertilizers": _fertilizer_items(fertilizers), &"decorations": _misc_items(DECORATIONS, &"decoration"),
@@ -118,8 +126,8 @@ func _add_card(item: Dictionary) -> void:
 	if int(item.get("stock", 1)) > 1: badge = _quantity_badge(int(item["stock"])); card.add_child(badge)
 	card.pressed.connect(_open_confirm.bind(item)); grid.add_child(card)
 
-func _configure_lot_button(card: Button) -> void:
-	CommerceUiStyle.shop_lot(card, COLORS[_category])
+func _configure_lot_button(card: Button) -> void: CommerceUiStyle.shop_lot(card, COLORS[_category])
+
 func _open_confirm(item: Dictionary) -> void:
 	_selected = item
 	CommerceUiStyle.curved_title(confirm_name, "BUY·%s" % _purchase_group(item))
@@ -159,7 +167,7 @@ func _refresh_purchase_preview() -> void:
 	quantity_minus.disabled = not can_change_quantity or _purchase_quantity <= 1
 	quantity_plus.disabled = not can_change_quantity or _purchase_quantity >= stock
 	confirm_price.text = str(unit_price * _purchase_quantity)
-	buy_button.disabled = not bool(_selected.get("unlocked", false))
+	buy_button.disabled = not bool(_selected.get("unlocked", false)) or unit_price * _purchase_quantity > _money
 
 func _hide_confirm() -> void: _selected = {}; confirm.visible = false; %CloseButton.disabled = false; %CloseButton.modulate = Color.WHITE
 func _request_close() -> void: _hide_confirm(); close_requested.emit()
@@ -170,22 +178,22 @@ func _rebuild_catalog_stock() -> void:
 
 func _plant_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	result.append(_item(&"starter_cuttings", SPECIES[0], "Starter Branches", "Plantable branches delivered to inventory.", &"cutting", true, 29, "res://assets/tree/tree_05.png"))
-	result.append(_item(&"fern_cutting", SPECIES[1], "Fern Branch", "A plantable branch delivered without a pot.", &"cutting", true, 1, "res://assets/tree/tree_05.png"))
-	result.append(_item(&"starter_plant", SPECIES[0], PLANT_NAMES[0], "A first-stage shoot supplied in its own pot.", &"potted_plant", true, 1, "res://assets/tree/tree_01.png"))
-	result.append(_item(&"young_ferns", SPECIES[1], PLANT_NAMES[1], "First-stage shoots supplied in their own pots.", &"potted_plant", true, 2, "res://assets/tree/tree_01.png"))
-	result.append(_item(&"sun_creeper_plant", SPECIES[2], PLANT_NAMES[2], "A first-stage shoot supplied in its own pot.", &"potted_plant", true, 1, "res://assets/tree/tree_01.png"))
+	result.append(_item(&"starter_cuttings", SPECIES[0], "Starter Branches", "Plantable branches delivered to inventory. After one growth cycle a planted cutting becomes a one-branch tree.", &"cutting", true, 29, "res://assets/tree/tree_05.png", CUTTING_PRICE))
+	result.append(_item(&"fern_cutting", SPECIES[1], "Fern Branch", "A plantable branch delivered without a pot.", &"cutting", true, 1, "res://assets/tree/tree_05.png", CUTTING_PRICE))
+	result.append(_item(&"starter_plant", SPECIES[0], PLANT_NAMES[0], "A sprout supplied in its own pot.", &"potted_plant", true, 1, "res://assets/tree/tree_01.png", SPROUT_WITH_POT_PRICE))
+	result.append(_item(&"young_ferns", SPECIES[1], PLANT_NAMES[1], "Sprouts supplied in their own pots.", &"potted_plant", true, 2, "res://assets/tree/tree_01.png", SPROUT_WITH_POT_PRICE))
+	result.append(_item(&"sun_creeper_plant", SPECIES[2], PLANT_NAMES[2], "A sprout supplied in its own pot.", &"potted_plant", true, 1, "res://assets/tree/tree_01.png", SPROUT_WITH_POT_PRICE))
 	return result
 
 func _pot_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for index in range(5): result.append(_item(StringName("pot_%d" % index), &"new_pot", POT_NAMES[index], "Adds an empty independent growing place.", &"pot", true, 1, "res://assets/pot/pot_%02d.png" % (index + 1)))
+	for index in range(5): result.append(_item(StringName("pot_%d" % index), &"new_pot", POT_NAMES[index], "Adds an empty independent growing place.", &"pot", true, 1, "res://assets/pot/pot_%02d.png" % (index + 1), _pot_price))
 	return result
 
 func _seed_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for index in range(5):
-		var item := _item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4)
+		var item := _item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4, "", SEED_PRICE)
 		item["seed_frame"] = randi_range(0, 7)
 		result.append(item)
 	return result
@@ -194,12 +202,12 @@ func _fertilizer_items(catalog: Array[Dictionary]) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var stage_catalog: Array[Dictionary] = []
 	for source in catalog:
-		if String(source.get("id", "")).begins_with("fertilizer_atlas_3_"):
-			stage_catalog.append(source)
+		if String(source.get("id", "")).begins_with("fertilizer_atlas_3_"): stage_catalog.append(source)
 	for index in range(stage_catalog.size()):
 		var source: Dictionary = stage_catalog[index]
 		var source_id := StringName(source.get("id", &""))
-		result.append(_item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id).trim_prefix("fertilizer_atlas_3_")), "Doubles growth and holds nutrition in the favorable zone during its matching stage.", &"fertilizer", true, 3))
+		var item := _item(StringName("fertilizer_%d" % index), source_id, _pretty(String(source_id).trim_prefix("fertilizer_atlas_3_")), "Restores 50% of the current nutrition capacity on its matching stage; otherwise works like ground fertilizer.", &"fertilizer", bool(source.get("unlocked", true)), 3, "", int(source.get("price", 0)))
+		result.append(item)
 	return result
 
 func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
@@ -209,16 +217,14 @@ func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
 		result.append(_item(item_id, item_id, _pretty(String(item_id)), "A %s item stored in the shared inventory." % _pretty(String(action)), action))
 	return result
 
-func _item(id: StringName, source_id: StringName, display_name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "") -> Dictionary:
+func _item(id: StringName, source_id: StringName, display_name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "", price: int = 1) -> Dictionary:
 	var key := String(id)
 	if not _stock.has(key): _stock[key] = maxi(0, stock)
-	return {"id": id, "source_id": source_id, "name": display_name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
+	return {"id": id, "source_id": source_id, "name": display_name, "price": maxi(1, price), "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
 
 func _preview_texture(item: Dictionary) -> Texture2D:
-	if StringName(item.get("action", &"")) == &"cutting":
-		return _cutting_texture(String(item.get("id", "")))
-	if StringName(item.get("action", &"")) == &"fertilizer":
-		return FertilizerOfferArt.texture_for(StringName(item.get("source_id", &"")))
+	if StringName(item.get("action", &"")) == &"cutting": return _cutting_texture(String(item.get("id", "")))
+	if StringName(item.get("action", &"")) == &"fertilizer": return FertilizerOfferArt.texture_for(StringName(item.get("source_id", &"")))
 	if item.has("seed_frame"):
 		var texture := AtlasTexture.new()
 		var frame := int(item["seed_frame"]) % 8
@@ -229,56 +235,35 @@ func _preview_texture(item: Dictionary) -> Texture2D:
 	if not path.is_empty() and ResourceLoader.exists(path): return load(path) as Texture2D
 	return UiAtlas.background(CATEGORIES.find(_category) % 2)
 
-func _cutting_texture(_item_id: String) -> Texture2D:
-	return UiAtlas.branch_texture()
+func _cutting_texture(_item_id: String) -> Texture2D: return UiAtlas.branch_texture()
 
 func _quantity_badge(amount: int) -> Control:
-	var badge := Panel.new()
-	badge.name = "QuantityBadge"
-	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	badge.position = Vector2(-30.0, 4.0)
-	badge.size = Vector2(30.0, 30.0)
-	var style := StyleBoxFlat.new()
-	style.bg_color = COLORS[_category].darkened(0.38)
-	style.border_color = COLORS[_category].lightened(0.20)
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(15)
-	badge.add_theme_stylebox_override(&"panel", style)
-	var label := Label.new()
-	badge.add_child(label)
-	label.position = Vector2.ZERO
-	label.size = Vector2(30.0, 30.0)
-	label.text = str(amount)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override(&"font_size", 13 if amount >= 10 else 15)
-	label.add_theme_color_override(&"font_color", Color.WHITE)
-	label.add_theme_color_override(&"font_outline_color", Color(0.20, 0.07, 0.015, 1.0))
-	label.add_theme_constant_override(&"outline_size", 1)
+	var badge := Panel.new(); badge.name = "QuantityBadge"; badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT); badge.position = Vector2(-30.0, 4.0); badge.size = Vector2(30.0, 30.0)
+	var style := StyleBoxFlat.new(); style.bg_color = COLORS[_category].darkened(0.38); style.border_color = COLORS[_category].lightened(0.20)
+	style.set_border_width_all(2); style.set_corner_radius_all(15); badge.add_theme_stylebox_override(&"panel", style)
+	var label := Label.new(); badge.add_child(label); label.position = Vector2.ZERO; label.size = Vector2(30.0, 30.0); label.text = str(amount)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override(&"font_size", 13 if amount >= 10 else 15); label.add_theme_color_override(&"font_color", Color.WHITE)
+	label.add_theme_color_override(&"font_outline_color", Color(0.20, 0.07, 0.015, 1.0)); label.add_theme_constant_override(&"outline_size", 1)
 	return badge
 
 func _lot_title_font_size(title: String) -> int:
-	if title.length() > 16:
-		return 12
-	if title.length() > 12:
-		return 14
+	if title.length() > 16: return 12
+	if title.length() > 12: return 14
 	return 16
 
 func _apply_category_hud(color: Color) -> void:
 	var style := StyleBoxFlat.new(); style.bg_color = color.darkened(0.72); style.bg_color.a = 0.96
 	style.border_width_left = 7; style.border_width_top = 7; style.border_width_right = 7; style.border_width_bottom = 7
 	style.border_color = color.lightened(0.28); style.shadow_color = Color(0.08, 0.04, 0.01, 0.55); style.shadow_size = 5; style.shadow_offset = Vector2(0, 3)
-	style.corner_radius_top_left = 20; style.corner_radius_top_right = 20
-	style.corner_radius_bottom_left = 20; style.corner_radius_bottom_right = 20
+	style.corner_radius_top_left = 20; style.corner_radius_top_right = 20; style.corner_radius_bottom_left = 20; style.corner_radius_bottom_right = 20
 	style.content_margin_left = 16; style.content_margin_top = 16; style.content_margin_right = 16; style.content_margin_bottom = 16
 	category_hud.add_theme_stylebox_override(&"panel", style)
 
 func _lot_price_style(accent: Color) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = accent.darkened(0.48); style.bg_color.a = 0.92
-	style.border_color = accent.darkened(0.66); style.set_border_width_all(2)
-	style.set_corner_radius_all(10)
+	var style := StyleBoxFlat.new(); style.bg_color = accent.darkened(0.48); style.bg_color.a = 0.92
+	style.border_color = accent.darkened(0.66); style.set_border_width_all(2); style.set_corner_radius_all(10)
 	return style
 
 func _pretty(value: String) -> String: return value.replace("_", " ").capitalize()
