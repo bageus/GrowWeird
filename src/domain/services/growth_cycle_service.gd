@@ -15,24 +15,27 @@ static func progress(plant: PlantState) -> float:
 static func repair_state(state: GameState) -> void:
 	if state == null: return
 	for pot in state.pots:
-		var plant := pot.plant as PlantState
-		if plant == null: continue
-		if not plant.alive:
-			plant.alive = true
-			plant.health = 1.0
-		plant.growth_cycle_index = clampi(plant.growth_cycle_index, 0, LAST_CYCLE)
-		if not is_finite(plant.growth_cycle_elapsed) or plant.growth_cycle_elapsed < 0.0:
-			plant.growth_cycle_elapsed = 0.0
-		if plant.branches.is_empty(): plant.initialize_native_branches()
-		if plant.growth_ratio >= 0.999 and plant.growth_cycle_index < 8:
-			plant.growth_cycle_index = 8
-		elif plant.growth_ratio > 0.0 and plant.growth_cycle_index == 0:
-			plant.growth_cycle_index = clampi(floori(plant.growth_ratio * 8.0), 1, 7)
-		_sync_legacy_growth(plant)
+		repair_plant(pot.plant as PlantState)
+
+static func repair_plant(plant: PlantState) -> void:
+	if plant == null: return
+	if not plant.alive:
+		plant.alive = true
+		plant.health = 1.0
+	plant.growth_cycle_index = clampi(plant.growth_cycle_index, 0, LAST_CYCLE)
+	if not is_finite(plant.growth_cycle_elapsed) or plant.growth_cycle_elapsed < 0.0:
+		plant.growth_cycle_elapsed = 0.0
+	if plant.branches.is_empty(): plant.initialize_native_branches()
+	if plant.growth_ratio >= 0.999 and plant.growth_cycle_index < 8:
+		plant.growth_cycle_index = 8
+	elif plant.growth_ratio > 0.0 and plant.growth_cycle_index == 0:
+		plant.growth_cycle_index = clampi(floori(plant.growth_ratio * 8.0), 1, 7)
+	_sync_legacy_growth(plant)
 
 static func advance(plant: PlantState, delta_seconds: float, _care_factor: float) -> bool:
-	if plant == null or not plant.alive or delta_seconds <= 0.0:
+	if plant == null or delta_seconds <= 0.0:
 		return false
+	repair_plant(plant)
 	var speed := 2.0 if plant.boosted_growth_cycle == plant.growth_cycle_index else 1.0
 	plant.growth_cycle_elapsed += delta_seconds * speed
 	var changed := false
