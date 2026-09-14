@@ -15,6 +15,7 @@ static func create(rules: GameRules) -> GameState:
 	first_pot.plant.species_id = STARTER_SPECIES
 	first_pot.plant.growth_cycle_index = 1
 	first_pot.plant.initialize_native_branches()
+	first_pot.plant.nutrition = NutritionService.capacity(first_pot.plant) * 0.5
 	var second_pot := PotState.new()
 	second_pot.pot_id = "pot-2"
 	second_pot.soil_moisture = 0.30
