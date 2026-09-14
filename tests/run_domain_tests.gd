@@ -1,7 +1,5 @@
 extends SceneTree
-
 var _failures: Array[String] = []
-
 func _init() -> void:
 	_test_pour_moistens_soil_one_stage()
 	_test_four_sprays_moisten_one_stage()
@@ -28,7 +26,6 @@ func _init() -> void:
 	for failure in _failures:
 		push_error(failure)
 	quit(1)
-
 func _test_pour_moistens_soil_one_stage() -> void:
 	var pot := PotState.new()
 	var expected := [0.30, 0.48, 0.68, 0.86, 1.0, 1.0]
@@ -39,7 +36,6 @@ func _test_pour_moistens_soil_one_stage() -> void:
 		pot.moisten_soil_one_stage()
 		_expect(is_equal_approx(pot.soil_moisture, expected[index]), "pour: soil moisture did not advance to the next stage")
 		_expect(pot.soil_moisture_stage() == mini(stage_before + 1, 5), "pour: soil visual stage did not advance exactly once")
-
 func _test_four_sprays_moisten_one_stage() -> void:
 	var pot := PotState.new()
 	pot.soil_moisture = 0.30
@@ -51,23 +47,26 @@ func _test_four_sprays_moisten_one_stage() -> void:
 	_expect(pot.spray_soil(0.035), "spray: fourth consecutive spray must complete one moisture stage")
 	_expect(is_equal_approx(pot.soil_moisture, 0.48), "spray: four quarter steps must reach the next stage")
 	_expect(pot.consecutive_sprays == 0, "spray: completed sequence must reset")
-
 func _test_care_gauge_ranges_and_stage_history() -> void:
 	var pot := PotState.new()
 	pot.plant = _plant("care-gauge")
 	pot.soil_moisture = 0.5
-	pot.plant.nutrition = 0.5
+	pot.plant.nutrition = 10.0
 	var species := PlantSpeciesDefinition.new()
-	var gauge := CareGaugeService.evaluate(pot, species); var feed := FertilizerDefinition.new(); feed.care_effects = {"growth_cycle": &"seed", "nutrition": 0.2}; pot.plant.nutrition = 0.2; FertilizerUseService.apply(pot.plant, feed, []); _expect(is_equal_approx(pot.plant.nutrition, 0.65), "fertilizer: stage boost must also feed the plant")
+	var gauge := CareGaugeService.evaluate(pot, species)
+	var feed := FertilizerDefinition.new()
+	feed.care_effects = {"growth_cycle": &"seed"}
+	pot.plant.nutrition = 4.0
+	FertilizerUseService.apply(pot.plant, feed, [])
+	_expect(is_equal_approx(pot.plant.nutrition, 14.0), "fertilizer: matching stage boost must restore half the current capacity")
 	_expect(int((gauge["water"] as Dictionary)["direction"]) == 0, "care gauge: optimal water should be in the favorable zone")
-	pot.plant.nutrition = 1.0
+	pot.plant.nutrition = NutritionService.capacity(pot.plant)
 	gauge = CareGaugeService.evaluate(pot, species)
 	_expect(int((gauge["food"] as Dictionary)["direction"]) == 1, "care gauge: excess food should be detected")
 	pot.plant.record_care_sample(0.8, 10.0)
 	pot.plant.finish_care_stage(1)
 	_expect(pot.plant.completed_care_scores.size() == 1 and is_equal_approx(pot.plant.completed_care_scores[0], 0.8), "care gauge: completed stage quality should use the full stage history")
 	_expect(CareGaugeService.stage_progress(0.124) > 0.9 and is_zero_approx(CareGaugeService.stage_progress(0.125)), "care gauge: pointer must restart after each growth cycle")
-
 func _test_growth_cycle_consumes_water_and_food() -> void:
 	var registry := ContentRegistry.new()
 	registry.load_all()
@@ -76,15 +75,14 @@ func _test_growth_cycle_consumes_water_and_food() -> void:
 	pot.pot_id = "growth-needs"
 	pot.soil_moisture = 0.8
 	pot.plant = _plant("growth-needs-plant")
-	pot.plant.nutrition = 0.8
+	pot.plant.nutrition = 16.0
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
 	var growth_before := pot.plant.growth_ratio
 	PlantSimulationService.advance(state, 60.0, registry, GameRules.new())
 	_expect(pot.plant.growth_ratio > growth_before, "growth needs: planted seed must start its growth cycle")
 	_expect(is_equal_approx(pot.soil_moisture, 0.75), "growth needs: soil must lose one quarter-cell per minute")
-	_expect(is_equal_approx(pot.plant.nutrition, 0.75), "growth needs: nutrition must lose one quarter-cell per minute")
-
+	_expect(is_equal_approx(pot.plant.nutrition, 15.0), "growth needs: nutrition must lose five percent of current capacity per minute")
 func _test_independent_pots_and_starter_seed() -> void:
 	var state := NewGameFactory.create(GameRules.new())
 	_expect(state.pots.size() >= 2 and state.pots[0].plant != null, "new game: first pot must contain a sprout")
@@ -96,10 +94,9 @@ func _test_independent_pots_and_starter_seed() -> void:
 	_expect(second_plant != null and second_plant.instance_id != first_plant.instance_id, "pots: planted specimens must have unique identities")
 	state.pots[1].soil_moisture = 0.9
 	state.pots[1].light_mode = PotState.LightMode.DIRECT
-	second_plant.nutrition = 0.2
+	second_plant.nutrition = 2.0
 	_expect(not is_equal_approx(state.pots[0].soil_moisture, state.pots[1].soil_moisture), "pots: watering must remain independent")
 	_expect(state.pots[0].light_mode != state.pots[1].light_mode and not is_equal_approx(first_plant.nutrition, second_plant.nutrition), "pots: light and nutrition must remain independent")
-
 func _test_pour_waters_empty_active_pot() -> void:
 	var app = load("res://src/application/game_app.gd").new()
 	var state := GameState.new()
@@ -121,7 +118,6 @@ func _test_seed_snapshot_is_immutable() -> void:
 	plant.branch_at(&"left").add_trait(&"thorns", 5)
 	_expect(seed_state != null, "seed snapshot: seed should be created")
 	_expect(int(seed_state.genome.traits.get("thorns", 0)) == 2, "seed snapshot: later parent mutation changed existing seed")
-
 func _test_grafted_branch_creates_hybrid_genome() -> void:
 	var host := _plant("host")
 	host.branch_at(&"left").add_trait(&"bloom", 1)
@@ -139,7 +135,6 @@ func _test_grafted_branch_creates_hybrid_genome() -> void:
 	_expect(fruit != null and fruit.hybrid, "hybrid fruit: grafted branch fruit must be hybrid")
 	_expect(int(fruit.genome.traits.get("bloom", 0)) == 1, "hybrid fruit: host trait missing")
 	_expect(int(fruit.genome.traits.get("thorns", 0)) == 3, "hybrid fruit: donor trait missing")
-
 func _test_offer_contains_three_unique_items() -> void:
 	var offer := FertilizerOfferState.new()
 	FertilizerOfferService.initialize_rng(offer, 42)
@@ -167,7 +162,6 @@ func _test_offer_contains_three_unique_items() -> void:
 	offer.seconds_until_offer = 30.0
 	_expect(FertilizerOfferService.ensure_active(offer, definitions, rules), "fertilizer offer: initial HUD offer must be generated immediately")
 	_expect(offer.offered_ids.size() == 3 and offer.seconds_until_offer == 0.0, "fertilizer offer: immediate offer state is invalid")
-
 func _test_fertilizer_atlas_catalog() -> void:
 	var definitions := FertilizerAssetCatalog.definitions()
 	var ids := {}
@@ -199,7 +193,6 @@ func _test_atlas_offer_moves_to_inventory() -> void:
 	result = FertilizerActions.choose_offer(state, null, fertilizer_id, registry, GameRules.new())
 	_expect(bool(result.get("success", false)) and InventoryService.fertilizer_count(state.inventory, fertilizer_id) == 2, "fertilizer atlas: selection without a plant must stack in inventory")
 	_expect(FertilizerOfferService.skip_price(state.fertilizer_offer, GameRules.new()) > 0, "fertilizer offer: cooldown controls must remain active")
-
 func _test_multi_axis_mutation_consumes_requirements() -> void:
 	var plant := _plant("synergy")
 	var fertilizer := FertilizerDefinition.new()
@@ -218,7 +211,6 @@ func _test_multi_axis_mutation_consumes_requirements() -> void:
 	for branch in plant.existing_branches():
 		found = found or branch.trait_level(&"lure_bloom") == 1
 	_expect(found, "mutation synergy: result trait was not applied")
-
 func _test_cutting_plant_and_graft_flow() -> void:
 	var donor := _plant("donor")
 	donor.branch_at(&"left").add_trait(&"thorns", 4)
@@ -240,7 +232,6 @@ func _test_cutting_plant_and_graft_flow() -> void:
 	_expect(not cutting_id.is_empty() and state.inventory.cuttings.size() == 1, "prune flow: cut plant branch was not added to inventory")
 	_expect(state.inventory.cuttings[0].source_branch_id == source_branch_id and state.energy == 10, "prune flow: inventory branch identity or ten-energy cost is incorrect")
 	source.alive = false; _expect(not PropagationActions.prune(state, source, &"right").is_empty() and state.inventory.cuttings.size() == 2 and state.energy == 0, "prune flow: an existing final-state branch must still become an inventory cutting"); _expect(PropagationActions.prune(state, source, &"center").is_empty() and source.branch_at(&"center") != null, "prune flow: insufficient energy must leave the branch intact")
-
 func _test_fruit_lifecycle_and_harvest() -> void:
 	var registry := ContentRegistry.new()
 	registry.load_all()
@@ -257,7 +248,6 @@ func _test_fruit_lifecycle_and_harvest() -> void:
 	var harvested := FruitLifecycleService.harvest(pot.plant, &"center", "fruit-harvest")
 	_expect(harvested != null, "fruit lifecycle: ripe fruit should harvest")
 	_expect(branch.fruit_growth == null, "fruit lifecycle: harvesting must reset branch fruit cycle")
-
 func _test_plant_sale_frees_pot() -> void:
 	var registry := ContentRegistry.new()
 	registry.load_all()
@@ -273,7 +263,6 @@ func _test_plant_sale_frees_pot() -> void:
 	var amount := EconomyActions.sell_plant(state, pot, registry, rules); _expect(amount == plant_only_value + rules.pot_base_price, "plant sale: value must include the sold pot")
 	_expect(state.pots.size() == 1 and state.pots[0] == next_pot, "plant sale: the pot must be sold with its plant")
 	_expect(state.active_pot_id == next_pot.pot_id, "plant sale: another pot must become active"); _expect(state.money == amount, "plant sale: money was not credited")
-
 func _test_shop_transactions() -> void:
 	var registry := ContentRegistry.new()
 	registry.load_all()
@@ -286,7 +275,6 @@ func _test_shop_transactions() -> void:
 	_expect(InventoryService.fertilizer_count(state.inventory, &"humus") == 1, "shop: fertilizer not added")
 	var pot_id := ShopActions.buy_pot(state, rules)
 	_expect(not pot_id.is_empty() and state.pots.size() == 3, "shop: new pot should be added")
-
 func _test_species_seed_unlock_progression() -> void:
 	var registry := ContentRegistry.new()
 	registry.load_all()
@@ -305,7 +293,6 @@ func _test_species_seed_unlock_progression() -> void:
 	state.pots.append(PotState.new())
 	var sun_seed_id := ShopActions.buy_species_seed(state, &"sun_creeper", registry)
 	_expect(not sun_seed_id.is_empty(), "species shop: sun creeper should unlock after graft milestone plus third pot")
-
 func _test_save_round_trip_preserves_new_state() -> void:
 	var state := GameState.new()
 	state.money = 123
@@ -337,14 +324,12 @@ func _test_save_round_trip_preserves_new_state() -> void:
 	var restored_fruit := restored.pots[0].plant.branch_at(&"left").fruit_growth
 	_expect(restored_fruit != null and absf(restored_fruit.progress - 0.61) < 0.001, "save round trip: growing fruit progress lost")
 	_expect(restored_fruit.hybrid, "save round trip: growing fruit hybrid marker lost")
-
 func _plant(id: String) -> PlantState:
 	var plant := PlantState.new()
 	plant.instance_id = id
 	plant.species_id = &"starter_sprout"
 	plant.initialize_native_branches()
 	return plant
-
 func _expect(condition: bool, message: String) -> void:
 	if not condition:
 		_failures.append(message)

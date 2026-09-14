@@ -34,6 +34,7 @@ static func plant_cutting(
 	plant.growth_cycle_index = 5
 	plant.growth_cycle_elapsed = 0.0
 	plant.care_stage_index = 5
+	plant.nutrition = NutritionService.capacity(plant) * 0.5
 	pot.plant = plant
 	return true
 
@@ -43,6 +44,7 @@ static func plant_seed(seed_state: SeedState, pot: PotState, plant_id: String) -
 	var plant := GeneticsService.plant_from_genome(seed_state.genome, plant_id)
 	if plant == null:
 		return false
+	plant.nutrition = NutritionService.capacity(plant) * 0.5
 	pot.plant = plant
 	return true
 

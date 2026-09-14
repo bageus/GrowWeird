@@ -40,8 +40,7 @@ static func _advance_pot(
 	plant.record_care_sample(overall, delta_seconds)
 	if policy.advance_growth:
 		GrowthCycleService.advance(plant, delta_seconds, overall)
-		if plant.boosted_growth_cycle == plant.growth_cycle_index:
-			plant.nutrition = clampf(plant.nutrition, species.nutrition_min, species.nutrition_max)
+		NutritionService.clamp_to_capacity(plant)
 
 	if policy.advance_health:
 		if overall < rules.critical_comfort_threshold:
@@ -54,7 +53,6 @@ static func _advance_pot(
 				plant.alive = false
 			else:
 				plant.health = 0.01
-
 
 static func _consume_growth_needs(
 	pot: PotState,
@@ -70,8 +68,4 @@ static func _consume_growth_needs(
 	)
 	if pot.soil_moisture_stage() != moisture_stage_before:
 		pot.reset_spray_streak()
-	plant.nutrition = clampf(
-		plant.nutrition - QUARTER_CELL_DECAY_PER_SECOND * delta_seconds,
-		0.0,
-		1.0
-	)
+	NutritionService.consume(plant, delta_seconds)

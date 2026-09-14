@@ -111,7 +111,7 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.boosted_growth_cycle = int(data.get("boosted_growth_cycle", -1))
 	plant.health = clampf(float(data.get("health", 1.0)), 0.0, 1.0)
 	plant.alive = bool(data.get("alive", true)) and plant.health > 0.0
-	plant.nutrition = clampf(float(data.get("nutrition", 0.5)), 0.0, 1.0)
+	plant.nutrition = maxf(0.0, float(data.get("nutrition", 10.0)))
 	plant.care_stage_index = maxi(0, int(data.get("care_stage_index", 0)))
 	plant.care_stage_score_sum = maxf(0.0, float(data.get("care_stage_score_sum", 0.0)))
 	plant.care_stage_sample_seconds = maxf(0.0, float(data.get("care_stage_sample_seconds", 0.0)))
@@ -136,6 +136,7 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 			plant.regrowth_fruit_cycles.erase(String(slot))
 		else:
 			plant.set_regrowth_progress(slot, plant.regrowth_progress_at(slot))
+	NutritionService.clamp_to_capacity(plant)
 	return plant
 
 static func _branch_to_dictionary(branch: BranchState) -> Dictionary:
