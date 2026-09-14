@@ -37,7 +37,9 @@ func _bind_auxiliary_hud() -> void:
 	_journal_button = host.get_node("JournalButton") as Button
 	_journal_button.z_as_relative = true
 	_journal_button.z_index = 0
+	_journal_button.mouse_filter = Control.MOUSE_FILTER_STOP
 	_journal_button.show()
+	_journal_button.move_to_front()
 	CommerceUiStyle.transaction_action(_journal_button, &"journal")
 	_journal_button.pressed.connect(_toggle_journal)
 	_journal = auxiliary.get_node("Journal") as Control

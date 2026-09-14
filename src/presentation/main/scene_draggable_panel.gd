@@ -35,10 +35,9 @@ func apply_normalized_position(value: Vector2) -> void:
 	if parent_control == null:
 		return
 	var available := _available_space(parent_control)
-	var target := _fixed_position() if _is_layout_locked() else value
 	position = Vector2(
-		clampf(target.x, 0.0, 1.0) * available.x,
-		clampf(target.y, 0.0, 1.0) * available.y
+		clampf(value.x, 0.0, 1.0) * available.x,
+		clampf(value.y, 0.0, 1.0) * available.y
 	)
 
 func normalized_position() -> Vector2:
@@ -52,10 +51,6 @@ func normalized_position() -> Vector2:
 	)
 
 func apply_scale_factor(value: float) -> void:
-	if _is_layout_locked():
-		scale_factor = 1.0
-		scale = Vector2.ONE
-		return
 	scale_factor = clampf(value, minimum_scale, maximum_scale)
 	scale = Vector2.ONE * scale_factor
 	var parent_control := get_parent() as Control
@@ -147,9 +142,6 @@ func _handle_mouse_motion() -> void:
 
 func _is_layout_locked() -> bool:
 	return lock_layout or FIXED_LAYOUT_POSITIONS.has(layout_id)
-
-func _fixed_position() -> Vector2:
-	return FIXED_LAYOUT_POSITIONS.get(layout_id, locked_normalized_position)
 
 func _clamp_position(parent_control: Control, value: Vector2) -> Vector2:
 	var available := _available_space(parent_control)
