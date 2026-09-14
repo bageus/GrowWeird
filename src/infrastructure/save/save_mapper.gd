@@ -97,6 +97,7 @@ static func _plant_to_dictionary(plant: PlantState) -> Dictionary:
 		"regrowth_fruit_cycles": _plain_dictionary(plant.regrowth_fruit_cycles),
 		"fruit_cycle_index": plant.fruit_cycle_index,
 		"rng_state": plant.rng_state,
+		"decorations": plant.decorations.duplicate(),
 	}
 
 static func _plant_from_dictionary(data: Dictionary) -> PlantState:
@@ -122,6 +123,7 @@ static func _plant_from_dictionary(data: Dictionary) -> PlantState:
 	plant.regrowth_fruit_cycles = _plain_dictionary(data.get("regrowth_fruit_cycles", {}))
 	plant.fruit_cycle_index = maxi(0, int(data.get("fruit_cycle_index", 0)))
 	plant.rng_state = int(data.get("rng_state", 0))
+	for decoration in data.get("decorations", []): plant.decorations.append(String(decoration))
 	var branch_data: Variant = data.get("branches", {})
 	for slot in BranchState.VALID_SLOTS:
 		var value: Variant = null
