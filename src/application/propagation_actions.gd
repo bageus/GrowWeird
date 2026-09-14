@@ -7,6 +7,7 @@ static func prune(state: GameState, plant: PlantState, slot: StringName) -> Stri
 	var cutting := PropagationService.prune(plant, slot, IdFactory.make("cutting"))
 	if cutting == null:
 		return ""
+	NutritionService.clamp_to_capacity(plant)
 	EnergyService.spend(state, EnergyService.PRUNE_COST)
 	InventoryService.add_cutting(state.inventory, cutting)
 	return cutting.item_id
