@@ -15,10 +15,12 @@ static func ensure_daily(state: GameState, unix_time: int) -> void:
 	if state == null:
 		return
 	var day := int(floor(float(maxi(0, unix_time)) / 86400.0))
-	if state.daily_task_day != day:
-		state.daily_task_day = day
-		state.daily_task_progress.clear()
-		state.daily_task_claimed.clear()
+	var stored_day := int(state.progression.progress_by_id.get("__tasks_daily_day", -1))
+	if stored_day != day:
+		for key in state.progression.progress_by_id.keys():
+			if String(key).begins_with("__daily_"):
+				state.progression.progress_by_id.erase(key)
+		state.progression.progress_by_id["__tasks_daily_day"] = day
 	record_daily_event(state, &"login")
 
 static func record_daily_event(state: GameState, event_id: StringName) -> void:
@@ -27,8 +29,7 @@ static func record_daily_event(state: GameState, event_id: StringName) -> void:
 	for task in DAILY_TASKS:
 		if StringName(task.event) != event_id:
 			continue
-		var key := String(task.id)
-		state.daily_task_progress[key] = maxi(1, int(state.daily_task_progress.get(key, 0)))
+		state.progression.progress_by_id[_daily_progress_key(String(task.id))] = 1
 
 static func main_tasks(state: GameState, registry: ContentRegistry) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -38,9 +39,8 @@ static func main_tasks(state: GameState, registry: ContentRegistry) -> Array[Dic
 	definitions.sort_custom(func(a: ProgressionDefinition, b: ProgressionDefinition) -> bool: return a.order < b.order)
 	for definition in definitions:
 		var key := String(definition.id)
-		var claimed := bool(state.task_claimed.get(key, false))
+		var claimed := _flag(state, "__task_claim_%s" % key)
 		var completed := state.progression.is_completed(definition.id)
-		var unlocked := _main_unlocked(state, definitions, definition)
 		result.append({
 			"id": key,
 			"title": definition.title,
@@ -51,7 +51,7 @@ static func main_tasks(state: GameState, registry: ContentRegistry) -> Array[Dic
 			"reward": definition.reward_money,
 			"completed": completed,
 			"claimed": claimed,
-			"unlocked": unlocked,
+			"unlocked": _main_unlocked(state, definitions, definition),
 		})
 	return result
 
@@ -62,10 +62,10 @@ static func daily_tasks(state: GameState) -> Array[Dictionary]:
 	for definition in DAILY_TASKS:
 		var task := definition.duplicate(true)
 		var key := String(task.id)
-		task["progress"] = int(state.daily_task_progress.get(key, 0))
+		task["progress"] = int(state.progression.progress_by_id.get(_daily_progress_key(key), 0))
 		task["target"] = 1
 		task["completed"] = int(task.progress) >= 1
-		task["claimed"] = bool(state.daily_task_claimed.get(key, false))
+		task["claimed"] = _flag(state, _daily_claim_key(key))
 		task["unlocked"] = true
 		result.append(task)
 	return result
@@ -82,7 +82,7 @@ static func claim_main(state: GameState, registry: ContentRegistry, task_id: Str
 			continue
 		if not bool(task.unlocked) or not bool(task.completed) or bool(task.claimed):
 			return {}
-		state.task_claimed[String(task_id)] = true
+		state.progression.progress_by_id["__task_claim_%s" % String(task_id)] = 1
 		_apply_reward(state, StringName(task.reward_kind), int(task.reward))
 		return task
 	return {}
@@ -93,7 +93,7 @@ static func claim_daily(state: GameState, task_id: StringName) -> Dictionary:
 			continue
 		if not bool(task.completed) or bool(task.claimed):
 			return {}
-		state.daily_task_claimed[String(task_id)] = true
+		state.progression.progress_by_id[_daily_claim_key(String(task_id))] = 1
 		_apply_reward(state, StringName(task.reward_kind), int(task.reward))
 		return task
 	return {}
@@ -102,9 +102,18 @@ static func _main_unlocked(state: GameState, definitions: Array[ProgressionDefin
 	for candidate in definitions:
 		if candidate.order >= definition.order:
 			continue
-		if not bool(state.task_claimed.get(String(candidate.id), false)):
+		if not _flag(state, "__task_claim_%s" % String(candidate.id)):
 			return false
 	return true
+
+static func _flag(state: GameState, key: String) -> bool:
+	return int(state.progression.progress_by_id.get(key, 0)) > 0
+
+static func _daily_progress_key(id: String) -> String:
+	return "__daily_progress_%s" % id
+
+static func _daily_claim_key(id: String) -> String:
+	return "__daily_claim_%s" % id
 
 static func _apply_reward(state: GameState, kind: StringName, amount: int) -> void:
 	if amount <= 0:
