@@ -25,20 +25,10 @@ func _build_hud() -> void:
 	body.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	layers.add_child(body)
 
-	var icon := TextureRect.new()
-	icon.name = "BalanceIcon"
-	icon.position = Vector2(-13.0, 17.0) if energy else Vector2(-8.0, 14.0)
-	icon.size = Vector2(80.0, 80.0)
-	icon.texture = UiAtlas.balance_icon(energy)
-	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	layers.add_child(icon)
-
 	var value := Label.new()
 	value.name = "Value" if energy else "MoneyLabel"
-	value.position = Vector2(79.0, 24.0)
-	value.size = Vector2(103.0, 42.0)
+	value.position = Vector2(48.0, 24.0)
+	value.size = Vector2(134.0, 42.0)
 	value.text = "0 / 0" if energy else "0"
 	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
