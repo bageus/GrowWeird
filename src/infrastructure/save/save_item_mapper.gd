@@ -52,6 +52,7 @@ static func genome_to_dictionary(genome: GenomeSnapshot) -> Dictionary:
 		return {}
 	return {
 		"species_id": String(genome.species_id),
+		"rarity": String(genome.rarity),
 		"ancestry": genome.ancestry.duplicate(),
 		"traits": genome.traits.duplicate(true),
 		"branch_traits": genome.branch_traits.duplicate(true),
@@ -63,6 +64,7 @@ static func genome_from_dictionary(source: Variant) -> GenomeSnapshot:
 	var data: Dictionary = source
 	var genome := GenomeSnapshot.new()
 	genome.species_id = StringName(data.get("species_id", ""))
+	genome.rarity = StringName(data.get("rarity", "common"))
 	for ancestor in data.get("ancestry", []):
 		genome.ancestry.append(String(ancestor))
 	genome.traits = _dictionary_copy(data.get("traits", {}))
