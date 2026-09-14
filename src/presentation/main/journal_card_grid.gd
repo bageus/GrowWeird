@@ -19,13 +19,14 @@ static func populate(scroll: ScrollContainer, app: Node, tab: StringName) -> voi
 		grid.add_theme_constant_override(&"v_separation", 10)
 		scroll.add_child(grid)
 	for child in grid.get_children():
-		child.free()
+		child.hide()
+		child.queue_free()
 	var knowledge := app.call("fertilizer_knowledge") as Dictionary
 	var entries := _entries(app, knowledge, tab)
 	for entry in entries:
-		grid.add_child(_card(entry, app))
+		grid.add_child(_card(entry, app, scroll))
 	if entries.is_empty():
-		grid.add_child(_empty_card(app))
+		grid.add_child(_empty_card(app, scroll))
 
 static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -55,7 +56,7 @@ static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array
 		result.append({"id": String(raw_id), "name": _display_name(StringName(raw_id)), "data": entry})
 	return result
 
-static func _card(entry: Dictionary, app: Node) -> PanelContainer:
+static func _card(entry: Dictionary, app: Node, scroll: ScrollContainer) -> PanelContainer:
 	var data := entry.get("data", {}) as Dictionary
 	var claimed := bool(data.get("reward_claimed", false))
 	var card := PanelContainer.new()
@@ -88,13 +89,48 @@ static func _card(entry: Dictionary, app: Node) -> PanelContainer:
 	column.add_child(details)
 	var item_id := StringName(entry.get("id", ""))
 	if not bool(entry.get("unknown", false)) and bool(app.call("can_claim_journal_reward", item_id)):
+		var reward_kind := StringName(app.call("journal_reward_kind", item_id))
 		var claim := Button.new()
 		claim.custom_minimum_size = Vector2(0.0, 38.0)
-		claim.text = "CLAIM +3 %s" % String(app.call("journal_reward_kind", item_id)).to_upper()
+		claim.text = "CLAIM +3 %s" % String(reward_kind).to_upper()
 		CommerceUiStyle.transaction_action(claim, &"claim")
-		claim.pressed.connect(func() -> void: app.call("claim_journal_reward", item_id))
+		claim.pressed.connect(func() -> void:
+			if not is_instance_valid(claim) or not is_instance_valid(scroll) or not is_instance_valid(app):
+				return
+			var start_global := claim.get_global_rect().get_center()
+			if bool(app.call("claim_journal_reward", item_id)):
+				_show_claim_feedback(scroll, reward_kind, 3, start_global)
+		, Object.CONNECT_DEFERRED)
 		column.add_child(claim)
 	return card
+
+static func _show_claim_feedback(scroll: ScrollContainer, reward_kind: StringName, amount: int, start_global: Vector2) -> void:
+	if scroll == null or not is_instance_valid(scroll):
+		return
+	var overlay := scroll.get_parent() as Control
+	if overlay == null or not is_instance_valid(overlay):
+		return
+	var label := Label.new()
+	label.text = "+%d %s" % [amount, String(reward_kind).to_upper()]
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.z_index = 50
+	label.size = Vector2(180.0, 42.0)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override(&"font_size", 24)
+	label.add_theme_color_override(&"font_color", Color("ffe36a") if reward_kind == &"energy" else Color("ffd071"))
+	label.add_theme_color_override(&"font_outline_color", Color("5b2b12"))
+	label.add_theme_constant_override(&"outline_size", 5)
+	overlay.add_child(label)
+	var local_start := overlay.get_global_transform_with_canvas().affine_inverse() * start_global
+	label.position = local_start - Vector2(90.0, 21.0)
+	var tween := label.create_tween()
+	tween.tween_property(label, "position", label.position + Vector2(0.0, -68.0), 1.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(label, "modulate:a", 0.0, 1.15).set_delay(0.30)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(label):
+			label.queue_free()
+	)
 
 static func _details(data: Dictionary) -> String:
 	var lines: Array[String] = []
@@ -124,8 +160,8 @@ static func _display_name(id: StringName) -> String:
 		return String(descriptor.get("item_id", id)).replace("_", " ").capitalize()
 	return String(id).replace("_", " ").capitalize()
 
-static func _empty_card(app: Node) -> PanelContainer:
-	return _card({"name": "NO ITEMS", "id": "", "unknown": true}, app)
+static func _empty_card(app: Node, scroll: ScrollContainer) -> PanelContainer:
+	return _card({"name": "NO ITEMS", "id": "", "unknown": true}, app, scroll)
 
 static func _card_style(claimed: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
