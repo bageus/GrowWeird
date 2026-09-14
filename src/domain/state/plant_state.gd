@@ -92,47 +92,38 @@ func existing_branches() -> Array[BranchState]:
 			result.append(branch)
 	return result
 
-func add_mutation_energy(axis: StringName, amount: float) -> void:
-	if amount <= 0.0:
-		return
-	var key := String(axis)
-	mutation_energy[key] = maxf(0.0, float(mutation_energy.get(key, 0.0)) + amount)
-
-func mutation_value(axis: StringName) -> float:
-	return maxf(0.0, float(mutation_energy.get(String(axis), 0.0)))
-
-func consume_mutation_energy(axis: StringName, amount: float) -> bool:
-	if amount <= 0.0:
-		return true
-	var key := String(axis)
-	var available := mutation_value(axis)
-	if available < amount:
-		return false
-	mutation_energy[key] = available - amount
-	return true
-
-func set_regrowth_progress(slot: StringName, value: float) -> void:
-	regrowth_progress[String(slot)] = clampf(value, 0.0, 1.0)
-
 func regrowth_progress_at(slot: StringName) -> float:
+	if not BranchState.VALID_SLOTS.has(slot):
+		return 0.0
 	return clampf(float(regrowth_progress.get(String(slot), 0.0)), 0.0, 1.0)
+
+func set_regrowth_progress(slot: StringName, progress: float) -> void:
+	if not BranchState.VALID_SLOTS.has(slot):
+		return
+	regrowth_progress[String(slot)] = clampf(progress, 0.0, 1.0)
 
 func clear_regrowth_progress(slot: StringName) -> void:
 	regrowth_progress.erase(String(slot))
 
 func regrowth_fruit_cycle_at(slot: StringName) -> int:
-	return maxi(0, int(regrowth_fruit_cycles.get(String(slot), 0)))
+	return maxi(0, int(regrowth_fruit_cycles.get(String(slot), fruit_cycle_index + 1)))
 
-func advance_fruit_cycle() -> void:
-	fruit_cycle_index += 1
+func add_mutation_energy(axis: StringName, amount: float) -> void:
+	var key := String(axis)
+	mutation_energy[key] = float(mutation_energy.get(key, 0.0)) + amount
 
-func next_random_u64() -> int:
-	var state := rng_state
-	if state == 0:
-		state = hash(instance_id)
-	state = int((state * 6364136223846793005 + 1442695040888963407) & 0x7fffffffffffffff)
-	rng_state = state
-	return state
+func record_care_sample(score: float, delta_seconds: float) -> void:
+	care_stage_score_sum += clampf(score, 0.0, 1.0) * maxf(delta_seconds, 0.0)
+	care_stage_sample_seconds += maxf(delta_seconds, 0.0)
 
-func random_float() -> float:
-	return float(next_random_u64() % 1000000) / 1000000.0
+func finish_care_stage(next_stage: int) -> void:
+	if care_stage_sample_seconds > 0.0:
+		completed_care_scores.append(care_stage_score_sum / care_stage_sample_seconds)
+	care_stage_index = next_stage
+	care_stage_score_sum = 0.0
+	care_stage_sample_seconds = 0.0
+
+func current_care_score() -> float:
+	if care_stage_sample_seconds <= 0.0:
+		return 1.0
+	return clampf(care_stage_score_sum / care_stage_sample_seconds, 0.0, 1.0)
