@@ -46,7 +46,7 @@ static func use_inventory(
 	var consumed := InventoryService.take_misc(state.inventory, String(fertilizer_id)) == 1 if kind == ResourceActions.MISC else InventoryService.take_fertilizer(state.inventory, fertilizer_id)
 	if not consumed:
 		return _failure()
-	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations())
+	var events := FertilizerUseService.apply(plant, fertilizer, registry.all_mutations(), kind)
 	return {"success": true, "events": events}
 
 static func _failure() -> Dictionary:
