@@ -3,7 +3,7 @@ extends RefCounted
 
 const DAILY_TASKS := [
 	{"id": "daily_login", "title": "Log in", "event": &"login", "reward_kind": &"coins", "reward": 5},
-	{"id": "daily_sell", "title": "Sell an item", "event": &"resource_processed", "reward_kind": &"coins", "reward": 3},
+	{"id": "daily_sell", "title": "Sell an item", "event": &"item_sold", "reward_kind": &"coins", "reward": 3},
 	{"id": "daily_shop", "title": "Buy in the shop", "event": &"shop_purchase", "reward_kind": &"coins", "reward": 3},
 	{"id": "daily_water", "title": "Water a plant", "event": &"watered", "reward_kind": &"energy", "reward": 3},
 	{"id": "daily_feed", "title": "Use fertilizer", "event": &"fertilizer_used", "reward_kind": &"energy", "reward": 3},
