@@ -268,11 +268,20 @@ func _test_plant_sale_frees_pot() -> void:
 	pot.plant = _plant("valuable")
 	pot.plant.growth_ratio = 1.0
 	pot.plant.branch_at(&"left").add_trait(&"thorns", 3)
-	var next_pot := PotState.new(); next_pot.pot_id = "next-pot"; state.pots = [pot, next_pot]
-	state.active_pot_id = pot.pot_id; var plant_only_value := EconomyActions.plant_value(pot.plant, registry, rules)
-	var amount := EconomyActions.sell_plant(state, pot, registry, rules); _expect(amount == plant_only_value + rules.pot_base_price, "plant sale: value must include the sold pot")
+	var next_pot := PotState.new()
+	next_pot.pot_id = "next-pot"
+	state.pots = [pot, next_pot]
+	state.active_pot_id = pot.pot_id
+	var blocked_amount := EconomyActions.sell_plant(state, pot, registry, rules)
+	_expect(blocked_amount == 0, "plant sale: the only planted specimen must not be sellable")
+	_expect(state.pots.size() == 2 and state.pots[0] == pot and state.pots[1] == next_pot, "plant sale: blocked sale must keep both pots")
+	next_pot.plant = _plant("backup")
+	var plant_only_value := EconomyActions.plant_value(pot.plant, registry, rules)
+	var amount := EconomyActions.sell_plant(state, pot, registry, rules)
+	_expect(amount == plant_only_value + rules.pot_base_price, "plant sale: value must include the sold pot")
 	_expect(state.pots.size() == 1 and state.pots[0] == next_pot, "plant sale: the pot must be sold with its plant")
-	_expect(state.active_pot_id == next_pot.pot_id, "plant sale: another pot must become active"); _expect(state.money == amount, "plant sale: money was not credited")
+	_expect(state.active_pot_id == next_pot.pot_id, "plant sale: another pot must become active")
+	_expect(state.money == amount, "plant sale: money was not credited")
 
 func _test_shop_transactions() -> void:
 	var registry := ContentRegistry.new()
