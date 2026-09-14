@@ -61,7 +61,7 @@ func _place_journal_button(host: Control) -> void:
 	if _journal_button == null or host == null:
 		return
 	_journal_button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_journal_button.position = Vector2(28.0, maxf(0.0, host.size.y - 92.0))
+	_journal_button.position = Vector2(28.0, maxf(0.0, host.size.y - 122.0))
 	_journal_button.size = Vector2(150.0, 37.0)
 	_journal_button.modulate = Color.WHITE
 	_journal_button.self_modulate = Color.WHITE
