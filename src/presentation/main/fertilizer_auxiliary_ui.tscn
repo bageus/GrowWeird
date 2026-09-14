@@ -27,7 +27,7 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 24.0
 offset_right = 322.0
-offset_bottom = 64.0
+offset_bottom = 66.0
 mouse_filter = 2
 
 [node name="Hud" type="Panel" parent="TimerHud"]
