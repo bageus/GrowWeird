@@ -94,16 +94,12 @@ offset_bottom = 76.0
 script = ExtResource("2_action")
 action_id = &"tasks"
 [node name="JournalButton" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 28.0
-offset_top = -62.0
-offset_right = 178.0
-offset_bottom = -25.0
-grow_vertical = 0
+custom_minimum_size = Vector2(150, 37)
+offset_right = 150.0
+offset_bottom = 37.0
 text = "JOURNAL"
+script = ExtResource("2_action")
+action_id = &"journal"
 [node name="WalletHud" type="PanelContainer" parent="."]
 z_index = 200
 custom_minimum_size = Vector2(224, 100)
