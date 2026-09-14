@@ -46,7 +46,7 @@ func _bind_auxiliary_hud() -> void:
 	_journal = auxiliary.get_node("Journal") as Control
 	(_journal.get_node("Background") as Panel).add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(8, 26, Vector4(24.0, 20.0, 24.0, 22.0)))
 	(_journal.get_node("Banner") as TextureRect).texture = UiAtlas.HUD_BUYSELL_BANNER
-	CommerceUiStyle.curved_title(_journal.get_node("Title") as Label, "JOURNAL")
+	CommerceUiStyle.curved_title(_journal.get_node("Title") as Label, "JOURNAL", 3.0)
 	var content_hud := _journal.get_node("ContentHud") as Panel
 	content_hud.add_theme_stylebox_override(&"panel", UiAtlas.warm_hud_style(2, 14, Vector4(18.0, 16.0, 18.0, 16.0)))
 	var close_button := _journal.get_node("Close") as Button
@@ -61,7 +61,7 @@ func _place_journal_button(host: Control) -> void:
 	if _journal_button == null or host == null:
 		return
 	_journal_button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_journal_button.position = Vector2(28.0, maxf(0.0, host.size.y - 62.0))
+	_journal_button.position = Vector2(28.0, maxf(0.0, host.size.y - 92.0))
 	_journal_button.size = Vector2(150.0, 37.0)
 	_journal_button.modulate = Color.WHITE
 	_journal_button.self_modulate = Color.WHITE
@@ -96,39 +96,14 @@ func _sync() -> void:
 	_refresh_journal(app)
 
 func _refresh_journal(app: Node) -> void:
-	var label := _journal.get_node_or_null("ContentHud/Scroll/KnowledgeText") as Label
-	if label == null:
-		return
-	var knowledge := app.call("fertilizer_knowledge") as Dictionary
-	var lines: Array[String] = []
-	if _journal_tab == &"unknown":
-		var definitions: Array = app.registry.all_fertilizers() + app.registry.all_offer_fertilizers()
-		for definition in definitions:
-			if definition != null and not knowledge.has(String(definition.id)): lines.append("UNKNOWN ITEM — properties hidden")
-	else:
-		var ids := knowledge.keys(); ids.sort()
-		for raw_id in ids:
-			var entry: Dictionary = knowledge[raw_id]
-			var care: Dictionary = entry.get("care_effects", {})
-			var mutation_effects: Dictionary = entry.get("mutation_effects", {})
-			var traits: Array = entry.get("discovered_traits", [])
-			if _journal_tab == &"fertilizers" and care.is_empty(): continue
-			if _journal_tab == &"mutagens" and mutation_effects.is_empty() and traits.is_empty(): continue
-			if _journal_tab == &"decorations" and String(entry.get("category", "")) != "decoration": continue
-			var details: Array[String] = ["used ×%d" % int(entry.get("uses", 0))]
-			for key in care:
-				var amount := float(care[key]); details.append("%s %s%.2f" % [String(key).replace("_", " "), "+" if amount >= 0.0 else "", amount])
-			for axis in mutation_effects:
-				var effect := float(mutation_effects[axis]); details.append("%s mutation %s%.2f" % [String(axis), "+" if effect >= 0.0 else "", effect])
-			if not traits.is_empty(): details.append("mutations: %s" % ", ".join(traits))
-			lines.append("%s — %s" % [String(raw_id).replace("_", " ").capitalize(), "; ".join(details)])
-	if lines.is_empty(): lines.append("No discovered items in this section yet.")
-	label.text = "\n".join(lines)
+	var scroll := _journal.get_node_or_null("ContentHud/Scroll") as ScrollContainer
+	JournalCardGrid.populate(scroll, app, _journal_tab)
 
 func _select_journal_tab(tab: StringName) -> void:
 	_journal_tab = tab
 	var app := get_node_or_null("/root/GameApp")
-	if app != null: _refresh_journal(app)
+	if app != null:
+		_refresh_journal(app)
 
 func _toggle_journal() -> void:
 	_journal.visible = not _journal.visible
@@ -139,33 +114,52 @@ func _close_journal() -> void:
 	_sync()
 
 func _other_menu_open() -> bool:
-	if _journal != null and _journal.visible: return true
+	if _journal != null and _journal.visible:
+		return true
 	var host := get_parent()
 	for path in ["ShopContainer", "WalletTopupPanel", "EnergyTopupPanel", "WaterOptions", "LightingOptions"]:
 		var menu := host.get_node_or_null(path) as Control
-		if menu != null and menu.visible: return true
+		if menu != null and menu.visible:
+			return true
 	var dialogs := host.get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs
 	return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	_timer.size = Vector2(306.0, 52.0)
+	_timer.size = Vector2(306.0, 42.0)
 	_timer_label.position = Vector2(14.0, 0.0)
-	_timer_label.size = Vector2(173.0, 52.0)
-	_timer_finish.position = Vector2(192.0, 6.0)
-	_timer_finish.size = Vector2(112.0, 39.0)
+	_timer_label.size = Vector2(173.0, 42.0)
+	_timer_finish.position = Vector2(192.0, 3.0)
+	_timer_finish.size = Vector2(112.0, 36.0)
 	var hud := _timer.get_node("Hud") as Panel
-	var hud_style := CommerceUiStyle.top_hud_style(24)
+	var hud_style := CommerceUiStyle.top_hud_style(21)
 	hud_style.shadow_size = 0
 	hud_style.shadow_offset = Vector2.ZERO
 	hud.add_theme_stylebox_override(&"panel", hud_style)
-	_timer_label.add_theme_font_size_override(&"font_size", 15); _timer_label.add_theme_color_override(&"font_color", Color("ffe7a1")); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2)
-	_timer_finish.alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_finish.add_theme_font_size_override(&"font_size", 16); _timer_finish.add_theme_color_override(&"font_color", Color.WHITE); _timer_finish.add_theme_color_override(&"font_outline_color", Color("31105c")); _timer_finish.add_theme_constant_override(&"outline_size", 2)
-	for state in [&"normal", &"hover", &"pressed", &"disabled"]: _timer_finish.add_theme_stylebox_override(state, _finish_button_style(state))
+	_timer_label.add_theme_font_size_override(&"font_size", 15)
+	_timer_label.add_theme_color_override(&"font_color", Color("ffe7a1"))
+	_timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405"))
+	_timer_label.add_theme_constant_override(&"outline_size", 2)
+	_timer_finish.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_timer_finish.add_theme_font_size_override(&"font_size", 16)
+	_timer_finish.add_theme_color_override(&"font_color", Color.WHITE)
+	_timer_finish.add_theme_color_override(&"font_outline_color", Color("31105c"))
+	_timer_finish.add_theme_constant_override(&"outline_size", 2)
+	for state in [&"normal", &"hover", &"pressed", &"disabled"]:
+		_timer_finish.add_theme_stylebox_override(state, _finish_button_style(state))
 	_timer_finish.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
 
 func _finish_button_style(state: StringName) -> StyleBoxFlat:
 	var colors := {&"normal": Color("7d25e8"), &"hover": Color("963cf2"), &"pressed": Color("6418c2"), &"disabled": Color("766b7e")}
-	var style := StyleBoxFlat.new(); style.bg_color = colors[state]; style.border_color = Color("451086"); style.set_border_width_all(3); style.set_corner_radius_all(18); style.shadow_color = Color(0.10, 0.02, 0.18, 0.55); style.shadow_size = 3; style.shadow_offset = Vector2(0.0, 2.0)
+	var style := StyleBoxFlat.new()
+	style.bg_color = colors[state]
+	style.border_color = Color("451086")
+	style.set_border_width_all(3)
+	style.set_corner_radius_all(17)
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 3.0
+	style.shadow_color = Color(0.10, 0.02, 0.18, 0.55)
+	style.shadow_size = 2
+	style.shadow_offset = Vector2(0.0, 1.0)
 	return style
 
 func _finish_timer() -> void:
@@ -179,7 +173,8 @@ func _request_rewarded_refresh() -> void:
 	get_node("/root/GameApp").call("show_fullscreen_ad")
 
 func _on_ad_closed(was_shown: bool) -> void:
-	if not _ad_pending: return
+	if not _ad_pending:
+		return
 	_ad_pending = false
 	get_node("Row/AdOffer").disabled = false
 	var app := get_node_or_null("/root/GameApp")
