@@ -278,6 +278,7 @@ offset_top = 170.0
 offset_right = -120.0
 offset_bottom = -20.0
 grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TreeGrowthPreview" parent="Shell/Layout/ScenePanel/SceneRoot/World" unique_id=1891517271 instance=ExtResource("9_tree_preview")]
 unique_name_in_owner = true
@@ -331,6 +332,8 @@ grow_horizontal = 2
 unique_name_in_owner = true
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1593357604]
 
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/SaveLayoutButton" to="." method="_on_save_layout_pressed"]
 [connection signal="pressed" from="Shell/Layout/LeftSidebar/LeftScroll/LeftLayout/ResetLayoutButton" to="." method="_on_reset_layout_pressed"]
