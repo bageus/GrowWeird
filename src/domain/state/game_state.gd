@@ -1,7 +1,7 @@
 class_name GameState
 extends RefCounted
 
-const SCHEMA_VERSION: int = 12
+const SCHEMA_VERSION: int = 13
 
 var schema_version: int = SCHEMA_VERSION
 var money: int = 0
@@ -13,6 +13,10 @@ var inventory := InventoryState.new()
 var fertilizer_offer := FertilizerOfferState.new()
 var fertilizer_knowledge: Dictionary = {}
 var progression := ProgressionState.new()
+var task_claimed: Dictionary = {}
+var daily_task_progress: Dictionary = {}
+var daily_task_claimed: Dictionary = {}
+var daily_task_day: int = -1
 var last_saved_unix: int = 0
 var rewarded_ad_claims: Array[int] = []
 
