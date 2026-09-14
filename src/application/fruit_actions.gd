@@ -20,5 +20,6 @@ static func harvest(
 	var fruit := FruitLifecycleService.harvest(plant, slot, item_id)
 	if fruit == null:
 		return ""
+	NutritionService.clamp_to_capacity(plant)
 	InventoryService.add_fruit(state.inventory, fruit)
 	return item_id
