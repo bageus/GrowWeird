@@ -49,7 +49,7 @@ func _build_hud() -> void:
 	if energy:
 		var next := PanelContainer.new()
 		next.name = "Next"
-		next.position = Vector2(48.0, 77.0)
+		next.position = Vector2(48.0, 66.0)
 		next.size = Vector2(170.0, 24.0)
 		next.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		layers.add_child(next)
