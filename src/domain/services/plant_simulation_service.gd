@@ -63,8 +63,10 @@ static func _consume_growth_needs(
 	delta_seconds: float
 ) -> void:
 	var moisture_stage_before := pot.soil_moisture_stage()
+	var moisture_multiplier := 1.0
+	for item_id in plant.decorations: moisture_multiplier -= float(AlmanacItemCatalog.decoration_effect(StringName(item_id)).get("moisture_saving", 0.0))
 	pot.soil_moisture = clampf(
-		pot.soil_moisture - QUARTER_CELL_DECAY_PER_SECOND * delta_seconds,
+		pot.soil_moisture - QUARTER_CELL_DECAY_PER_SECOND * maxf(0.2, moisture_multiplier) * delta_seconds,
 		0.0,
 		1.0
 	)
