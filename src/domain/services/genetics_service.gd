@@ -23,6 +23,7 @@ static func snapshot_plant(plant: PlantState) -> GenomeSnapshot:
 		return null
 	var genome := GenomeSnapshot.new()
 	genome.species_id = plant.species_id
+	genome.rarity = plant.genetic_rarity
 	_append_unique(genome.ancestry, plant.instance_id)
 	for slot in BranchState.VALID_SLOTS:
 		var branch := plant.branch_at(slot)
@@ -45,6 +46,7 @@ static func combine(first: GenomeSnapshot, second: GenomeSnapshot) -> GenomeSnap
 	var result := first.duplicate_snapshot()
 	if second == null:
 		return result
+	result.rarity = GeneticItemValuationService.higher_rarity(result.rarity, second.rarity)
 	_merge_traits(result.traits, second.traits)
 	for slot in second.branch_traits:
 		var key := String(slot)
@@ -61,6 +63,7 @@ static func plant_from_genome(genome: GenomeSnapshot, instance_id: String) -> Pl
 	var plant := PlantState.new()
 	plant.instance_id = instance_id
 	plant.species_id = genome.species_id
+	plant.genetic_rarity = genome.rarity
 	plant.initialize_native_branches()
 	for branch in plant.existing_branches():
 		var inherited: Variant = genome.branch_traits.get(String(branch.slot))

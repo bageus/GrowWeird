@@ -14,9 +14,14 @@ var _tab: StringName = &"main"
 var _suppress_visibility := false
 var _refresh_queued := false
 
+func _app() -> Node:
+	return get_node_or_null("/root/GameApp")
+
 func _ready() -> void:
 	_build_modal()
-	TaskService.ensure_daily(GameApp.state, int(Time.get_unix_time_from_system()))
+	var app := _app()
+	if app != null:
+		TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
 	visibility_changed.connect(_on_host_visibility_changed)
 	_suppress_visibility = true
 	hide()
@@ -61,7 +66,9 @@ func _build_tabs() -> void:
 	_main_tab.pressed.connect(_select_tab.bind(&"main")); _daily_tab.pressed.connect(_select_tab.bind(&"daily")); _style_tabs()
 
 func _open() -> void:
-	TaskService.ensure_daily(GameApp.state, int(Time.get_unix_time_from_system()))
+	var app := _app()
+	if app != null:
+		TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
 	_overlay.show(); _refresh(); call_deferred("_center_current_main")
 func _close() -> void:
 	if _overlay != null: _overlay.hide()
@@ -81,17 +88,20 @@ func _deferred_refresh() -> void:
 	if _overlay != null and _overlay.visible: _refresh()
 
 func _refresh() -> void:
-	if _content == null or GameApp.state == null: return
+	var app := _app()
+	if _content == null or app == null or app.state == null: return
 	for child in _content.get_children():
 		_content.remove_child(child); child.queue_free()
 	if _tab == &"daily": _build_daily()
 	else: _build_main()
 
 func _build_main() -> void:
+	var app := _app()
+	if app == null: return
 	var scroll := HScrollBar.new(); scroll.name = "MainTaskScroll"; scroll.position = Vector2(0.0, 336.0); scroll.size = Vector2(_content.size.x, 24.0); _content.add_child(scroll)
 	var viewport := Control.new(); viewport.name = "MainViewport"; viewport.clip_contents = true; viewport.size = Vector2(_content.size.x, 330.0); _content.add_child(viewport)
 	var ribbon := HBoxContainer.new(); ribbon.name = "MainRibbon"; ribbon.position = Vector2(18.0, 15.0); ribbon.add_theme_constant_override(&"separation", 0); viewport.add_child(ribbon)
-	var tasks := TaskService.main_tasks(GameApp.state, GameApp.registry)
+	var tasks := TaskService.main_tasks(app.state, app.registry)
 	for index in range(tasks.size()):
 		var task: Dictionary = tasks[index]; ribbon.add_child(_task_card(task, false))
 		if index < tasks.size() - 1: ribbon.add_child(_connector(task))
@@ -100,10 +110,12 @@ func _build_main() -> void:
 	scroll.value_changed.connect(func(value: float) -> void: ribbon.position.x = 18.0 - value)
 
 func _build_daily() -> void:
+	var app := _app()
+	if app == null: return
 	var scroll := ScrollContainer.new(); scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; _content.add_child(scroll)
 	var grid := GridContainer.new(); grid.columns = 3; grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	grid.add_theme_constant_override(&"h_separation", 10); grid.add_theme_constant_override(&"v_separation", 10); scroll.add_child(grid)
-	for task in TaskService.daily_tasks(GameApp.state): grid.add_child(_task_card(task, true))
+	for task in TaskService.daily_tasks(app.state): grid.add_child(_task_card(task, true))
 
 func _task_card(task: Dictionary, daily: bool) -> PanelContainer:
 	var card := PanelContainer.new(); card.name = "Task_%s" % String(task.id); card.custom_minimum_size = CARD_SIZE
@@ -130,9 +142,11 @@ func _configure_claim(button: Button, task: Dictionary, daily: bool) -> void:
 		button.pressed.connect(_claim_task.bind(StringName(task.id), daily), CONNECT_DEFERRED)
 
 func _claim_task(task_id: StringName, daily: bool) -> void:
-	var result := TaskService.claim_daily(GameApp.state, task_id) if daily else TaskService.claim_main(GameApp.state, GameApp.registry, task_id)
+	var app := _app()
+	if app == null: return
+	var result := TaskService.claim_daily(app.state, task_id) if daily else TaskService.claim_main(app.state, app.registry, task_id)
 	if result.is_empty(): return
-	if daily: GameApp.state_changed.emit(); _refresh()
+	if daily: app.state_changed.emit(); _refresh()
 	else: _animate_connector(task_id)
 
 func _animate_connector(task_id: StringName) -> void:
@@ -144,7 +158,9 @@ func _animate_connector(task_id: StringName) -> void:
 	var tween := fill.create_tween(); tween.tween_property(fill, "size", Vector2(CONNECTOR_WIDTH, 5.0), 0.48).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT); tween.tween_callback(_finish_main_claim)
 
 func _finish_main_claim() -> void:
-	GameApp.state_changed.emit(); _refresh(); call_deferred("_center_current_main")
+	var app := _app()
+	if app != null: app.state_changed.emit()
+	_refresh(); call_deferred("_center_current_main")
 
 func _connector(task: Dictionary) -> Control:
 	var connector := Control.new(); connector.name = "Connector_%s" % String(task.id); connector.custom_minimum_size = Vector2(CONNECTOR_WIDTH, CARD_SIZE.y)
@@ -154,9 +170,11 @@ func _connector(task: Dictionary) -> Control:
 
 func _center_current_main() -> void:
 	if _tab != &"main" or _content == null: return
+	var app := _app()
+	if app == null: return
 	var scroll := _content.get_node_or_null("MainTaskScroll") as HScrollBar
 	if scroll == null: return
-	var tasks := TaskService.main_tasks(GameApp.state, GameApp.registry); var active_index := 0
+	var tasks := TaskService.main_tasks(app.state, app.registry); var active_index := 0
 	for index in range(tasks.size()):
 		if bool(tasks[index].unlocked) and not bool(tasks[index].claimed): active_index = index; break
 	var center_x := float(active_index) * (CARD_SIZE.x + CONNECTOR_WIDTH) + CARD_SIZE.x * 0.5

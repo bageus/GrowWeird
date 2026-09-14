@@ -4,6 +4,7 @@ extends RefCounted
 var instance_id: String = ""
 var custom_name: String = ""
 var species_id: StringName
+var genetic_rarity: StringName = &"common"
 var age_seconds: float = 0.0
 var growth_ratio: float = 0.0
 var growth_cycle_index: int = 0

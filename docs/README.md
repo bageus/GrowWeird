@@ -15,13 +15,14 @@ This directory is the single home for project documentation and development rule
 ## Current documents
 
 - [`GAME_DESIGN.md`](GAME_DESIGN.md) — gameplay, UX, progression, economy and content rules.
+- [`ITEM_BALANCE.md`](ITEM_BALANCE.md) — canonical item economy, mutations, nutrition, fertilizer prices and journal discovery rules.
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — code boundaries, ownership, persistence, platform and technical rules.
 - [`TESTING.md`](TESTING.md) — test execution, smoke checks and save-schema verification workflow.
 - [`YANDEX_GAMES.md`](YANDEX_GAMES.md) — Yandex SDK bootstrap, cloud saves, lifecycle and release verification.
 
 ## Source-of-truth rule
 
-Gameplay intent belongs in `GAME_DESIGN.md`.
+Gameplay intent belongs in `GAME_DESIGN.md`. Detailed item/economy values and nutrition rules belong in `ITEM_BALANCE.md` and the runtime data file it references.
 Technical ownership and implementation constraints belong in `ARCHITECTURE.md`.
 Test execution instructions belong in `TESTING.md`.
 Yandex-specific integration and release behavior belongs in `YANDEX_GAMES.md`.

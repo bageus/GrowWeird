@@ -18,6 +18,8 @@ static func prune(
 	cutting.source_plant_id = plant.instance_id
 	cutting.source_branch_id = branch.branch_id
 	cutting.genome = GeneticsService.snapshot_branch(branch)
+	if cutting.genome != null:
+		cutting.genome.rarity = plant.genetic_rarity
 	return cutting
 
 static func plant_cutting(
@@ -57,7 +59,10 @@ static func graft_cutting(
 	if cutting == null or cutting.genome == null or not GraftingService.can_graft(plant, slot):
 		return false
 	var branch := GeneticsService.graft_branch_from_genome(cutting.genome, branch_id, slot)
-	return GraftingService.graft(plant, branch, slot)
+	var grafted := GraftingService.graft(plant, branch, slot)
+	if grafted:
+		plant.genetic_rarity = GeneticItemValuationService.higher_rarity(plant.genetic_rarity, cutting.genome.rarity)
+	return grafted
 
 static func create_fruit(
 	plant: PlantState,

@@ -9,12 +9,12 @@ const MANIFEST_PATHS := [
 	"res://assets/fertilizers/fertilizers_02.json",
 ]
 const STAGE_ITEMS := [
-	{"id": "seed_booster", "row": 1, "position": 1, "growth_cycle": &"seed"},
-	{"id": "sprout_booster", "row": 1, "position": 2, "growth_cycle": &"sprout"},
-	{"id": "flower_booster", "row": 1, "position": 3, "growth_cycle": &"flower"},
-	{"id": "fruit_booster", "row": 2, "position": 1, "growth_cycle": &"fruit"},
-	{"id": "restart_booster", "row": 2, "position": 2, "growth_cycle": &"restart"},
-	{"id": "tree_booster", "row": 2, "position": 3, "growth_cycle": &"tree"},
+	{"id": "seed_booster", "row": 1, "position": 1, "growth_cycle": &"seed", "shop_price": 12},
+	{"id": "sprout_booster", "row": 1, "position": 2, "growth_cycle": &"sprout", "shop_price": 20},
+	{"id": "flower_booster", "row": 1, "position": 3, "growth_cycle": &"flower", "shop_price": 50},
+	{"id": "fruit_booster", "row": 2, "position": 1, "growth_cycle": &"fruit", "shop_price": 60},
+	{"id": "restart_booster", "row": 2, "position": 2, "growth_cycle": &"branch", "shop_price": 40},
+	{"id": "tree_booster", "row": 2, "position": 3, "growth_cycle": &"tree", "shop_price": 30},
 ]
 
 static func definitions() -> Array[FertilizerDefinition]:
@@ -27,12 +27,30 @@ static func definitions() -> Array[FertilizerDefinition]:
 			definition.id = _offer_id(atlas_index, String(item.get("id", "")))
 			definition.display_name_key = "fertilizer.%s" % String(item.get("id", ""))
 			definition.offer_weight = 1.0
-			definition.care_effects = {"health": FOOD_HEALTH, "nutrition": 0.18}
+			definition.care_effects = {"health": FOOD_HEALTH}
 			if atlas_index == 2:
-				definition.shop_price = 1
+				definition.shop_price = int(item.get("shop_price", 0))
 				definition.care_effects["growth_cycle"] = item["growth_cycle"]
+			else:
+				_apply_balance(definition)
 			result.append(definition)
 	return result
+
+static func _apply_balance(definition: FertilizerDefinition) -> void:
+	var balance := ItemBalanceCatalog.entry(definition.id)
+	if balance.is_empty():
+		return
+	definition.display_name = String(balance.get("display_name", ""))
+	definition.sell_price = int(balance.get("sell_price", 0))
+	definition.recycle_yield = int(balance.get("grind_yield", 0))
+	definition.drop_chance = clampf(float(balance.get("drop_chance_percent", 0.0)) / 100.0, 0.0, 1.0)
+	definition.offer_weight = float(balance.get("drop_chance_percent", 0.0))
+	definition.rarity = String(balance.get("rarity", ""))
+	definition.target = String(balance.get("target", ""))
+	definition.effect_description = String(balance.get("effect", ""))
+	var food: Variant = balance.get("food", 0)
+	if food is int or food is float:
+		definition.care_effects["nutrition_points"] = float(food)
 
 static func id_for(atlas_index: int, row: int, column: int) -> StringName:
 	for item in _items_for_atlas(atlas_index):
@@ -46,11 +64,13 @@ static func descriptor_for(id: StringName) -> Dictionary:
 			if _is_reserved_grind_result(atlas_index, item):
 				continue
 			if _offer_id(atlas_index, String(item.get("id", ""))) == id:
+				var balance := ItemBalanceCatalog.entry(id)
 				return {
 					"atlas_index": atlas_index,
 					"row": int(item.get("row", 1)) - 1,
 					"column": int(item.get("position", 1)) - 1,
 					"item_id": StringName(item.get("id", "")),
+					"display_name": balance.get("display_name", ""),
 				}
 	return {}
 
