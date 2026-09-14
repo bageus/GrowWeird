@@ -32,19 +32,9 @@ func _ready() -> void:
 func _apply_ui_atlases() -> void:
 	if get_node_or_null("WalletHud") == null:
 		return
-	var wallet := get_node("WalletHud") as PanelContainer
-	wallet.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	var balance_art := get_node("WalletHud/Layers/BalanceArt") as Panel
-	UiAtlas.configure_balance_hud(balance_art)
-	(get_node("WalletHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon()
-	UiAtlas.configure_balance_plus(get_node("WalletHud/Layers/ShopButton") as Button, balance_art)
-	var energy_art := get_node("EnergyHud/Layers/BalanceArt") as Panel
-	UiAtlas.configure_balance_hud(energy_art)
-	(get_node("EnergyHud/Layers/BalanceIcon") as TextureRect).texture = UiAtlas.balance_icon(true)
 	var energy_next := get_node("EnergyHud/Layers/Next") as PanelContainer
 	UiAtlas.configure_warm_timer_hud(energy_next, get_node("EnergyHud/Layers/Next/Timer") as Label)
 	UiAtlas.configure_warm_timer_hud(get_node("OffersPanel/CooldownCenter/CooldownOverlay") as PanelContainer, get_node("OffersPanel/CooldownCenter/CooldownOverlay/CooldownLabel") as Label)
-	UiAtlas.configure_balance_plus(get_node("EnergyHud/Layers/AddButton") as Button, energy_art)
 	var offers := get_node("OffersPanel") as PanelContainer
 	offers.add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	UiAtlas.configure_hud_slot(get_node("OffersPanel/Row/OfferOne") as Button)
