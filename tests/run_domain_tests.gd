@@ -56,11 +56,16 @@ func _test_care_gauge_ranges_and_stage_history() -> void:
 	var pot := PotState.new()
 	pot.plant = _plant("care-gauge")
 	pot.soil_moisture = 0.5
-	pot.plant.nutrition = 0.5
+	pot.plant.nutrition = 10.0
 	var species := PlantSpeciesDefinition.new()
-	var gauge := CareGaugeService.evaluate(pot, species); var feed := FertilizerDefinition.new(); feed.care_effects = {"growth_cycle": &"seed", "nutrition": 0.2}; pot.plant.nutrition = 0.2; FertilizerUseService.apply(pot.plant, feed, []); _expect(is_equal_approx(pot.plant.nutrition, 0.65), "fertilizer: stage boost must also feed the plant")
+	var gauge := CareGaugeService.evaluate(pot, species)
+	var feed := FertilizerDefinition.new()
+	feed.care_effects = {"growth_cycle": &"seed"}
+	pot.plant.nutrition = 4.0
+	FertilizerUseService.apply(pot.plant, feed, [])
+	_expect(is_equal_approx(pot.plant.nutrition, 14.0), "fertilizer: matching stage boost must restore half the current capacity")
 	_expect(int((gauge["water"] as Dictionary)["direction"]) == 0, "care gauge: optimal water should be in the favorable zone")
-	pot.plant.nutrition = 1.0
+	pot.plant.nutrition = NutritionService.capacity(pot.plant)
 	gauge = CareGaugeService.evaluate(pot, species)
 	_expect(int((gauge["food"] as Dictionary)["direction"]) == 1, "care gauge: excess food should be detected")
 	pot.plant.record_care_sample(0.8, 10.0)
@@ -76,14 +81,14 @@ func _test_growth_cycle_consumes_water_and_food() -> void:
 	pot.pot_id = "growth-needs"
 	pot.soil_moisture = 0.8
 	pot.plant = _plant("growth-needs-plant")
-	pot.plant.nutrition = 0.8
+	pot.plant.nutrition = 16.0
 	state.pots = [pot]
 	state.active_pot_id = pot.pot_id
 	var growth_before := pot.plant.growth_ratio
 	PlantSimulationService.advance(state, 60.0, registry, GameRules.new())
 	_expect(pot.plant.growth_ratio > growth_before, "growth needs: planted seed must start its growth cycle")
 	_expect(is_equal_approx(pot.soil_moisture, 0.75), "growth needs: soil must lose one quarter-cell per minute")
-	_expect(is_equal_approx(pot.plant.nutrition, 0.75), "growth needs: nutrition must lose one quarter-cell per minute")
+	_expect(is_equal_approx(pot.plant.nutrition, 15.0), "growth needs: nutrition must lose five percent of current capacity per minute")
 
 func _test_independent_pots_and_starter_seed() -> void:
 	var state := NewGameFactory.create(GameRules.new())
@@ -96,7 +101,7 @@ func _test_independent_pots_and_starter_seed() -> void:
 	_expect(second_plant != null and second_plant.instance_id != first_plant.instance_id, "pots: planted specimens must have unique identities")
 	state.pots[1].soil_moisture = 0.9
 	state.pots[1].light_mode = PotState.LightMode.DIRECT
-	second_plant.nutrition = 0.2
+	second_plant.nutrition = 2.0
 	_expect(not is_equal_approx(state.pots[0].soil_moisture, state.pots[1].soil_moisture), "pots: watering must remain independent")
 	_expect(state.pots[0].light_mode != state.pots[1].light_mode and not is_equal_approx(first_plant.nutrition, second_plant.nutrition), "pots: light and nutrition must remain independent")
 
