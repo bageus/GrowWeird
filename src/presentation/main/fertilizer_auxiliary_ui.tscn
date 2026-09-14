@@ -51,13 +51,13 @@ vertical_alignment = 1
 [node name="FinishButton" type="Button" parent="TimerHud"]
 layout_mode = 0
 offset_left = 192.0
-offset_top = 3.0
-offset_right = 303.0
+offset_top = 1.0
+offset_right = 304.0
 offset_bottom = 40.0
 text = "FINISH · 5"
 
 [node name="JournalButton" type="Button" parent="."]
-z_index = 205
+z_index = 6
 layout_mode = 1
 anchors_preset = 3
 anchor_top = 1.0
@@ -170,9 +170,7 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="KnowledgeText" type="Label" parent="Journal/ContentHud/Scroll"]
+[node name="Cards" type="VBoxContainer" parent="Journal/ContentHud/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Use fertilizers to reveal their care and mutation properties."
-vertical_alignment = 0
-autowrap_mode = 2
+theme_override_constants/separation = 10
