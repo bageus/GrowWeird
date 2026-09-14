@@ -9,6 +9,9 @@ var _timer_label: Label
 var _skip_button: Button
 
 func _ready() -> void:
+	custom_minimum_size = Vector2(306.0, 60.0)
+	size = Vector2(306.0, 60.0)
+	position.x -= 3.0
 	_build_hud()
 	_skip_button.pressed.connect(func() -> void: skip_requested.emit())
 
@@ -37,7 +40,7 @@ func _build_hud() -> void:
 	_stage_label = Label.new()
 	_stage_label.name = "StageLabel"
 	_stage_label.position = Vector2(22.0, 0.0)
-	_stage_label.size = Vector2(88.0, 42.0)
+	_stage_label.size = Vector2(88.0, 60.0)
 	_stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_stage_label.add_theme_font_size_override(&"font_size", 15)
@@ -49,7 +52,7 @@ func _build_hud() -> void:
 	_timer_label = Label.new()
 	_timer_label.name = "TimerLabel"
 	_timer_label.position = Vector2(110.0, 0.0)
-	_timer_label.size = Vector2(74.0, 42.0)
+	_timer_label.size = Vector2(74.0, 60.0)
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.add_theme_font_size_override(&"font_size", 18)
@@ -59,7 +62,7 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(192.0, 2.0)
+	_skip_button.position = Vector2(192.0, 11.0)
 	_skip_button.size = Vector2(112.0, 39.0)
 	_skip_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_skip_button.focus_mode = Control.FOCUS_NONE
@@ -76,7 +79,10 @@ func _build_hud() -> void:
 	add_child(_skip_button)
 
 func _hud_style() -> StyleBoxFlat:
-	return CommerceUiStyle.top_hud_style()
+	var style := CommerceUiStyle.top_hud_style(24)
+	style.shadow_size = 0
+	style.shadow_offset = Vector2.ZERO
+	return style
 
 func _button_style(color: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

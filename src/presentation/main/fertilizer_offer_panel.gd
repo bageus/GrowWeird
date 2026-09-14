@@ -31,15 +31,12 @@ func _bind_auxiliary_hud() -> void:
 	_timer_finish = auxiliary.get_node("TimerHud/FinishButton") as Button
 	_configure_timer_hud()
 	_timer_finish.pressed.connect(_finish_timer)
-	_journal_button = auxiliary.get_node("JournalButton") as Button
-	_journal_button.reparent(host)
-	_journal_button.z_as_relative = false
-	_journal_button.z_index = 10
-	_journal_button.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_journal_button.offset_left = 28.0
-	_journal_button.offset_top = -62.0
-	_journal_button.offset_right = 178.0
-	_journal_button.offset_bottom = -25.0
+	var legacy_journal_button := auxiliary.get_node_or_null("JournalButton") as Button
+	if legacy_journal_button != null:
+		legacy_journal_button.hide()
+	_journal_button = host.get_node("JournalButton") as Button
+	_journal_button.z_as_relative = true
+	_journal_button.z_index = 0
 	_journal_button.show()
 	CommerceUiStyle.transaction_action(_journal_button, &"journal")
 	_journal_button.pressed.connect(_toggle_journal)
@@ -136,7 +133,15 @@ func _other_menu_open() -> bool:
 	return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	(_timer.get_node("Hud") as Panel).add_theme_stylebox_override(&"panel", CommerceUiStyle.top_hud_style())
+	_timer.size = Vector2(306.0, 60.0)
+	_timer_label.position = Vector2(14.0, 0.0)
+	_timer_label.size = Vector2(173.0, 60.0)
+	_timer_finish.position = Vector2(192.0, 11.0)
+	_timer_finish.size = Vector2(112.0, 39.0)
+	var hud_style := CommerceUiStyle.top_hud_style(24)
+	hud_style.shadow_size = 0
+	hud_style.shadow_offset = Vector2.ZERO
+	(_timer.get_node("Hud") as Panel).add_theme_stylebox_override(&"panel", hud_style)
 	_timer_label.add_theme_font_size_override(&"font_size", 15); _timer_label.add_theme_color_override(&"font_color", Color("ffe7a1")); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2)
 	_timer_finish.alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_finish.add_theme_font_size_override(&"font_size", 16); _timer_finish.add_theme_color_override(&"font_color", Color.WHITE); _timer_finish.add_theme_color_override(&"font_outline_color", Color("31105c")); _timer_finish.add_theme_constant_override(&"outline_size", 2)
 	for state in [&"normal", &"hover", &"pressed", &"disabled"]: _timer_finish.add_theme_stylebox_override(state, _finish_button_style(state))

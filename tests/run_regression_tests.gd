@@ -35,9 +35,10 @@ func _test_offer_scene_nodes() -> void:
 	var panel := controls.get_node("OffersPanel") as Control
 	var dim := auxiliary.get_node("Dim") as ColorRect
 	var timer := auxiliary.get_node("TimerHud") as Control
-	var journal_button := auxiliary.get_node("JournalButton") as Button
+	var journal_button := controls.get_node("JournalButton") as Button
 	_expect(not panel.visible and not dim.visible and timer.visible, "offer UI: timer state must be visible without modal dim")
 	_expect(journal_button.visible, "offer UI: journal button must always exist on the left")
+	_expect(journal_button.z_index == 0 and journal_button.z_as_relative, "offer UI: journal button must share the SceneControls action layer")
 	_expect(journal_button.position.y > 500.0 and journal_button.position.y + journal_button.size.y <= controls.size.y, "offer UI: journal button must remain visible in the lower-left corner")
 	for tab in ["Unknown", "Fertilizers", "Decorations", "Mutagens"]: _expect(auxiliary.has_node("Journal/ContentHud/Tabs/" + tab), "almanac: missing %s tab" % tab)
 	var dialogs := controls.get_node("InventoryItemDialogs") as InventoryItemDialogs

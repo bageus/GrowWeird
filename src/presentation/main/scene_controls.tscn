@@ -1,5 +1,4 @@
 [gd_scene load_steps=17 format=3]
-
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="3_drag"]
@@ -15,7 +14,6 @@
 [ext_resource type="Script" path="res://src/presentation/main/fertilizer_offer_panel.gd" id="13_offer_panel"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/fertilizer_auxiliary_ui.tscn" id="14_offer_aux"]
 [ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="15_balance"]
-
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
 border_width_left = 1
@@ -31,7 +29,6 @@ content_margin_left = 8.0
 content_margin_top = 6.0
 content_margin_right = 8.0
 content_margin_bottom = 7.0
-
 [sub_resource type="StyleBoxFlat" id="StyleBox_popup"]
 bg_color = Color(0.035, 0.035, 0.035, 0.9)
 border_width_left = 1
@@ -47,7 +44,6 @@ content_margin_left = 8.0
 content_margin_top = 7.0
 content_margin_right = 8.0
 content_margin_bottom = 8.0
-
 [node name="SceneControls" type="Control"]
 layout_mode = 1
 z_index = 5
@@ -56,7 +52,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource("1_controls")
-
 [node name="WaterButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
@@ -64,7 +59,6 @@ offset_bottom = 76.0
 text = "Water"
 script = ExtResource("2_action")
 action_id = &"water"
-
 [node name="LightingButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
@@ -72,7 +66,6 @@ offset_bottom = 76.0
 text = "Lighting"
 script = ExtResource("2_action")
 action_id = &"lighting"
-
 [node name="PruneButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
@@ -81,7 +74,6 @@ toggle_mode = true
 text = "Prune"
 script = ExtResource("2_action")
 action_id = &"prune"
-
 [node name="SellPlantButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
@@ -89,21 +81,29 @@ offset_bottom = 76.0
 text = "Sell plant"
 script = ExtResource("2_action")
 action_id = &"sell_plant"
-
 [node name="ShopActionButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
 offset_bottom = 76.0
 script = ExtResource("2_action")
 action_id = &"shop"
-
 [node name="TasksButton" type="Button" parent="."]
 custom_minimum_size = Vector2(150, 76)
 offset_right = 150.0
 offset_bottom = 76.0
 script = ExtResource("2_action")
 action_id = &"tasks"
-
+[node name="JournalButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 28.0
+offset_top = -62.0
+offset_right = 178.0
+offset_bottom = -25.0
+grow_vertical = 0
+text = "JOURNAL"
 [node name="WalletHud" type="PanelContainer" parent="."]
 z_index = 200
 custom_minimum_size = Vector2(224, 100)
@@ -114,11 +114,9 @@ script = ExtResource("3_drag")
 layout_id = &"wallet"
 drag_handle_height = 120.0
 allow_scaling = true
-
 [node name="Layers" type="Control" parent="WalletHud"]
 layout_mode = 2
 mouse_filter = 1
-
 [node name="BalanceArt" type="Panel" parent="WalletHud/Layers"]
 layout_mode = 0
 offset_left = 36.0
@@ -128,17 +126,15 @@ offset_bottom = 76.0
 mouse_filter = 2
 script = ExtResource("15_balance")
 plus_button_path = NodePath("../ShopButton")
-
 [node name="BalanceIcon" type="TextureRect" parent="WalletHud/Layers"]
 layout_mode = 0
-offset_left = -1.0
-offset_top = 20.0
-offset_right = 79.0
-offset_bottom = 100.0
+offset_left = -4.0
+offset_top = 18.0
+offset_right = 76.0
+offset_bottom = 98.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
-
 [node name="MoneyLabel" type="Label" parent="WalletHud/Layers"]
 layout_mode = 0
 offset_left = 79.0
@@ -152,18 +148,14 @@ theme_override_font_sizes/font_size = 25
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
-
 [node name="ShopButton" type="Button" parent="WalletHud/Layers"]
 layout_mode = 0
 offset_left = 198.0
 offset_top = 41.0
 offset_right = 236.0
 offset_bottom = 79.0
-
 [node name="EnergyHud" parent="." instance=ExtResource("12_energy_hud")]
-
 [node name="FertilizerAuxiliaryUi" parent="." instance=ExtResource("14_offer_aux")]
-
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
 custom_minimum_size = Vector2(637, 112)
@@ -173,7 +165,6 @@ theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("13_offer_panel")
 layout_id = &"fertilizers"
 drag_handle_height = 112.0
-
 [node name="PotSelector" type="PanelContainer" parent="."]
 z_index = 7
 custom_minimum_size = Vector2(240, 120)
@@ -183,11 +174,9 @@ theme_override_styles/panel = SubResource("StyleBox_hud")
 script = ExtResource("7_pots")
 layout_id = &"pots"
 drag_handle_height = 120.0
-
 [node name="Layers" type="Control" parent="PotSelector"]
 layout_mode = 2
 mouse_filter = 1
-
 [node name="PotCircle" type="Panel" parent="PotSelector/Layers"]
 layout_mode = 0
 offset_left = 76.0
@@ -195,7 +184,6 @@ offset_top = 16.0
 offset_right = 164.0
 offset_bottom = 104.0
 mouse_filter = 2
-
 [node name="PotHover" type="TextureRect" parent="PotSelector/Layers"]
 layout_mode = 1
 anchors_preset = 15
@@ -206,7 +194,6 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 0
-
 [node name="PreviousPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
 offset_left = 29.0
@@ -214,7 +201,6 @@ offset_top = 31.0
 offset_right = 72.0
 offset_bottom = 91.0
 text = "‹"
-
 [node name="PotThumbnail" type="TextureRect" parent="PotSelector/Layers"]
 layout_mode = 0
 offset_left = 90.0
@@ -225,7 +211,6 @@ mouse_filter = 2
 texture = ExtResource("8_pot")
 expand_mode = 1
 stretch_mode = 5
-
 [node name="NextPot" type="Button" parent="PotSelector/Layers"]
 layout_mode = 0
 offset_left = 168.0
@@ -233,50 +218,40 @@ offset_top = 31.0
 offset_right = 215.0
 offset_bottom = 91.0
 text = "›"
-
 [node name="Row" type="HBoxContainer" parent="OffersPanel"]
 layout_mode = 2
 theme_override_constants/separation = 5
-
 [node name="RefreshOffer" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(112, 72)
 layout_mode = 2
 text = "Refresh"
-
 [node name="OfferOne" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 size_flags_vertical = 4
 text = "?"
-
 [node name="OfferTwo" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 size_flags_vertical = 4
 text = "?"
-
 [node name="OfferThree" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(92, 92)
 layout_mode = 2
 size_flags_vertical = 4
 text = "?"
-
 [node name="SkipOffer" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(112, 72)
 layout_mode = 2
 text = "Skip"
-
 [node name="AdOffer" type="Button" parent="OffersPanel/Row"]
 custom_minimum_size = Vector2(112, 72)
 layout_mode = 2
 text = "AD"
-
 [node name="CooldownCenter" parent="OffersPanel" instance=ExtResource("9_cooldown")]
 layout_mode = 2
-
 [node name="InventoryHud" parent="." instance=ExtResource("5_inventory")]
 z_index = 7
-
 [node name="WaterOptions" type="PanelContainer" parent="."]
 visible = false
 z_index = 30
@@ -284,21 +259,17 @@ custom_minimum_size = Vector2(112, 84)
 offset_right = 112.0
 offset_bottom = 84.0
 theme_override_styles/panel = SubResource("StyleBox_popup")
-
 [node name="Options" type="VBoxContainer" parent="WaterOptions"]
 layout_mode = 2
 theme_override_constants/separation = -6
-
 [node name="SprayButton" type="Button" parent="WaterOptions/Options"]
 custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Spray"
-
 [node name="PourButton" type="Button" parent="WaterOptions/Options"]
 custom_minimum_size = Vector2(150, 70)
 layout_mode = 2
 text = "Pour"
-
 [node name="LightingOptions" type="PanelContainer" parent="."]
 visible = false
 z_index = 30
@@ -306,40 +277,31 @@ custom_minimum_size = Vector2(140, 164)
 offset_right = 140.0
 offset_bottom = 164.0
 theme_override_styles/panel = SubResource("StyleBox_popup")
-
 [node name="Options" type="VBoxContainer" parent="LightingOptions"]
 layout_mode = 2
 theme_override_constants/separation = -6
-
 [node name="CurtainsButton" type="Button" parent="LightingOptions/Options"]
 custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Curtains"
-
 [node name="OpenWindowButton" type="Button" parent="LightingOptions/Options"]
 custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Open window"
-
 [node name="BlindsButton" type="Button" parent="LightingOptions/Options"]
 custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Blinds"
-
 [node name="NormalLightButton" type="Button" parent="LightingOptions/Options"]
 custom_minimum_size = Vector2(160, 70)
 layout_mode = 2
 text = "Normal light"
-
 [node name="ShopContainer" parent="." instance=ExtResource("4_shop")]
 visible = false
 z_index = 180
-
 [node name="WalletTopupPanel" parent="." instance=ExtResource("10_topup")]
 z_index = 180
-
 [node name="EnergyTopupPanel" parent="." instance=ExtResource("11_energy")]
 visible = false
 z_index = 180
-
 [node name="InventoryItemDialogs" parent="." instance=ExtResource("6_dialogs")]
