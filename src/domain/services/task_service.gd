@@ -60,7 +60,7 @@ static func daily_tasks(state: GameState) -> Array[Dictionary]:
 	if state == null:
 		return result
 	for definition in DAILY_TASKS:
-		var task := definition.duplicate(true)
+		var task: Dictionary = definition.duplicate(true)
 		var key := String(task.id)
 		task["progress"] = int(state.progression.progress_by_id.get(_daily_progress_key(key), 0))
 		task["target"] = 1
