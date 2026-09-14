@@ -30,6 +30,7 @@ static func repair_plant(plant: PlantState) -> void:
 		plant.growth_cycle_index = 8
 	elif plant.growth_ratio > 0.0 and plant.growth_cycle_index == 0:
 		plant.growth_cycle_index = clampi(floori(plant.growth_ratio * 8.0), 1, 7)
+	NutritionService.clamp_to_capacity(plant)
 	_sync_legacy_growth(plant)
 
 static func advance(plant: PlantState, delta_seconds: float, _care_factor: float) -> bool:
@@ -51,6 +52,7 @@ static func advance(plant: PlantState, delta_seconds: float, _care_factor: float
 			plant.growth_cycle_index += 1
 		plant.boosted_growth_cycle = -1
 		changed = true
+	NutritionService.clamp_to_capacity(plant)
 	_sync_legacy_growth(plant)
 	return changed
 
@@ -83,7 +85,6 @@ static func activate_stage_fertilizer(plant: PlantState, target: StringName) -> 
 	if plant == null or not matches_target(plant.growth_cycle_index, target):
 		return false
 	plant.boosted_growth_cycle = plant.growth_cycle_index
-	plant.nutrition = clampf(plant.nutrition, 0.45, 0.65)
 	return true
 
 static func matches_target(cycle: int, target: StringName) -> bool:
