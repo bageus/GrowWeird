@@ -42,7 +42,7 @@ func normalized_position() -> Vector2:
 
 func _on_native_pressed() -> void:
 	if not _tracking and not disabled:
-		activated.emit(action_id)
+		_activate()
 
 func _gui_input(event: InputEvent) -> void:
 	if not Input.is_key_pressed(KEY_CTRL):
@@ -67,10 +67,19 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 	if _dragging:
 		position_committed.emit(action_id, normalized_position())
 	elif not disabled:
-		activated.emit(action_id)
+		_activate()
 	_tracking = false
 	_dragging = false
 	accept_event()
+
+func _activate() -> void:
+	if action_id == &"tasks":
+		var scene := get_tree().current_scene
+		var tasks_panel := scene.get_node_or_null("%ProgressionPanel") as ProgressionPanel if scene != null else null
+		if tasks_panel != null:
+			tasks_panel.toggle_menu()
+			return
+	activated.emit(action_id)
 
 func _handle_mouse_motion() -> void:
 	var parent_control := get_parent() as Control
