@@ -31,13 +31,17 @@ func _build_hud() -> void:
 	_panel.name = "Hud"
 	_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_panel.add_theme_stylebox_override(&"panel", _hud_style())
 	add_child(_panel)
+	CommerceUiStyle.balance_hud(_panel)
+	var outer := _panel.get_theme_stylebox(&"panel") as StyleBoxFlat
+	if outer != null:
+		outer.shadow_size = 0
+		outer.shadow_offset = Vector2.ZERO
 
 	_stage_label = Label.new()
 	_stage_label.name = "StageLabel"
 	_stage_label.position = Vector2(22.0, 0.0)
-	_stage_label.size = Vector2(88.0, 42.0)
+	_stage_label.size = Vector2(88.0, 52.0)
 	_stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_stage_label.add_theme_font_size_override(&"font_size", 15)
@@ -49,7 +53,7 @@ func _build_hud() -> void:
 	_timer_label = Label.new()
 	_timer_label.name = "TimerLabel"
 	_timer_label.position = Vector2(110.0, 0.0)
-	_timer_label.size = Vector2(74.0, 42.0)
+	_timer_label.size = Vector2(74.0, 52.0)
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.add_theme_font_size_override(&"font_size", 18)
@@ -59,7 +63,7 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(192.0, 2.0)
+	_skip_button.position = Vector2(192.0, 6.0)
 	_skip_button.size = Vector2(112.0, 39.0)
 	_skip_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_skip_button.focus_mode = Control.FOCUS_NONE
@@ -74,12 +78,6 @@ func _build_hud() -> void:
 	_skip_button.add_theme_stylebox_override(&"disabled", _button_style(Color("766b7e")))
 	_skip_button.add_theme_stylebox_override(&"focus", StyleBoxEmpty.new())
 	add_child(_skip_button)
-
-func _hud_style() -> StyleBoxFlat:
-	var style := CommerceUiStyle.top_hud_style(24)
-	style.shadow_size = 0
-	style.shadow_offset = Vector2.ZERO
-	return style
 
 func _button_style(color: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
