@@ -22,20 +22,20 @@ static func all() -> Dictionary:
 				_cache[id] = raw.duplicate(true)
 	return _cache
 
-static func get(id: StringName) -> Dictionary:
+static func entry(id: StringName) -> Dictionary:
 	return (all().get(String(id), {}) as Dictionary).duplicate(true)
 
 static func food_gain(id: StringName) -> float:
-	var value: Variant = get(id).get("food", 0)
+	var value: Variant = entry(id).get("food", 0)
 	if value is int or value is float:
 		return float(value)
 	return 0.0
 
 static func grind_yield(id: StringName) -> int:
-	return maxi(0, int(get(id).get("grind_yield", 0)))
+	return maxi(0, int(entry(id).get("grind_yield", 0)))
 
 static func sell_price(id: StringName) -> int:
-	return maxi(0, int(get(id).get("sell_price", 0)))
+	return maxi(0, int(entry(id).get("sell_price", 0)))
 
 static func drop_chance(id: StringName) -> float:
-	return clampf(float(get(id).get("drop_chance_percent", 0.0)) / 100.0, 0.0, 1.0)
+	return clampf(float(entry(id).get("drop_chance_percent", 0.0)) / 100.0, 0.0, 1.0)
