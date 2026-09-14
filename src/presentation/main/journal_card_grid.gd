@@ -19,7 +19,8 @@ static func populate(scroll: ScrollContainer, app: Node, tab: StringName) -> voi
 		grid.add_theme_constant_override(&"v_separation", 10)
 		scroll.add_child(grid)
 	for child in grid.get_children():
-		child.free()
+		child.hide()
+		child.queue_free()
 	var knowledge := app.call("fertilizer_knowledge") as Dictionary
 	var entries := _entries(app, knowledge, tab)
 	for entry in entries:
@@ -94,18 +95,20 @@ static func _card(entry: Dictionary, app: Node, scroll: ScrollContainer) -> Pane
 		claim.text = "CLAIM +3 %s" % String(reward_kind).to_upper()
 		CommerceUiStyle.transaction_action(claim, &"claim")
 		claim.pressed.connect(func() -> void:
+			if not is_instance_valid(claim) or not is_instance_valid(scroll) or not is_instance_valid(app):
+				return
 			var start_global := claim.get_global_rect().get_center()
 			if bool(app.call("claim_journal_reward", item_id)):
 				_show_claim_feedback(scroll, reward_kind, 3, start_global)
-		)
+		, Object.CONNECT_DEFERRED)
 		column.add_child(claim)
 	return card
 
 static func _show_claim_feedback(scroll: ScrollContainer, reward_kind: StringName, amount: int, start_global: Vector2) -> void:
-	if scroll == null:
+	if scroll == null or not is_instance_valid(scroll):
 		return
 	var overlay := scroll.get_parent() as Control
-	if overlay == null:
+	if overlay == null or not is_instance_valid(overlay):
 		return
 	var label := Label.new()
 	label.text = "+%d %s" % [amount, String(reward_kind).to_upper()]
