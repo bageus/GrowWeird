@@ -1,88 +1,18 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="1_drag"]
-[ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="2_balance"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBox_empty"]
+[ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="1_balance"]
 
 [node name="EnergyHud" type="PanelContainer"]
+layout_mode = 1
 z_index = 200
-custom_minimum_size = Vector2(224, 126)
-offset_right = 224.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -418.0
+offset_right = -194.0
 offset_bottom = 126.0
-theme_override_styles/panel = SubResource("StyleBox_empty")
-script = ExtResource("1_drag")
-layout_id = &"energy"
-drag_handle_height = 120.0
-allow_scaling = true
-
-[node name="Layers" type="Control" parent="."]
-layout_mode = 2
-mouse_filter = 1
-
-[node name="BalanceArt" type="Panel" parent="Layers"]
-layout_mode = 0
-offset_left = 36.0
-offset_top = 24.0
-offset_right = 224.0
-offset_bottom = 66.0
+grow_horizontal = 0
+custom_minimum_size = Vector2(224, 126)
 mouse_filter = 2
-script = ExtResource("2_balance")
-plus_button_path = NodePath("../AddButton")
-
-[node name="LegacyBalanceContractMarker" type="Control" parent="Layers"]
-visible = false
-layout_mode = 0
-offset_top = 24.0
-offset_right = 224.0
-offset_bottom = 76.0
-mouse_filter = 2
-
-[node name="BalanceIcon" type="TextureRect" parent="Layers"]
-layout_mode = 0
-offset_left = -13.0
-offset_top = 17.0
-offset_right = 67.0
-offset_bottom = 97.0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Value" type="Label" parent="Layers"]
-layout_mode = 0
-offset_left = 79.0
-offset_top = 24.0
-offset_right = 182.0
-offset_bottom = 66.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.04, 0.16, 1)
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 22
-text = "0 / 0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AddButton" type="Button" parent="Layers"]
-layout_mode = 0
-offset_left = 198.0
-offset_top = 26.0
-offset_right = 236.0
-offset_bottom = 64.0
-
-[node name="Next" type="PanelContainer" parent="Layers"]
-layout_mode = 0
-z_index = 188
-z_as_relative = false
-offset_left = 48.0
-offset_top = 77.0
-offset_right = 218.0
-offset_bottom = 101.0
-mouse_filter = 2
-
-[node name="Timer" type="Label" parent="Layers/Next"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.28, 0.12, 0.04, 1)
-theme_override_font_sizes/font_size = 14
-text = "Next energy in 02:00"
-horizontal_alignment = 1
-vertical_alignment = 1
+script = ExtResource("1_balance")
+energy = true
