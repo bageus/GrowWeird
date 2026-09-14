@@ -37,7 +37,7 @@ func _build_hud() -> void:
 	_stage_label = Label.new()
 	_stage_label.name = "StageLabel"
 	_stage_label.position = Vector2(22.0, 0.0)
-	_stage_label.size = Vector2(88.0, 52.0)
+	_stage_label.size = Vector2(88.0, 42.0)
 	_stage_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_stage_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_stage_label.add_theme_font_size_override(&"font_size", 15)
@@ -49,7 +49,7 @@ func _build_hud() -> void:
 	_timer_label = Label.new()
 	_timer_label.name = "TimerLabel"
 	_timer_label.position = Vector2(110.0, 0.0)
-	_timer_label.size = Vector2(74.0, 52.0)
+	_timer_label.size = Vector2(74.0, 42.0)
 	_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_timer_label.add_theme_font_size_override(&"font_size", 18)
@@ -59,15 +59,14 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(192.0, 6.0)
-	_skip_button.size = Vector2(112.0, 39.0)
+	_skip_button.position = Vector2(192.0, 3.0)
+	_skip_button.size = Vector2(112.0, 36.0)
 	_skip_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_skip_button.focus_mode = Control.FOCUS_NONE
 	_skip_button.add_theme_font_size_override(&"font_size", 16)
 	_skip_button.add_theme_color_override(&"font_color", Color.WHITE)
 	_skip_button.add_theme_color_override(&"font_outline_color", Color("31105c"))
 	_skip_button.add_theme_constant_override(&"outline_size", 2)
-	_skip_button.add_theme_constant_override(&"content_margin_top", 1)
 	_skip_button.add_theme_stylebox_override(&"normal", _button_style(Color("7d25e8")))
 	_skip_button.add_theme_stylebox_override(&"hover", _button_style(Color("963cf2")))
 	_skip_button.add_theme_stylebox_override(&"pressed", _button_style(Color("6418c2")))
@@ -76,7 +75,7 @@ func _build_hud() -> void:
 	add_child(_skip_button)
 
 func _hud_style() -> StyleBoxFlat:
-	var style := CommerceUiStyle.top_hud_style(24)
+	var style := CommerceUiStyle.top_hud_style(21)
 	style.shadow_size = 0
 	style.shadow_offset = Vector2.ZERO
 	return style
@@ -86,12 +85,12 @@ func _button_style(color: Color) -> StyleBoxFlat:
 	style.bg_color = color
 	style.border_color = Color("451086")
 	style.set_border_width_all(3)
-	style.set_corner_radius_all(18)
-	style.content_margin_top = 5.0
-	style.content_margin_bottom = 4.0
+	style.set_corner_radius_all(17)
+	style.content_margin_top = 4.0
+	style.content_margin_bottom = 3.0
 	style.shadow_color = Color(0.10, 0.02, 0.18, 0.55)
-	style.shadow_size = 3
-	style.shadow_offset = Vector2(0.0, 2.0)
+	style.shadow_size = 2
+	style.shadow_offset = Vector2(0.0, 1.0)
 	style.anti_aliasing_size = 1.5
 	return style
 
