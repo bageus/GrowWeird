@@ -35,6 +35,8 @@ func _bind_auxiliary_hud() -> void:
 	if legacy_journal_button != null:
 		legacy_journal_button.hide()
 	_journal_button = host.get_node("JournalButton") as Button
+	if _journal_button is SceneActionButton:
+		(_journal_button as SceneActionButton).action_id = &""
 	_journal_button.z_as_relative = true
 	_journal_button.z_index = 0
 	_journal_button.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -146,6 +148,11 @@ func _other_menu_open() -> bool:
 	return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
+	_timer.size = Vector2(306.0, 52.0)
+	_timer_label.position = Vector2(14.0, 0.0)
+	_timer_label.size = Vector2(173.0, 52.0)
+	_timer_finish.position = Vector2(192.0, 6.0)
+	_timer_finish.size = Vector2(112.0, 39.0)
 	var hud := _timer.get_node("Hud") as Panel
 	var hud_style := CommerceUiStyle.top_hud_style(24)
 	hud_style.shadow_size = 0
