@@ -24,7 +24,7 @@ func set_cycle(plant: PlantState, _energy: int) -> void:
 	_timer_label.add_theme_color_override(&"font_color", Color("8cff91") if boosted else Color.WHITE)
 	var cost := EnergyService.cycle_skip_cost(plant)
 	_skip_button.text = "FINISH · %d" % cost
-	_skip_button.disabled = cost <= 0 or (false)
+	_skip_button.disabled = cost <= 0
 
 func _build_hud() -> void:
 	_panel = Panel.new()
@@ -59,14 +59,15 @@ func _build_hud() -> void:
 
 	_skip_button = Button.new()
 	_skip_button.name = "SkipButton"
-	_skip_button.position = Vector2(192.0, 3.0)
-	_skip_button.size = Vector2(111.0, 37.0)
+	_skip_button.position = Vector2(192.0, 2.0)
+	_skip_button.size = Vector2(112.0, 39.0)
 	_skip_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_skip_button.focus_mode = Control.FOCUS_NONE
 	_skip_button.add_theme_font_size_override(&"font_size", 16)
 	_skip_button.add_theme_color_override(&"font_color", Color.WHITE)
 	_skip_button.add_theme_color_override(&"font_outline_color", Color("31105c"))
 	_skip_button.add_theme_constant_override(&"outline_size", 2)
+	_skip_button.add_theme_constant_override(&"content_margin_top", 1)
 	_skip_button.add_theme_stylebox_override(&"normal", _button_style(Color("7d25e8")))
 	_skip_button.add_theme_stylebox_override(&"hover", _button_style(Color("963cf2")))
 	_skip_button.add_theme_stylebox_override(&"pressed", _button_style(Color("6418c2")))
@@ -83,6 +84,8 @@ func _button_style(color: Color) -> StyleBoxFlat:
 	style.border_color = Color("451086")
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(18)
+	style.content_margin_top = 5.0
+	style.content_margin_bottom = 4.0
 	style.shadow_color = Color(0.10, 0.02, 0.18, 0.55)
 	style.shadow_size = 3
 	style.shadow_offset = Vector2(0.0, 2.0)
