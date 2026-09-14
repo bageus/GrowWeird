@@ -58,6 +58,7 @@ func active_species_definition() -> PlantSpeciesDefinition:
 func switch_pot(pot_id: String) -> bool:
 	if state == null or state.find_pot(pot_id) == null:
 		return false
+	GrowthCycleService.repair_state(state)
 	state.active_pot_id = pot_id
 	state_changed.emit()
 	return true
@@ -136,6 +137,21 @@ func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = Reso
 	_emit_mutation_events(events)
 	state_changed.emit()
 	return result
+func use_inventory_special(item_id: String) -> bool:
+	var plant := active_plant()
+	if state == null or plant == null or not plant.alive: return false
+	var category := AlmanacItemCatalog.category_for(ResourceActions.MISC, item_id, registry)
+	if category == &"decoration":
+		if plant.decorations.has(item_id) or InventoryService.take_misc(state.inventory, item_id) != 1: return false
+		plant.decorations.append(item_id)
+		AlmanacKnowledgeService.record_use(state, item_id, category, {}, {}, [], AlmanacItemCatalog.decoration_effect(StringName(item_id)))
+	elif category == &"mutagen":
+		if InventoryService.take_misc(state.inventory, item_id) != 1: return false
+		var effects := AlmanacItemCatalog.mutagen_effect(StringName(item_id))
+		for axis in effects: plant.add_mutation_energy(StringName(axis), float(effects[axis]))
+		AlmanacKnowledgeService.record_use(state, item_id, category, {}, effects, [])
+	else: return false
+	state_changed.emit(); return true
 func fertilizer_knowledge() -> Dictionary:
 	return state.fertilizer_knowledge.duplicate(true) if state != null else {}
 func prune_active_branch(slot: StringName) -> String:
@@ -204,9 +220,10 @@ func inventory_item_recycle_yield(kind: StringName) -> int:
 	return ResourceActions.recycle_yield(kind, rules)
 func recycle_inventory_item(kind: StringName, item_id: String) -> int:
 	if state.energy < ResourceActions.RECYCLE_ENERGY_COST: return 0
+	var category := AlmanacItemCatalog.category_for(kind, item_id, registry)
 	var amount := ResourceActions.recycle_item(state, kind, item_id, rules)
 	if amount > 0:
-		EnergyService.spend(state, ResourceActions.RECYCLE_ENERGY_COST); _progress(&"resource_processed"); state_changed.emit()
+		EnergyService.spend(state, ResourceActions.RECYCLE_ENERGY_COST); AlmanacKnowledgeService.record_recycle(state, item_id, category, amount); _progress(&"resource_processed"); state_changed.emit()
 	return amount
 func shop_catalog() -> Array[Dictionary]:
 	return ShopService.fertilizer_catalog(state, registry.all_fertilizers())
@@ -304,18 +321,14 @@ func _emit_mutation_events(events: Array[Dictionary]) -> void:
 func _record_fertilizer_knowledge(fertilizer_id: StringName, events: Array[Dictionary]) -> void:
 	var definition := registry.get_fertilizer(fertilizer_id)
 	if definition == null: return
-	var previous: Dictionary = state.fertilizer_knowledge.get(String(fertilizer_id), {})
 	var discovered: Array[String] = []
-	for value in previous.get("discovered_traits", []):
-		var known_trait := String(value)
-		if not known_trait.is_empty() and not discovered.has(known_trait): discovered.append(known_trait)
 	for event in events:
 		var trait_id := String(event.get("trait_id", ""))
 		if not trait_id.is_empty() and not discovered.has(trait_id): discovered.append(trait_id)
 	var care: Dictionary = definition.care_effects.duplicate(true)
 	var mutation_effects: Dictionary = definition.mutation_contributions.duplicate(true)
-	var category := "mutagen" if not mutation_effects.is_empty() else "fertilizer"
-	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "category": category, "care_effects": care, "mutation_effects": mutation_effects, "discovered_traits": discovered}
+	var category: StringName = &"mutagen" if not mutation_effects.is_empty() else &"fertilizer"
+	AlmanacKnowledgeService.record_use(state, String(fertilizer_id), category, care, mutation_effects, discovered)
 func _progress(event_id: StringName) -> void:
 	ProgressionActions.record_event(state, event_id, registry)
 func _has_living_plant() -> bool:
