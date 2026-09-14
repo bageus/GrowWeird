@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_draggable_panel.gd" id="1_drag"]
+[ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="2_balance"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBox_empty"]
 
@@ -26,6 +27,8 @@ offset_top = 24.0
 offset_right = 224.0
 offset_bottom = 76.0
 mouse_filter = 2
+script = ExtResource("2_balance")
+plus_button_path = NodePath("../AddButton")
 
 [node name="BalanceIcon" type="TextureRect" parent="Layers"]
 layout_mode = 0

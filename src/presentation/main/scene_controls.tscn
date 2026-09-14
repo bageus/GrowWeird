@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://src/presentation/main/scene_controls_overlay.gd" id="1_controls"]
 [ext_resource type="Script" path="res://src/presentation/main/scene_action_button.gd" id="2_action"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://src/presentation/main/energy_hud.tscn" id="12_energy_hud"]
 [ext_resource type="Script" path="res://src/presentation/main/fertilizer_offer_panel.gd" id="13_offer_panel"]
 [ext_resource type="PackedScene" path="res://src/presentation/main/fertilizer_auxiliary_ui.tscn" id="14_offer_aux"]
+[ext_resource type="Script" path="res://src/presentation/main/programmatic_balance_hud.gd" id="15_balance"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_hud"]
 bg_color = Color(0.035, 0.035, 0.035, 0.6)
@@ -125,6 +126,8 @@ offset_top = 24.0
 offset_right = 224.0
 offset_bottom = 76.0
 mouse_filter = 2
+script = ExtResource("15_balance")
+plus_button_path = NodePath("../ShopButton")
 
 [node name="BalanceIcon" type="TextureRect" parent="WalletHud/Layers"]
 layout_mode = 0
