@@ -1,7 +1,7 @@
 class_name JournalCardGrid
 extends RefCounted
 
-const CARD_SIZE := Vector2(242.0, 250.0)
+const CARD_SIZE := Vector2(242.0, 278.0)
 
 static func populate(scroll: ScrollContainer, app: Node, tab: StringName) -> void:
 	if scroll == null or app == null:
@@ -23,9 +23,9 @@ static func populate(scroll: ScrollContainer, app: Node, tab: StringName) -> voi
 	var knowledge := app.call("fertilizer_knowledge") as Dictionary
 	var entries := _entries(app, knowledge, tab)
 	for entry in entries:
-		grid.add_child(_card(entry))
+		grid.add_child(_card(entry, app))
 	if entries.is_empty():
-		grid.add_child(_empty_card())
+		grid.add_child(_empty_card(app))
 
 static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -55,10 +55,12 @@ static func _entries(app: Node, knowledge: Dictionary, tab: StringName) -> Array
 		result.append({"id": String(raw_id), "name": _display_name(StringName(raw_id)), "data": entry})
 	return result
 
-static func _card(entry: Dictionary) -> PanelContainer:
+static func _card(entry: Dictionary, app: Node) -> PanelContainer:
+	var data := entry.get("data", {}) as Dictionary
+	var claimed := bool(data.get("reward_claimed", false))
 	var card := PanelContainer.new()
 	card.custom_minimum_size = CARD_SIZE
-	card.add_theme_stylebox_override(&"panel", _card_style())
+	card.add_theme_stylebox_override(&"panel", _card_style(claimed))
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", 5)
 	card.add_child(column)
@@ -77,12 +79,21 @@ static func _card(entry: Dictionary) -> PanelContainer:
 	image.modulate = Color(1, 1, 1, 0.52) if bool(entry.get("unknown", false)) else Color.WHITE
 	column.add_child(image)
 	var details := Label.new()
-	details.text = "Properties not discovered yet." if bool(entry.get("unknown", false)) else _details(entry.get("data", {}) as Dictionary)
+	details.text = "Properties not discovered yet." if bool(entry.get("unknown", false)) else _details(data)
 	details.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	details.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	details.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	details.add_theme_font_size_override(&"font_size", 13)
 	details.add_theme_color_override(&"font_color", Color("5b2b12"))
 	column.add_child(details)
+	var item_id := StringName(entry.get("id", ""))
+	if not bool(entry.get("unknown", false)) and bool(app.call("can_claim_journal_reward", item_id)):
+		var claim := Button.new()
+		claim.custom_minimum_size = Vector2(0.0, 38.0)
+		claim.text = "CLAIM +3 %s" % String(app.call("journal_reward_kind", item_id)).to_upper()
+		CommerceUiStyle.transaction_action(claim, &"claim")
+		claim.pressed.connect(func() -> void: app.call("claim_journal_reward", item_id))
+		column.add_child(claim)
 	return card
 
 static func _details(data: Dictionary) -> String:
@@ -103,6 +114,8 @@ static func _details(data: Dictionary) -> String:
 	if not traits.is_empty():
 		lines.append("Special: %s" % ", ".join(traits))
 	lines.append("Used: %d" % int(data.get("uses", 0)))
+	if bool(data.get("reward_claimed", false)):
+		lines.append("Reward claimed")
 	return "\n".join(lines)
 
 static func _display_name(id: StringName) -> String:
@@ -111,13 +124,13 @@ static func _display_name(id: StringName) -> String:
 		return String(descriptor.get("item_id", id)).replace("_", " ").capitalize()
 	return String(id).replace("_", " ").capitalize()
 
-static func _empty_card() -> PanelContainer:
-	return _card({"name": "NO ITEMS", "id": "", "unknown": true})
+static func _empty_card(app: Node) -> PanelContainer:
+	return _card({"name": "NO ITEMS", "id": "", "unknown": true}, app)
 
-static func _card_style() -> StyleBoxFlat:
+static func _card_style(claimed: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color("ffe0a2")
-	style.border_color = Color("c36a1a")
+	style.bg_color = Color("f4c651") if claimed else Color("e8bd78")
+	style.border_color = Color("c47a08") if claimed else Color("a95c1a")
 	style.set_border_width_all(3)
 	style.set_corner_radius_all(16)
 	style.content_margin_left = 10.0

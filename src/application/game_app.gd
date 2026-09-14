@@ -27,11 +27,9 @@ func _ready() -> void:
 	_persistence.start(state, registry, rules, platform)
 	state_changed.emit()
 func _process(delta: float) -> void:
-	if state == null:
-		return
+	if state == null: return
 	_persistence.process(delta, state)
-	if not _persistence.is_ready() or _platform_paused:
-		return
+	if not _persistence.is_ready() or _platform_paused: return
 	var changed := false
 	var steps := _clock.consume(delta, rules.simulation_step_seconds)
 	for _step in range(steps):
@@ -40,28 +38,18 @@ func _process(delta: float) -> void:
 		changed = true
 	if EnergyService.advance(state, delta): changed = true
 	if FertilizerOfferService.advance(state.fertilizer_offer, delta, registry.all_offer_fertilizers(), rules):
-		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate())
-		changed = true
-	if changed:
-		state_changed.emit()
+		fertilizer_offer_ready.emit(state.fertilizer_offer.offered_ids.duplicate()); changed = true
+	if changed: state_changed.emit()
 func _exit_tree() -> void:
-	if state != null and _persistence.is_ready():
-		_persistence.save_now(state, false)
-func active_pot() -> PotState:
-	return state.active_pot() if state != null else null
+	if state != null and _persistence.is_ready(): _persistence.save_now(state, false)
+func active_pot() -> PotState: return state.active_pot() if state != null else null
 func active_plant() -> PlantState:
-	var pot := active_pot()
-	return pot.plant if pot != null else null
+	var pot := active_pot(); return pot.plant if pot != null else null
 func active_species_definition() -> PlantSpeciesDefinition:
-	var plant := active_plant()
-	return registry.get_plant(plant.species_id) if plant != null else null
+	var plant := active_plant(); return registry.get_plant(plant.species_id) if plant != null else null
 func switch_pot(pot_id: String) -> bool:
-	if state == null or state.find_pot(pot_id) == null:
-		return false
-	state.active_pot_id = pot_id
-	GrowthCycleService.repair_plant(active_plant())
-	state_changed.emit()
-	return true
+	if state == null or state.find_pot(pot_id) == null: return false
+	state.active_pot_id = pot_id; GrowthCycleService.repair_plant(active_plant()); state_changed.emit(); return true
 func set_light_mode(mode: int) -> bool:
 	var pot := active_pot()
 	if pot == null or mode < 0 or mode >= PotState.LightMode.size(): return false
@@ -88,8 +76,7 @@ func skip_fertilizer_offer() -> bool:
 	if not FertilizerActions.skip_offer(state, rules, registry.all_offer_fertilizers()): return false
 	state_changed.emit(); return true
 func refresh_fertilizer_offer() -> bool:
-	if state == null: return false
-	if not EnergyService.spend(state, EnergyService.OFFER_COST): return false
+	if state == null or not EnergyService.spend(state, EnergyService.OFFER_COST): return false
 	if not FertilizerOfferService.refresh_offer(state.fertilizer_offer, registry.all_offer_fertilizers(), rules):
 		EnergyService.credit(state, EnergyService.OFFER_COST); return false
 	state_changed.emit(); return true
@@ -112,6 +99,23 @@ func use_inventory_fertilizer(fertilizer_id: StringName, kind: StringName = Reso
 	if not events.is_empty(): _progress(&"mutation_resolved")
 	_emit_mutation_events(events); state_changed.emit(); return result
 func fertilizer_knowledge() -> Dictionary: return state.fertilizer_knowledge.duplicate(true) if state != null else {}
+func journal_reward_kind(item_id: StringName) -> StringName:
+	if state != null:
+		var entry: Dictionary = state.fertilizer_knowledge.get(String(item_id), {})
+		var stored := StringName(entry.get("reward_kind", &""))
+		if stored == &"energy" or stored == &"coins": return stored
+	return &"energy" if posmod(String(item_id).hash(), 2) == 0 else &"coins"
+func can_claim_journal_reward(item_id: StringName) -> bool:
+	if state == null: return false
+	var entry: Dictionary = state.fertilizer_knowledge.get(String(item_id), {})
+	return _journal_entry_complete(entry) and not bool(entry.get("reward_claimed", false))
+func claim_journal_reward(item_id: StringName) -> bool:
+	if not can_claim_journal_reward(item_id): return false
+	var key := String(item_id); var entry: Dictionary = state.fertilizer_knowledge[key]; var kind := journal_reward_kind(item_id)
+	if kind == &"energy": EnergyService.credit(state, 3)
+	else: EconomyService.credit(state, 3)
+	entry["reward_claimed"] = true; entry["reward_kind"] = kind; state.fertilizer_knowledge[key] = entry
+	state_changed.emit(); return true
 func prune_active_branch(slot: StringName) -> String:
 	var item_id := PropagationActions.prune(state, active_plant(), slot)
 	if not item_id.is_empty(): _progress(&"branch_pruned"); state_changed.emit()
@@ -236,7 +240,11 @@ func _record_fertilizer_knowledge(fertilizer_id: StringName, events: Array[Dicti
 		var trait_id := String(event.get("trait_id", ""))
 		if not trait_id.is_empty() and not discovered.has(trait_id): discovered.append(trait_id)
 	var care: Dictionary = definition.care_effects.duplicate(true); var mutation_effects: Dictionary = definition.mutation_contributions.duplicate(true); var category := "mutagen" if not mutation_effects.is_empty() else "fertilizer"
-	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "category": category, "care_effects": care, "mutation_effects": mutation_effects, "discovered_traits": discovered}
+	state.fertilizer_knowledge[String(fertilizer_id)] = {"uses": int(previous.get("uses", 0)) + 1, "category": category, "care_effects": care, "mutation_effects": mutation_effects, "discovered_traits": discovered, "fully_studied": true, "reward_claimed": bool(previous.get("reward_claimed", false)), "reward_kind": previous.get("reward_kind", &"")}
+func _journal_entry_complete(entry: Dictionary) -> bool:
+	if entry.is_empty() or int(entry.get("uses", 0)) <= 0: return false
+	if entry.has("fully_studied"): return bool(entry.get("fully_studied", false))
+	return not String(entry.get("category", "")).is_empty() and (not (entry.get("care_effects", {}) as Dictionary).is_empty() or not (entry.get("mutation_effects", {}) as Dictionary).is_empty() or not (entry.get("discovered_traits", []) as Array).is_empty() or String(entry.get("category", "")) == "decoration")
 func _progress(event_id: StringName) -> void: ProgressionActions.record_event(state, event_id, registry)
 func _has_living_plant() -> bool:
 	if state == null: return false
