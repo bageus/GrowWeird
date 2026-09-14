@@ -25,9 +25,9 @@ color = Color(0.02, 0.015, 0.025, 0.68)
 z_index = 20
 layout_mode = 0
 offset_left = 16.0
-offset_top = 68.0
+offset_top = 24.0
 offset_right = 322.0
-offset_bottom = 108.0
+offset_bottom = 66.0
 mouse_filter = 2
 
 [node name="Hud" type="Panel" parent="TimerHud"]

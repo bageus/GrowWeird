@@ -9,6 +9,7 @@ var _timer_label: Label
 var _skip_button: Button
 
 func _ready() -> void:
+	position = Vector2(position.x, 24.0)
 	_build_hud()
 	_skip_button.pressed.connect(func() -> void: skip_requested.emit())
 
