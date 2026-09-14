@@ -18,6 +18,9 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_NONE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if action_id == &"tasks":
+		z_as_relative = false
+		z_index = 175
 	pressed.connect(_on_native_pressed)
 
 func apply_normalized_position(value: Vector2) -> void:
