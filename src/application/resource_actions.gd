@@ -22,16 +22,12 @@ static func item_value(
 			var cutting := InventoryService.find_cutting(state.inventory, item_id)
 			if cutting == null or cutting.genome == null:
 				return 0
-			return GeneticItemValuationService.cutting_value(
-				cutting, registry.get_plant(cutting.genome.species_id), rules
-			)
+			return GeneticItemValuationService.cutting_value(cutting, registry.get_plant(cutting.genome.species_id), rules)
 		SEED:
 			var seed_state := InventoryService.find_seed(state.inventory, item_id)
 			if seed_state == null or seed_state.genome == null:
 				return 0
-			return GeneticItemValuationService.seed_value(
-				seed_state, registry.get_plant(seed_state.genome.species_id), rules
-			)
+			return GeneticItemValuationService.seed_value(seed_state, registry.get_plant(seed_state.genome.species_id), rules)
 		FRUIT:
 			var fruit := InventoryService.find_fruit(state.inventory, item_id)
 			return EconomyActions.fruit_value(fruit, registry, rules)
@@ -41,26 +37,19 @@ static func item_value(
 			var fertilizer := registry.get_fertilizer(StringName(item_id))
 			if fertilizer == null:
 				return 0
-			return maxi(1, int(round(float(fertilizer.shop_price) * 0.5)))
+			if fertilizer.sell_price > 0:
+				return fertilizer.sell_price
+			return maxi(0, int(round(float(fertilizer.shop_price) * 0.5)))
+		MISC:
+			if InventoryService.misc_count(state.inventory, item_id) <= 0:
+				return 0
+			return ItemBalanceCatalog.sell_price(StringName(item_id))
 	return 0
 
-static func sell_item(
-	state: GameState,
-	kind: StringName,
-	item_id: String,
-	registry: ContentRegistry,
-	rules: GameRules
-) -> int:
+static func sell_item(state: GameState, kind: StringName, item_id: String, registry: ContentRegistry, rules: GameRules) -> int:
 	return sell_items(state, kind, item_id, 1, registry, rules)
 
-static func sell_items(
-	state: GameState,
-	kind: StringName,
-	item_id: String,
-	quantity: int,
-	registry: ContentRegistry,
-	rules: GameRules
-) -> int:
+static func sell_items(state: GameState, kind: StringName, item_id: String, quantity: int, registry: ContentRegistry, rules: GameRules) -> int:
 	if state == null or quantity <= 0:
 		return 0
 	var unit_value := item_value(state, kind, item_id, registry, rules)
@@ -82,21 +71,20 @@ static func sell_items(
 	TaskService.record_daily_event(state, &"item_sold")
 	return unit_value
 
-static func recycle_item(
-	state: GameState,
-	kind: StringName,
-	item_id: String,
-	rules: GameRules
-) -> int:
+static func recycle_item(state: GameState, kind: StringName, item_id: String, rules: GameRules) -> int:
 	if state == null:
 		return 0
-	var amount := recycle_yield(kind, rules)
+	var amount := recycle_yield(kind, rules, item_id)
 	if amount <= 0 or not _take_item(state, kind, item_id):
 		return 0
 	InventoryService.add_fertilizer(state.inventory, RecyclingService.COMPOST_ID, amount)
 	return amount
 
-static func recycle_yield(kind: StringName, rules: GameRules) -> int:
+static func recycle_yield(kind: StringName, rules: GameRules, item_id: String = "") -> int:
+	if not item_id.is_empty() and (kind == FERTILIZER or kind == MISC):
+		var balance := ItemBalanceCatalog.entry(StringName(item_id))
+		if not balance.is_empty():
+			return maxi(0, int(balance.get("grind_yield", 0)))
 	match kind:
 		FERTILIZER:
 			return RecyclingService.fertilizer_yield(rules)

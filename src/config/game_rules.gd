@@ -48,8 +48,11 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var cutting_sale_multiplier: float = 0.35
 @export var genetic_item_trait_value: int = 10
 @export var genetic_item_ancestry_value: int = 4
-@export var pot_base_price: int = 250
-@export_range(1.0, 3.0, 0.05) var pot_price_growth: float = 1.55
+@export var pot_base_price: int = 130
+@export_range(1.0, 3.0, 0.05) var pot_price_growth: float = 1.0
+@export var seed_shop_price: int = 20
+@export var sprout_shop_price: int = 60
+@export var cutting_shop_price: int = 110
 
 @export_group("Recycling")
 @export_range(0, 20, 1) var fruit_compost_yield: int = 1
