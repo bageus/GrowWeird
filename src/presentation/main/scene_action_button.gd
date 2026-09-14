@@ -18,9 +18,6 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_NONE
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	if action_id == &"tasks":
-		z_as_relative = false
-		z_index = 175
 	pressed.connect(_on_native_pressed)
 
 func apply_normalized_position(value: Vector2) -> void:
@@ -76,12 +73,6 @@ func _handle_mouse_button(event: InputEventMouseButton) -> void:
 	accept_event()
 
 func _activate() -> void:
-	if action_id == &"tasks":
-		var scene := get_tree().current_scene
-		var tasks_panel := scene.get_node_or_null("%ProgressionPanel") as ProgressionPanel if scene != null else null
-		if tasks_panel != null:
-			tasks_panel.toggle_menu()
-			return
 	activated.emit(action_id)
 
 func _handle_mouse_motion() -> void:
