@@ -66,7 +66,6 @@ func _place_journal_button(host: Control) -> void:
 	_journal_button.modulate = Color.WHITE
 	_journal_button.self_modulate = Color.WHITE
 	_journal_button.show()
-	_journal_button.move_to_front()
 
 func _process(_delta: float) -> void:
 	var blocked := _other_menu_open()
