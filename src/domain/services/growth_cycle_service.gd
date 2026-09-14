@@ -91,7 +91,8 @@ static func matches_target(cycle: int, target: StringName) -> bool:
 	match target:
 		&"seed": return cycle == 0
 		&"sprout": return cycle >= 1 and cycle <= 4
-		&"tree": return cycle >= 5 and cycle <= 8
+		&"tree": return cycle == 5
+		&"branch": return (cycle >= 6 and cycle <= 8) or cycle == 12
 		&"flower": return cycle == 9
 		&"fruit": return cycle == 10 or cycle == 11
 		&"restart": return cycle == 12
