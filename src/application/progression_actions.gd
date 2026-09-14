@@ -9,14 +9,15 @@ static func record_event(
 	var result: Array[Dictionary] = []
 	if state == null:
 		return result
+	TaskService.record_daily_event(state, event_id)
+	if TaskService.has_main_claim_block(state, registry):
+		return result
 	var completed := ProgressionService.record_event(
 		state.progression,
 		event_id,
 		registry.all_progression()
 	)
 	for definition in completed:
-		if definition.reward_money > 0:
-			EconomyService.credit(state, definition.reward_money)
 		result.append({
 			"id": definition.id,
 			"title": definition.title,

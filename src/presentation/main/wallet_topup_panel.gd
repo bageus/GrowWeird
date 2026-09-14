@@ -56,6 +56,8 @@ func _request_purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["coins"]), int(product["rub"]))
 	var credited: int = int(_app().buy_coins(int(product["coins"])))
+	if credited > 0:
+		TaskService.record_daily_event(_app().state, &"coins_bought")
 	status_label.text = "+%d coins received." % credited
 	refresh()
 

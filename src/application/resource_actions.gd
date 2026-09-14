@@ -72,12 +72,14 @@ static func sell_items(
 			return 0
 		var total := unit_value * taken
 		EconomyService.credit(state, total)
+		TaskService.record_daily_event(state, &"item_sold")
 		return total
 	if kind == FRUIT:
 		return EconomyActions.sell_fruit(state, item_id, registry, rules)
 	if not _take_item(state, kind, item_id):
 		return 0
 	EconomyService.credit(state, unit_value)
+	TaskService.record_daily_event(state, &"item_sold")
 	return unit_value
 
 static func recycle_item(

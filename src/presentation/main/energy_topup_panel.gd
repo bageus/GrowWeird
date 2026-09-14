@@ -38,6 +38,8 @@ func _purchase(index: int) -> void:
 	var product: Dictionary = PRODUCTS[index]
 	purchase_requested.emit(product["id"], int(product["energy"]), int(product["rub"]))
 	var credited: int = int(_app().buy_energy(int(product["energy"])))
+	if credited > 0:
+		TaskService.record_daily_event(_app().state, &"energy_bought")
 	%StatusLabel.text = "+%d energy received." % credited
 	refresh()
 
