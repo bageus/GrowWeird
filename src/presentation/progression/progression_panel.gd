@@ -31,10 +31,17 @@ func set_goal(_goal: Dictionary) -> void:
 	if _overlay != null and _overlay.visible: _queue_refresh()
 func invalidate() -> void: _queue_refresh()
 
+func toggle_menu() -> void:
+	if _overlay == null:
+		return
+	if _overlay.visible:
+		_close()
+	else:
+		_open()
+
 func _on_host_visibility_changed() -> void:
 	if _suppress_visibility or not visible or _overlay == null: return
-	if _overlay.visible: _close()
-	else: _open()
+	toggle_menu()
 	_suppress_visibility = true
 	hide()
 	_suppress_visibility = false
