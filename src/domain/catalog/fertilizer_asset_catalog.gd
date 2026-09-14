@@ -44,6 +44,9 @@ static func _apply_balance(definition: FertilizerDefinition) -> void:
 	definition.sell_price = int(balance.get("sell_price", 0))
 	definition.recycle_yield = int(balance.get("grind_yield", 0))
 	definition.drop_chance = clampf(float(balance.get("drop_chance_percent", 0.0)) / 100.0, 0.0, 1.0)
+	# Offer generation is weighted, so the configured drop percentage is used as its weight.
+	# Zero-drop reward/processed items are therefore excluded from random offers.
+	definition.offer_weight = float(balance.get("drop_chance_percent", 0.0))
 	definition.rarity = String(balance.get("rarity", ""))
 	definition.target = String(balance.get("target", ""))
 	definition.effect_description = String(balance.get("effect", ""))
