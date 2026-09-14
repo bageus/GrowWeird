@@ -16,6 +16,7 @@ static func buy_fertilizer(
 	if not EconomyService.spend(state, definition.shop_price):
 		return false
 	InventoryService.add_fertilizer(state.inventory, fertilizer_id, 1)
+	TaskService.record_daily_event(state, &"shop_purchase")
 	return true
 
 static func buy_species_seed(
@@ -41,6 +42,7 @@ static func buy_species_seed(
 		EconomyService.credit(state, definition.shop_seed_price)
 		return ""
 	InventoryService.add_seed(state.inventory, seed_state)
+	TaskService.record_daily_event(state, &"shop_purchase")
 	return seed_state.item_id
 
 static func buy_pot(state: GameState, rules: GameRules) -> String:
@@ -53,6 +55,7 @@ static func buy_pot(state: GameState, rules: GameRules) -> String:
 	pot.pot_id = "pot-%d" % (state.pots.size() + 1)
 	pot.soil_moisture = 0.30
 	state.pots.append(pot)
+	TaskService.record_daily_event(state, &"shop_purchase")
 	return pot.pot_id
 
 static func buy_catalog_item(state: GameState, item: Dictionary, registry: ContentRegistry) -> bool:
@@ -74,7 +77,10 @@ static func buy_catalog_item(state: GameState, item: Dictionary, registry: Conte
 		&"decoration", &"mutagen": success = not String(source_id).is_empty()
 	if success and action == &"fertilizer": InventoryService.add_fertilizer(state.inventory, source_id, amount)
 	if success and action in [&"decoration", &"mutagen"]: InventoryService.add_misc(state.inventory, String(source_id), amount)
-	if not success: EconomyService.credit(state, price)
+	if not success:
+		EconomyService.credit(state, price)
+	else:
+		TaskService.record_daily_event(state, &"shop_purchase")
 	return success
 
 static func _add_pot(state: GameState, visual_index := -1) -> String:
