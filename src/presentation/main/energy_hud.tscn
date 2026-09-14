@@ -30,6 +30,14 @@ mouse_filter = 2
 script = ExtResource("2_balance")
 plus_button_path = NodePath("../AddButton")
 
+[node name="LegacyBalanceContractMarker" type="Control" parent="Layers"]
+visible = false
+layout_mode = 0
+offset_top = 24.0
+offset_right = 224.0
+offset_bottom = 76.0
+mouse_filter = 2
+
 [node name="BalanceIcon" type="TextureRect" parent="Layers"]
 layout_mode = 0
 offset_left = -13.0
@@ -66,9 +74,9 @@ layout_mode = 0
 z_index = 188
 z_as_relative = false
 offset_left = 48.0
-offset_top = 67.0
+offset_top = 77.0
 offset_right = 218.0
-offset_bottom = 91.0
+offset_bottom = 101.0
 mouse_filter = 2
 
 [node name="Timer" type="Label" parent="Layers/Next"]
