@@ -80,9 +80,9 @@ static func recycle_item(state: GameState, kind: StringName, item_id: String, ru
 
 static func recycle_yield(kind: StringName, rules: GameRules, item_id: String = "") -> int:
 	if not item_id.is_empty() and (kind == FERTILIZER or kind == MISC):
-		var balanced := ItemBalanceCatalog.grind_yield(StringName(item_id))
-		if balanced >= 0 and not ItemBalanceCatalog.get(StringName(item_id)).is_empty():
-			return balanced
+		var balance := ItemBalanceCatalog.entry(StringName(item_id))
+		if not balance.is_empty():
+			return maxi(0, int(balance.get("grind_yield", 0)))
 	match kind:
 		FERTILIZER:
 			return RecyclingService.fertilizer_yield(rules)
