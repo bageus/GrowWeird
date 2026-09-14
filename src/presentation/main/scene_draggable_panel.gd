@@ -10,6 +10,8 @@ const DRAG_THRESHOLD := 5.0
 @export var layout_id: StringName = &""
 @export var drag_handle_height := 30.0
 @export var allow_scaling := false
+@export var lock_layout := false
+@export var locked_normalized_position := Vector2.ZERO
 @export_range(0.4, 1.0, 0.05) var minimum_scale := 0.6
 @export_range(1.0, 3.0, 0.05) var maximum_scale := 1.8
 
@@ -29,9 +31,10 @@ func apply_normalized_position(value: Vector2) -> void:
 	if parent_control == null:
 		return
 	var available := _available_space(parent_control)
+	var target := locked_normalized_position if lock_layout else value
 	position = Vector2(
-		clampf(value.x, 0.0, 1.0) * available.x,
-		clampf(value.y, 0.0, 1.0) * available.y
+		clampf(target.x, 0.0, 1.0) * available.x,
+		clampf(target.y, 0.0, 1.0) * available.y
 	)
 
 func normalized_position() -> Vector2:
@@ -45,6 +48,10 @@ func normalized_position() -> Vector2:
 	)
 
 func apply_scale_factor(value: float) -> void:
+	if lock_layout:
+		scale_factor = 1.0
+		scale = Vector2.ONE
+		return
 	scale_factor = clampf(value, minimum_scale, maximum_scale)
 	scale = Vector2.ONE * scale_factor
 	var parent_control := get_parent() as Control
@@ -52,6 +59,8 @@ func apply_scale_factor(value: float) -> void:
 		position = _clamp_position(parent_control, position)
 
 func _input(event: InputEvent) -> void:
+	if lock_layout:
+		return
 	if _handle_scale_input(event):
 		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -79,7 +88,7 @@ func _input(event: InputEvent) -> void:
 		_handle_mouse_motion()
 
 func _handle_scale_input(event: InputEvent) -> bool:
-	if not allow_scaling or not Input.is_key_pressed(KEY_CTRL):
+	if lock_layout or not allow_scaling or not Input.is_key_pressed(KEY_CTRL):
 		return false
 	if not (event is InputEventMouseButton) or not event.pressed:
 		return false
