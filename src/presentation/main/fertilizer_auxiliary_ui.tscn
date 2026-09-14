@@ -51,9 +51,9 @@ vertical_alignment = 1
 [node name="FinishButton" type="Button" parent="TimerHud"]
 layout_mode = 0
 offset_left = 192.0
-offset_top = 2.0
+offset_top = 3.0
 offset_right = 304.0
-offset_bottom = 41.0
+offset_bottom = 39.0
 text = "FINISH · 5"
 
 [node name="JournalButton" type="Button" parent="."]
@@ -63,9 +63,9 @@ anchors_preset = 3
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 28.0
-offset_top = -62.0
+offset_top = -92.0
 offset_right = 178.0
-offset_bottom = -25.0
+offset_bottom = -55.0
 grow_vertical = 0
 text = "JOURNAL"
 
@@ -78,10 +78,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -215.0
-offset_top = -220.0
-offset_right = 215.0
-offset_bottom = 220.0
+offset_left = -310.0
+offset_top = -260.0
+offset_right = 310.0
+offset_bottom = 260.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
@@ -89,71 +89,71 @@ mouse_filter = 0
 [node name="Background" type="Panel" parent="Journal"]
 layout_mode = 0
 offset_left = 2.0
-offset_top = 26.0
-offset_right = 428.0
-offset_bottom = 430.0
+offset_top = 30.0
+offset_right = 618.0
+offset_bottom = 510.0
 mouse_filter = 2
 
 [node name="Banner" type="TextureRect" parent="Journal"]
 layout_mode = 0
-offset_left = -13.0
+offset_left = 100.0
 offset_top = -4.0
-offset_right = 443.0
-offset_bottom = 76.0
+offset_right = 520.0
+offset_bottom = 78.0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="Journal"]
 layout_mode = 0
-offset_left = 55.0
-offset_top = 9.0
-offset_right = 375.0
-offset_bottom = 63.0
+offset_left = 150.0
+offset_top = 10.0
+offset_right = 470.0
+offset_bottom = 62.0
 text = "JOURNAL"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Close" type="Button" parent="Journal"]
 layout_mode = 0
-offset_left = 398.0
-offset_top = 2.0
-offset_right = 458.0
-offset_bottom = 62.0
+offset_left = 552.0
+offset_top = 6.0
+offset_right = 612.0
+offset_bottom = 66.0
 
 [node name="ContentHud" type="Panel" parent="Journal"]
 layout_mode = 0
-offset_left = 28.0
-offset_top = 102.0
-offset_right = 402.0
-offset_bottom = 398.0
+offset_left = 36.0
+offset_top = 104.0
+offset_right = 584.0
+offset_bottom = 482.0
 mouse_filter = 2
 
 [node name="Tabs" type="HBoxContainer" parent="Journal/ContentHud"]
 layout_mode = 0
-offset_left = 12.0
+offset_left = 14.0
 offset_top = 12.0
-offset_right = 362.0
-offset_bottom = 56.0
+offset_right = 534.0
+offset_bottom = 58.0
 theme_override_constants/separation = 4
 
 [node name="Unknown" type="Button" parent="Journal/ContentHud/Tabs"]
-custom_minimum_size = Vector2(83, 42)
+custom_minimum_size = Vector2(122, 42)
 layout_mode = 2
 text = "?"
 
 [node name="Fertilizers" type="Button" parent="Journal/ContentHud/Tabs"]
-custom_minimum_size = Vector2(83, 42)
+custom_minimum_size = Vector2(122, 42)
 layout_mode = 2
 text = "FEED"
 
 [node name="Decorations" type="Button" parent="Journal/ContentHud/Tabs"]
-custom_minimum_size = Vector2(83, 42)
+custom_minimum_size = Vector2(122, 42)
 layout_mode = 2
 text = "DECOR"
 
 [node name="Mutagens" type="Button" parent="Journal/ContentHud/Tabs"]
-custom_minimum_size = Vector2(83, 42)
+custom_minimum_size = Vector2(122, 42)
 layout_mode = 2
 text = "MUTATE"
 
@@ -162,9 +162,9 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 18.0
-offset_top = 68.0
-offset_right = -18.0
+offset_left = 16.0
+offset_top = 72.0
+offset_right = -16.0
 offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
