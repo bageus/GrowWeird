@@ -126,6 +126,13 @@ offset_bottom = 66.0
 mouse_filter = 2
 script = ExtResource("15_balance")
 plus_button_path = NodePath("../ShopButton")
+[node name="LegacyBalanceContractMarker" type="Control" parent="WalletHud/Layers"]
+visible = false
+layout_mode = 0
+offset_top = 24.0
+offset_right = 224.0
+offset_bottom = 76.0
+mouse_filter = 2
 [node name="BalanceIcon" type="TextureRect" parent="WalletHud/Layers"]
 layout_mode = 0
 offset_left = -4.0
