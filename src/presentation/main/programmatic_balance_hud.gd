@@ -7,7 +7,13 @@ func _ready() -> void:
 	call_deferred("_apply_programmatic_style")
 
 func _apply_programmatic_style() -> void:
-	CommerceUiStyle.balance_hud(self)
+	var inset := get_node_or_null("InnerShadow")
+	if inset != null:
+		inset.queue_free()
+	var hud_style := CommerceUiStyle.top_hud_style(24)
+	hud_style.shadow_size = 0
+	hud_style.shadow_offset = Vector2.ZERO
+	add_theme_stylebox_override(&"panel", hud_style)
 	_move_wallet_coin_icon()
 	var button := get_node_or_null(plus_button_path) as Button
 	if button == null:
