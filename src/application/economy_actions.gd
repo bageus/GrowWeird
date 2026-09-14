@@ -19,6 +19,12 @@ static func sell_plant(
 ) -> int:
 	if state == null or pot == null or pot.plant == null:
 		return 0
+	var planted_count := 0
+	for candidate in state.pots:
+		if candidate != null and candidate.plant != null:
+			planted_count += 1
+	if planted_count <= 1:
+		return 0
 	var amount := plant_value(pot.plant, registry, rules) + maxi(0, rules.pot_base_price)
 	if amount <= 0:
 		return 0
