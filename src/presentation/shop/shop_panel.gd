@@ -220,7 +220,9 @@ func _misc_items(ids: Array, action: StringName) -> Array[Dictionary]:
 func _item(id: StringName, source_id: StringName, display_name: String, description: String, action: StringName, unlocked: bool = true, stock: int = 1, preview_path: String = "", price: int = 1) -> Dictionary:
 	var key := String(id)
 	if not _stock.has(key): _stock[key] = maxi(0, stock)
-	return {"id": id, "source_id": source_id, "name": display_name, "price": maxi(1, price), "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
+	var item := {"id": id, "source_id": source_id, "name": display_name, "price": 1, "stock": int(_stock[key]), "preview_path": preview_path, "unlocked": unlocked, "description": description, "action": action}
+	item["price"] = maxi(1, price)
+	return item
 
 func _preview_texture(item: Dictionary) -> Texture2D:
 	if StringName(item.get("action", &"")) == &"cutting": return _cutting_texture(String(item.get("id", "")))
