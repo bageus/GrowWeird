@@ -9,6 +9,7 @@ const SIDE_BRANCH_CAPACITY := 10.0
 const FLOWER_BONUS := 15.0
 const FRUIT_BONUS := 25.0
 const DECAY_FRACTION_PER_MINUTE := 0.05
+const LEGACY_MISC_FOOD_GAIN := 2.0
 
 static func capacity(plant: PlantState) -> float:
 	if plant == null:
@@ -81,14 +82,12 @@ static func ground_fertilizer_gain(plant: PlantState, extra: float = 0.0) -> flo
 static func item_gain(plant: PlantState, fertilizer: FertilizerDefinition) -> float:
 	if plant == null or fertilizer == null:
 		return 0.0
-	# Legacy/generic items without an explicit nutrition value keep the old +2 default.
-	# Balanced atlas items always receive an explicit nutrition_points value, including zero.
-	var points := float(fertilizer.care_effects.get("nutrition_points", 2.0))
+	var points := float(fertilizer.care_effects.get("nutrition_points", LEGACY_MISC_FOOD_GAIN))
 	if points >= 100.0:
 		return capacity(plant)
 	return clampf(points, 0.0, 5.0)
 
-static func fertilizer_gain(plant: PlantState, fertilizer: FertilizerDefinition, _kind: StringName) -> float:
+static func fertilizer_gain(plant: PlantState, fertilizer: FertilizerDefinition, kind: StringName) -> float:
 	if plant == null or fertilizer == null:
 		return 0.0
 	var target := StringName(fertilizer.care_effects.get("growth_cycle", &""))
@@ -98,4 +97,8 @@ static func fertilizer_gain(plant: PlantState, fertilizer: FertilizerDefinition,
 		return ground_fertilizer_gain(plant)
 	if fertilizer.care_effects.has("nutrition_points"):
 		return item_gain(plant, fertilizer)
+	# Legacy ordinary misc items had no explicit Food field and historically fed +2.
+	# Processed/store fertilizer still uses the stage-based 10/9/8/7/6/5 curve.
+	if kind == ResourceActions.MISC:
+		return LEGACY_MISC_FOOD_GAIN
 	return ground_fertilizer_gain(plant)
