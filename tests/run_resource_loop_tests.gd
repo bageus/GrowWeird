@@ -7,6 +7,7 @@ func _init() -> void:
 	_test_seed_sale()
 	_test_item_recycling()
 	_test_compost_uses_normal_fertilizer_path()
+	_test_dynamic_nutrition_capacity()
 	if _failures.is_empty():
 		print("GrowWeird resource loop tests passed")
 		quit(0)
@@ -95,10 +96,34 @@ func _test_compost_uses_normal_fertilizer_path() -> void:
 	var nutrition_before := plant.nutrition
 	result = FertilizerActions.use_inventory(state, plant, &"dead_mouse", registry, &"misc")
 	_expect(bool(result.get("success", false)) and not state.inventory.misc.has("dead_mouse"), "resource: used misc fertilizer should leave inventory")
-	_expect(plant.nutrition > nutrition_before, "resource: used misc fertilizer should feed the plant")
-	state.fertilizer_knowledge["dead_mouse"] = {"uses": 1, "care_effects": {"nutrition": 0.18}}
+	_expect(is_equal_approx(plant.nutrition - nutrition_before, 2.0), "resource: ordinary item should feed two units by default")
+	state.fertilizer_knowledge["dead_mouse"] = {"uses": 1, "care_effects": {"nutrition_points": 2}}
 	var restored := SaveMapper.from_dictionary(SaveMapper.to_dictionary(state))
 	_expect(restored.fertilizer_knowledge.has("dead_mouse"), "resource: discovered fertilizer knowledge must survive save and load")
+
+func _test_dynamic_nutrition_capacity() -> void:
+	var plant := _plant("nutrition-capacity")
+	plant.growth_cycle_index = 0; _expect(NutritionService.capacity(plant) == 20.0, "nutrition: seed capacity must be 20")
+	plant.growth_cycle_index = 1; _expect(NutritionService.capacity(plant) == 40.0, "nutrition: sprout capacity must be 40")
+	plant.growth_cycle_index = 5; _expect(NutritionService.capacity(plant) == 60.0, "nutrition: young tree capacity must be 60")
+	plant.growth_cycle_index = 6; _expect(NutritionService.capacity(plant) == 70.0, "nutrition: center tree capacity must be 70")
+	plant.growth_cycle_index = 7; _expect(NutritionService.capacity(plant) == 80.0, "nutrition: first side branch must raise capacity to 80")
+	plant.growth_cycle_index = 8; _expect(NutritionService.capacity(plant) == 90.0, "nutrition: second side branch must raise capacity to 90")
+	plant.growth_cycle_index = 9; _expect(NutritionService.capacity(plant) == 105.0, "nutrition: flowering must add 15")
+	plant.growth_cycle_index = 10
+	plant.branch_at(&"center").fruit_growth = GrowingFruitState.new()
+	_expect(NutritionService.capacity(plant) == 115.0, "nutrition: fruit phase must add 25")
+	plant.branch_at(&"center").fruit_growth = null
+	_expect(NutritionService.capacity(plant) == 90.0, "nutrition: harvested fruit phase must remove 25")
+	for pair in [[0, 10.0], [1, 9.0], [5, 8.0], [7, 7.0], [9, 6.0], [10, 5.0]]:
+		plant.growth_cycle_index = int(pair[0])
+		_expect(NutritionService.ground_fertilizer_gain(plant) == float(pair[1]), "nutrition: compost gain mismatch for cycle %d" % int(pair[0]))
+	var fertilizer := FertilizerDefinition.new()
+	fertilizer.care_effects = {"growth_cycle": &"sprout"}
+	plant.growth_cycle_index = 1
+	_expect(NutritionService.fertilizer_gain(plant, fertilizer, &"fertilizer") == 20.0, "nutrition: matching fertilizer must restore half capacity")
+	plant.growth_cycle_index = 8
+	_expect(NutritionService.fertilizer_gain(plant, fertilizer, &"fertilizer") == 7.0, "nutrition: mismatched fertilizer must act like compost")
 
 func _registry() -> ContentRegistry:
 	var registry := ContentRegistry.new()
