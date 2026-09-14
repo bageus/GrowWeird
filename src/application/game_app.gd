@@ -137,6 +137,10 @@ func create_seed_from_fruit(fruit_id: String) -> String:
 func active_plant_sale_value() -> int:
 	var value := EconomyActions.plant_value(active_plant(), registry, rules); return value + rules.pot_base_price if value > 0 else 0
 func sell_active_plant() -> int:
+	var planted := 0
+	for pot in state.pots:
+		if pot.plant != null: planted += 1
+	if planted <= 1: return 0
 	var amount := EconomyActions.sell_plant(state, active_pot(), registry, rules)
 	if amount > 0: state_changed.emit()
 	return amount
