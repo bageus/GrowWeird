@@ -28,6 +28,7 @@ static func sell_plant(
 	EnergyService.clamp_to_capacity(state)
 	if state.active_pot_id == sold_pot_id:
 		state.active_pot_id = state.pots[0].pot_id if not state.pots.is_empty() else ""
+	TaskService.record_daily_event(state, &"item_sold")
 	return amount
 
 static func fruit_value(
@@ -56,4 +57,5 @@ static func sell_fruit(
 	if removed == null:
 		return 0
 	EconomyService.credit(state, amount)
+	TaskService.record_daily_event(state, &"item_sold")
 	return amount
