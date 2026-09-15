@@ -69,10 +69,11 @@ func _other_menu_open() -> bool:
 	var dialogs := host.get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs; return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	_timer.size = Vector2(306.0, 42.0); _timer_label.position = Vector2(62.0, 0.0); _timer_label.size = Vector2(116.0, 42.0)
-	_timer_icon = TextureRect.new(); _timer_icon.name = "FertilizerIcon"; _timer_icon.position = Vector2(18.0, 3.0); _timer_icon.size = Vector2(38.0, 36.0); Hud5Atlas.configure_icon(_timer_icon, Hud5Atlas.fertilizer_icon()); _timer.add_child(_timer_icon)
-	_timer_finish.position = Vector2(184.0, 3.0); _timer_finish.size = Vector2(120.0, 36.0); Hud5Atlas.configure_atlas_button(_timer_finish, Hud5Atlas.fertilizer_finish_icon(), Hud5Atlas.fertilizer_finish_pressed_icon(), Hud5Atlas.fertilizer_finish_pressed_icon()); _timer_cost = Hud5Atlas.add_cost_overlay(_timer_finish)
-	var hud := _timer.get_node("Hud") as Panel; var hud_style := CommerceUiStyle.top_hud_style(21); hud_style.shadow_size = 0; hud_style.shadow_offset = Vector2.ZERO; hud.add_theme_stylebox_override(&"panel", hud_style)
+	_timer.size = Vector2(153.0, 42.0); _timer_label.position = Vector2(50.0, 0.0); _timer_label.size = Vector2(88.0, 42.0)
+	var hud := _timer.get_node("Hud") as Panel; hud.position = Vector2.ZERO; hud.size = Vector2(153.0, 42.0)
+	_timer_icon = TextureRect.new(); _timer_icon.name = "FertilizerIcon"; _timer_icon.position = Vector2(5.0, -3.0); _timer_icon.size = Vector2(49.0, 47.0); Hud5Atlas.configure_icon(_timer_icon, Hud5Atlas.fertilizer_icon()); _timer.add_child(_timer_icon)
+	_timer_finish.position = Vector2(136.0, 3.0); _timer_finish.size = Vector2(120.0, 36.0); Hud5Atlas.configure_atlas_button(_timer_finish, Hud5Atlas.fertilizer_finish_icon()); _timer_cost = Hud5Atlas.add_cost_overlay(_timer_finish)
+	var hud_style := CommerceUiStyle.top_hud_style(21); hud_style.shadow_size = 0; hud_style.shadow_offset = Vector2.ZERO; hud.add_theme_stylebox_override(&"panel", hud_style)
 	_timer_label.add_theme_font_size_override(&"font_size", 18); _timer_label.add_theme_color_override(&"font_color", Color.WHITE); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2)
 
 func _finish_timer() -> void:
