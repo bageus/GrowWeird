@@ -11,3 +11,97 @@ script = ExtResource("1_hud")
 layout_id = &"inventory"
 drag_handle_height = 0.0
 allow_scaling = true
+
+[node name="Layers" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="Layers"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Hover" type="TextureRect" parent="Layers"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FrameContent" type="Control" parent="Layers"]
+clip_contents = true
+layout_mode = 1
+anchor_left = 0.045
+anchor_top = 0.0
+anchor_right = 0.955
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Layers/FrameContent"]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 3.0
+offset_top = 81.0
+offset_right = -3.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="Items" type="VBoxContainer" parent="Layers/FrameContent/Scroll"]
+custom_minimum_size = Vector2(0, 358)
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="ScrollUp" type="TextureButton" parent="Layers/FrameContent"]
+z_index = 5
+layout_mode = 1
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -38.0
+offset_top = 30.0
+offset_right = 38.0
+offset_bottom = 72.0
+grow_horizontal = 2
+focus_mode = 0
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="ScrollDown" type="TextureButton" parent="Layers/FrameContent"]
+z_index = 5
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -38.0
+offset_top = -70.0
+offset_right = 38.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+focus_mode = 0
+ignore_texture_size = true
+stretch_mode = 0
