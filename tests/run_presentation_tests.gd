@@ -30,7 +30,7 @@ func _programmatic_balance_contract(message: String) -> bool:
 		"scene HUD: balance and shop must share a wallet block":
 			return controls.contains("wallet_hud.tscn") and controls.contains("energy_hud.tscn") and balance.contains('value.name = "Value" if energy else "MoneyLabel"') and balance.contains('plus.name = "AddButton" if energy else "ShopButton"')
 		"scene HUD: balance plus hit area must use fixed atlas coordinates":
-			return balance.contains("plus.position = Vector2(193.0, 28.0)") and balance.contains("plus.size = Vector2(34.0, 34.0)") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and wallet_scene.contains("offset_left = -234.0") and wallet_scene.contains("offset_right = -10.0") and energy_scene.contains("offset_left = -428.0") and energy_scene.contains("offset_right = -204.0")
+			return balance.contains("plus.position = Vector2(193.0, 28.0)") and balance.contains("plus.size = Vector2(34.0, 34.0)") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and wallet_scene.contains("offset_left = -234.0") and wallet_scene.contains("offset_right = -10.0") and energy_scene.contains("offset_left = -438.0") and energy_scene.contains("offset_right = -214.0")
 		"scene HUD: fertilizer modal, dim, compact timer, journal, and actions must be persistent scene nodes":
 			return fertilizer_aux.contains('name="Dim"') and fertilizer_aux.contains('name="JournalButton"') and fertilizer_aux.contains('name="Close"') and fertilizer_aux.contains('name="FinishButton"') and fertilizer_aux.contains("offset_top = 24.0") and fertilizer_aux.contains("offset_bottom = 66.0")
 		"balance HUD: both visible bodies must be exactly 52 pixels high":
