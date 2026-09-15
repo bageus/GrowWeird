@@ -11,6 +11,7 @@ var _cost_label: Label
 
 func _ready() -> void:
 	position = Vector2(position.x, 24.0)
+	size = Vector2(153.0, 42.0)
 	_build_hud()
 	_skip_button.pressed.connect(func() -> void: skip_requested.emit())
 
@@ -28,11 +29,11 @@ func set_cycle(plant: PlantState, _energy: int) -> void:
 	_skip_button.disabled = cost <= 0
 
 func _build_hud() -> void:
-	_panel = Panel.new(); _panel.name = "Hud"; _panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _panel.mouse_filter = Control.MOUSE_FILTER_IGNORE; _panel.add_theme_stylebox_override(&"panel", _hud_style()); add_child(_panel)
-	_stage_icon = TextureRect.new(); _stage_icon.name = "StageIcon"; _stage_icon.position = Vector2(18.0, 3.0); _stage_icon.size = Vector2(38.0, 36.0); Hud5Atlas.configure_icon(_stage_icon, Hud5Atlas.restart_icon()); _panel.add_child(_stage_icon)
-	_timer_label = Label.new(); _timer_label.name = "TimerLabel"; _timer_label.position = Vector2(60.0, 0.0); _timer_label.size = Vector2(116.0, 42.0); _timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; _timer_label.add_theme_font_size_override(&"font_size", 18); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2); _panel.add_child(_timer_label)
-	_skip_button = Button.new(); _skip_button.name = "SkipButton"; _skip_button.position = Vector2(184.0, 3.0); _skip_button.size = Vector2(120.0, 36.0); add_child(_skip_button)
-	Hud5Atlas.configure_atlas_button(_skip_button, Hud5Atlas.cycle_finish_icon(), Hud5Atlas.cycle_finish_hover_icon(), Hud5Atlas.cycle_finish_pressed_icon())
+	_panel = Panel.new(); _panel.name = "Hud"; _panel.position = Vector2.ZERO; _panel.size = Vector2(153.0, 42.0); _panel.mouse_filter = Control.MOUSE_FILTER_IGNORE; _panel.add_theme_stylebox_override(&"panel", _hud_style()); add_child(_panel)
+	_stage_icon = TextureRect.new(); _stage_icon.name = "StageIcon"; _stage_icon.position = Vector2(5.0, -3.0); _stage_icon.size = Vector2(49.0, 47.0); Hud5Atlas.configure_icon(_stage_icon, Hud5Atlas.restart_icon()); _panel.add_child(_stage_icon)
+	_timer_label = Label.new(); _timer_label.name = "TimerLabel"; _timer_label.position = Vector2(50.0, 0.0); _timer_label.size = Vector2(88.0, 42.0); _timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; _timer_label.add_theme_font_size_override(&"font_size", 18); _timer_label.add_theme_color_override(&"font_outline_color", Color("3b1405")); _timer_label.add_theme_constant_override(&"outline_size", 2); _panel.add_child(_timer_label)
+	_skip_button = Button.new(); _skip_button.name = "SkipButton"; _skip_button.position = Vector2(136.0, 3.0); _skip_button.size = Vector2(120.0, 36.0); add_child(_skip_button)
+	Hud5Atlas.configure_atlas_button(_skip_button, Hud5Atlas.cycle_finish_icon())
 	_cost_label = Hud5Atlas.add_cost_overlay(_skip_button)
 
 func _hud_style() -> StyleBoxFlat:
