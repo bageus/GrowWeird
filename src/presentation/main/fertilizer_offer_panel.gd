@@ -51,7 +51,7 @@ func _sync() -> void:
 	var active: bool = app.state.fertilizer_offer.is_active(); var blocked := _other_menu_open(); visible = active and not blocked; _dim.visible = visible or _journal.visible; _timer.visible = not active
 	if visible: z_index = 210; position = (host.size - size) * 0.5
 	var seconds := maxi(0, int(ceil(app.state.fertilizer_offer.seconds_until_offer))); _timer_label.text = "%02d:%02d" % [floori(float(seconds) / 60.0), seconds % 60]
-	var finish_cost := EnergyService.fertilizer_timer_skip_cost(app.state.fertilizer_offer); _timer_cost.text = "· %d" % finish_cost; _timer_finish.disabled = finish_cost <= 0; _refresh_journal(app)
+	var finish_cost := EnergyService.fertilizer_timer_skip_cost(app.state.fertilizer_offer); _timer_cost.text = str(finish_cost); _timer_finish.disabled = finish_cost <= 0; _refresh_journal(app)
 
 func _refresh_journal(app: Node) -> void:
 	JournalCardGrid.populate(_journal.get_node_or_null("ContentHud/Scroll") as ScrollContainer, app, _journal_tab)

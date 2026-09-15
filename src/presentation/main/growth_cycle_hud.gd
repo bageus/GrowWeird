@@ -24,7 +24,7 @@ func set_cycle(plant: PlantState, _energy: int) -> void:
 	_timer_label.text = _format(remaining)
 	_timer_label.add_theme_color_override(&"font_color", Color("8cff91") if boosted else Color.WHITE)
 	var cost := EnergyService.cycle_skip_cost(plant)
-	_cost_label.text = "· %d" % cost
+	_cost_label.text = str(cost)
 	_skip_button.disabled = cost <= 0
 
 func _build_hud() -> void:

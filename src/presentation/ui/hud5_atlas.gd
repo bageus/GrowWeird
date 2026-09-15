@@ -2,7 +2,7 @@ class_name Hud5Atlas
 extends RefCounted
 
 const TEXTURE: Texture2D = preload("res://assets/ui/hud5.png")
-const CELL := 512.0
+const CELL := 256.0
 
 static func cell(row: int, column: int) -> Texture2D:
 	var texture := AtlasTexture.new()
@@ -48,7 +48,7 @@ static func configure_atlas_button(button: Button, normal: Texture2D, hover: Tex
 	button.icon = normal
 	button.expand_icon = true
 	button.focus_mode = Control.FOCUS_NONE
-	button.add_theme_constant_override(&"icon_max_width", 512)
+	button.add_theme_constant_override(&"icon_max_width", 256)
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
 		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 	if hover != null:
@@ -59,11 +59,26 @@ static func configure_atlas_button(button: Button, normal: Texture2D, hover: Tex
 		button.button_up.connect(func() -> void: button.icon = hover if hover != null and button.is_hovered() else normal)
 
 static func add_cost_overlay(button: Button) -> Label:
+	var dot := Label.new()
+	dot.name = "EnergyDot"
+	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dot.position = Vector2(button.size.x * 0.5 - 20.0, 0.0)
+	dot.size = Vector2(18.0, button.size.y)
+	dot.text = "·"
+	dot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dot.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	dot.add_theme_font_override(&"font", UiAtlas.GAME_FONT)
+	dot.add_theme_font_size_override(&"font_size", 22)
+	dot.add_theme_color_override(&"font_color", Color("ffd229"))
+	dot.add_theme_color_override(&"font_outline_color", Color("5b2b12"))
+	dot.add_theme_constant_override(&"outline_size", 2)
+	button.add_child(dot)
 	var label := Label.new()
 	label.name = "Cost"
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.position = Vector2(button.size.x * 0.5 - 2.0, 0.0)
+	label.size = Vector2(button.size.x * 0.5 - 8.0, button.size.y)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_override(&"font", UiAtlas.GAME_FONT)
 	label.add_theme_font_size_override(&"font_size", 17)
