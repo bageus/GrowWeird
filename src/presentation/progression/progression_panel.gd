@@ -33,23 +33,15 @@ func set_goal(_goal: Dictionary) -> void:
 func invalidate() -> void: _queue_refresh()
 
 func toggle_menu() -> void:
-	if _overlay == null:
-		return
-	if _overlay.get_parent() == null:
-		_attach_modal()
-	if _overlay.get_parent() == null:
-		return
-	if _overlay.visible:
-		_close()
-	else:
-		_open()
+	if _overlay == null: return
+	if _overlay.get_parent() == null: _attach_modal()
+	if _overlay.get_parent() == null: return
+	if _overlay.visible: _close()
+	else: _open()
 
 func _on_host_visibility_changed() -> void:
 	if _suppress_visibility or not visible or _overlay == null: return
-	toggle_menu()
-	_suppress_visibility = true
-	hide()
-	_suppress_visibility = false
+	toggle_menu(); _suppress_visibility = true; hide(); _suppress_visibility = false
 
 func _build_modal() -> void:
 	_overlay = Control.new(); _overlay.name = "TasksMenuOverlay"
@@ -73,14 +65,10 @@ func _build_modal() -> void:
 	_content = Control.new(); _content.position = Vector2(28.0, 106.0); _content.size = Vector2(844.0, 370.0); _window.add_child(_content)
 
 func _attach_modal() -> void:
-	if _overlay == null or _overlay.get_parent() != null:
-		return
+	if _overlay == null or _overlay.get_parent() != null: return
 	var scene := get_tree().current_scene
-	if scene == null:
-		call_deferred("_attach_modal")
-		return
-	scene.add_child(_overlay)
-	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if scene == null: call_deferred("_attach_modal"); return
+	scene.add_child(_overlay); _overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 func _build_tabs() -> void:
 	_main_tab = Button.new(); _main_tab.text = "MAIN"; _main_tab.position = Vector2(255.0, 57.0); _main_tab.size = Vector2(190.0, 48.0); _window.add_child(_main_tab)
@@ -89,8 +77,7 @@ func _build_tabs() -> void:
 
 func _open() -> void:
 	var app := _app()
-	if app != null:
-		TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
+	if app != null: TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
 	_overlay.show(); _refresh(); call_deferred("_center_current_main")
 func _close() -> void:
 	if _overlay != null: _overlay.hide()
@@ -112,8 +99,7 @@ func _deferred_refresh() -> void:
 func _refresh() -> void:
 	var app := _app()
 	if _content == null or app == null or app.state == null: return
-	for child in _content.get_children():
-		_content.remove_child(child); child.queue_free()
+	for child in _content.get_children(): _content.remove_child(child); child.queue_free()
 	if _tab == &"daily": _build_daily()
 	else: _build_main()
 
@@ -134,10 +120,10 @@ func _build_main() -> void:
 func _build_daily() -> void:
 	var app := _app()
 	if app == null: return
-	var scroll := ScrollContainer.new(); scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; _content.add_child(scroll)
-	var grid := GridContainer.new(); grid.columns = 3; grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	grid.add_theme_constant_override(&"h_separation", 10); grid.add_theme_constant_override(&"v_separation", 10); scroll.add_child(grid)
-	for task in TaskService.daily_tasks(app.state): grid.add_child(_task_card(task, true))
+	var scroll := ScrollContainer.new(); scroll.name = "DailyTaskScroll"; scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; _content.add_child(scroll)
+	var row := HBoxContainer.new(); row.name = "DailyRibbon"; row.add_theme_constant_override(&"separation", 12); row.size_flags_vertical = Control.SIZE_SHRINK_BEGIN; scroll.add_child(row)
+	for task in TaskService.daily_tasks(app.state): row.add_child(_task_card(task, true))
 
 func _task_card(task: Dictionary, daily: bool) -> PanelContainer:
 	var card := PanelContainer.new(); card.name = "Task_%s" % String(task.id); card.custom_minimum_size = CARD_SIZE
@@ -161,15 +147,24 @@ func _configure_claim(button: Button, task: Dictionary, daily: bool) -> void:
 	elif not bool(task.completed): button.text = "IN PROGRESS"; button.disabled = true; _style_disabled_claim(button)
 	else:
 		button.text = "CLAIM"; CommerceUiStyle.transaction_action(button, &"claim")
-		button.pressed.connect(_claim_task.bind(StringName(task.id), daily), CONNECT_DEFERRED)
+		button.pressed.connect(_claim_task.bind(StringName(task.id), daily, int(task.reward), StringName(task.reward_kind)), CONNECT_DEFERRED)
 
-func _claim_task(task_id: StringName, daily: bool) -> void:
+func _claim_task(task_id: StringName, daily: bool, reward_amount: int, reward_kind: StringName) -> void:
 	var app := _app()
 	if app == null: return
 	var result := TaskService.claim_daily(app.state, task_id) if daily else TaskService.claim_main(app.state, app.registry, task_id)
 	if result.is_empty(): return
-	if daily: app.state_changed.emit(); _refresh()
+	_show_claim_reward(reward_amount, reward_kind)
+	if daily: app.state_changed.emit(); call_deferred("_refresh")
 	else: _animate_connector(task_id)
+
+func _show_claim_reward(amount: int, reward_kind: StringName) -> void:
+	if _window == null: return
+	var popup := HBoxContainer.new(); popup.name = "ClaimReward"; popup.z_index = 30; popup.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	popup.position = Vector2(WINDOW_SIZE.x * 0.5 - 70.0, WINDOW_SIZE.y * 0.5 - 12.0); popup.size = Vector2(140.0, 48.0); popup.add_theme_constant_override(&"separation", 5); _window.add_child(popup)
+	var label := Label.new(); label.text = "+%d" % amount; label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; label.add_theme_font_override(&"font", UiAtlas.GAME_FONT); label.add_theme_font_size_override(&"font_size", 28); label.add_theme_color_override(&"font_color", Color.WHITE); label.add_theme_color_override(&"font_outline_color", Color("6a3214")); label.add_theme_constant_override(&"outline_size", 5); popup.add_child(label)
+	var icon := TextureRect.new(); icon.custom_minimum_size = Vector2(42.0, 42.0); icon.texture = UiAtlas.balance_icon(reward_kind == &"energy"); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; popup.add_child(icon)
+	var tween := popup.create_tween().set_parallel(true); tween.tween_property(popup, "position:y", popup.position.y - 75.0, 1.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT); tween.tween_property(popup, "modulate:a", 0.0, 1.15).set_delay(0.25); tween.chain().tween_callback(popup.queue_free)
 
 func _animate_connector(task_id: StringName) -> void:
 	var connector := _content.get_node_or_null("MainViewport/MainRibbon/Connector_%s" % String(task_id)) as Control
