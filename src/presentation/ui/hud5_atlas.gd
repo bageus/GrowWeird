@@ -45,19 +45,23 @@ static func configure_icon(rect: TextureRect, texture: Texture2D) -> void:
 
 static func configure_atlas_button(button: Button, texture: Texture2D) -> void:
 	button.text = ""
-	button.icon = texture
-	button.expand_icon = true
+	button.icon = null
 	button.focus_mode = Control.FOCUS_NONE
-	button.add_theme_constant_override(&"icon_max_width", 512)
+	var box := StyleBoxTexture.new()
+	box.texture = texture
+	box.texture_margin_left = 0.0
+	box.texture_margin_top = 0.0
+	box.texture_margin_right = 0.0
+	box.texture_margin_bottom = 0.0
 	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+		button.add_theme_stylebox_override(state, box)
 
 static func add_cost_overlay(button: Button) -> Label:
 	var dot := Label.new()
 	dot.name = "EnergyDot"
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	dot.position = Vector2(button.size.x * 0.66, 0.0)
-	dot.size = Vector2(14.0, button.size.y)
+	dot.position = Vector2(button.size.x * 0.56, 0.0)
+	dot.size = Vector2(16.0, button.size.y)
 	dot.text = "·"
 	dot.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	dot.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -68,8 +72,8 @@ static func add_cost_overlay(button: Button) -> Label:
 	var label := Label.new()
 	label.name = "Cost"
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.position = Vector2(button.size.x * 0.66 + 14.0, 0.0)
-	label.size = Vector2(button.size.x * 0.30, button.size.y)
+	label.position = Vector2(button.size.x * 0.56 + 16.0, 0.0)
+	label.size = Vector2(button.size.x * 0.34, button.size.y)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_override(&"font", UiAtlas.GAME_FONT)
