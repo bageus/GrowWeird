@@ -76,7 +76,7 @@ func _other_menu_open() -> bool:
 	var dialogs := host.get_node_or_null("InventoryItemDialogs") as InventoryItemDialogs; return dialogs != null and dialogs.is_open()
 
 func _configure_timer_hud() -> void:
-	_timer.size = Vector2(HUD_WIDTH, 42.0); _timer_label.position = Vector2(54.0, 0.0); _timer_label.size = Vector2(86.0, 42.0)
+	_timer.size = Vector2(HUD_WIDTH, 42.0); _timer_label.position = Vector2(54.0, 0.0); _timer_label.size = Vector2(82.0, 42.0); _timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; _timer_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var hud := _timer.get_node("Hud") as Panel; hud.position = Vector2.ZERO; hud.size = Vector2(HUD_WIDTH, 42.0)
 	_timer_icon = TextureRect.new(); _timer_icon.name = "FertilizerIcon"; _timer_icon.position = Vector2(3.0, -5.0); _timer_icon.size = ICON_SIZE; Hud5Atlas.configure_icon(_timer_icon, Hud5Atlas.fertilizer_icon()); _timer.add_child(_timer_icon)
 	_timer_finish.position = Vector2(136.0, 3.0); _timer_finish.size = Vector2(72.0, 36.0); _timer_cost = Hud5Atlas.configure_finish_button(_timer_finish, Hud5Atlas.fertilizer_finish_left())
