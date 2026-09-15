@@ -19,6 +19,7 @@ func _app() -> Node:
 
 func _ready() -> void:
 	_build_modal()
+	call_deferred("_attach_modal")
 	var app := _app()
 	if app != null:
 		TaskService.ensure_daily(app.state, int(Time.get_unix_time_from_system()))
@@ -33,6 +34,10 @@ func invalidate() -> void: _queue_refresh()
 
 func toggle_menu() -> void:
 	if _overlay == null:
+		return
+	if _overlay.get_parent() == null:
+		_attach_modal()
+	if _overlay.get_parent() == null:
 		return
 	if _overlay.visible:
 		_close()
@@ -49,7 +54,7 @@ func _on_host_visibility_changed() -> void:
 func _build_modal() -> void:
 	_overlay = Control.new(); _overlay.name = "TasksMenuOverlay"
 	_overlay.z_as_relative = false; _overlay.z_index = 190; _overlay.mouse_filter = Control.MOUSE_FILTER_STOP
-	get_tree().current_scene.add_child(_overlay); _overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _overlay.hide()
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _overlay.hide()
 	var dim := ColorRect.new(); dim.color = Color(0.05, 0.025, 0.015, 0.58); dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	_overlay.add_child(dim); dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_window = Control.new(); _window.name = "TasksWindow"; _window.set_anchors_preset(Control.PRESET_CENTER)
@@ -66,6 +71,16 @@ func _build_modal() -> void:
 	UiAtlas.configure_close_button(close); close.pressed.connect(_close)
 	_build_tabs()
 	_content = Control.new(); _content.position = Vector2(28.0, 106.0); _content.size = Vector2(844.0, 370.0); _window.add_child(_content)
+
+func _attach_modal() -> void:
+	if _overlay == null or _overlay.get_parent() != null:
+		return
+	var scene := get_tree().current_scene
+	if scene == null:
+		call_deferred("_attach_modal")
+		return
+	scene.add_child(_overlay)
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 func _build_tabs() -> void:
 	_main_tab = Button.new(); _main_tab.text = "MAIN"; _main_tab.position = Vector2(255.0, 57.0); _main_tab.size = Vector2(190.0, 48.0); _window.add_child(_main_tab)
