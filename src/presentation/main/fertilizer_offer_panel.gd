@@ -62,6 +62,10 @@ func _close_journal() -> void: _journal.visible = false; _sync()
 
 func _other_menu_open() -> bool:
 	if _journal != null and _journal.visible: return true
+	var scene := get_tree().current_scene
+	if scene != null:
+		var tasks_overlay := scene.get_node_or_null("TasksMenuOverlay") as Control
+		if tasks_overlay != null and tasks_overlay.visible: return true
 	var host := get_parent()
 	for path in ["ShopContainer", "WalletTopupPanel", "EnergyTopupPanel", "WaterOptions", "LightingOptions"]:
 		var menu := host.get_node_or_null(path) as Control
