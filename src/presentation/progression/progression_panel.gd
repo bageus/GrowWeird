@@ -38,7 +38,6 @@ func toggle_menu() -> void:
 func _on_host_visibility_changed() -> void:
 	if _suppress_visibility or not visible or _overlay == null: return
 	toggle_menu(); _suppress_visibility = true; hide(); _suppress_visibility = false
-
 func _build_modal() -> void:
 	_overlay = Control.new(); _overlay.name = "TasksMenuOverlay"; _overlay.z_as_relative = false; _overlay.z_index = 190; _overlay.mouse_filter = Control.MOUSE_FILTER_STOP; _overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); _overlay.hide()
 	var dim := ColorRect.new(); dim.color = Color(0.05, 0.025, 0.015, 0.58); dim.mouse_filter = Control.MOUSE_FILTER_STOP; _overlay.add_child(dim); dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -89,7 +88,6 @@ func _refresh() -> void:
 	for child in _content.get_children(): _content.remove_child(child); child.queue_free()
 	if _tab == &"daily": _build_daily()
 	else: _build_main()
-
 func _build_main() -> void:
 	var app := _app()
 	if app == null: return
@@ -117,13 +115,13 @@ func _build_scroll(name_value: String) -> HScrollBar:
 func _build_viewport(name_value: String) -> Control:
 	var viewport := Control.new(); viewport.name = name_value; viewport.clip_contents = true; viewport.size = Vector2(_content.size.x, VIEWPORT_HEIGHT); _content.add_child(viewport); return viewport
 func _bind_scroll(scroll: HScrollBar, ribbon: Control, total_width: float, saved_value: float, main: bool) -> void:
-	scroll.max_value = maxf(0.0, total_width - _content.size.x); scroll.page = _content.size.x
+	scroll.max_value = maxf(_content.size.x, total_width); scroll.page = _content.size.x
 	scroll.value_changed.connect(func(value: float) -> void:
 		ribbon.position.x = 18.0 - value
 		if main: _main_scroll_value = value
 		else: _daily_scroll_value = value)
-	scroll.value = clampf(saved_value, 0.0, scroll.max_value); ribbon.position.x = 18.0 - scroll.value
-
+	var last_value := maxf(0.0, scroll.max_value - scroll.page)
+	scroll.value = clampf(saved_value, 0.0, last_value); ribbon.position.x = 18.0 - scroll.value
 func _task_card(task: Dictionary, daily: bool) -> PanelContainer:
 	var card := PanelContainer.new(); card.name = "Task_%s" % String(task.id); card.custom_minimum_size = CARD_SIZE; card.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN; card.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	var active := bool(task.unlocked) and not bool(task.claimed); card.add_theme_stylebox_override(&"panel", _card_style(active, bool(task.claimed)))
@@ -176,7 +174,7 @@ func _center_current_main() -> void:
 	if _tab != &"main" or _content == null or _main_scroll_value > 0.0: return
 	var scroll := _content.get_node_or_null("MainTaskScroll") as HScrollBar
 	if scroll == null: return
-	var center_x := float(_main_active_index) * (CARD_SIZE.x + CONNECTOR_WIDTH) + CARD_SIZE.x * 0.5; scroll.value = clampf(center_x - _content.size.x * 0.5 + 18.0, 0.0, scroll.max_value)
+	var center_x := float(_main_active_index) * (CARD_SIZE.x + CONNECTOR_WIDTH) + CARD_SIZE.x * 0.5; scroll.value = clampf(center_x - _content.size.x * 0.5 + 18.0, 0.0, maxf(0.0, scroll.max_value - scroll.page))
 func _card_style(active: bool, claimed: bool) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new(); style.bg_color = Color("d9a968") if claimed else Color("f0c982"); style.border_color = Color("8d5b2b") if claimed else (Color("f6b817") if active else Color("a76525")); style.set_border_width_all(4 if active else 3); style.set_corner_radius_all(18); style.content_margin_left = 13.0; style.content_margin_top = 14.0; style.content_margin_right = 13.0; style.content_margin_bottom = 12.0
 	if active: style.shadow_color = Color(1.0, 0.72, 0.12, 0.35); style.shadow_size = 8

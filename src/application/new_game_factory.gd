@@ -24,15 +24,14 @@ static func create(rules: GameRules) -> GameState:
 	state.active_pot_id = first_pot.pot_id
 	add_starter_inventory_item(state, first_pot.plant)
 	FertilizerOfferService.initialize_rng(state.fertilizer_offer, int(first_pot.plant.instance_id.hash()))
-	FertilizerOfferService.schedule_initial(state.fertilizer_offer, rules)
+	FertilizerOfferService.reset_to_initial_timer(state.fertilizer_offer, rules)
 	return state
 
 static func add_starter_inventory_item(state: GameState, plant: PlantState) -> void:
 	state.inventory.misc["dead_mouse"] = 1
 	ensure_starter_seed(state)
 	var branch := plant.branch_at(&"center")
-	if branch == null:
-		return
+	if branch == null: return
 	var cutting := CuttingState.new()
 	cutting.item_id = IdFactory.make("cutting")
 	cutting.source_plant_id = plant.instance_id
@@ -41,22 +40,14 @@ static func add_starter_inventory_item(state: GameState, plant: PlantState) -> v
 	InventoryService.add_cutting(state.inventory, cutting)
 
 static func ensure_inventory_bootstrap(state: GameState, plant: PlantState) -> void:
-	if not state.inventory.misc.has("dead_mouse"):
-		state.inventory.misc["dead_mouse"] = 1
+	if not state.inventory.misc.has("dead_mouse"): state.inventory.misc["dead_mouse"] = 1
 	ensure_starter_seed(state)
 	var has_items := not state.inventory.cuttings.is_empty() or not state.inventory.seeds.is_empty() or not state.inventory.fruits.is_empty() or not state.inventory.fertilizers.is_empty() or not state.inventory.misc.is_empty()
-	if not has_items and plant != null:
-		add_starter_inventory_item(state, plant)
+	if not has_items and plant != null: add_starter_inventory_item(state, plant)
 
 static func ensure_starter_seed(state: GameState) -> void:
 	for seed_state in state.inventory.seeds:
-		if seed_state != null and seed_state.genome != null and seed_state.genome.species_id == STARTER_SEED_SPECIES:
-			return
+		if seed_state != null and seed_state.genome != null and seed_state.genome.species_id == STARTER_SEED_SPECIES: return
 	for pot in state.pots:
-		if pot.plant != null and pot.plant.species_id == STARTER_SEED_SPECIES:
-			return
-	var seed_state := SeedState.new()
-	seed_state.item_id = IdFactory.make("seed")
-	seed_state.ensure_visual_frame()
-	seed_state.genome = GeneticsService.fresh_species_snapshot(STARTER_SEED_SPECIES)
-	InventoryService.add_seed(state.inventory, seed_state)
+		if pot.plant != null and pot.plant.species_id == STARTER_SEED_SPECIES: return
+	var seed_state := SeedState.new(); seed_state.item_id = IdFactory.make("seed"); seed_state.ensure_visual_frame(); seed_state.genome = GeneticsService.fresh_species_snapshot(STARTER_SEED_SPECIES); InventoryService.add_seed(state.inventory, seed_state)
