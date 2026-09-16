@@ -68,9 +68,12 @@ func _draw_bark(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("bark_ring_count", 0))
 	for index in range(count): var t := (float(index) + 1.0) / (float(count) + 1.0); var center := start.lerp(end, t); draw_arc(center, 6.0, -0.8, 0.8, 8, Color(0.18, 0.11, 0.07, 0.85), 2.0, true)
 func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool, vitality: float) -> void:
-	if branch.fruit_growth == null: return
-	var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0); var center := end + Vector2(0.0, 18.0); var ripe := progress >= 0.82; var seed := "%s:%s:fruit" % [_plant.instance_id, branch.branch_id]; var texture := PlantAtlasArt.fruit_texture(PlantAtlasArt.stable_index(seed, 4), ripe); var target_size := Vector2.ONE * lerpf(16.0, 42.0, progress); var rect := Rect2(center - target_size * 0.5, target_size); draw_texture_rect(texture, rect, false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
-	if branch.fruit_growth.is_ready() and _plant.alive: draw_arc(center, target_size.x * 0.5 + 4.0, 0.0, TAU, 24, Color(1.0, 0.82, 0.28, 1.0 if highlighted else 0.6), 3.0, true)
+	var in_fruit_stage := _plant != null and GrowthCycleService.matches_target(_plant.growth_cycle_index, &"fruit")
+	if branch.fruit_growth == null and not in_fruit_stage: return
+	var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0) if branch.fruit_growth != null else GrowthCycleService.progress(_plant)
+	var ripe := (_plant != null and _plant.growth_cycle_index == 11) or (branch.fruit_growth != null and branch.fruit_growth.progress >= 0.82)
+	var center := end + Vector2(0.0, 18.0); var seed := "%s:%s:fruit" % [_plant.instance_id, branch.branch_id]; var texture := PlantAtlasArt.fruit_texture(PlantAtlasArt.stable_index(seed, 4), ripe); var target_size := Vector2.ONE * lerpf(24.0, 46.0, progress); var rect := Rect2(center - target_size * 0.5, target_size); draw_texture_rect(texture, rect, false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+	if branch.fruit_growth != null and branch.fruit_growth.is_ready() and _plant.alive: draw_arc(center, target_size.x * 0.5 + 4.0, 0.0, TAU, 24, Color(1.0, 0.82, 0.28, 1.0 if highlighted else 0.6), 3.0, true)
 func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Dictionary, vitality: float) -> void:
 	var species_scale := _species_style.leaf_scale if _species_style != null else 1.0; var leaf_scale := float(phenotype.get("leaf_scale", 1.0)) * species_scale * lerpf(0.58, 1.0, vitality); var vector := end - start; var length := maxf(vector.length(), 1.0); var normal := Vector2(-vector.y, vector.x) / length; var base_count := clampi(int(length / 42.0), 0, 6); var count := clampi(int(round(float(base_count) * lerpf(0.18, 1.0, vitality))), 0, 6)
 	if count <= 0: return
@@ -88,13 +91,14 @@ func _draw_spore_traps(start: Vector2, end: Vector2, phenotype: Dictionary) -> v
 	var count := int(phenotype.get("spore_trap_count", 0)); var vector := end - start; var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
 	for index in range(count): var t := 0.25 + (float(index) / maxf(float(count), 1.0)) * 0.65; var side := -1.0 if index % 2 == 0 else 1.0; var center := start.lerp(end, t) + normal * side * 13.0; draw_circle(center, 7.0, Color(0.43, 0.16, 0.39)); draw_circle(center, 3.0, Color(0.76, 0.70, 0.35)); draw_line(center, center + normal * side * 8.0, Color(0.34, 0.12, 0.28), 2.0, true)
 func _draw_flowers(branch: BranchState, end: Vector2, phenotype: Dictionary, vitality: float) -> void:
-	var count := int(phenotype.get("flower_count", 0))
+	var count := int(phenotype.get("flower_count", 0)); var in_flower_stage := _plant != null and GrowthCycleService.matches_target(_plant.growth_cycle_index, &"flower")
+	if in_flower_stage: count = maxi(count, 3)
 	if count <= 0: return
 	var flower_scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality); var crown := float(phenotype.get("crown_bloom_strength", 0.0)); var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
 	for index in range(count):
 		var angle := TAU * float(index) / float(count); var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * flower_scale
 		if flower_glow > 0.0: draw_circle(center, 13.0 * flower_scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
-		var seed := "%s:%s:flower:%d" % [_plant.instance_id, branch.branch_id, index]; var texture := PlantAtlasArt.flower_texture(PlantAtlasArt.stable_index(seed, 24)); var target_size := Vector2.ONE * 34.0 * flower_scale; draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+		var seed := "%s:%s:flower:%d" % [_plant.instance_id, branch.branch_id, index]; var texture := PlantAtlasArt.flower_texture(PlantAtlasArt.stable_index(seed, 24)); var target_size := Vector2.ONE * 38.0 * flower_scale; draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
 func _detect_trait_increases(plant: PlantState) -> void:
 	for slot in BranchState.VALID_SLOTS:
 		var branch := plant.branch_at(slot)
