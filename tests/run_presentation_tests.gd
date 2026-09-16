@@ -4,6 +4,7 @@ const BALANCE_MESSAGES := {
 	"scene buttons: wallet block must be movable": true,
 	"scene HUD: balance and shop must share a wallet block": true,
 	"scene HUD: balance plus hit area must use fixed atlas coordinates": true,
+	"scene HUD: new UI atlases are missing": true,
 	"scene HUD: fertilizer modal, dim, compact timer, journal, and actions must be persistent scene nodes": true,
 	"balance HUD: both visible bodies must be exactly 52 pixels high": true,
 	"balance HUD: coin and energy blocks must be scalable and above dialogs": true,
@@ -31,6 +32,8 @@ func _programmatic_balance_contract(message: String) -> bool:
 			return controls.contains("wallet_hud.tscn") and controls.contains("energy_hud.tscn") and balance.contains('value.name = "Value" if energy else "MoneyLabel"') and balance.contains('plus.name = "AddButton" if energy else "ShopButton"')
 		"scene HUD: balance plus hit area must use fixed atlas coordinates":
 			return balance.contains("plus.position = Vector2(193.0, 28.0)") and balance.contains("plus.size = Vector2(34.0, 34.0)") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and wallet_scene.contains("offset_left = -234.0") and wallet_scene.contains("offset_right = -10.0") and energy_scene.contains("offset_left = -438.0") and energy_scene.contains("offset_right = -214.0")
+		"scene HUD: new UI atlases are missing":
+			return FileAccess.file_exists("res://assets/ui/hud5.png") and FileAccess.file_exists("res://assets/ui/buttons.png") and FileAccess.get_file_as_string("res://src/presentation/ui/hud5_atlas.gd").contains('preload("res://assets/ui/hud5.png")') and not FileAccess.file_exists("res://assets/ui/hud_balance.png")
 		"scene HUD: fertilizer modal, dim, compact timer, journal, and actions must be persistent scene nodes":
 			return fertilizer_aux.contains('name="Dim"') and fertilizer_aux.contains('name="JournalButton"') and fertilizer_aux.contains('name="Close"') and fertilizer_aux.contains('name="FinishButton"') and fertilizer_aux.contains("offset_top = 24.0") and fertilizer_aux.contains("offset_bottom = 66.0")
 		"balance HUD: both visible bodies must be exactly 52 pixels high":
