@@ -23,7 +23,6 @@ func _programmatic_balance_contract(message: String) -> bool:
 	var balance := FileAccess.get_file_as_string("res://src/presentation/main/programmatic_balance_hud.gd")
 	var overlay := FileAccess.get_file_as_string("res://src/presentation/main/scene_controls_overlay.gd")
 	var fertilizer_aux := FileAccess.get_file_as_string("res://src/presentation/main/fertilizer_auxiliary_ui.tscn")
-	var main_scene := FileAccess.get_file_as_string("res://src/presentation/main/main.tscn")
 	match message:
 		"scene buttons: wallet block must be movable":
 			return not wallet_scene.contains("scene_draggable_panel.gd") and not energy_scene.contains("scene_draggable_panel.gd")
@@ -40,5 +39,5 @@ func _programmatic_balance_contract(message: String) -> bool:
 		"modal HUD: top-ups and transaction confirmations must stay below balances and above other UI":
 			return wallet_scene.contains("z_index = 200") and energy_scene.contains("z_index = 200") and FileAccess.get_file_as_string("res://src/presentation/shop/shop_panel.tscn").contains('z_index = 190')
 		"wallet HUD: switching, curved titles, programmatic buttons, and timer placement are required":
-			return overlay.contains("set_energy_topup_visible(false)") and overlay.contains("set_wallet_topup_visible(false)") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains('curved_title($Window/MenuTitle, "COINS")') and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains('curved_title($Window/MenuTitle, "ENERGY")') and balance.contains("next.position = Vector2(48.0, 66.0)") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains("_app().buy_coins") and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains("_app().buy_energy")
+			return overlay.contains("set_energy_topup_visible(false)") and overlay.contains("set_wallet_topup_visible(false)") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains('curved_title($Window/MenuTitle, "COINS")') and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains('curved_title($Window/MenuTitle, "ENERGY")') and balance.contains("next.position = Vector2(91.0, 66.0)") and balance.contains("next.size = Vector2(85.0, 24.0)") and balance.contains('timer.text = "02:00"') and not balance.contains("Next energy in") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains("_app().buy_coins") and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains("_app().buy_energy")
 	return false
