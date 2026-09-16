@@ -2,29 +2,12 @@ class_name TreeGrowthPreview
 extends Control
 
 const LAYOUT_PATH := "user://tree_asset_layout.cfg"
-const STAGES := [
-	preload("res://assets/tree/tree_01.png"),
-	preload("res://assets/tree/tree_02.png"),
-	preload("res://assets/tree/tree_03.png"),
-	preload("res://assets/tree/tree_04.png"),
-	preload("res://assets/tree/tree_05.png"),
-	preload("res://assets/tree/tree_06.png"),
-	preload("res://assets/tree/tree_07.png"),
-	preload("res://assets/tree/tree_08.png"),
-	preload("res://assets/tree/tree_09.png"),
-	preload("res://assets/tree/tree_10.png"),
-	preload("res://assets/tree/tree_11.png"),
-	preload("res://assets/tree/tree_12.png"),
-	preload("res://assets/tree/tree_13.png"),
-	preload("res://assets/tree/tree_14.png"),
-]
-
+const STAGES := [preload("res://assets/tree/tree_01.png"), preload("res://assets/tree/tree_02.png"), preload("res://assets/tree/tree_03.png"), preload("res://assets/tree/tree_04.png"), preload("res://assets/tree/tree_05.png"), preload("res://assets/tree/tree_06.png"), preload("res://assets/tree/tree_07.png"), preload("res://assets/tree/tree_08.png"), preload("res://assets/tree/tree_09.png"), preload("res://assets/tree/tree_10.png"), preload("res://assets/tree/tree_11.png"), preload("res://assets/tree/tree_12.png"), preload("res://assets/tree/tree_13.png"), preload("res://assets/tree/tree_14.png")]
 @onready var tree: TextureRect = $Tree
 @onready var left_hover: TextureRect = $Tree/LeftHover
 @onready var right_hover: TextureRect = $Tree/RightHover
 @onready var leaf_layout: LeafLayoutEditor = $Tree/LeafLayout
 @onready var flower_layout: FlowerLayoutEditor = $Tree/FlowerLayout
-
 var stage := 0
 var _plant: PlantState
 var _testing_stage := -1
@@ -36,179 +19,85 @@ var _fresh_cut_slots: Array[StringName] = []
 var _shown_plant_id := ""
 signal tree_branch_pruned(side: StringName)
 signal tree_hover_changed(hovered: bool)
-
 func _ready() -> void:
-	tree.gui_input.connect(_on_tree_gui_input)
-	flower_layout.fruit_selected.connect(_on_fruit_selected)
-	tree.mouse_entered.connect(tree_hover_changed.emit.bind(true))
-	tree.mouse_exited.connect(tree_hover_changed.emit.bind(false)); tree.mouse_exited.connect(leaf_layout.clear_leaf_hover)
-	_load_asset_layout()
-	_set_stage(stage)
-
+	tree.gui_input.connect(_on_tree_gui_input); flower_layout.fruit_selected.connect(_on_fruit_selected); tree.mouse_entered.connect(tree_hover_changed.emit.bind(true)); tree.mouse_exited.connect(tree_hover_changed.emit.bind(false)); tree.mouse_exited.connect(leaf_layout.clear_leaf_hover); _load_asset_layout(); _set_stage(stage)
 func set_plant(plant: PlantState) -> void:
 	var next_id := plant.instance_id if plant != null else ""
-	if not _shown_plant_id.is_empty() and next_id != _shown_plant_id:
-		_fresh_cut_slots.clear()
-	_shown_plant_id = next_id
-	_plant = plant
-	if _testing_stage >= 0:
-		visible = true
-		_set_stage(_testing_stage)
-		return
-	var next_stage := _stage_for_view(plant)
-	visible = plant != null and next_stage >= 0
-	if next_stage >= 0:
-		_set_stage(next_stage)
-
+	if not _shown_plant_id.is_empty() and next_id != _shown_plant_id: _fresh_cut_slots.clear()
+	_shown_plant_id = next_id; _plant = plant
+	if _plant != null: _plant.ensure_visual_lines()
+	if _testing_stage >= 0: visible = true; _set_stage(_testing_stage); return
+	var next_stage := _stage_for_view(plant); visible = plant != null and next_stage >= 0
+	if next_stage >= 0: _set_stage(next_stage)
 static func stage_for(plant: PlantState) -> int:
-	if plant == null:
-		return -1
-	var has_left := plant.branch_at(&"left") != null
-	var has_right := plant.branch_at(&"right") != null
+	if plant == null: return -1
+	var has_left := plant.branch_at(&"left") != null; var has_right := plant.branch_at(&"right") != null
 	if not has_left and not has_right: return 13
 	if not has_left: return 11
 	if not has_right: return 12
 	var growth_stage := plant.growth_cycle_index
-	if growth_stage == 0:
-		return -1
-	if growth_stage <= 8:
-		return growth_stage - 1
+	if growth_stage == 0: return -1
+	if growth_stage <= 8: return growth_stage - 1
 	return 7
-
 func _stage_for_view(plant: PlantState) -> int:
-	if plant == null or _fresh_cut_slots.is_empty():
-		return stage_for(plant)
-	var has_left := plant.branch_at(&"left") != null
-	var has_right := plant.branch_at(&"right") != null
+	if plant == null or _fresh_cut_slots.is_empty(): return stage_for(plant)
+	var has_left := plant.branch_at(&"left") != null; var has_right := plant.branch_at(&"right") != null
 	if not has_left and not has_right: return 8
 	if not has_left: return 9
 	if not has_right: return 10
-	_fresh_cut_slots.clear()
-	return stage_for(plant)
-
+	_fresh_cut_slots.clear(); return stage_for(plant)
 func _set_stage(value: int) -> void:
-	if tree == null:
-		tree = get_node("Tree") as TextureRect
-		leaf_layout = get_node("Tree/LeafLayout") as LeafLayoutEditor
-		flower_layout = get_node("Tree/FlowerLayout") as FlowerLayoutEditor
-		left_hover = get_node("Tree/LeftHover") as TextureRect
-		right_hover = get_node("Tree/RightHover") as TextureRect
-	stage = clampi(value, 0, STAGES.size() - 1)
-	tree.texture = STAGES[stage]
-	leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
-	if leaf_layout.visible:
-		leaf_layout.set_stage(stage)
-	var cycle := _plant.growth_cycle_index if _plant != null else 9
-	flower_layout.visible = _testing_stage >= 0 or cycle in [9, 10, 11]
+	if tree == null: tree = get_node("Tree") as TextureRect; leaf_layout = get_node("Tree/LeafLayout") as LeafLayoutEditor; flower_layout = get_node("Tree/FlowerLayout") as FlowerLayoutEditor; left_hover = get_node("Tree/LeftHover") as TextureRect; right_hover = get_node("Tree/RightHover") as TextureRect
+	stage = clampi(value, 0, STAGES.size() - 1); tree.texture = STAGES[stage]; leaf_layout.visible = stage >= LeafLayoutEditor.FIRST_TREE_STAGE
+	if leaf_layout.visible: leaf_layout.set_stage(stage)
+	var cycle := _plant.growth_cycle_index if _plant != null else 9; flower_layout.visible = _testing_stage >= 0 or cycle in [9, 10, 11]
 	if flower_layout.visible:
-		flower_layout.set_stage(8)
-		var slots: Array[StringName] = []
+		flower_layout.set_stage(8); var slots: Array[StringName] = []
 		if _plant != null:
 			for branch in _plant.existing_branches():
 				if cycle == 9 and branch.fruit_cycle_eligible <= _plant.fruit_cycle_index: slots.append(branch.slot)
 				elif cycle in [10, 11] and branch.fruit_growth != null: slots.append(branch.slot)
 		var kind: FlowerLayoutEditor.DisplayKind = FlowerLayoutEditor.DisplayKind.FLOWER if cycle == 9 else (FlowerLayoutEditor.DisplayKind.UNRIPE_FRUIT if cycle == 10 else FlowerLayoutEditor.DisplayKind.RIPE_FRUIT)
-		flower_layout.set_display(kind, slots)
+		flower_layout.set_display(kind, slots, _plant)
 	_update_hover_visibility()
-
-func preview_stage_for_testing(value: int) -> void:
-	_testing_stage = clampi(value, 0, STAGES.size() - 1)
-	visible = true
-	_set_stage(_testing_stage)
-
-func clear_testing_preview() -> void:
-	_testing_stage = -1
-	set_plant(_plant)
-
-func has_prunable_branch() -> bool:
-	if _testing_stage >= 0:
-		return stage in [6, 7, 11, 12]
-	return _can_prune_side(&"left") or _can_prune_side(&"right")
-
-func set_prune_mode(enabled: bool) -> void:
-	prune_mode = enabled
-	_hovered_branch = &""
-	_update_hover_visibility()
-
-func save_asset_layout() -> void:
-	var config := ConfigFile.new()
-	config.set_value("tree", "position", tree.position)
-	config.set_value("tree", "scale", tree.scale)
-	config.save(LAYOUT_PATH)
-
+func preview_stage_for_testing(value: int) -> void: _testing_stage = clampi(value, 0, STAGES.size() - 1); visible = true; _set_stage(_testing_stage)
+func clear_testing_preview() -> void: _testing_stage = -1; set_plant(_plant)
+func has_prunable_branch() -> bool: return stage in [6, 7, 11, 12] if _testing_stage >= 0 else (_can_prune_side(&"left") or _can_prune_side(&"right"))
+func set_prune_mode(enabled: bool) -> void: prune_mode = enabled; _hovered_branch = &""; _update_hover_visibility()
+func save_asset_layout() -> void: var config := ConfigFile.new(); config.set_value("tree", "position", tree.position); config.set_value("tree", "scale", tree.scale); config.save(LAYOUT_PATH)
 func _load_asset_layout() -> void:
 	var config := ConfigFile.new()
-	if config.load(LAYOUT_PATH) != OK:
-		return
-	var saved_position: Variant = config.get_value("tree", "position", tree.position)
-	var saved_scale: Variant = config.get_value("tree", "scale", tree.scale)
-	if saved_position is Vector2:
-		tree.position = saved_position
-	if saved_scale is Vector2:
-		tree.scale = saved_scale
-
-func _update_hover_visibility() -> void:
-	left_hover.visible = prune_mode and _hovered_branch == &"left" and _can_prune_side(&"left")
-	right_hover.visible = prune_mode and _hovered_branch == &"right" and _can_prune_side(&"right")
-	left_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	right_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
+	if config.load(LAYOUT_PATH) != OK: return
+	var saved_position: Variant = config.get_value("tree", "position", tree.position); var saved_scale: Variant = config.get_value("tree", "scale", tree.scale)
+	if saved_position is Vector2: tree.position = saved_position
+	if saved_scale is Vector2: tree.scale = saved_scale
+func _update_hover_visibility() -> void: left_hover.visible = prune_mode and _hovered_branch == &"left" and _can_prune_side(&"left"); right_hover.visible = prune_mode and _hovered_branch == &"right" and _can_prune_side(&"right"); left_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE; right_hover.mouse_filter = Control.MOUSE_FILTER_IGNORE
 func _set_hovered_branch(side: StringName) -> void:
-	if side != _hovered_branch:
-		_hovered_branch = side
-		_update_hover_visibility()
-
+	if side != _hovered_branch: _hovered_branch = side; _update_hover_visibility()
 func _on_tree_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion: leaf_layout.set_leaf_hover((event as InputEventMouseMotion).position)
-	if prune_mode and event is InputEventMouseMotion:
-		_set_hovered_branch(_branch_side_at(tree.get_local_mouse_position()))
-		return
+	if prune_mode and event is InputEventMouseMotion: _set_hovered_branch(_branch_side_at(tree.get_local_mouse_position())); return
 	if prune_mode and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var side := _branch_side_at(tree.get_local_mouse_position())
-		if side == &"left" and _can_prune_side(side):
-			_fresh_cut_slots.append(side)
-			tree_branch_pruned.emit(side)
-			return
-		if side == &"right" and _can_prune_side(side):
-			_fresh_cut_slots.append(side)
-			tree_branch_pruned.emit(side)
-			return
-	if not Input.is_key_pressed(KEY_CTRL):
-		return
+		if side in [&"left", &"right"] and _can_prune_side(side): _fresh_cut_slots.append(side); tree_branch_pruned.emit(side); return
+	if not Input.is_key_pressed(KEY_CTRL): return
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
-				_dragging = true
-				_drag_offset = get_global_mouse_position() - tree.global_position
-				tree.move_to_front()
-			else:
-				_dragging = false
-		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
-			_scale_tree(1.1)
-		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
-			_scale_tree(0.9)
-	elif event is InputEventMouseMotion and _dragging and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		tree.global_position = get_global_mouse_position() - _drag_offset
-
+			if event.pressed: _dragging = true; _drag_offset = get_global_mouse_position() - tree.global_position; tree.move_to_front()
+			else: _dragging = false
+		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed: _scale_tree(1.1)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed: _scale_tree(0.9)
+	elif event is InputEventMouseMotion and _dragging and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT): tree.global_position = get_global_mouse_position() - _drag_offset
 func _branch_side_at(point: Vector2) -> StringName:
 	var normalized := Vector2(clampf(point.x / maxf(tree.size.x, 1.0), 0.0, 1.0), clampf(point.y / maxf(tree.size.y, 1.0), 0.0, 1.0))
 	if normalized.y < 0.08 or normalized.y > 0.78: return &""
 	var preferred: StringName = &"left" if normalized.x < 0.5 else &"right"
 	if _can_prune_side(preferred): return preferred
-	var alternate: StringName = &"right" if preferred == &"left" else &"left"
-	return alternate if _can_prune_side(alternate) else &""
-func _can_prune_side(side: StringName) -> bool:
-	if _testing_stage >= 0: return stage in ([6, 7, 12] if side == &"left" else [7, 11])
-	return GrowthCycleService.branch_has_grown(_plant, side)
-
+	var alternate: StringName = &"right" if preferred == &"left" else &"left"; return alternate if _can_prune_side(alternate) else &""
+func _can_prune_side(side: StringName) -> bool: return stage in ([6, 7, 12] if side == &"left" else [7, 11]) if _testing_stage >= 0 else GrowthCycleService.branch_has_grown(_plant, side)
 func _on_fruit_selected(slot: StringName) -> void:
 	var app := get_node_or_null("/root/GameApp")
 	if app == null: return
 	if _plant != null and _plant.growth_cycle_index == 9: app.call("pick_active_flower", slot)
 	else: app.call("harvest_active_fruit", slot)
-
-func _scale_tree(factor: float) -> void:
-	var next_scale := tree.scale * factor
-	next_scale.x = clampf(next_scale.x, 0.2, 4.0)
-	next_scale.y = clampf(next_scale.y, 0.2, 4.0)
-	tree.scale = next_scale
+func _scale_tree(factor: float) -> void: var next_scale := tree.scale * factor; next_scale.x = clampf(next_scale.x, 0.2, 4.0); next_scale.y = clampf(next_scale.y, 0.2, 4.0); tree.scale = next_scale
