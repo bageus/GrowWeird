@@ -9,6 +9,7 @@ const BALANCE_MESSAGES := {
 	"balance HUD: coin and energy blocks must be scalable and above dialogs": true,
 	"modal HUD: top-ups and transaction confirmations must stay below balances and above other UI": true,
 	"wallet HUD: switching, curved titles, programmatic buttons, and timer placement are required": true,
+	"inventory HUD: inventory and three slot atlas art are not wired": true,
 }
 
 func _expect(condition: bool, message: String) -> void:

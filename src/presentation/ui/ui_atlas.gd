@@ -12,9 +12,6 @@ const GAME_FONT: Font = preload("res://assets/ui/fonts/fredoka_black.tres")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
-const HUD_INVENTORY: Texture2D = preload("res://assets/ui/hud_background_inventory.png")
-const HUD_INVENTORY_HOVER_UP: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverup.png")
-const HUD_INVENTORY_HOVER_DOWN: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverdown.png")
 const HUD_POT: Texture2D = preload("res://assets/ui/hud_background_pot.png")
 const HUD_POT_HOVER_LEFT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverleft.png")
 const HUD_POT_HOVER_RIGHT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverright.png")
@@ -209,142 +206,62 @@ static func configure_topup_button(button: Button, price := 0, rewarded_ad := fa
 	button.offset_bottom = -34.0
 	button.clip_contents = false
 
-static func configure_balance_hud(panel: Panel) -> void:
-	CommerceUiStyle.balance_hud(panel)
+static func configure_balance_hud(panel: Panel) -> void: CommerceUiStyle.balance_hud(panel)
 static func configure_balance_plus(button: Button, _balance_art: Control) -> void:
 	if button != null:
-		CommerceUiStyle.balance_plus(button)
-		button.text = ""
-		button.icon = BALANCE_PLUS_TEXTURE
-		button.expand_icon = true
+		CommerceUiStyle.balance_plus(button); button.text = ""; button.icon = BALANCE_PLUS_TEXTURE; button.expand_icon = true
 		button.add_theme_constant_override(&"icon_max_width", 39)
-		for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-			button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-		button.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		button.custom_minimum_size = Vector2(39.0, 39.0)
-		button.position = Vector2(182.0, 31.0)
-		button.size = Vector2(39.0, 39.0)
-static func balance_background() -> Texture2D:
-	return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
-
-static func balance_icon(energy := false) -> Texture2D:
-	return energy_coin_icon(2, 4) if energy else energy_coin_icon(2, 3)
-
-static func balance_next_texture() -> Texture2D:
-	return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
+		for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]: button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+		button.set_anchors_preset(Control.PRESET_TOP_LEFT); button.custom_minimum_size = Vector2(39.0, 39.0); button.position = Vector2(182.0, 31.0); button.size = Vector2(39.0, 39.0)
+static func balance_background() -> Texture2D: return atlas_region(HUD_BALANCE, Rect2(48.0, 132.0, 936.0, 252.0))
+static func balance_icon(energy := false) -> Texture2D: return energy_coin_icon(2, 4) if energy else energy_coin_icon(2, 3)
+static func balance_next_texture() -> Texture2D: return atlas_region(HUD_BALANCE_NEXT, Rect2(196.0, 188.0, 632.0, 136.0))
 
 static func warm_hud_style(border_width := 3, radius := 16, margins := Vector4(14.0, 10.0, 14.0, 10.0)) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = Color(1.0, 0.88, 0.62, 0.97)
-	style.border_color = Color(0.76, 0.38, 0.07, 1.0)
-	style.set_border_width_all(border_width)
-	style.set_corner_radius_all(radius)
-	style.shadow_color = Color(0.34, 0.14, 0.025, 0.48)
-	style.shadow_size = maxi(2, border_width - 1)
-	style.shadow_offset = Vector2(0.0, 3.0)
-	style.anti_aliasing_size = 1.5
-	style.content_margin_left = margins.x
-	style.content_margin_top = margins.y
-	style.content_margin_right = margins.z
-	style.content_margin_bottom = margins.w
-	return style
+	var style := StyleBoxFlat.new(); style.bg_color = Color(1.0, 0.88, 0.62, 0.97); style.border_color = Color(0.76, 0.38, 0.07, 1.0); style.set_border_width_all(border_width); style.set_corner_radius_all(radius); style.shadow_color = Color(0.34, 0.14, 0.025, 0.48); style.shadow_size = maxi(2, border_width - 1); style.shadow_offset = Vector2(0.0, 3.0); style.anti_aliasing_size = 1.5; style.content_margin_left = margins.x; style.content_margin_top = margins.y; style.content_margin_right = margins.z; style.content_margin_bottom = margins.w; return style
 
 static func configure_warm_timer_hud(panel: PanelContainer, label: Label) -> void:
-	if panel == null or label == null:
-		return
-	panel.add_theme_stylebox_override(&"panel", warm_hud_style(2, 10, Vector4(10.0, 2.0, 10.0, 2.0)))
-	label.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0))
-	label.add_theme_font_size_override(&"font_size", 14)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	if panel == null or label == null: return
+	panel.add_theme_stylebox_override(&"panel", warm_hud_style(2, 10, Vector4(10.0, 2.0, 10.0, 2.0))); label.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0)); label.add_theme_font_size_override(&"font_size", 14); label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
 static func configure_hud_slot(button: Button) -> void:
-	if button == null:
-		return
+	if button == null: return
 	var style := panel_style(background(0), Vector4(10.0, 10.0, 10.0, 10.0))
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, style)
-	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
-	button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
-	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]: button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE); button.action_mode = BaseButton.ACTION_MODE_BUTTON_PRESS; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.mouse_entered.connect(_set_slot_hover.bind(button, true)); button.mouse_exited.connect(_set_slot_hover.bind(button, false))
 
 static func configure_inventory_arrow(button: TextureButton, _points_up: bool) -> void:
-	if button == null:
-		return
-	button.texture_normal = null
-	button.texture_hover = null
-	button.texture_pressed = null
-	button.texture_disabled = null
-	button.ignore_texture_size = true
-	button.stretch_mode = TextureButton.STRETCH_SCALE
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	if button == null: return
+	button.texture_normal = null; button.texture_hover = null; button.texture_pressed = null; button.texture_disabled = null; button.ignore_texture_size = true; button.stretch_mode = TextureButton.STRETCH_SCALE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 
 static func configure_shop_slot(button: Button) -> void:
-	if button == null:
-		return
+	if button == null: return
 	var style := panel_style(background2(1), Vector4(14.0, 14.0, 14.0, 14.0))
-	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]:
-		button.add_theme_stylebox_override(state, style)
-	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE)
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.mouse_entered.connect(_set_slot_hover.bind(button, true))
-	button.mouse_exited.connect(_set_slot_hover.bind(button, false))
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]: button.add_theme_stylebox_override(state, style)
+	button.add_theme_color_override(&"icon_disabled_color", Color.WHITE); button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.mouse_entered.connect(_set_slot_hover.bind(button, true)); button.mouse_exited.connect(_set_slot_hover.bind(button, false))
 
-
-static func branch_texture() -> Texture2D:
-	return atlas_region(BUTTONS, Rect2(0.0, 7.0 * CELL, CELL, CELL))
-
-static func shop_title_texture() -> Texture2D:
-	return button_texture(6, 1)
-
-static func shop_awning_texture() -> Texture2D:
-	return button_texture(6, 2)
-
-static func buy_close_texture(hover := false) -> Texture2D:
-	return button_texture(6, 0, hover)
-
-static func buy_button_texture(hover := false) -> Texture2D:
-	return button_texture(7, 1, hover)
-
-static func shop_lot_texture(row: int, column: int) -> Texture2D:
-	return atlas_region(HUD_SHOP_LOTS, Rect2(column * CELL, row * CELL, CELL, CELL))
+static func branch_texture() -> Texture2D: return atlas_region(BUTTONS, Rect2(0.0, 7.0 * CELL, CELL, CELL))
+static func shop_title_texture() -> Texture2D: return button_texture(6, 1)
+static func shop_awning_texture() -> Texture2D: return button_texture(6, 2)
+static func buy_close_texture(hover := false) -> Texture2D: return button_texture(6, 0, hover)
+static func buy_button_texture(hover := false) -> Texture2D: return button_texture(7, 1, hover)
+static func shop_lot_texture(row: int, column: int) -> Texture2D: return atlas_region(HUD_SHOP_LOTS, Rect2(column * CELL, row * CELL, CELL, CELL))
 
 static func panel_style(texture: Texture2D, margins := Vector4(12.0, 12.0, 12.0, 12.0)) -> StyleBoxTexture:
-	var style := StyleBoxTexture.new()
-	style.texture = texture
-	style.content_margin_left = margins.x
-	style.content_margin_top = margins.y
-	style.content_margin_right = margins.z
-	style.content_margin_bottom = margins.w
-	return style
-
-static func background(index: int) -> Texture2D:
-	return atlas_region(HUD_BACKGROUND, Rect2(index * CELL, 0.0, CELL, CELL))
-
-static func background2(index: int) -> Texture2D:
-	return atlas_region(HUD_BACKGROUND2, Rect2(index * CELL, 0.0, CELL, CELL))
-
+	var style := StyleBoxTexture.new(); style.texture = texture; style.content_margin_left = margins.x; style.content_margin_top = margins.y; style.content_margin_right = margins.z; style.content_margin_bottom = margins.w; return style
+static func background(index: int) -> Texture2D: return atlas_region(HUD_BACKGROUND, Rect2(index * CELL, 0.0, CELL, CELL))
+static func background2(index: int) -> Texture2D: return atlas_region(HUD_BACKGROUND2, Rect2(index * CELL, 0.0, CELL, CELL))
 static func prune_cursor() -> Texture2D:
-	var image := background(1).get_image()
-	image.resize(72, 72, Image.INTERPOLATE_LANCZOS)
-	return ImageTexture.create_from_image(image)
-
+	var image := background(1).get_image(); image.resize(64, 64, Image.INTERPOLATE_LANCZOS); return ImageTexture.create_from_image(image)
+static func pot_hud_texture() -> Texture2D: return HUD_POT
+static func pot_hover_texture(points_left: bool) -> Texture2D: return HUD_POT_HOVER_LEFT if points_left else HUD_POT_HOVER_RIGHT
+static func buysell_hud_texture() -> Texture2D: return HUD_BUYSELL
+static func buysell_banner_texture() -> Texture2D: return HUD_BUYSELL_BANNER
+static func count_hud_texture() -> Texture2D: return HUD_COUNT
+static func coin_energy_banner_texture() -> Texture2D: return HUD_COIN_ENERGY_BANNER
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = button_texture(row, column, hovered, mirror_x)
-		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
-
+	button.icon = button_texture(row, column, hovered, mirror_x); button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
 static func _set_icon_button_hover(button: Button, row: int, column: int, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = _button_icon_crop(row, column, hovered)
-		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
-
-static func _set_close_hover(button: Button, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = _close_texture(hovered)
-
-static func _set_slot_hover(button: Button, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
+	button.icon = _button_icon_crop(row, column, hovered); button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
+static func _set_close_hover(button: Button, hovered: bool) -> void: button.icon = _close_texture(hovered)
+static func _set_slot_hover(button: Button, hovered: bool) -> void: button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
