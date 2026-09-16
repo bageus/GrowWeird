@@ -95,10 +95,12 @@ func _draw_flowers(branch: BranchState, end: Vector2, phenotype: Dictionary, vit
 	if in_flower_stage: count = maxi(count, 3)
 	if count <= 0: return
 	var flower_scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality); var crown := float(phenotype.get("crown_bloom_strength", 0.0)); var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
+	var flower_line := PlantAtlasArt.flower_line(_plant.instance_id)
+	var mutation_column := PlantAtlasArt.flower_mutation_column(branch)
 	for index in range(count):
 		var angle := TAU * float(index) / float(count); var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * flower_scale
 		if flower_glow > 0.0: draw_circle(center, 13.0 * flower_scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
-		var seed := "%s:%s:flower:%d" % [_plant.instance_id, branch.branch_id, index]; var texture := PlantAtlasArt.flower_texture(PlantAtlasArt.stable_index(seed, 24)); var target_size := Vector2.ONE * 38.0 * flower_scale; draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+		var texture := PlantAtlasArt.flower_texture(flower_line, mutation_column); var target_size := Vector2.ONE * 38.0 * flower_scale; draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
 func _detect_trait_increases(plant: PlantState) -> void:
 	for slot in BranchState.VALID_SLOTS:
 		var branch := plant.branch_at(slot)
