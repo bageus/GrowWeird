@@ -23,107 +23,67 @@ var regrowth_progress: Dictionary = {}
 var regrowth_fruit_cycles: Dictionary = {}
 var fruit_cycle_index: int = 0
 var rng_state: int = 0
+var flower_visual_line: int = -1
+var fruit_visual_line: int = -1
+
+func ensure_visual_lines() -> void:
+	var seed := instance_id if not instance_id.is_empty() else String(species_id)
+	if flower_visual_line < 0: flower_visual_line = PlantAtlasArt.flower_line(seed + ":flower")
+	if fruit_visual_line < 0: fruit_visual_line = PlantAtlasArt.fruit_line(seed + ":fruit")
 
 func initialize_native_branches() -> void:
-	branches.clear()
-	regrowth_progress.clear()
-	regrowth_fruit_cycles.clear()
+	branches.clear(); regrowth_progress.clear(); regrowth_fruit_cycles.clear()
 	for slot in BranchState.VALID_SLOTS:
-		var branch := BranchState.new()
-		branch.branch_id = "%s:%s" % [instance_id, String(slot)]
-		branch.slot = slot
-		branch.source_species_id = species_id
-		branch.ancestry = [instance_id]
-		branches[String(slot)] = branch
+		var branch := BranchState.new(); branch.branch_id = "%s:%s" % [instance_id, String(slot)]; branch.slot = slot; branch.source_species_id = species_id; branch.ancestry = [instance_id]; branches[String(slot)] = branch
 
 func branch_at(slot: StringName) -> BranchState:
-	var value: Variant = branches.get(String(slot))
-	return value as BranchState
+	return branches.get(String(slot)) as BranchState
 
 func restore_native_branch(slot: StringName) -> bool:
-	if slot not in [&"left", &"right"] or branch_at(slot) != null:
-		return false
-	var branch := BranchState.new()
-	branch.branch_id = "%s:%s:regrown:%d" % [instance_id, String(slot), fruit_cycle_index]
-	branch.slot = slot
-	branch.source_species_id = species_id
-	branch.ancestry = [instance_id]
-	branch.fruit_cycle_eligible = regrowth_fruit_cycle_at(slot)
+	if slot not in [&"left", &"right"] or branch_at(slot) != null: return false
+	var branch := BranchState.new(); branch.branch_id = "%s:%s:regrown:%d" % [instance_id, String(slot), fruit_cycle_index]; branch.slot = slot; branch.source_species_id = species_id; branch.ancestry = [instance_id]; branch.fruit_cycle_eligible = regrowth_fruit_cycle_at(slot)
 	return attach_branch(branch, slot)
 
-func has_free_slot(slot: StringName) -> bool:
-	return BranchState.VALID_SLOTS.has(slot) and branch_at(slot) == null
-
+func has_free_slot(slot: StringName) -> bool: return BranchState.VALID_SLOTS.has(slot) and branch_at(slot) == null
 func cut_branch(slot: StringName) -> BranchState:
 	var branch := branch_at(slot)
-	if branch == null:
-		return null
-	branches[String(slot)] = null
-	set_regrowth_progress(slot, 0.0)
-	regrowth_fruit_cycles[String(slot)] = fruit_cycle_index + 1
+	if branch == null: return null
+	branches[String(slot)] = null; set_regrowth_progress(slot, 0.0); regrowth_fruit_cycles[String(slot)] = fruit_cycle_index + 1
 	return branch
-
 func removed_last_active_fruit(removed: BranchState) -> bool:
 	if removed == null or removed.fruit_growth == null: return false
 	for existing in existing_branches():
 		if existing.fruit_growth != null: return false
 	return true
-
 func has_active_fruits() -> bool:
 	for branch in existing_branches():
 		if branch.fruit_growth != null: return true
 	return false
-
 func attach_branch(branch: BranchState, slot: StringName) -> bool:
-	if branch == null or not has_free_slot(slot):
-		return false
+	if branch == null or not has_free_slot(slot): return false
 	branch.slot = slot
 	if has_active_fruits(): branch.fruit_cycle_eligible = maxi(branch.fruit_cycle_eligible, fruit_cycle_index + 1)
-	branches[String(slot)] = branch
-	clear_regrowth_progress(slot)
-	regrowth_fruit_cycles.erase(String(slot))
-	return true
-
+	branches[String(slot)] = branch; clear_regrowth_progress(slot); regrowth_fruit_cycles.erase(String(slot)); return true
 func existing_branches() -> Array[BranchState]:
 	var result: Array[BranchState] = []
 	for slot in BranchState.VALID_SLOTS:
 		var branch := branch_at(slot)
-		if branch != null:
-			result.append(branch)
+		if branch != null: result.append(branch)
 	return result
-
 func regrowth_progress_at(slot: StringName) -> float:
-	if not BranchState.VALID_SLOTS.has(slot):
-		return 0.0
+	if not BranchState.VALID_SLOTS.has(slot): return 0.0
 	return clampf(float(regrowth_progress.get(String(slot), 0.0)), 0.0, 1.0)
-
 func set_regrowth_progress(slot: StringName, progress: float) -> void:
-	if not BranchState.VALID_SLOTS.has(slot):
-		return
-	regrowth_progress[String(slot)] = clampf(progress, 0.0, 1.0)
-
-func clear_regrowth_progress(slot: StringName) -> void:
-	regrowth_progress.erase(String(slot))
-
-func regrowth_fruit_cycle_at(slot: StringName) -> int:
-	return maxi(0, int(regrowth_fruit_cycles.get(String(slot), fruit_cycle_index + 1)))
-
+	if BranchState.VALID_SLOTS.has(slot): regrowth_progress[String(slot)] = clampf(progress, 0.0, 1.0)
+func clear_regrowth_progress(slot: StringName) -> void: regrowth_progress.erase(String(slot))
+func regrowth_fruit_cycle_at(slot: StringName) -> int: return maxi(0, int(regrowth_fruit_cycles.get(String(slot), fruit_cycle_index + 1)))
 func add_mutation_energy(axis: StringName, amount: float) -> void:
-	var key := String(axis)
-	mutation_energy[key] = float(mutation_energy.get(key, 0.0)) + amount
-
+	var key := String(axis); mutation_energy[key] = float(mutation_energy.get(key, 0.0)) + amount
 func record_care_sample(score: float, delta_seconds: float) -> void:
-	care_stage_score_sum += clampf(score, 0.0, 1.0) * maxf(delta_seconds, 0.0)
-	care_stage_sample_seconds += maxf(delta_seconds, 0.0)
-
+	care_stage_score_sum += clampf(score, 0.0, 1.0) * maxf(delta_seconds, 0.0); care_stage_sample_seconds += maxf(delta_seconds, 0.0)
 func finish_care_stage(next_stage: int) -> void:
-	if care_stage_sample_seconds > 0.0:
-		completed_care_scores.append(care_stage_score_sum / care_stage_sample_seconds)
-	care_stage_index = next_stage
-	care_stage_score_sum = 0.0
-	care_stage_sample_seconds = 0.0
-
+	if care_stage_sample_seconds > 0.0: completed_care_scores.append(care_stage_score_sum / care_stage_sample_seconds)
+	care_stage_index = next_stage; care_stage_score_sum = 0.0; care_stage_sample_seconds = 0.0
 func current_care_score() -> float:
-	if care_stage_sample_seconds <= 0.0:
-		return 1.0
+	if care_stage_sample_seconds <= 0.0: return 1.0
 	return clampf(care_stage_score_sum / care_stage_sample_seconds, 0.0, 1.0)
