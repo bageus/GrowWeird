@@ -22,22 +22,22 @@ func _ready() -> void:
 	call_deferred("_update_scroll_buttons")
 
 func _build_programmatic_hud() -> void:
-	for child in get_children():
-		remove_child(child); child.queue_free()
-	custom_minimum_size = HUD_SIZE; size = HUD_SIZE; clip_contents = true
-	var layers := Control.new(); layers.name = "Layers"; layers.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(layers); layers.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var background := TextureRect.new(); background.name = "Background"; background.mouse_filter = Control.MOUSE_FILTER_IGNORE; background.texture = UiAtlas.background(0); background.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; background.stretch_mode = TextureRect.STRETCH_SCALE; layers.add_child(background); background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var frame := Control.new(); frame.name = "FrameContent"; frame.position = Vector2(8.0, 0.0); frame.size = Vector2(148.0, 520.0); frame.mouse_filter = Control.MOUSE_FILTER_PASS; layers.add_child(frame)
-	scroll = ScrollContainer.new(); scroll.name = "Scroll"; scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; frame.add_child(scroll)
+	for child in get_children(): remove_child(child); child.queue_free()
+	custom_minimum_size = HUD_SIZE; size = HUD_SIZE; clip_contents = false
+	var frame := Panel.new(); frame.name = "ProgrammaticFrame"; frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; frame.add_theme_stylebox_override(&"panel", _inventory_frame_style()); add_child(frame); frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var content := Control.new(); content.name = "FrameContent"; content.position = Vector2(8.0, 0.0); content.size = Vector2(148.0, 520.0); content.mouse_filter = Control.MOUSE_FILTER_PASS; add_child(content)
+	scroll = ScrollContainer.new(); scroll.name = "Scroll"; scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; content.add_child(scroll)
 	items = VBoxContainer.new(); items.name = "Items"; items.custom_minimum_size = Vector2(142.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
-	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 22.0); frame.add_child(scroll_up)
-	scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 456.0); frame.add_child(scroll_down)
+	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 18.0); content.add_child(scroll_up)
+	scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 460.0); content.add_child(scroll_down)
 	scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
+
+func _inventory_frame_style() -> StyleBoxFlat:
+	var style := CommerceUiStyle.top_hud_style(22); style.bg_color = Color("ffd078"); style.border_color = Color("b95a12"); style.set_border_width_all(4); style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); style.shadow_size = 4; style.shadow_offset = Vector2(0.0, 4.0); style.content_margin_left = 8.0; style.content_margin_top = 8.0; style.content_margin_right = 8.0; style.content_margin_bottom = 8.0; return style
 
 func _make_scroll_button(name_value: String, points_up: bool) -> Button:
 	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	button.text = "▲" if points_up else "▼"; button.add_theme_font_size_override(&"font_size", 24); button.add_theme_color_override(&"font_color", Color.WHITE); button.add_theme_color_override(&"font_outline_color", Color("5b2b12")); button.add_theme_constant_override(&"outline_size", 3)
-	CommerceUiStyle.transaction_action(button, &"inventory_scroll")
+	Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon())
 	return button
 
 func set_inventory(inventory: InventoryState) -> void:
@@ -83,7 +83,7 @@ func _add_item(kind: StringName, item_id: String, count: int, title: String, vis
 func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
 	var icon := TextureRect.new(); button.add_child(icon); icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 19.7; icon.offset_top = 19.7; icon.offset_right = -19.7; icon.offset_bottom = -19.7; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; icon.texture = texture; icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 func _add_stack_badge(button: Button, count: int) -> void:
-	var badge := Label.new(); badge.name = "StackBadge"; button.add_child(badge); badge.z_index = 10; badge.mouse_filter = Control.MOUSE_FILTER_IGNORE; badge.set_anchors_preset(Control.PRESET_TOP_RIGHT); badge.position = Vector2(-42.0, 8.0); badge.size = Vector2(34.0, 34.0); badge.text = str(count); badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; badge.add_theme_font_size_override(&"font_size", 22); badge.add_theme_color_override(&"font_color", Color.WHITE); badge.add_theme_color_override(&"font_outline_color", Color("4a2817")); badge.add_theme_constant_override(&"outline_size", 5)
+	var badge := Label.new(); badge.name = "StackBadge"; button.add_child(badge); badge.z_index = 10; badge.mouse_filter = Control.MOUSE_FILTER_IGNORE; badge.set_anchors_preset(Control.PRESET_TOP_RIGHT); badge.position = Vector2(-42.0, 8.0); badge.size = Vector2(34.0, 34.0); badge.text = str(count); badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; badge.add_theme_font_override(&"font", UiAtlas.GAME_FONT); badge.add_theme_font_size_override(&"font_size", 22); badge.add_theme_color_override(&"font_color", Color.WHITE); badge.add_theme_color_override(&"font_outline_color", Color("4a2817")); badge.add_theme_constant_override(&"outline_size", 5)
 func _set_item_hover(button: Button, hovered: bool) -> void:
 	if is_instance_valid(button): button.self_modulate = Color(1.18, 1.18, 1.08, 1.0) if hovered else Color.WHITE
 func _add_empty() -> void:
@@ -102,7 +102,7 @@ func set_context_cancel(active: bool) -> void:
 	if face != null: return
 	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 17.0; face.offset_top = 17.0; face.offset_right = -17.0; face.offset_bottom = -17.0
 	var style := StyleBoxFlat.new(); style.bg_color = Color("d94732"); style.border_color = Color("8c1d12"); style.set_border_width_all(3); style.set_corner_radius_all(14); face.add_theme_stylebox_override(&"panel", style)
-	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_size_override(&"font_size", 17); caption.add_theme_color_override(&"font_color", Color.WHITE)
+	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_override(&"font", UiAtlas.GAME_FONT); caption.add_theme_font_size_override(&"font_size", 17); caption.add_theme_color_override(&"font_color", Color.WHITE)
 func _emit_selected(button: Button, kind: StringName, item_id: String, count: int, title: String) -> void:
 	if button == _context_button and button.get_node_or_null("ContextCancelCell") != null: context_cancel_requested.emit(); return
 	set_context_cancel(false); _context_button = button; set_context_cancel(true); item_selected.emit(kind, item_id, count, title)
