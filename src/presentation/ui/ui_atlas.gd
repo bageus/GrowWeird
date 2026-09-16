@@ -17,7 +17,6 @@ const HUD_POT_HOVER_LEFT: Texture2D = preload("res://assets/ui/hud_background_po
 const HUD_POT_HOVER_RIGHT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverright.png")
 const HUD_BUYSELL: Texture2D = preload("res://assets/ui/hud4.png")
 const HUD_BUYSELL_BANNER: Texture2D = preload("res://assets/ui/hud_buysell_banner.png")
-const HUD_COUNT: Texture2D = preload("res://assets/ui/hud_background_count.png")
 const HUD_SHOP_LOTS: Texture2D = preload("res://assets/ui/hud_background_shop.png")
 const HUD_COIN_ENERGY_BANNER: Texture2D = preload("res://assets/ui/hud_coinenergy_banner.png")
 const CELL := 512.0
@@ -257,7 +256,6 @@ static func pot_hud_texture() -> Texture2D: return HUD_POT
 static func pot_hover_texture(points_left: bool) -> Texture2D: return HUD_POT_HOVER_LEFT if points_left else HUD_POT_HOVER_RIGHT
 static func buysell_hud_texture() -> Texture2D: return HUD_BUYSELL
 static func buysell_banner_texture() -> Texture2D: return HUD_BUYSELL_BANNER
-static func count_hud_texture() -> Texture2D: return HUD_COUNT
 static func coin_energy_banner_texture() -> Texture2D: return HUD_COIN_ENERGY_BANNER
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
 	button.icon = button_texture(row, column, hovered, mirror_x); button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
