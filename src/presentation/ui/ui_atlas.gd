@@ -12,9 +12,6 @@ const GAME_FONT: Font = preload("res://assets/ui/fonts/fredoka_black.tres")
 const HUD_BALANCE_NEXT: Texture2D = preload("res://assets/ui/hud_balance_next.png")
 const HUD_BACKGROUND: Texture2D = preload("res://assets/ui/hud_background.png")
 const HUD_BACKGROUND2: Texture2D = preload("res://assets/ui/hud_background2.png")
-const HUD_INVENTORY: Texture2D = preload("res://assets/ui/hud_background_inventory.png")
-const HUD_INVENTORY_HOVER_UP: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverup.png")
-const HUD_INVENTORY_HOVER_DOWN: Texture2D = preload("res://assets/ui/hud_background_inventory_hoverdown.png")
 const HUD_POT: Texture2D = preload("res://assets/ui/hud_background_pot.png")
 const HUD_POT_HOVER_LEFT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverleft.png")
 const HUD_POT_HOVER_RIGHT: Texture2D = preload("res://assets/ui/hud_background_pot_hoverright.png")
@@ -328,23 +325,37 @@ static func background2(index: int) -> Texture2D:
 
 static func prune_cursor() -> Texture2D:
 	var image := background(1).get_image()
-	image.resize(72, 72, Image.INTERPOLATE_LANCZOS)
+	image.resize(64, 64, Image.INTERPOLATE_LANCZOS)
 	return ImageTexture.create_from_image(image)
 
+static func pot_hud_texture() -> Texture2D:
+	return HUD_POT
+
+static func pot_hover_texture(points_left: bool) -> Texture2D:
+	return HUD_POT_HOVER_LEFT if points_left else HUD_POT_HOVER_RIGHT
+
+static func buysell_hud_texture() -> Texture2D:
+	return HUD_BUYSELL
+
+static func buysell_banner_texture() -> Texture2D:
+	return HUD_BUYSELL_BANNER
+
+static func count_hud_texture() -> Texture2D:
+	return HUD_COUNT
+
+static func coin_energy_banner_texture() -> Texture2D:
+	return HUD_COIN_ENERGY_BANNER
+
 static func _set_button_hover(button: Button, row: int, column: int, mirror_x: bool, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = button_texture(row, column, hovered, mirror_x)
-		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
+	button.icon = button_texture(row, column, hovered, mirror_x)
+	button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
 
 static func _set_icon_button_hover(button: Button, row: int, column: int, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = _button_icon_crop(row, column, hovered)
-		button.self_modulate = Color(1.12, 1.12, 1.12, 1.0) if hovered else Color.WHITE
+	button.icon = _button_icon_crop(row, column, hovered)
+	button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
 
 static func _set_close_hover(button: Button, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.icon = _close_texture(hovered)
+	button.icon = _close_texture(hovered)
 
 static func _set_slot_hover(button: Button, hovered: bool) -> void:
-	if is_instance_valid(button):
-		button.self_modulate = Color(1.22, 1.22, 1.12, 1.0) if hovered else Color.WHITE
+	button.modulate = Color(1.08, 1.08, 1.08, 1.0) if hovered else Color.WHITE
