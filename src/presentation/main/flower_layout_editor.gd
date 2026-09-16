@@ -6,6 +6,8 @@ signal fruit_selected(slot: StringName)
 enum DisplayKind { FLOWER, UNRIPE_FRUIT, RIPE_FRUIT }
 const FLOWER_LAYOUT_PATH := "res://content/visual/tree_flower_layouts.json"
 const USER_LAYOUT_PATH := "user://tree_flower_layouts.json"
+const FLOWER_SIZE := 44.0
+const FRUIT_SIZE := 48.0
 var display_kind: DisplayKind = DisplayKind.FLOWER
 var active_slots: Array[StringName] = []
 
@@ -48,20 +50,19 @@ func _load_layouts() -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 func _draw_leaf(point_position: Vector2, scale_factor: float, angle: float) -> void:
-	if display_kind != DisplayKind.FLOWER:
-		var fruit_color := Color("e53935") if display_kind == DisplayKind.RIPE_FRUIT else Color("66c92f")
-		var radius := 14.0 * scale_factor
-		draw_circle(point_position, radius, fruit_color); draw_arc(point_position, radius, 0.0, TAU, 20, fruit_color.darkened(0.45), 2.0, true)
-		draw_circle(point_position + Vector2(-4.0, -5.0) * scale_factor, 3.5 * scale_factor, Color(1.0, 1.0, 1.0, 0.55)); return
-	var petal_color := Color("ff75bd")
-	var petal_radius := 10.0 * scale_factor
-	var petal_distance := 12.0 * scale_factor
-	draw_set_transform(point_position, angle, Vector2.ONE)
-	for petal in range(5):
-		var petal_position := Vector2.from_angle(float(petal) * TAU / 5.0) * petal_distance
-		var current_radius := petal_radius * (1.2 if petal == 0 else 1.0)
-		draw_circle(petal_position, current_radius, petal_color)
-		draw_arc(petal_position, current_radius, 0.0, TAU, 16, Color("a92d73"), 1.5, true)
-	draw_circle(Vector2.ZERO, 8.0 * scale_factor, Color("ffd85a"))
-	draw_arc(Vector2.ZERO, 8.0 * scale_factor, 0.0, TAU, 16, Color("9b5d20"), 1.5, true)
+	# This control is the renderer used by TreeGrowthPreview in the actual main
+	# scene. Keep the layout/interaction system, but replace its legacy circles
+	# and procedural petals with the new atlas artwork.
+	var seed := "%d:%d:%d" % [stage, int(round(point_position.x)), int(round(point_position.y))]
+	var texture: Texture2D
+	var base_size := FLOWER_SIZE
+	if display_kind == DisplayKind.FLOWER:
+		texture = PlantAtlasArt.flower_texture(PlantAtlasArt.stable_index(seed + ":flower", 24))
+	else:
+		var ripe := display_kind == DisplayKind.RIPE_FRUIT
+		texture = PlantAtlasArt.fruit_texture(PlantAtlasArt.stable_index(seed + ":fruit", 4), ripe)
+		base_size = FRUIT_SIZE
+	var art_size := Vector2.ONE * base_size * scale_factor
+	draw_set_transform(point_position, angle if display_kind == DisplayKind.FLOWER else 0.0, Vector2.ONE)
+	draw_texture_rect(texture, Rect2(-art_size * 0.5, art_size), false)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
