@@ -14,11 +14,11 @@ func _build_hud() -> void:
 	var body := Panel.new(); body.name = "BalanceArt"; body.position = Vector2(36.0, 24.0); body.size = Vector2(188.0, 42.0); body.mouse_filter = Control.MOUSE_FILTER_IGNORE; layers.add_child(body)
 	var badge := Panel.new(); badge.name = "IconBadge"; badge.position = Vector2(29.0, 17.0); badge.size = Vector2(52.0, 52.0); badge.mouse_filter = Control.MOUSE_FILTER_IGNORE; badge.add_theme_stylebox_override(&"panel", Hud5Atlas.icon_badge_style()); layers.add_child(badge)
 	var icon := TextureRect.new(); icon.name = "BalanceIcon"; icon.position = Vector2(2.9, 6.0) if energy else Vector2(5.0, 7.0); icon.size = Vector2(46.2, 46.2) if energy else Vector2(42.0, 42.0); Hud5Atlas.configure_icon(icon, Hud5Atlas.energy_icon() if energy else Hud5Atlas.balance_coin_icon()); badge.add_child(icon)
-	var value := Label.new(); value.name = "Value" if energy else "MoneyLabel"; value.position = Vector2(76.0, 24.0); value.size = Vector2(108.0, 42.0); value.text = "0 / 0" if energy else "0"; value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; value.add_theme_font_size_override(&"font_size", 18); value.add_theme_color_override(&"font_color", Color.WHITE); value.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1.0)); value.add_theme_constant_override(&"outline_size", 5); value.mouse_filter = Control.MOUSE_FILTER_IGNORE; layers.add_child(value)
+	var value := Label.new(); value.name = "Value" if energy else "MoneyLabel"; value.position = Vector2(76.0, 24.0); value.size = Vector2(108.0, 42.0); value.text = "0 / 0" if energy else "0"; value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; value.add_theme_font_override(&"font", UiAtlas.GAME_FONT); value.add_theme_font_size_override(&"font_size", 18); value.add_theme_color_override(&"font_color", Color.WHITE); value.add_theme_color_override(&"font_outline_color", Color(0.12, 0.04, 0.16, 1.0)); value.add_theme_constant_override(&"outline_size", 5); value.mouse_filter = Control.MOUSE_FILTER_IGNORE; layers.add_child(value)
 	var plus := Button.new(); plus.name = "AddButton" if energy else "ShopButton"; plus.position = Vector2(193.0, 28.0); plus.size = Vector2(34.0, 34.0); plus.focus_mode = Control.FOCUS_NONE; layers.add_child(plus)
 	if energy:
-		var next := PanelContainer.new(); next.name = "Next"; next.position = Vector2(48.0, 66.0); next.size = Vector2(170.0, 24.0); next.mouse_filter = Control.MOUSE_FILTER_IGNORE; layers.add_child(next)
-		var timer := Label.new(); timer.name = "Timer"; timer.text = "Next energy in 02:00"; timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; timer.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; timer.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0)); timer.add_theme_font_size_override(&"font_size", 14); next.add_child(timer)
+		var next := PanelContainer.new(); next.name = "Next"; next.position = Vector2(91.0, 66.0); next.size = Vector2(85.0, 24.0); next.mouse_filter = Control.MOUSE_FILTER_IGNORE; layers.add_child(next)
+		var timer := Label.new(); timer.name = "Timer"; timer.text = "02:00"; timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; timer.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; timer.add_theme_font_override(&"font", UiAtlas.GAME_FONT); timer.add_theme_color_override(&"font_color", Color(0.28, 0.12, 0.04, 1.0)); timer.add_theme_font_size_override(&"font_size", 14); next.add_child(timer)
 
 func _apply_programmatic_style() -> void:
 	var body := get_node_or_null("Layers/BalanceArt") as Panel
@@ -29,4 +29,4 @@ func _apply_programmatic_style() -> void:
 	if plus != null: Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())
 	if energy:
 		var next := get_node_or_null("Layers/Next") as PanelContainer; var timer := get_node_or_null("Layers/Next/Timer") as Label
-		if next != null and timer != null: UiAtlas.configure_warm_timer_hud(next, timer)
+		if next != null and timer != null: UiAtlas.configure_warm_timer_hud(next, timer); timer.add_theme_font_override(&"font", UiAtlas.GAME_FONT)

@@ -23,6 +23,12 @@ static func fertilizer_finish_left() -> Texture2D: return cell(3, 1)
 static func finish_cost_segment() -> Texture2D: return cell(3, 2)
 static func cycle_finish_left() -> Texture2D: return cell(3, 3)
 static func plus_icon() -> Texture2D: return cell(3, 5)
+static func inventory_up_icon() -> Texture2D: return cell(4, 1)
+static func inventory_down_icon() -> Texture2D: return cell(4, 2)
+static func pots_right_icon() -> Texture2D: return cell(4, 3)
+static func pots_left_icon() -> Texture2D: return cell(4, 4)
+static func inventory_sprout_icon() -> Texture2D: return cell(4, 5)
+static func inventory_flower_icon() -> Texture2D: return cell(4, 7)
 
 static func stage_icon(cycle: int) -> Texture2D:
 	match cycle:
