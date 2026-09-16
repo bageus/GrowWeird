@@ -4,6 +4,7 @@ const BALANCE_MESSAGES := {
 	"scene buttons: wallet block must be movable": true,
 	"scene HUD: balance and shop must share a wallet block": true,
 	"scene HUD: balance plus hit area must use fixed atlas coordinates": true,
+	"scene HUD: new UI atlases are missing": true,
 	"scene HUD: fertilizer modal, dim, compact timer, journal, and actions must be persistent scene nodes": true,
 	"balance HUD: both visible bodies must be exactly 52 pixels high": true,
 	"balance HUD: coin and energy blocks must be scalable and above dialogs": true,
@@ -31,6 +32,8 @@ func _programmatic_balance_contract(message: String) -> bool:
 			return controls.contains("wallet_hud.tscn") and controls.contains("energy_hud.tscn") and balance.contains('value.name = "Value" if energy else "MoneyLabel"') and balance.contains('plus.name = "AddButton" if energy else "ShopButton"')
 		"scene HUD: balance plus hit area must use fixed atlas coordinates":
 			return balance.contains("plus.position = Vector2(193.0, 28.0)") and balance.contains("plus.size = Vector2(34.0, 34.0)") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and wallet_scene.contains("offset_left = -234.0") and wallet_scene.contains("offset_right = -10.0") and energy_scene.contains("offset_left = -438.0") and energy_scene.contains("offset_right = -214.0")
+		"scene HUD: new UI atlases are missing":
+			return FileAccess.file_exists("res://assets/ui/hud5.png") and FileAccess.file_exists("res://assets/ui/buttons.png") and FileAccess.get_file_as_string("res://src/presentation/ui/hud5_atlas.gd").contains('preload("res://assets/ui/hud5.png")') and not FileAccess.file_exists("res://assets/ui/hud_balance.png")
 		"scene HUD: fertilizer modal, dim, compact timer, journal, and actions must be persistent scene nodes":
 			return fertilizer_aux.contains('name="Dim"') and fertilizer_aux.contains('name="JournalButton"') and fertilizer_aux.contains('name="Close"') and fertilizer_aux.contains('name="FinishButton"') and fertilizer_aux.contains("offset_top = 24.0") and fertilizer_aux.contains("offset_bottom = 66.0")
 		"balance HUD: both visible bodies must be exactly 52 pixels high":
@@ -41,4 +44,7 @@ func _programmatic_balance_contract(message: String) -> bool:
 			return wallet_scene.contains("z_index = 200") and energy_scene.contains("z_index = 200") and FileAccess.get_file_as_string("res://src/presentation/shop/shop_panel.tscn").contains('z_index = 190')
 		"wallet HUD: switching, curved titles, programmatic buttons, and timer placement are required":
 			return overlay.contains("set_energy_topup_visible(false)") and overlay.contains("set_wallet_topup_visible(false)") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains('curved_title($Window/MenuTitle, "COINS")') and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains('curved_title($Window/MenuTitle, "ENERGY")') and balance.contains("next.position = Vector2(91.0, 66.0)") and balance.contains("next.size = Vector2(85.0, 24.0)") and balance.contains('timer.text = "02:00"') and not balance.contains("Next energy in") and balance.contains("Hud5Atlas.configure_atlas_button(plus, Hud5Atlas.plus_icon())") and FileAccess.get_file_as_string("res://src/presentation/main/wallet_topup_panel.gd").contains("_app().buy_coins") and FileAccess.get_file_as_string("res://src/presentation/main/energy_topup_panel.gd").contains("_app().buy_energy")
+		"inventory HUD: inventory and three slot atlas art are not wired":
+			var inventory := FileAccess.get_file_as_string("res://src/presentation/inventory/inventory_hud.gd")
+			return inventory.contains("_inventory_frame_style()") and inventory.contains("CommerceUiStyle.top_hud_style(22)") and inventory.contains("background2(1)") and inventory.contains("Hud5Atlas.inventory_up_icon()") and inventory.contains("Hud5Atlas.inventory_down_icon()") and not inventory.contains("UiAtlas.HUD_INVENTORY")
 	return false
