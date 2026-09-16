@@ -3,51 +3,33 @@ extends SceneDraggablePanel
 
 signal item_selected(kind: StringName, item_id: String, count: int, title: String)
 signal context_cancel_requested
-
 const SCROLL_STEP := 120
 const HUD_SIZE := Vector2(164.0, 520.0)
-
 var items: VBoxContainer
 var scroll: ScrollContainer
 var scroll_up: Button
 var scroll_down: Button
 var _signature := ""
 var _context_button: Button
-
-func _ready() -> void:
-	super()
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
-	_build_programmatic_hud()
-	call_deferred("_update_scroll_buttons")
-
+func _ready() -> void: super(); mouse_filter = Control.MOUSE_FILTER_IGNORE; add_theme_stylebox_override(&"panel", StyleBoxEmpty.new()); _build_programmatic_hud(); call_deferred("_update_scroll_buttons")
 func _build_programmatic_hud() -> void:
 	for child in get_children(): remove_child(child); child.queue_free()
 	custom_minimum_size = HUD_SIZE; size = HUD_SIZE; clip_contents = false
 	var frame := Panel.new(); frame.name = "ProgrammaticFrame"; frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; frame.add_theme_stylebox_override(&"panel", _inventory_frame_style()); add_child(frame); frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var content := Control.new(); content.name = "FrameContent"; content.position = Vector2(8.0, 0.0); content.size = Vector2(148.0, 520.0); content.mouse_filter = Control.MOUSE_FILTER_PASS; add_child(content)
-	scroll = ScrollContainer.new(); scroll.name = "Scroll"; scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; content.add_child(scroll)
-	items = VBoxContainer.new(); items.name = "Items"; items.custom_minimum_size = Vector2(142.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
-	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 18.0); content.add_child(scroll_up)
-	scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 460.0); content.add_child(scroll_down)
-	scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
-
+	scroll = ScrollContainer.new(); scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; content.add_child(scroll)
+	items = VBoxContainer.new(); items.custom_minimum_size = Vector2(142.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
+	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 18.0); content.add_child(scroll_up); scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 460.0); content.add_child(scroll_down); scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
 func _inventory_frame_style() -> StyleBoxFlat:
 	var style := CommerceUiStyle.top_hud_style(22); style.bg_color = Color("ffd078"); style.border_color = Color("b95a12"); style.set_border_width_all(4); style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); style.shadow_size = 4; style.shadow_offset = Vector2(0.0, 4.0); style.content_margin_left = 8.0; style.content_margin_top = 8.0; style.content_margin_right = 8.0; style.content_margin_bottom = 8.0; return style
-
 func _make_scroll_button(name_value: String, points_up: bool) -> Button:
-	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon())
-	return button
-
+	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon()); return button
 func set_inventory(inventory: InventoryState) -> void:
-	var signature := _inventory_signature(inventory)
-	if signature == _signature: return
+	var signature := _inventory_signature(inventory); if signature == _signature: return
 	_signature = signature; _rebuild(inventory)
 func invalidate() -> void: _signature = ""
 func _rebuild(inventory: InventoryState) -> void:
-	set_context_cancel(false)
-	for child in items.get_children(): items.remove_child(child); child.queue_free()
+	set_context_cancel(false); for child in items.get_children(): items.remove_child(child); child.queue_free()
 	if inventory == null: _add_empty(); call_deferred("_update_scroll_buttons"); return
 	var added := 0; var fertilizer_ids := inventory.fertilizers.keys(); fertilizer_ids.sort()
 	for raw_id in fertilizer_ids:
@@ -58,7 +40,7 @@ func _rebuild(inventory: InventoryState) -> void:
 	for seed_state in inventory.seeds:
 		if seed_state != null: seed_state.ensure_visual_frame(); _add_item(&"seed", seed_state.item_id, 1, _genetic_title("Seed", seed_state.genome), seed_state.visual_frame); added += 1
 	for fruit in inventory.fruits:
-		if fruit != null: _add_item(&"fruit", fruit.item_id, 1, _genetic_title("Fruit", fruit.genome)); added += 1
+		if fruit != null: _add_item(&"fruit", fruit.item_id, 1, _genetic_title("Fruit", fruit.genome), fruit.visual_line, fruit.mutation_frame); added += 1
 	var misc_ids := inventory.misc.keys(); misc_ids.sort()
 	for raw_id in misc_ids:
 		var count := int(inventory.misc[raw_id]); if count > 0: _add_item(&"misc", String(raw_id), count, _pretty_id(String(raw_id))); added += 1
@@ -71,15 +53,12 @@ func _on_scroll_changed(_value: float) -> void: _update_scroll_buttons()
 func _update_scroll_buttons() -> void:
 	if scroll == null: return
 	var bar := scroll.get_v_scroll_bar(); scroll_up.disabled = scroll.scroll_vertical <= 0; scroll_down.disabled = scroll.scroll_vertical >= int(maxf(0.0, bar.max_value - bar.page))
-func _add_item(kind: StringName, item_id: String, count: int, title: String, visual_frame := -1) -> void:
-	var button := Button.new(); _configure_fixed_slot(button); button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.text = title + (" ×%d" % count if count > 1 else "")
-	var texture := InventoryItemArt.texture_for(kind, item_id, visual_frame)
+func _add_item(kind: StringName, item_id: String, count: int, title: String, visual_frame := -1, mutation_frame := -1) -> void:
+	var button := Button.new(); _configure_fixed_slot(button); button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; button.text = title + (" ×%d" % count if count > 1 else ""); var texture := InventoryItemArt.texture_for(kind, item_id, visual_frame, mutation_frame)
 	if texture != null: _add_fitted_icon(button, texture); button.text = ""
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER; button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	for state_name in [&"normal", &"hover", &"pressed"]: button.add_theme_stylebox_override(state_name, UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0)))
-	button.tooltip_text = "%s%s · click for actions" % [title, " ×%d" % count if count > 1 else ""]; button.mouse_entered.connect(_set_item_hover.bind(button, true)); button.mouse_exited.connect(_set_item_hover.bind(button, false)); button.pressed.connect(_emit_selected.bind(button, kind, item_id, count, title))
-	if count > 1: _add_stack_badge(button, count)
-	items.add_child(button)
+	button.tooltip_text = "%s%s · click for actions" % [title, " ×%d" % count if count > 1 else ""]; button.mouse_entered.connect(_set_item_hover.bind(button, true)); button.mouse_exited.connect(_set_item_hover.bind(button, false)); button.pressed.connect(_emit_selected.bind(button, kind, item_id, count, title)); if count > 1: _add_stack_badge(button, count); items.add_child(button)
 func _add_fitted_icon(button: Button, texture: Texture2D) -> void:
 	var icon := TextureRect.new(); button.add_child(icon); icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); icon.offset_left = 19.7; icon.offset_top = 19.7; icon.offset_right = -19.7; icon.offset_bottom = -19.7; icon.mouse_filter = Control.MOUSE_FILTER_IGNORE; icon.texture = texture; icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 func _add_stack_badge(button: Button, count: int) -> void:
@@ -90,8 +69,7 @@ func _add_empty() -> void:
 	for index in range(3): _add_empty_slot("Inventory empty" if index == 0 else "")
 func _add_empty_slot(label := "") -> void:
 	var slot := Button.new(); _configure_fixed_slot(slot); slot.text = label; slot.disabled = true; slot.mouse_filter = Control.MOUSE_FILTER_IGNORE; slot.add_theme_stylebox_override(&"disabled", UiAtlas.panel_style(UiAtlas.background2(1), Vector4(14.0, 14.0, 14.0, 14.0))); items.add_child(slot)
-func _configure_fixed_slot(button: Button) -> void:
-	button.custom_minimum_size = Vector2(118.0, 118.0); button.size = Vector2(118.0, 118.0); button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; button.size_flags_vertical = Control.SIZE_SHRINK_CENTER; button.clip_contents = true; button.clip_text = true; button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+func _configure_fixed_slot(button: Button) -> void: button.custom_minimum_size = Vector2(118.0, 118.0); button.size = Vector2(118.0, 118.0); button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER; button.size_flags_vertical = Control.SIZE_SHRINK_CENTER; button.clip_contents = true; button.clip_text = true; button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 func set_context_cancel(active: bool) -> void:
 	if not is_instance_valid(_context_button): _context_button = null; return
 	var face := _context_button.get_node_or_null("ContextCancelCell") as Panel; _context_button.self_modulate = Color.WHITE; var badge := _context_button.get_node_or_null("StackBadge") as Label
@@ -100,9 +78,7 @@ func set_context_cancel(active: bool) -> void:
 		if face != null: face.free()
 		_context_button = null; return
 	if face != null: return
-	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 17.0; face.offset_top = 17.0; face.offset_right = -17.0; face.offset_bottom = -17.0
-	var style := StyleBoxFlat.new(); style.bg_color = Color("d94732"); style.border_color = Color("8c1d12"); style.set_border_width_all(3); style.set_corner_radius_all(14); face.add_theme_stylebox_override(&"panel", style)
-	var caption := Label.new(); caption.name = "ContextCancelCaption"; caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_override(&"font", UiAtlas.GAME_FONT); caption.add_theme_font_size_override(&"font_size", 17); caption.add_theme_color_override(&"font_color", Color.WHITE)
+	face = Panel.new(); face.name = "ContextCancelCell"; face.z_index = 20; face.mouse_filter = Control.MOUSE_FILTER_IGNORE; _context_button.add_child(face); face.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); face.offset_left = 17.0; face.offset_top = 17.0; face.offset_right = -17.0; face.offset_bottom = -17.0; var style := StyleBoxFlat.new(); style.bg_color = Color("d94732"); style.border_color = Color("8c1d12"); style.set_border_width_all(3); style.set_corner_radius_all(14); face.add_theme_stylebox_override(&"panel", style); var caption := Label.new(); caption.text = "CANCEL"; caption.mouse_filter = Control.MOUSE_FILTER_IGNORE; face.add_child(caption); caption.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER; caption.add_theme_font_override(&"font", UiAtlas.GAME_FONT); caption.add_theme_font_size_override(&"font_size", 17); caption.add_theme_color_override(&"font_color", Color.WHITE)
 func _emit_selected(button: Button, kind: StringName, item_id: String, count: int, title: String) -> void:
 	if button == _context_button and button.get_node_or_null("ContextCancelCell") != null: context_cancel_requested.emit(); return
 	set_context_cancel(false); _context_button = button; set_context_cancel(true); item_selected.emit(kind, item_id, count, title)
@@ -111,7 +87,7 @@ func _inventory_signature(inventory: InventoryState) -> String:
 	if inventory == null: return "null"
 	var parts: Array[String] = [str(inventory.fertilizers), str(inventory.misc)]
 	for cutting in inventory.cuttings: parts.append("c:%s" % cutting.item_id)
-	for seed_state in inventory.seeds: parts.append("s:%s" % seed_state.item_id)
-	for fruit in inventory.fruits: parts.append("f:%s" % fruit.item_id)
+	for seed_state in inventory.seeds: parts.append("s:%s:%d" % [seed_state.item_id, seed_state.visual_frame])
+	for fruit in inventory.fruits: parts.append("f:%s:%d:%d" % [fruit.item_id, fruit.visual_line, fruit.mutation_frame])
 	return "|".join(parts)
 func _pretty_id(value: String) -> String: return value.replace("_", " ").capitalize()
