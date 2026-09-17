@@ -79,7 +79,10 @@ func _rebuild_catalog_stock() -> void:
 func _plant_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []; result.append(_item(&"starter_cuttings", SPECIES[0], "Starter Branches", "Plantable branches delivered to inventory. After one growth cycle a planted cutting becomes a one-branch tree.", &"cutting", true, 29, "res://assets/tree/tree_05.png", CUTTING_PRICE)); result.append(_item(&"fern_cutting", SPECIES[1], "Fern Branch", "A plantable branch delivered without a pot.", &"cutting", true, 1, "res://assets/tree/tree_05.png", CUTTING_PRICE)); result.append(_item(&"starter_plant", SPECIES[0], PLANT_NAMES[0], "A sprout supplied in its own pot.", &"potted_plant", true, 1, "", SPROUT_WITH_POT_PRICE)); result.append(_item(&"young_ferns", SPECIES[1], PLANT_NAMES[1], "Sprouts supplied in their own pots.", &"potted_plant", true, 2, "", SPROUT_WITH_POT_PRICE)); result.append(_item(&"sun_creeper_plant", SPECIES[2], PLANT_NAMES[2], "A sprout supplied in its own pot.", &"potted_plant", true, 1, "", SPROUT_WITH_POT_PRICE)); return result
 func _pot_items() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []; for index in range(5): result.append(_item(StringName("pot_%d" % index), &"new_pot", POT_NAMES[index], "Adds an empty independent growing place.", &"pot", true, 1, "res://assets/pot/pot_%02d.png" % (index + 1), _pot_price)); return result
+	var result: Array[Dictionary] = []
+	for index in range(5):
+		result.append(_item(StringName("pot_%d" % index), &"new_pot", POT_NAMES[index], "Adds an empty independent growing place.", &"pot", true, 1, "res://assets/pot/pot_%02d.png" % (index + 1), _pot_price))
+	return result
 func _seed_items() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for index in range(5): var item := _item(StringName("seed_%d" % index), SPECIES[index], SEED_NAMES[index], "A seed that can be planted in a free pot.", &"seed", true, 4, "", SEED_PRICE); item["seed_frame"] = randi_range(0, 7); result.append(item)
