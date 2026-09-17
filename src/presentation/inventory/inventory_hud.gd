@@ -11,6 +11,7 @@ var scroll_up: Button
 var scroll_down: Button
 var _signature := ""
 var _context_button: Button
+var _scroll_hide_timer: Timer
 func _ready() -> void: super(); mouse_filter = Control.MOUSE_FILTER_IGNORE; add_theme_stylebox_override(&"panel", StyleBoxEmpty.new()); _build_programmatic_hud(); call_deferred("_update_scroll_buttons")
 func _build_programmatic_hud() -> void:
 	for child in get_children(): remove_child(child); child.queue_free()
@@ -18,12 +19,27 @@ func _build_programmatic_hud() -> void:
 	var frame := Panel.new(); frame.name = "ProgrammaticFrame"; frame.mouse_filter = Control.MOUSE_FILTER_IGNORE; frame.add_theme_stylebox_override(&"panel", _inventory_frame_style()); add_child(frame); frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var content := Control.new(); content.name = "FrameContent"; content.position = Vector2(8.0, 0.0); content.size = Vector2(148.0, 520.0); content.mouse_filter = Control.MOUSE_FILTER_PASS; add_child(content)
 	scroll = ScrollContainer.new(); scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; content.add_child(scroll)
-	items = VBoxContainer.new(); items.custom_minimum_size = Vector2(142.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
-	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 18.0); content.add_child(scroll_up); scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 460.0); content.add_child(scroll_down); scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
+	items = VBoxContainer.new(); items.custom_minimum_size = Vector2(130.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
+	scroll_up = _make_scroll_button("ScrollUp", true); scroll_down = _make_scroll_button("ScrollDown", false); content.add_child(scroll_up); content.add_child(scroll_down); _center_scroll_buttons(content)
+	scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed); _configure_scrollbar()
+	_scroll_hide_timer = Timer.new(); _scroll_hide_timer.one_shot = true; _scroll_hide_timer.wait_time = 1.0; _scroll_hide_timer.timeout.connect(_hide_scrollbar); add_child(_scroll_hide_timer)
 func _inventory_frame_style() -> StyleBoxFlat:
-	var style := CommerceUiStyle.top_hud_style(22); style.bg_color = Color("ffd078"); style.border_color = Color("b95a12"); style.set_border_width_all(4); style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); style.shadow_size = 4; style.shadow_offset = Vector2(0.0, 4.0); style.content_margin_left = 8.0; style.content_margin_top = 8.0; style.content_margin_right = 8.0; style.content_margin_bottom = 8.0; return style
+	var style := CommerceUiStyle.top_hud_style(22); style.bg_color = Color("ffd078"); style.border_color = Color("b95a12"); style.set_border_width_all(4); style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); style.shadow_size = 4; style.shadow_offset = Vector2(0.0, 4.0); return style
 func _make_scroll_button(name_value: String, points_up: bool) -> Button:
-	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon()); return button
+	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	for state in [&"normal", &"hover", &"pressed", &"focus", &"disabled"]: button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
+	var art := TextureRect.new(); art.name = "ArrowArt"; art.mouse_filter = Control.MOUSE_FILTER_IGNORE; art.texture = Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon(); art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; button.add_child(art); art.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	return button
+func _center_scroll_buttons(content: Control) -> void:
+	var x := (content.size.x - scroll_up.size.x) * 0.5; scroll_up.position = Vector2(x, 18.0); scroll_down.position = Vector2(x, 460.0)
+func _configure_scrollbar() -> void:
+	var bar := scroll.get_v_scroll_bar(); bar.custom_minimum_size.x = 16.0; bar.modulate.a = 0.0
+	var track := StyleBoxFlat.new(); track.bg_color = Color(0.70, 0.31, 0.06, 0.30); track.set_corner_radius_all(8)
+	var grab := StyleBoxFlat.new(); grab.bg_color = Color("ed8b25"); grab.border_color = Color("9d430d"); grab.set_border_width_all(2); grab.set_corner_radius_all(8)
+	bar.add_theme_stylebox_override(&"scroll", track); bar.add_theme_stylebox_override(&"grabber", grab); bar.add_theme_stylebox_override(&"grabber_highlight", grab); bar.add_theme_stylebox_override(&"grabber_pressed", grab)
+func _show_scrollbar() -> void:
+	var bar := scroll.get_v_scroll_bar(); bar.modulate.a = 1.0; _scroll_hide_timer.start()
+func _hide_scrollbar() -> void: scroll.get_v_scroll_bar().modulate.a = 0.0
 func set_inventory(inventory: InventoryState) -> void:
 	var signature := _inventory_signature(inventory); if signature == _signature: return
 	_signature = signature; _rebuild(inventory)
@@ -43,13 +59,13 @@ func _rebuild(inventory: InventoryState) -> void:
 		if fruit != null: _add_item(&"fruit", fruit.item_id, 1, _genetic_title("Fruit", fruit.genome), fruit.visual_line, fruit.mutation_frame); added += 1
 	var misc_ids := inventory.misc.keys(); misc_ids.sort()
 	for raw_id in misc_ids:
-		var count := int(inventory.misc[raw_id]); if count > 0: _add_item(&"misc", String(raw_id), count, _pretty_id(String(raw_id))); added += 1
+		var count := int(inventory.misc[raw_id]); if count > 0: var misc_id := String(raw_id); _add_item(&"misc", misc_id, count, "Picked Flower" if misc_id.begins_with(FruitActions.PICKED_FLOWER_PREFIX) else _pretty_id(misc_id)); added += 1
 	if added == 0: _add_empty()
 	else:
 		while added < 3: _add_empty_slot(); added += 1
 	call_deferred("_update_scroll_buttons")
-func _scroll_inventory(direction: int) -> void: scroll.scroll_vertical += direction * SCROLL_STEP; call_deferred("_update_scroll_buttons")
-func _on_scroll_changed(_value: float) -> void: _update_scroll_buttons()
+func _scroll_inventory(direction: int) -> void: _show_scrollbar(); scroll.scroll_vertical += direction * SCROLL_STEP; call_deferred("_update_scroll_buttons")
+func _on_scroll_changed(_value: float) -> void: _show_scrollbar(); _update_scroll_buttons()
 func _update_scroll_buttons() -> void:
 	if scroll == null: return
 	var bar := scroll.get_v_scroll_bar(); scroll_up.disabled = scroll.scroll_vertical <= 0; scroll_down.disabled = scroll.scroll_vertical >= int(maxf(0.0, bar.max_value - bar.page))
