@@ -106,6 +106,7 @@ text = "JOURNAL"
 [node name="WalletHud" parent="." instance=ExtResource("15_wallet_hud")]
 [node name="EnergyHud" parent="." instance=ExtResource("12_energy_hud")]
 [node name="FertilizerAuxiliaryUi" parent="." instance=ExtResource("14_offer_aux")]
+# Previous six-action row occupied Vector2(637, 112); the visible five-action row below is intentionally 520 wide after AD removal.
 [node name="OffersPanel" type="PanelContainer" parent="."]
 z_index = 7
 custom_minimum_size = Vector2(520, 112)
