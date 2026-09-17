@@ -6,3 +6,5 @@ var source_plant_id: String = ""
 var source_branch_id: String = ""
 var hybrid: bool = false
 var genome: GenomeSnapshot
+var visual_line: int = -1
+var mutation_frame: int = 1
