@@ -13,6 +13,8 @@ var _plant: PlantState
 var _species_style: PlantSpeciesDefinition
 var _interaction_mode: StringName = MODE_NONE
 var _hovered_slot: StringName = &""
+var _hovered_visual_slot: StringName = &""
+var _hovered_visual_kind: StringName = &""
 var _layout: Dictionary = {}
 var _trait_snapshot: Dictionary = {}
 var _reveal_slots: Dictionary = {}
@@ -21,9 +23,12 @@ func set_plant(plant: PlantState) -> void:
 	var same_specimen := _plant != null and plant != null and _plant.instance_id == plant.instance_id
 	if same_specimen: _detect_trait_increases(plant)
 	else: _reveal_slots.clear(); set_process(false)
-	_plant = plant; _trait_snapshot = _snapshot_traits(plant); _rebuild()
+	_plant = plant
+	if _plant != null: _plant.ensure_visual_lines()
+	_trait_snapshot = _snapshot_traits(plant)
+	_rebuild()
 func set_species_style(definition: PlantSpeciesDefinition) -> void: _species_style = definition; _rebuild()
-func set_interaction_mode(mode: StringName) -> void: _interaction_mode = mode; _hovered_slot = &""; mouse_default_cursor_shape = Control.CURSOR_ARROW if mode == MODE_NONE else Control.CURSOR_POINTING_HAND; queue_redraw()
+func set_interaction_mode(mode: StringName) -> void: _interaction_mode = mode; _hovered_slot = &""; mouse_default_cursor_shape = Control.CURSOR_ARROW; queue_redraw()
 func _ready() -> void: mouse_filter = Control.MOUSE_FILTER_STOP; set_process(false); _rebuild()
 func _process(delta: float) -> void:
 	var expired: Array[String] = []
@@ -36,11 +41,18 @@ func _process(delta: float) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED: _rebuild()
 func _gui_input(event: InputEvent) -> void:
-	if _interaction_mode == MODE_NONE: return
 	if event is InputEventMouseMotion:
-		var next_slot := _candidate_at(event.position)
-		if next_slot != _hovered_slot: _hovered_slot = next_slot; queue_redraw()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var visual := _visual_candidate_at(event.position)
+		var next_visual_slot: StringName = visual.get("slot", &"")
+		var next_visual_kind: StringName = visual.get("kind", &"")
+		var next_slot := _candidate_at(event.position) if _interaction_mode != MODE_NONE else &""
+		if next_slot != _hovered_slot or next_visual_slot != _hovered_visual_slot or next_visual_kind != _hovered_visual_kind:
+			_hovered_slot = next_slot
+			_hovered_visual_slot = next_visual_slot
+			_hovered_visual_kind = next_visual_kind
+			mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if not String(next_visual_kind).is_empty() or not String(next_slot).is_empty() else Control.CURSOR_ARROW
+			queue_redraw()
+	elif _interaction_mode != MODE_NONE and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		var slot := _candidate_at(event.position)
 		if not String(slot).is_empty(): branch_selected.emit(slot); accept_event()
 func _rebuild() -> void: _layout = PlantVisualAssembler.build(size, _plant, _species_style); queue_redraw()
@@ -58,7 +70,7 @@ func _draw_slot(descriptor: Dictionary, wood_color: Color, leaf_color: Color, vi
 		return
 	var phenotype: Dictionary = descriptor.get("phenotype", {}); var glow_strength := float(phenotype.get("glow_strength", 0.0)) * vitality
 	if glow_strength > 0.0: draw_line(start, end, Color(0.45, 0.96, 0.68, glow_strength * 0.32), 24.0, true)
-	var branch_color := Color(0.88, 0.74, 0.26) if highlighted else wood_color; var width := (10.0 if highlighted else 8.0) + float(phenotype.get("branch_width_bonus", 0.0)); draw_line(start, end, branch_color, width, true); _draw_bark(start, end, phenotype); _draw_leaves(start, end, leaf_color, phenotype, vitality); _draw_thorns(start, end, phenotype); BranchMutationRenderer.draw_hooks(self, start, end, phenotype); _draw_crystal_thorns(start, end, phenotype); BranchMutationRenderer.draw_mineral_nodes(self, start, end, phenotype); _draw_fungi(start, end, phenotype, vitality); _draw_spore_traps(start, end, phenotype); BranchMutationRenderer.draw_toxic_sacs(self, start, end, phenotype, vitality); _draw_flowers(branch, end, phenotype, vitality); _draw_fruit(branch, end, highlighted, vitality)
+	var branch_color := Color(0.88, 0.74, 0.26) if highlighted else wood_color; var width := (10.0 if highlighted else 8.0) + float(phenotype.get("branch_width_bonus", 0.0)); draw_line(start, end, branch_color, width, true); _draw_bark(start, end, phenotype); _draw_leaves(start, end, leaf_color, phenotype, vitality); _draw_thorns(start, end, phenotype); BranchMutationRenderer.draw_hooks(self, start, end, phenotype); _draw_crystal_thorns(start, end, phenotype); BranchMutationRenderer.draw_mineral_nodes(self, start, end, phenotype); _draw_fungi(start, end, phenotype, vitality); _draw_spore_traps(start, end, phenotype); BranchMutationRenderer.draw_toxic_sacs(self, start, end, phenotype, vitality); _draw_flowers(slot, branch, end, phenotype, vitality); _draw_fruit(slot, branch, end, highlighted, vitality)
 	if branch.grafted: var graft_point := start.lerp(end, 0.12); draw_circle(graft_point, 7.0, Color(0.68, 0.43, 0.26)); draw_arc(graft_point, 10.0, 0.0, TAU, 18, Color(0.94, 0.83, 0.61), 2.0, true)
 	var reveal := float(_reveal_slots.get(String(slot), 0.0)) / REVEAL_SECONDS; BranchMutationRenderer.draw_reveal(self, start, end, reveal)
 func _draw_regrowth(start: Vector2, end: Vector2, progress: float) -> void:
@@ -67,12 +79,19 @@ func _draw_regrowth(start: Vector2, end: Vector2, progress: float) -> void:
 func _draw_bark(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("bark_ring_count", 0))
 	for index in range(count): var t := (float(index) + 1.0) / (float(count) + 1.0); var center := start.lerp(end, t); draw_arc(center, 6.0, -0.8, 0.8, 8, Color(0.18, 0.11, 0.07, 0.85), 2.0, true)
-func _draw_fruit(branch: BranchState, end: Vector2, highlighted: bool, vitality: float) -> void:
+func _draw_fruit(slot: StringName, branch: BranchState, end: Vector2, highlighted: bool, vitality: float) -> void:
 	var in_fruit_stage := _plant != null and GrowthCycleService.matches_target(_plant.growth_cycle_index, &"fruit")
 	if branch.fruit_growth == null and not in_fruit_stage: return
 	var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0) if branch.fruit_growth != null else GrowthCycleService.progress(_plant)
 	var ripe := (_plant != null and _plant.growth_cycle_index == 11) or (branch.fruit_growth != null and branch.fruit_growth.progress >= 0.82)
-	var center := end + Vector2(0.0, 18.0); var seed := "%s:%s:fruit" % [_plant.instance_id, branch.branch_id]; var texture := PlantAtlasArt.fruit_texture(PlantAtlasArt.stable_index(seed, 4), ripe); var target_size := Vector2.ONE * lerpf(24.0, 46.0, progress); var rect := Rect2(center - target_size * 0.5, target_size); draw_texture_rect(texture, rect, false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+	var center := end + Vector2(0.0, 18.0)
+	var mutation_column := PlantAtlasArt.fruit_mutation_column(branch)
+	var texture := PlantAtlasArt.fruit_texture(_plant.fruit_visual_line, mutation_column, ripe)
+	var hovered := slot == _hovered_visual_slot and _hovered_visual_kind == &"fruit"
+	var target_size := Vector2.ONE * lerpf(24.0, 46.0, progress) * (1.12 if hovered else 1.0)
+	var rect := Rect2(center - target_size * 0.5, target_size)
+	draw_texture_rect(texture, rect, false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+	if hovered: draw_arc(center, target_size.x * 0.5 + 3.0, 0.0, TAU, 24, Color(1.0, 0.92, 0.52, 0.95), 2.0, true)
 	if branch.fruit_growth != null and branch.fruit_growth.is_ready() and _plant.alive: draw_arc(center, target_size.x * 0.5 + 4.0, 0.0, TAU, 24, Color(1.0, 0.82, 0.28, 1.0 if highlighted else 0.6), 3.0, true)
 func _draw_leaves(start: Vector2, end: Vector2, color: Color, phenotype: Dictionary, vitality: float) -> void:
 	var species_scale := _species_style.leaf_scale if _species_style != null else 1.0; var leaf_scale := float(phenotype.get("leaf_scale", 1.0)) * species_scale * lerpf(0.58, 1.0, vitality); var vector := end - start; var length := maxf(vector.length(), 1.0); var normal := Vector2(-vector.y, vector.x) / length; var base_count := clampi(int(length / 42.0), 0, 6); var count := clampi(int(round(float(base_count) * lerpf(0.18, 1.0, vitality))), 0, 6)
@@ -90,17 +109,18 @@ func _draw_fungi(start: Vector2, end: Vector2, phenotype: Dictionary, vitality: 
 func _draw_spore_traps(start: Vector2, end: Vector2, phenotype: Dictionary) -> void:
 	var count := int(phenotype.get("spore_trap_count", 0)); var vector := end - start; var normal := Vector2(-vector.y, vector.x) / maxf(vector.length(), 1.0)
 	for index in range(count): var t := 0.25 + (float(index) / maxf(float(count), 1.0)) * 0.65; var side := -1.0 if index % 2 == 0 else 1.0; var center := start.lerp(end, t) + normal * side * 13.0; draw_circle(center, 7.0, Color(0.43, 0.16, 0.39)); draw_circle(center, 3.0, Color(0.76, 0.70, 0.35)); draw_line(center, center + normal * side * 8.0, Color(0.34, 0.12, 0.28), 2.0, true)
-func _draw_flowers(branch: BranchState, end: Vector2, phenotype: Dictionary, vitality: float) -> void:
+func _draw_flowers(slot: StringName, branch: BranchState, end: Vector2, phenotype: Dictionary, vitality: float) -> void:
 	var count := int(phenotype.get("flower_count", 0)); var in_flower_stage := _plant != null and GrowthCycleService.matches_target(_plant.growth_cycle_index, &"flower")
 	if in_flower_stage: count = maxi(count, 3)
 	if count <= 0: return
 	var flower_scale := float(phenotype.get("flower_scale", 1.0)) * lerpf(0.65, 1.0, vitality); var crown := float(phenotype.get("crown_bloom_strength", 0.0)); var flower_glow := float(phenotype.get("flower_glow", 0.0)) * vitality
-	var flower_line := PlantAtlasArt.flower_line(_plant.instance_id)
 	var mutation_column := PlantAtlasArt.flower_mutation_column(branch)
+	var hovered := slot == _hovered_visual_slot and _hovered_visual_kind == &"flower"
 	for index in range(count):
 		var angle := TAU * float(index) / float(count); var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * flower_scale
 		if flower_glow > 0.0: draw_circle(center, 13.0 * flower_scale, Color(0.60, 0.94, 0.74, flower_glow * 0.24))
-		var texture := PlantAtlasArt.flower_texture(flower_line, mutation_column); var target_size := Vector2.ONE * 38.0 * flower_scale; draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+		var texture := PlantAtlasArt.flower_texture(_plant.flower_visual_line, mutation_column); var target_size := Vector2.ONE * 38.0 * flower_scale * (1.10 if hovered else 1.0); draw_texture_rect(texture, Rect2(center - target_size * 0.5, target_size), false, Color(1.0, 1.0, 1.0, lerpf(0.55, 1.0, vitality)))
+		if hovered: draw_arc(center, target_size.x * 0.5 + 2.0, 0.0, TAU, 20, Color(1.0, 0.92, 0.52, 0.9), 2.0, true)
 func _detect_trait_increases(plant: PlantState) -> void:
 	for slot in BranchState.VALID_SLOTS:
 		var branch := plant.branch_at(slot)
@@ -127,3 +147,25 @@ func _candidate_at(point: Vector2) -> StringName:
 		var distance := Geometry2D.get_closest_point_to_segment(point, descriptor.get("start", Vector2.ZERO), descriptor.get("end", Vector2.ZERO)).distance_to(point)
 		if distance < best_distance and distance <= 34.0: best = slot_name; best_distance = distance
 	return best
+func _visual_candidate_at(point: Vector2) -> Dictionary:
+	if _plant == null: return {}
+	var slots: Dictionary = _layout.get("slots", {})
+	for slot_name in BranchState.VALID_SLOTS:
+		var descriptor: Dictionary = slots.get(String(slot_name), {})
+		var branch := descriptor.get("branch") as BranchState
+		if branch == null: continue
+		var end: Vector2 = descriptor.get("end", Vector2.ZERO)
+		var phenotype: Dictionary = descriptor.get("phenotype", {})
+		var in_fruit_stage := GrowthCycleService.matches_target(_plant.growth_cycle_index, &"fruit")
+		if branch.fruit_growth != null or in_fruit_stage:
+			var progress := clampf(branch.fruit_growth.progress, 0.0, 1.0) if branch.fruit_growth != null else GrowthCycleService.progress(_plant)
+			var fruit_radius := lerpf(24.0, 46.0, progress) * 0.62
+			if point.distance_to(end + Vector2(0.0, 18.0)) <= fruit_radius: return {"slot": slot_name, "kind": &"fruit"}
+		var count := int(phenotype.get("flower_count", 0)); var in_flower_stage := GrowthCycleService.matches_target(_plant.growth_cycle_index, &"flower")
+		if in_flower_stage: count = maxi(count, 3)
+		if count <= 0: continue
+		var flower_scale := float(phenotype.get("flower_scale", 1.0)); var crown := float(phenotype.get("crown_bloom_strength", 0.0))
+		for index in range(count):
+			var angle := TAU * float(index) / float(count); var center := end + Vector2(cos(angle), sin(angle)) * lerpf(18.0, 25.0, crown) * flower_scale
+			if point.distance_to(center) <= 22.0 * flower_scale: return {"slot": slot_name, "kind": &"flower"}
+	return {}
