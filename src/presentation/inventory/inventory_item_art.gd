@@ -13,6 +13,9 @@ static func texture_for(kind: StringName, item_id: String, visual_frame := -1, m
 		var line := visual_frame if visual_frame >= 0 else PlantAtlasArt.fruit_line(item_id); var mutation := mutation_frame if mutation_frame >= 0 else PlantAtlasArt.FRUIT_NORMAL; return PlantAtlasArt.fruit_texture(line, mutation, true)
 	if kind == &"flower":
 		var flower_line := visual_frame if visual_frame >= 0 else PlantAtlasArt.flower_line(item_id); return PlantAtlasArt.flower_texture(flower_line, mutation_frame if mutation_frame >= 0 else PlantAtlasArt.FLOWER_NORMAL)
+	if kind == &"misc":
+		var flower_frame := FruitActions.picked_flower_frame(item_id)
+		if flower_frame.x >= 0: return PlantAtlasArt.flower_texture(flower_frame.x, flower_frame.y)
 	if kind == &"fertilizer" and FertilizerAssetCatalog.is_offer_id(StringName(item_id)): return FertilizerOfferArt.texture_for(StringName(item_id))
 	var cell: Variant = REGIONS.get("%s:%s" % [kind, item_id])
 	if not cell is Vector2i: return null
