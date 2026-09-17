@@ -11,6 +11,7 @@ var scroll_up: Button
 var scroll_down: Button
 var _signature := ""
 var _context_button: Button
+var _scrollbar_hide_tween: Tween
 func _ready() -> void: super(); mouse_filter = Control.MOUSE_FILTER_IGNORE; add_theme_stylebox_override(&"panel", StyleBoxEmpty.new()); _build_programmatic_hud(); call_deferred("_update_scroll_buttons")
 func _build_programmatic_hud() -> void:
 	for child in get_children(): remove_child(child); child.queue_free()
@@ -19,11 +20,21 @@ func _build_programmatic_hud() -> void:
 	var content := Control.new(); content.name = "FrameContent"; content.position = Vector2(8.0, 0.0); content.size = Vector2(148.0, 520.0); content.mouse_filter = Control.MOUSE_FILTER_PASS; add_child(content)
 	scroll = ScrollContainer.new(); scroll.position = Vector2(3.0, 72.0); scroll.size = Vector2(142.0, 376.0); scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED; scroll.mouse_filter = Control.MOUSE_FILTER_PASS; content.add_child(scroll)
 	items = VBoxContainer.new(); items.custom_minimum_size = Vector2(142.0, 358.0); items.size_flags_horizontal = Control.SIZE_EXPAND_FILL; items.add_theme_constant_override(&"separation", 2); items.alignment = BoxContainer.ALIGNMENT_CENTER; scroll.add_child(items)
-	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(36.0, 18.0); content.add_child(scroll_up); scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(36.0, 460.0); content.add_child(scroll_down); scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); scroll.get_v_scroll_bar().value_changed.connect(_on_scroll_changed)
+	scroll_up = _make_scroll_button("ScrollUp", true); scroll_up.position = Vector2(53.0, 18.0); content.add_child(scroll_up); scroll_down = _make_scroll_button("ScrollDown", false); scroll_down.position = Vector2(53.0, 460.0); content.add_child(scroll_down); scroll_up.pressed.connect(_scroll_inventory.bind(-1)); scroll_down.pressed.connect(_scroll_inventory.bind(1)); var bar := scroll.get_v_scroll_bar(); _configure_scrollbar(bar); bar.value_changed.connect(_on_scroll_changed)
 func _inventory_frame_style() -> StyleBoxFlat:
 	var style := CommerceUiStyle.top_hud_style(22); style.bg_color = Color("ffd078"); style.border_color = Color("b95a12"); style.set_border_width_all(4); style.shadow_color = Color(0.35, 0.12, 0.015, 0.55); style.shadow_size = 4; style.shadow_offset = Vector2(0.0, 4.0); style.content_margin_left = 8.0; style.content_margin_top = 8.0; style.content_margin_right = 8.0; style.content_margin_bottom = 8.0; return style
 func _make_scroll_button(name_value: String, points_up: bool) -> Button:
-	var button := Button.new(); button.name = name_value; button.size = Vector2(76.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon()); return button
+	var button := Button.new(); button.name = name_value; button.size = Vector2(42.0, 42.0); button.focus_mode = Control.FOCUS_NONE; button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND; Hud5Atlas.configure_atlas_button(button, Hud5Atlas.inventory_up_icon() if points_up else Hud5Atlas.inventory_down_icon()); return button
+func _configure_scrollbar(bar: VScrollBar) -> void:
+	bar.custom_minimum_size.x = 12.0; bar.modulate.a = 0.0
+	var track := StyleBoxFlat.new(); track.bg_color = Color(0.45, 0.20, 0.06, 0.28); track.set_corner_radius_all(6); bar.add_theme_stylebox_override(&"scroll", track)
+	for state_name in [&"grabber", &"grabber_highlight", &"grabber_pressed"]:
+		var grabber := StyleBoxFlat.new(); grabber.bg_color = Color("d9771e") if state_name == &"grabber" else Color("f09a31"); grabber.border_color = Color("8b3d0d"); grabber.set_border_width_all(2); grabber.set_corner_radius_all(6); bar.add_theme_stylebox_override(state_name, grabber)
+func _show_scrollbar() -> void:
+	if scroll == null: return
+	var bar := scroll.get_v_scroll_bar(); bar.modulate.a = 1.0
+	if _scrollbar_hide_tween != null and _scrollbar_hide_tween.is_valid(): _scrollbar_hide_tween.kill()
+	_scrollbar_hide_tween = create_tween(); _scrollbar_hide_tween.tween_interval(1.0); _scrollbar_hide_tween.tween_property(bar, "modulate:a", 0.0, 0.2)
 func set_inventory(inventory: InventoryState) -> void:
 	var signature := _inventory_signature(inventory); if signature == _signature: return
 	_signature = signature; _rebuild(inventory)
@@ -48,8 +59,8 @@ func _rebuild(inventory: InventoryState) -> void:
 	else:
 		while added < 3: _add_empty_slot(); added += 1
 	call_deferred("_update_scroll_buttons")
-func _scroll_inventory(direction: int) -> void: scroll.scroll_vertical += direction * SCROLL_STEP; call_deferred("_update_scroll_buttons")
-func _on_scroll_changed(_value: float) -> void: _update_scroll_buttons()
+func _scroll_inventory(direction: int) -> void: _show_scrollbar(); scroll.scroll_vertical += direction * SCROLL_STEP; call_deferred("_update_scroll_buttons")
+func _on_scroll_changed(_value: float) -> void: _show_scrollbar(); _update_scroll_buttons()
 func _update_scroll_buttons() -> void:
 	if scroll == null: return
 	var bar := scroll.get_v_scroll_bar(); scroll_up.disabled = scroll.scroll_vertical <= 0; scroll_down.disabled = scroll.scroll_vertical >= int(maxf(0.0, bar.max_value - bar.page))

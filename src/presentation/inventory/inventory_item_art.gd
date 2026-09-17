@@ -11,7 +11,7 @@ static func texture_for(kind: StringName, item_id: String, visual_frame := -1, m
 		var seed_texture := AtlasTexture.new(); var frame := visual_frame if visual_frame >= 0 else posmod(item_id.hash(), 8); seed_texture.atlas = SEEDS; seed_texture.region = Rect2((frame % 4) * 512, floori(float(frame) / 4.0) * 512, 512, 512); return seed_texture
 	if kind == &"fruit":
 		var line := visual_frame if visual_frame >= 0 else PlantAtlasArt.fruit_line(item_id); var mutation := mutation_frame if mutation_frame >= 0 else PlantAtlasArt.FRUIT_NORMAL; return PlantAtlasArt.fruit_texture(line, mutation, true)
-	if kind == &"flower":
+	if kind == &"flower" or (kind == &"misc" and item_id == "picked_flower"):
 		var flower_line := visual_frame if visual_frame >= 0 else PlantAtlasArt.flower_line(item_id); return PlantAtlasArt.flower_texture(flower_line, mutation_frame if mutation_frame >= 0 else PlantAtlasArt.FLOWER_NORMAL)
 	if kind == &"fertilizer" and FertilizerAssetCatalog.is_offer_id(StringName(item_id)): return FertilizerOfferArt.texture_for(StringName(item_id))
 	var cell: Variant = REGIONS.get("%s:%s" % [kind, item_id])
