@@ -12,21 +12,27 @@ var _timer_icon: TextureRect
 var _timer_cost: Label
 var _journal_button: Button
 var _journal: Control
-var _ad_pending := false
 var _last_blocked := false
 var _journal_tab: StringName = &"unknown"
 
 func _ready() -> void:
-	super(); _bind_auxiliary_hud()
+	super()
+	_bind_auxiliary_hud()
 	var app := get_node_or_null("/root/GameApp")
 	if app != null:
-		app.state_changed.connect(_sync); get_node("Row/AdOffer").pressed.connect(_request_rewarded_refresh); app.call("_platform_runtime").ad_closed.connect(_on_ad_closed)
-	get_parent().resized.connect(_sync); call_deferred("_sync")
+		app.state_changed.connect(_sync)
+	get_parent().resized.connect(_sync)
+	call_deferred("_sync")
 
 func _bind_auxiliary_hud() -> void:
-	var host := get_parent() as Control; var auxiliary := host.get_node("FertilizerAuxiliaryUi")
-	_dim = auxiliary.get_node("Dim") as ColorRect; _timer = auxiliary.get_node("TimerHud") as Control; _timer_label = auxiliary.get_node("TimerHud/Label") as Label; _timer_finish = auxiliary.get_node("TimerHud/FinishButton") as Button
-	_configure_timer_hud(); _timer_finish.pressed.connect(_finish_timer)
+	var host := get_parent() as Control
+	var auxiliary := host.get_node("FertilizerAuxiliaryUi")
+	_dim = auxiliary.get_node("Dim") as ColorRect
+	_timer = auxiliary.get_node("TimerHud") as Control
+	_timer_label = auxiliary.get_node("TimerHud/Label") as Label
+	_timer_finish = auxiliary.get_node("TimerHud/FinishButton") as Button
+	_configure_timer_hud()
+	_timer_finish.pressed.connect(_finish_timer)
 	var legacy_journal_button := auxiliary.get_node_or_null("JournalButton") as Button
 	if legacy_journal_button != null: legacy_journal_button.hide()
 	_journal_button = host.get_node("JournalButton") as Button
@@ -86,12 +92,3 @@ func _configure_timer_hud() -> void:
 
 func _finish_timer() -> void:
 	var app := get_node_or_null("/root/GameApp"); if app != null and not bool(app.call("finish_fertilizer_timer")): get_parent().call("show_insufficient_balance", true)
-func _request_rewarded_refresh() -> void:
-	_ad_pending = true; get_node("Row/AdOffer").disabled = true; get_node("/root/GameApp").call("show_fullscreen_ad")
-func _on_ad_closed(was_shown: bool) -> void:
-	if not _ad_pending: return
-	_ad_pending = false; get_node("Row/AdOffer").disabled = false
-	var app := get_node_or_null("/root/GameApp")
-	if app != null and app.state.fertilizer_offer.is_active():
-		if was_shown: app.call("refresh_fertilizer_offer_rewarded")
-		else: _sync()
