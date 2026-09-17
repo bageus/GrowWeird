@@ -11,6 +11,8 @@ var traits: Dictionary = {}
 var grafted: bool = false
 var fruit_growth: GrowingFruitState
 var fruit_cycle_eligible: int = 0
+var prunable: bool:
+	get: return slot in [&"left", &"right"]
 
 func add_trait(trait_id: StringName, amount: int = 1) -> void:
 	var key := String(trait_id)
