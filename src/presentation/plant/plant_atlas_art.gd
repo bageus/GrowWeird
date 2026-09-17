@@ -33,52 +33,15 @@ const FRUIT_CRYSTAL := 14
 const FRUIT_COSMIC := 15
 
 static func flower_texture(line: int, mutation_column: int = FLOWER_NORMAL) -> AtlasTexture:
-	var row := posmod(line, FLOWER_ROWS)
-	var column := clampi(mutation_column, 0, FLOWER_COLUMNS - 1)
-	return _atlas_cell(FLOWERS, column, row, FLOWER_CELL)
-
-static func flower_line(seed_text: String) -> int:
-	return stable_index(seed_text, FLOWER_ROWS)
-
-static func flower_mutation_column(branch: BranchState) -> int:
-	if branch == null: return FLOWER_NORMAL
-	if branch.trait_level(&"toxic_sacs") > 0: return FLOWER_POISONOUS
-	if branch.trait_level(&"lure_bloom") > 0 or branch.trait_level(&"spore_trap") > 0: return FLOWER_CARNIVOROUS
-	if branch.trait_level(&"thorns") > 0 or branch.trait_level(&"hooks") > 0: return FLOWER_THORNY
-	if branch.trait_level(&"crystal_thorns") > 0 or branch.trait_level(&"mineral_nodes") > 0: return FLOWER_CRYSTAL
-	if branch.trait_level(&"bark_armor") > 0: return FLOWER_CYBERNETIC
-	if branch.trait_level(&"glow") > 0 or branch.trait_level(&"luminous_bloom") > 0 or branch.trait_level(&"luminous_fungus") > 0: return FLOWER_COSMIC
-	if branch.trait_level(&"crown_bloom") > 0: return FLOWER_GOLDEN
-	if branch.trait_level(&"fungi") > 0: return FLOWER_DRAGON
-	return FLOWER_NORMAL
-
-static func fruit_line(seed_text: String) -> int:
-	return stable_index(seed_text, FRUIT_ROWS)
-
+	var row := posmod(line, FLOWER_ROWS); var column := clampi(mutation_column, 0, FLOWER_COLUMNS - 1); return _atlas_cell(FLOWERS, column, row, FLOWER_CELL)
+static func flower_line(seed_text: String) -> int: return stable_index(seed_text, FLOWER_ROWS)
+# A flowering cycle is one phenotype visually: branch-local mutations must not mix flower assets on one plant.
+static func flower_mutation_column(_branch: BranchState) -> int: return FLOWER_NORMAL
+static func fruit_line(seed_text: String) -> int: return stable_index(seed_text, FRUIT_ROWS)
 static func fruit_texture(line: int, mutation_column: int = FRUIT_NORMAL, ripe: bool = true) -> AtlasTexture:
-	var row := posmod(line, FRUIT_ROWS)
-	var column := clampi(mutation_column, 0, FRUIT_COLUMNS - 1) if ripe else FRUIT_UNRIPE
-	return _atlas_cell(FRUITS, column, row, FRUIT_CELL)
-
-static func fruit_mutation_column(branch: BranchState) -> int:
-	if branch == null: return FRUIT_NORMAL
-	if branch.trait_level(&"toxic_sacs") > 0: return FRUIT_POISONOUS
-	if branch.trait_level(&"lure_bloom") > 0 or branch.trait_level(&"spore_trap") > 0: return FRUIT_CARNIVOROUS
-	if branch.trait_level(&"thorns") > 0 or branch.trait_level(&"hooks") > 0: return FRUIT_THORNY
-	if branch.trait_level(&"crystal_thorns") > 0 or branch.trait_level(&"mineral_nodes") > 0: return FRUIT_CRYSTAL
-	if branch.trait_level(&"bark_armor") > 0: return FRUIT_CYBERNETIC
-	if branch.trait_level(&"crown_bloom") > 0: return FRUIT_GOLDEN
-	if branch.trait_level(&"fungi") > 0: return FRUIT_DRAGON
-	if branch.trait_level(&"luminous_bloom") > 0: return FRUIT_MAGIC
-	if branch.trait_level(&"luminous_fungus") > 0: return FRUIT_LUNAR
-	if branch.trait_level(&"glow") > 0: return FRUIT_ENERGETIC
-	return FRUIT_NORMAL
-
-static func stable_index(seed_text: String, count: int) -> int:
-	return posmod(seed_text.hash(), count)
-
+	var row := posmod(line, FRUIT_ROWS); var column := clampi(mutation_column, 0, FRUIT_COLUMNS - 1) if ripe else FRUIT_UNRIPE; return _atlas_cell(FRUITS, column, row, FRUIT_CELL)
+# Fruit from the same fruiting cycle uses the same plant line and phenotype across all branches.
+static func fruit_mutation_column(_branch: BranchState) -> int: return FRUIT_NORMAL
+static func stable_index(seed_text: String, count: int) -> int: return posmod(seed_text.hash(), count)
 static func _atlas_cell(texture: Texture2D, column: int, row: int, cell_size: float) -> AtlasTexture:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = texture
-	atlas.region = Rect2(Vector2(column, row) * cell_size, Vector2.ONE * cell_size)
-	return atlas
+	var atlas := AtlasTexture.new(); atlas.atlas = texture; atlas.region = Rect2(Vector2(column, row) * cell_size, Vector2.ONE * cell_size); return atlas
