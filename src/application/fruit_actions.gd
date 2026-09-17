@@ -5,7 +5,8 @@ static func pick_flower(state: GameState, plant: PlantState, slot: StringName) -
 	if state == null or plant == null or plant.growth_cycle_index != 9: return false
 	var branch := plant.branch_at(slot)
 	if branch == null or branch.fruit_cycle_eligible > plant.fruit_cycle_index: return false
-	branch.fruit_cycle_eligible = plant.fruit_cycle_index + 1
+	# Picking a flower gives an inventory specimen but does not cancel the branch's fruit set.
+	# This keeps the following unripe/ripe fruit stages alive even when every visible flower is collected.
 	InventoryService.add_misc(state.inventory, "picked_flower")
 	return true
 
