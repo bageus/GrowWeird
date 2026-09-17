@@ -1,5 +1,5 @@
 class_name SceneDraggablePanel
-extends PanelContainer
+extends Control
 
 signal position_committed(layout_id: StringName, normalized_position: Vector2)
 signal drag_moved(layout_id: StringName)
