@@ -7,6 +7,14 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_theme_stylebox_override(&"panel", StyleBoxEmpty.new())
 	_build_hud(); call_deferred("_apply_programmatic_style")
+	set_process(energy)
+
+func _process(_delta: float) -> void:
+	if not energy: return
+	var timer := get_node_or_null("Layers/Next/Timer") as Label
+	if timer == null: return
+	var marker := timer.text.rfind(" ")
+	if marker >= 0: timer.text = timer.text.substr(marker + 1)
 
 func _build_hud() -> void:
 	if get_node_or_null("Layers") != null: return
